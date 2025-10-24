@@ -124,7 +124,7 @@ pip install -m requirements.txt
 
 Our MMDA Bench is in [MMDA](./datasets/MMDA).
 
-For DUDE and its samples subset you can refer https://huggingface.co/datasets/jordyvl/DUDE_loader/tree/main/data.
+For DUDE and its samples subset you can refer (https://huggingface.co/datasets/jordyvl/DUDE_loader/tree/main/data).
 
 **Model.**
 
