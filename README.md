@@ -46,14 +46,14 @@ MoDora combines OCR, Embedding models and MLLMs in preprocessing, tree construct
 | What is the temperature range for the testing of paper chromatography reagents?                                                    | 110–120°C                                    | 10 - 20 wg.                                                                               | 0 to 20°C                                                                    | 110–120 °C                                                           | The temperature range for the testing of paper chromatography reagents is 110-120°C.                              | 20–25 °C.                                                                                                    | 110–120°C                                                                  | 110–120°C, 60–80°C, and 40–45°C.            | 110–120 °C                                     | 110–120°C                                                                      |
 | What is the distribution coefficient of Benzol?                                                                                    | 160                                          | The distribution coefficient of Benzol is K.                                              | 160                                                                          | 160                                                                  | The distribution coefficient of Benzol (Benzol) is 160.                                                           | 160                                                                                                          |                                                                            | 10.4                                        | 150                                            | 160                                                                            |
 
-The full results of MoDora and baselines are shown in [Results](./Results).
+The full results of MoDora and baselines are shown in [Results](./Results/resmodora.jsonl).
 
 ## 💻 MMDA Bench
 
 MMDA is a benchmark with 537 documents and 1065 questions curated from over one million real-world documents. We perform layout-emphasize clustering to obtain these representative documents and most of them are semi-structured.
 Then automatic LLM generation and manual verification are combined for QA pairs annotaion. The questions can be concered about different aspects of document (e.g. hierarchy, text, table, chart, imgae, location, formatted), to comprehensively evaluate the semi-structured document analysis performance.
 
-You can visit it here [MMDA](./datasets/MMDA), and some documents involving sensitive data are hidden.
+You can visit it here [MMDA](./datasets/MMDA/test.json), and some documents involving sensitive data are hidden.
 
 ## 📊 Performance
 
@@ -122,7 +122,7 @@ pip install -m requirements.txt
 
 **Benchmark.**
 
-Our MMDA Bench is in [MMDA](./datasets/MMDA).
+Our MMDA Bench is in [MMDA](./datasets/MMDA/test.json).
 
 For DUDE and its samples subset you can refer [DUDE](https://huggingface.co/datasets/jordyvl/DUDE_loader/tree/main/data).
 
