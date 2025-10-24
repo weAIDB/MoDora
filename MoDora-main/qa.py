@@ -69,7 +69,7 @@ def qa(cctree, query, log_file=None, source_path=False):
         print(f"Error parsing location: {e}")
         print(f"Response: {location_cues}")
         page_list = [-1]
-        position_vector == [-1, -1]
+        position_vector = [-1, -1]
     
     # Semantics-based retrival for no explict location cues
     if -1 in page_list and position_vector == [-1, -1]:
@@ -129,5 +129,6 @@ def qa(cctree, query, log_file=None, source_path=False):
             with open(log_file, 'a', encoding="utf-8") as f:
                 f.write(f"{DELIMITER} Final Answer for Whole Table Reasoning {DELIMITER}\n")
                 f.write(f"{final_answer}\n")
+
 
     return final_answer
