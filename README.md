@@ -152,7 +152,7 @@ EM_MODEL_PATH = "The path to the local embedding model"
 
 First set path configurations in constnts.py according to your file paths.
 ```python
-BASE_DIR = "datasets/MMDA" # The path to the dataset
+BASE_DIR = "../datasets/MMDA" # The path to the dataset
 CACHE_DIR = "cache" # The path to store the components and trees
 LOG_DIR = "log" # The path to store logs
 OUTPUT_DIR = "output" #The path to store execution results
