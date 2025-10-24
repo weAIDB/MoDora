@@ -1,5 +1,6 @@
 import ast
 import traceback
+import fitz  # PyMuPDF
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -221,4 +222,5 @@ def retrieve_by_semantics(query, cctree, source_path, log_file=False):
     # Retrive based on titles, metadata and data
     retrieve_result = select_and_check_by_level({"root":cctree}, query, log_file, source_path)
     return retrieve_result
+
 
