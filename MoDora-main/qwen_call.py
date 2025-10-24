@@ -126,8 +126,9 @@ def qwen_annotation(base64_image, cp_type):
             flag = True
         else:
             cnt = cnt + 1
-            print(f"Qwen-VL Error: {e}. The output is {text}. Try for time {cnt}！")
+            print(f"Fail to parse Qwen-VL output. The output is {text}. Try for time {cnt}！")
 
     return title, metadata, content
+
 
 
