@@ -10,6 +10,7 @@ import io
 import base64
 
 from constants import *
+from qwen_call import *
 
 def pdf_to_base64(pdf_path):
 
@@ -196,6 +197,12 @@ def bbox_to_base64_2(pdf_path, bbox_list):
         pdf_document.close()
 
 def gpt_generate(prompt, key=API_KEY, url=API_URL, base_model = MODEL):
+    return call_qwen_vl_textonly(prompt)
+
+def gpt_generate_pdf(base64_image, prompt, key=API_KEY, url=API_URL, base_model = MODEL):
+    return call_qwen_vl(prompt, base64_image)
+'''
+def gpt_generate(prompt, key=API_KEY, url=API_URL, base_model = MODEL):
     # Call LLM
     client = OpenAI(
         base_url=url,
@@ -268,3 +275,4 @@ def gpt_generate_pdf(base64_image, prompt, key=API_KEY, url=API_URL, base_model 
             import time; time.sleep(0.1)
 
     return res
+'''

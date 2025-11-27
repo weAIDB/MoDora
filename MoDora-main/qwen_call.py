@@ -2,21 +2,23 @@ import os
 import numpy as np
 import torch
 import re
-from transformers import Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
+from transformers import Qwen3VLForConditionalGeneration, AutoTokenizer, AutoProcessor
 from qwen_vl_utils import process_vision_info
 from sentence_transformers import SentenceTransformer
 from prompt_template import *
 from constants import *
 
 
-qwen_vl_model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+qwen_vl_model = Qwen3VLForConditionalGeneration.from_pretrained(
     VL_MODEL_PATH, torch_dtype="auto", device_map="auto"
 )
 qwen_vl_processor = AutoProcessor.from_pretrained(VL_MODEL_PATH)
 
+'''
 qwen_em_model = SentenceTransformer(
     EM_MODEL_PATH, device="cuda:0"
 )
+'''
 
 def flat_tree(sub_tree):
     res = []
@@ -66,8 +68,40 @@ def call_qwen_em(query, sub_tree, k=3):
             top_sentences.append(documents[i])
     return " ".join(top_sentences)
 
+def call_qwen_vl_textonly(prompt):
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt}
+            ],
+        }
+    ]
 
-def call_qwen_vl(prompt,base64_image):
+    inputs = qwen_vl_processor.apply_chat_template(
+        messages, tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt"
+    )
+
+    image_inputs, video_inputs = process_vision_info(messages)
+    inputs = qwen_vl_processor(
+        text=[text],
+        images=image_inputs,
+        videos=video_inputs,
+        padding=True,
+        return_tensors="pt",
+    )
+    inputs = inputs.to(model.device)
+
+    generated_ids = qwen_vl_model.generate(**inputs, max_new_tokens=2048)
+    generated_ids_trimmed = [
+        out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+    ]
+    output_text = qwen_vl_processor.batch_decode(
+        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+    )
+    return output_text[0]
+
+def call_qwen_vl(prompt, base64_image):
     messages = [
         {
             "role": "user",
@@ -78,9 +112,10 @@ def call_qwen_vl(prompt,base64_image):
         }
     ]
 
-    text = qwen_vl_processor.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
+    inputs = qwen_vl_processor.apply_chat_template(
+        messages, tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt"
     )
+
     image_inputs, video_inputs = process_vision_info(messages)
     inputs = qwen_vl_processor(
         text=[text],
@@ -89,7 +124,7 @@ def call_qwen_vl(prompt,base64_image):
         padding=True,
         return_tensors="pt",
     )
-    inputs = inputs.to("cuda")
+    inputs = inputs.to(model.device)
 
     generated_ids = qwen_vl_model.generate(**inputs, max_new_tokens=2048)
     generated_ids_trimmed = [
@@ -129,6 +164,5 @@ def qwen_annotation(base64_image, cp_type):
             print(f"Fail to parse Qwen-VL output. The output is {text}. Try for time {cnt}！")
 
     return title, metadata, content
-
 
 

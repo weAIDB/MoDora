@@ -36,10 +36,65 @@ def check_answer(query, answer):
     res = gpt_generate(prompt)
     return bool_string(res)
 
-def extract_location_cues(query):
-    prompt = location_extraction_prompt.format(query=query)
+def parse_response(resp):
+    """
+    解析大模型返回的响应，提取location和content信息
+    
+    Args:
+        resp: 大模型返回的字符串，格式如：
+              "-question: ...\n-location: [{\"page\":1, \"grid\":[\"(2, 2)\"]}]\n-content: ..."
+    
+    Returns:
+        dict: 包含解析后的location和content
+    """
+    try:
+        question_match = re.search(r'-question:\s*(.*?)(?=\n-location:|\Z)', resp, re.DOTALL)
+        location_match = re.search(r'-location:\s*(.*?)(?=\n-content:|\Z)', resp, re.DOTALL)
+        content_match = re.search(r'-content:\s*(.*)', resp, re.DOTALL)
+        
+        if not all([question_match, location_match, content_match]):
+            lines = resp.strip().split('\n')
+            parsed = {}
+            for line in lines:
+                if line.startswith('-question:'):
+                    parsed['question'] = line.replace('-question:', '').strip()
+                elif line.startswith('-location:'):
+                    parsed['location_str'] = line.replace('-location:', '').strip()
+                elif line.startswith('-content:'):
+                    parsed['content'] = line.replace('-content:', '').strip()
+            
+            location_str = parsed.get('location_str', '[]')
+        else:
+            location_str = location_match.group(1).strip()
+            content = content_match.group(1).strip()
+
+        location_str = re.sub(r'\s+', ' ', location_str).strip()
+        
+        # 解析JSON
+        location_data = json.loads(location_str)
+
+        for location in location_data:
+            tuple_list = [ast.literal_eval(s) for s in location['grid']]
+            location['grids'] = tuple_list
+            del location['grid']
+        
+        return {
+            'location': location_data,
+            'content': content_match.group(1).strip() if content_match else parsed.get('content', '')
+        }
+        
+    except json.JSONDecodeError as e:
+        print(f"JSON解析错误: {e}")
+        print(f"原始location字符串: {location_str}")
+        return {'location': [], 'content': ''}
+    except Exception as e:
+        print(f"解析响应时出错: {e}")
+        return {'location': [{'page':0, 'grids':[]}], 'content': ''}
+
+def question_parsing(question):
+    prompt = question_parsing_prompt.replace("__QUESTION_PLACEHOLDER__", question)
     res = gpt_generate(prompt)
-    return res
+    return parse_response(res)
 
 def qa(cctree, query, log_file=None, source_path=False):
 
@@ -51,39 +106,30 @@ def qa(cctree, query, log_file=None, source_path=False):
             f.write(f"{query}\n")
 
     answer = "None"
-    
-    # Extract location cues
-    location_cues = extract_location_cues(query)
+    locations, query = question_parsing(query)
+
     if log_file is not None:    # Log
-            with open(log_file, "a", encoding="utf-8") as f:
-                f.write(
-                    f"{DELIMITER} Location Cues {DELIMITER}\n"
-                )
-                f.write(f"{location_cues}\n")
-    try:
-        page_numbers = location_cues.split("Page:")[1].split(";")[0].strip()
-        position = location_cues.split("Position:")[1].strip()
-        page_list = ast.literal_eval(page_numbers)
-        position_vector = ast.literal_eval(position)
-    except Exception as e:
-        print(f"Error parsing location: {e}")
-        print(f"Response: {location_cues}")
-        page_list = [-1]
-        position_vector = [-1, -1]
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(
+                f"{DELIMITER} Location Cues {DELIMITER}\n"
+            )
+            f.write(f"{locations}\n")
+    if log_file is not None:    # Log
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(
+                f"{DELIMITER} Semantic Cues {DELIMITER}\n"
+            )
+            f.write(f"{query}\n")
+
     
-    # Semantics-based retrival for no explict location cues
-    if -1 in page_list and position_vector == [-1, -1]:
-        retrieved_text, retrieved_bbox = retrieve_by_semantics(query=query,cctree=cctree,source_path=source_path,log_file=log_file)
-
-    # Location-based retrival
-    else:
-        retrieved_text, retrieved_bbox = retrieve_by_location(tree=cctree['children'], page_list=page_list, position_vector=position_vector, pdf_path=source_path)
-
+    # 结合位置和语义的 Retrieve
+    retrieved_text, retrieved_bbox = retrieve(query=query, cctree=cctree, source_path=source_path, locations=locations, log_file=log_file)
+    
     try:
         schema = get_tree_schema(cctree['children']) # Hierarchical Information
         if len(retrieved_text) > 0:
             bbox_list = [bbox for location in retrieved_bbox.values() for bbox in location]
-            if -1 in page_list and position_vector == [-1, -1]:
+            if True: # or -1 in page_list and position_vector == [-1, -1]:
                 retrieved_image = bbox_to_base64(source_path, bbox_list) # Cropped regions spliced vertically
                 answer = retrieved_reason(query, retrieved_text, retrieved_image, schema)
             else:
@@ -129,6 +175,5 @@ def qa(cctree, query, log_file=None, source_path=False):
             with open(log_file, 'a', encoding="utf-8") as f:
                 f.write(f"{DELIMITER} Final Answer for Whole Table Reasoning {DELIMITER}\n")
                 f.write(f"{final_answer}\n")
-
 
     return final_answer
