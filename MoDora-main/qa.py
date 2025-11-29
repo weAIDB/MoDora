@@ -106,7 +106,9 @@ def qa(cctree, query, log_file=None, source_path=False):
             f.write(f"{query}\n")
 
     answer = "None"
-    locations, query = question_parsing(query)
+    parsed_res = question_parsing(query)
+    locations = parsed_res['location']
+    query = parsed_res['content']
 
     if log_file is not None:    # Log
         with open(log_file, "a", encoding="utf-8") as f:

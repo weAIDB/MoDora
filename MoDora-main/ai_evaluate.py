@@ -176,8 +176,8 @@ def evaluate(input_file, output_file):
     print(f"{input_file} ANLS: {anls_avg}")
 
 if __name__ == "__main__":
-    output_path = os.path.join(OUTPUT_DIR, os.path.basename(SOURCE_DIR), "res.json")
-    evaluation_path = os.path.join(EVALUATION_DIR, os.path.basename(SOURCE_DIR), "res.jsonl")
+    output_path = os.path.join(BASE_DIR, os.path.basename(BASE_DIR), "res.json")
+    evaluation_path = os.path.join(EVALUATION_DIR, os.path.basename(BASE_DIR), "res.jsonl")
     evaluate(output_path, evaluation_path)
 
     

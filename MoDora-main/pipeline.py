@@ -75,7 +75,7 @@ def run_on_dataset(source_dir, cache_dir, log_dir = None, output_dir = None, ena
     
     
     sorted_data = sorted(dataset, key=lambda x: x["questionId"])
-    #sorted_data = sorted_data[0:10] # Few samples test
+    sorted_data = sorted_data[0:5] # Few samples test
 
     results = []
     processed_docs = {}
@@ -102,10 +102,10 @@ def run_on_dataset(source_dir, cache_dir, log_dir = None, output_dir = None, ena
                 print(f"Error in future for item {item}: {e}")
 
 def main():
-    source_dir = SOURCE_DIR
-    cache_dir = os.path.join(CACHE_DIR, os.path.basename(SOURCE_DIR))
-    log_dir = os.path.join(LOG_DIR, os.path.basename(SOURCE_DIR))
-    output_dir = os.path.join(OUTPUT_DIR, os.path.basename(SOURCE_DIR))
+    source_dir = BASE_DIR
+    cache_dir = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
+    log_dir = os.path.join(LOG_DIR, os.path.basename(BASE_DIR))
+    output_dir = os.path.join(OUTPUT_DIR, os.path.basename(BASE_DIR))
     enable_cache = ENABLE_CACHE
     run_on_dataset(source_dir, cache_dir, log_dir, output_dir, enable_cache)
 

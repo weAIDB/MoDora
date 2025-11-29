@@ -101,6 +101,7 @@ def bbox_to_base64(pdf_path, bbox_list):
 
     except Exception as e:
         # Replace with blank 1x1 square
+        print(f"!!! Error in bbox_to_base64: {e}")  # <--- 添加这一行
         empty_image = Image.new("RGB", (1, 1), color=(255, 255, 255))
         buffered = io.BytesIO()
         empty_image.save(buffered, format="PNG")

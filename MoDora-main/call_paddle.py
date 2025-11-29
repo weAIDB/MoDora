@@ -1,9 +1,9 @@
 from pathlib import Path
 from paddleocr import PPStructureV3
-
+import paddle
 
 paddle_pipeline = PPStructureV3(
-        device="gpu",
+        device="gpu:2",
         # text_recognition_model_name = "en_PP-OCRv4_mobile_rec" # For ALL English test
     )
 

@@ -43,7 +43,7 @@ def _safe_log(log_file, *lines):
         pass
 
 def check_location(node, source_path, locations, only_self = False):
-    pdf_document = fitz.open(pdf_path)
+    pdf_document = fitz.open(source_path)
     page_count = pdf_document.page_count
     within_locs = []
     flag = False
@@ -111,7 +111,7 @@ def check_location(node, source_path, locations, only_self = False):
     # Recursively check children
     if not only_self and 'children' in node:
         for child_node in node['children'].values():
-            child_res, _ = check_location(child_node, source_path, locations):
+            child_res, _ = check_location(child_node, source_path, locations)
             if child_res:
                 return True, []
 
@@ -125,7 +125,7 @@ def filt_by_location(node, source_path, locations):
 
     filted_keys = []
     for key, child_node in node['children'].items():
-        child_res, _ = check_location(child_node, source_path, locations):
+        child_res, _ = check_location(child_node, source_path, locations)
         if child_res:
             filted_keys.append(key)
 
@@ -236,7 +236,7 @@ def select_and_check_by_level(cur_level, query, log_file, source_path, locations
 
     # Go to the next level
     sub_result, sub_bbox = select_and_check_by_level(
-        selected_children, query, log_file, source_path, locations
+        selected_children, query, log_file, source_path, locations,
         max_workers=max_workers, inner_max_workers=inner_max_workers
     )
     retrieve_result.update(sub_result)

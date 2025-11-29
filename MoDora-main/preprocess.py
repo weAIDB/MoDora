@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import traceback
 
 from pydantic import BaseModel, Field
 from call_paddle import paddle_generate
@@ -173,6 +174,7 @@ def preprocess(source_path,cache_dir):
         
     except Exception as e:
         print(f"Error in preprocessing: {e}")
+        print(traceback.format_exc())
         cp_dict = {
             'body':[],
             'supplement':{}

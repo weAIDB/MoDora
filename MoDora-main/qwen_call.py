@@ -8,18 +8,17 @@ from sentence_transformers import SentenceTransformer
 from prompt_template import *
 from constants import *
 
-
+# 初始化模型
 qwen_vl_model = Qwen3VLForConditionalGeneration.from_pretrained(
     VL_MODEL_PATH, torch_dtype="auto", device_map="auto"
 )
 qwen_vl_processor = AutoProcessor.from_pretrained(VL_MODEL_PATH)
 
-'''
 qwen_em_model = SentenceTransformer(
-    EM_MODEL_PATH, device="cuda:0"
+    EM_MODEL_PATH, device="cpu"
 )
-'''
 
+# --- 树结构处理工具函数 (保持不变) ---
 def flat_tree(sub_tree):
     res = []
     for index, node in sub_tree.items():
@@ -47,10 +46,9 @@ def merge_short_segments(res, threshold=100):
             current_segment = res[i]
 
     merged_res.append(current_segment)
-
     return merged_res
 
-
+# --- 检索相关函数 (保持不变) ---
 def call_qwen_em(query, sub_tree, k=3):
     queries = [query]
     documents = flat_tree1("",sub_tree)
@@ -68,6 +66,7 @@ def call_qwen_em(query, sub_tree, k=3):
             top_sentences.append(documents[i])
     return " ".join(top_sentences)
 
+# --- [重点修改] 纯文本调用函数 ---
 def call_qwen_vl_textonly(prompt):
     messages = [
         {
@@ -78,11 +77,15 @@ def call_qwen_vl_textonly(prompt):
         }
     ]
 
-    inputs = qwen_vl_processor.apply_chat_template(
-        messages, tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt"
+    # 修改：使用 tokenizer 调用，且只保留 text 相关的参数
+    text = qwen_vl_processor.tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
     )
 
+    # 这里的输入没有图片，所以 process_vision_info 返回的可能是 None 或空，
+    # 但 qwen_vl_processor 能处理这种情况
     image_inputs, video_inputs = process_vision_info(messages)
+    
     inputs = qwen_vl_processor(
         text=[text],
         images=image_inputs,
@@ -90,7 +93,7 @@ def call_qwen_vl_textonly(prompt):
         padding=True,
         return_tensors="pt",
     )
-    inputs = inputs.to(model.device)
+    inputs = inputs.to(qwen_vl_model.device)
 
     generated_ids = qwen_vl_model.generate(**inputs, max_new_tokens=2048)
     generated_ids_trimmed = [
@@ -101,6 +104,7 @@ def call_qwen_vl_textonly(prompt):
     )
     return output_text[0]
 
+# --- [重点修改] 带图调用函数 ---
 def call_qwen_vl(prompt, base64_image):
     messages = [
         {
@@ -112,11 +116,14 @@ def call_qwen_vl(prompt, base64_image):
         }
     ]
 
-    inputs = qwen_vl_processor.apply_chat_template(
-        messages, tokenize=True, add_generation_prompt=True, return_dict=True, return_tensors="pt"
+    # 修改 1：使用 .tokenizer.apply_chat_template
+    # 修改 2：删除了 return_dict=True 和 return_tensors="pt"，确保返回纯字符串
+    text = qwen_vl_processor.tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
     )
 
     image_inputs, video_inputs = process_vision_info(messages)
+    
     inputs = qwen_vl_processor(
         text=[text],
         images=image_inputs,
@@ -124,7 +131,7 @@ def call_qwen_vl(prompt, base64_image):
         padding=True,
         return_tensors="pt",
     )
-    inputs = inputs.to(model.device)
+    inputs = inputs.to(qwen_vl_model.device)
 
     generated_ids = qwen_vl_model.generate(**inputs, max_new_tokens=2048)
     generated_ids_trimmed = [
@@ -135,6 +142,7 @@ def call_qwen_vl(prompt, base64_image):
     )
     return output_text[0]
 
+# --- 标注函数 (保持不变) ---
 def qwen_annotation(base64_image, cp_type):
     prompt_map = {
         "table": table_enrichment_prompt,
@@ -164,5 +172,3 @@ def qwen_annotation(base64_image, cp_type):
             print(f"Fail to parse Qwen-VL output. The output is {text}. Try for time {cnt}！")
 
     return title, metadata, content
-
-

@@ -257,6 +257,7 @@ def build_tree(source_path, cache_dir):
             # Construction
             cctree = construct(cp_dict)
         except Exception as e:
+            print(f"!!! Error in build_tree logic: {e}")
             title_list = []
             cctree = {}
         
