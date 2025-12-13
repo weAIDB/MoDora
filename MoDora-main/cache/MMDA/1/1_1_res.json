@@ -1,0 +1,51 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 1,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "\nTE\nt",
+            "block_bbox": [
+                149.10804748535156,
+                186.8802947998047,
+                547.2396240234375,
+                375.2967529296875
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "content",
+            "block_content": "—HH\nTEEX\nt4\n:\n\n*#9151$\n1X\nTAN\nFA8\n#\nFOKE×",
+            "block_bbox": [
+                150.10752868652344,
+                187.48110961914062,
+                1036.7056884765625,
+                1455.5301513671875
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "content",
+            "block_content": "0",
+            "block_bbox": [
+                151.54702758789062,
+                709.9996337890625,
+                1036.3564453125,
+                1453.40673828125
+            ],
+            "block_id": 2,
+            "block_order": 3
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

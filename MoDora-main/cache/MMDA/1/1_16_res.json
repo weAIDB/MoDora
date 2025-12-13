@@ -1,0 +1,63 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 16,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                111.02442169189453,
+                148.16043090820312,
+                261.10491943359375,
+                183.41888427734375
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "text",
+            "block_content": "E,\nM4\n12±\nFBT\nEx*A*#AS",
+            "block_bbox": [
+                108.63078308105469,
+                211.28134155273438,
+                1282.287841796875,
+                507.6313781738281
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "text",
+            "block_content": ":T4\n4\n:3,6,,12—\n4",
+            "block_bbox": [
+                107.91014099121094,
+                595.4012451171875,
+                1284.5384521484375,
+                825.4033203125
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": ")",
+            "block_bbox": [
+                103.56124114990234,
+                905.1427612304688,
+                841.6741333007812,
+                947.771484375
+            ],
+            "block_id": 4,
+            "block_order": 5
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

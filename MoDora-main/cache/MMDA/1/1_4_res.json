@@ -1,0 +1,87 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 4,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                106.91168212890625,
+                154.5523223876953,
+                580.3316040039062,
+                199.58627319335938
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                112.76478576660156,
+                258.3734436035156,
+                708.2399291992188,
+                293.6209411621094
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "—B",
+            "block_bbox": [
+                114.35565185546875,
+                380.4528503417969,
+                283.884033203125,
+                415.4413757324219
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "text",
+            "block_content": "\n",
+            "block_bbox": [
+                110.89627075195312,
+                443.39471435546875,
+                1279.4091796875,
+                545.7120971679688
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                112.14834594726562,
+                631.87890625,
+                283.3290710449219,
+                667.7797241210938
+            ],
+            "block_id": 5,
+            "block_order": 6
+        },
+        {
+            "block_label": "text",
+            "block_content": "Z′$\n\n\n1,\n#6£\n02",
+            "block_bbox": [
+                111.08281707763672,
+                697.1442260742188,
+                1282.1712646484375,
+                1057.6671142578125
+            ],
+            "block_id": 6,
+            "block_order": 7
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

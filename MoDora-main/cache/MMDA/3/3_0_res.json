@@ -1,0 +1,123 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/3.pdf",
+    "page_index": 0,
+    "parsing_res_list": [
+        {
+            "block_label": "header",
+            "block_content": "96GWh",
+            "block_bbox": [
+                119.753662109375,
+                67.13345336914062,
+                426.8382263183594,
+                132.0391845703125
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "aside_text",
+            "block_content": "",
+            "block_bbox": [
+                19.349472045898438,
+                132.09747314453125,
+                55.568809509277344,
+                227.6747589111328
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "doc_title",
+            "block_content": "31909-2 303, H49 300BMA\n#80.31pct.£*7531Aftk0k(5(*22 {.\nt*ti\nP1300",
+            "block_bbox": [
+                119.14610290527344,
+                189.55923461914062,
+                629.0885009765625,
+                225.03684997558594
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "doc_title",
+            "block_content": "1022",
+            "block_bbox": [
+                341.3581848144531,
+                282.0948791503906,
+                806.3392333984375,
+                309.8819274902344
+            ],
+            "block_id": 5,
+            "block_order": 6
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "4tHoman4Fx,Hl",
+            "block_bbox": [
+                108.78939056396484,
+                343.86810302734375,
+                266.0483703613281,
+                366.2603454589844
+            ],
+            "block_id": 8,
+            "block_order": 9
+        },
+        {
+            "block_label": "text",
+            "block_content": "L:*5.5A64,4#44PAM.04h427\n2088A$45t2.09%.010\nS#z 1115M\n(fR)4\n£1*160,#854*3414.5154\nEAA*AEXN$AAHEHRIA*",
+            "block_bbox": [
+                106.97639465332031,
+                376.0964660644531,
+                793.773193359375,
+                459.47955322265625
+            ],
+            "block_id": 9,
+            "block_order": 10
+        },
+        {
+            "block_label": "text",
+            "block_content": "8.57xR47*7*202248\n1$1RE4#xi,18A,*4t#4+\n.i%11205M,#€32,i2%\n, setRitkk,AMiRRMUtkASxm\nL*ik, tixtrtk.\n,****#*2m4c385,44#*#)\n*700km ,2,#€{0. 65kg/100km, i-\nPA.1. #4. $M.—A*42M68#44M\n:\nA$#\nid,KeAR#4#caRSv,A\n#.3kia.14-9:\nS0270518070001\n$444 *3604k,#t3**x\nif:\n021-60883486\n4iutasii.tixxixae2tnmkn\n4t 1 :\nzhoucl@wlzq.com.cn\n ( 688339 ),4$# ( 000723).\nARME:\nT1\nSAAM1TABM:M#ER$RM2AH3\neis:\n13929126885\nA4x41\n4 fi:\nhuangxing@wlzq.com.cn\n: XeeMaItI#RxaB:ARRKxA\nRKA.",
+            "block_bbox": [
+                125.92520904541016,
+                469.13616943359375,
+                795.29736328125,
+                770.6088256835938
+            ],
+            "block_id": 11,
+            "block_order": 12
+        },
+        {
+            "block_label": "aside_text",
+            "block_content": "",
+            "block_bbox": [
+                19.70980453491211,
+                482.3208312988281,
+                56.352787017822266,
+                578.6672973632812
+            ],
+            "block_id": 12,
+            "block_order": 13
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                126.2883529663086,
+                781.5548095703125,
+                795.7664184570312,
+                1113.352294921875
+            ],
+            "block_id": 16,
+            "block_order": 17
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

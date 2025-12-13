@@ -1,0 +1,207 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/3.pdf",
+    "page_index": 10,
+    "parsing_res_list": [
+        {
+            "block_label": "header",
+            "block_content": "6AAk*10%",
+            "block_bbox": [
+                83.36853790283203,
+                52.89900207519531,
+                308.6220703125,
+                99.81706237792969
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                80.99555206298828,
+                126.66783905029297,
+                230.93679809570312,
+                148.92201232910156
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                80.77104187011719,
+                160.08912658691406,
+                609.307373046875,
+                179.74684143066406
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                81.39479064941406,
+                191.06460571289062,
+                678.394775390625,
+                210.4744110107422
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                81.50662994384766,
+                222.1080780029297,
+                608.635986328125,
+                241.4080352783203
+            ],
+            "block_id": 5,
+            "block_order": 6
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "TRXREEEAARA",
+            "block_bbox": [
+                80.92959594726562,
+                284.7911682128906,
+                230.2717742919922,
+                307.3880310058594
+            ],
+            "block_id": 6,
+            "block_order": 7
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                81.3690185546875,
+                318.40185546875,
+                525.4283447265625,
+                337.46929931640625
+            ],
+            "block_id": 7,
+            "block_order": 8
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                81.14364624023438,
+                348.88677978515625,
+                534.810302734375,
+                368.56439208984375
+            ],
+            "block_id": 8,
+            "block_order": 9
+        },
+        {
+            "block_label": "text",
+            "block_content": "52373",
+            "block_bbox": [
+                81.39791107177734,
+                380.27423095703125,
+                531.9114990234375,
+                399.5744323730469
+            ],
+            "block_id": 9,
+            "block_order": 10
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                82.3420181274414,
+                411.2321472167969,
+                513.1825561523438,
+                430.38751220703125
+            ],
+            "block_id": 10,
+            "block_order": 11
+        },
+        {
+            "block_label": "text",
+            "block_content": "35 5-68 6\nHS5mhis",
+            "block_bbox": [
+                82.72905731201172,
+                443.0246276855469,
+                317.1900634765625,
+                462.4093933105469
+            ],
+            "block_id": 11,
+            "block_order": 12
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                82.1675033569336,
+                505.98565673828125,
+                182.34361267089844,
+                527.636962890625
+            ],
+            "block_id": 12,
+            "block_order": 13
+        },
+        {
+            "block_label": "text",
+            "block_content": "ATMEiE.MMAFiEAiEAMA\n4i##hit.\n4AAAAE,AA#ifTHUgf↑ATiuH4xm.2M,H,*k5",
+            "block_bbox": [
+                79.83735656738281,
+                538.3685302734375,
+                1093.39111328125,
+                621.1038818359375
+            ],
+            "block_id": 13,
+            "block_order": 14
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                80.6028060913086,
+                655.172119140625,
+                256.0519104003906,
+                677.8466186523438
+            ],
+            "block_id": 14,
+            "block_order": 15
+        },
+        {
+            "block_label": "text",
+            "block_content": "Lthki1528f4FREAkl\nP*#28\n( th kilt 2007 4k1e 4 5\nIA.8 11 511",
+            "block_bbox": [
+                79.23746490478516,
+                687.5724487304688,
+                1094.04345703125,
+                770.3984375
+            ],
+            "block_id": 15,
+            "block_order": 16
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                80.9352798461914,
+                813.07763671875,
+                184.17591857910156,
+                836.9925537109375
+            ],
+            "block_id": 16,
+            "block_order": 17
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

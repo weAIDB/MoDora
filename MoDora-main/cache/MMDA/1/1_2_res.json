@@ -1,0 +1,51 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 2,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "FACE\n\n¥\nBitME",
+            "block_bbox": [
+                137.40744018554688,
+                92.53555297851562,
+                480.119140625,
+                280.2937316894531
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "text",
+            "block_content": "EGAEA$.\n3\n\n.\nJAME\n()\nM",
+            "block_bbox": [
+                142.4730987548828,
+                366.38482666015625,
+                1051.6875,
+                664.9415893554688
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "text",
+            "block_content": "6\n2\nlockData",
+            "block_bbox": [
+                142.5406494140625,
+                748.6953735351562,
+                1052.0882568359375,
+                981.4041748046875
+            ],
+            "block_id": 2,
+            "block_order": 3
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

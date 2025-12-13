@@ -3,7 +3,7 @@ import os
 DELIMITER = "################"
 
 ######## Edit This
-BASE_DIR = "/home/yukai/project/modora-frontend/datasets/MMDA/MMDA_complete" # The path to the dataset
+BASE_DIR = "/home/yukai/project/MoDora/datasets/MMDA" # The path to the dataset
 CACHE_DIR = "cache" # The path to store the components and trees
 LOG_DIR = "log" # The path to store logs
 OUTPUT_DIR = "output" #The path to store execution results

@@ -1,0 +1,75 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/2.pdf",
+    "page_index": 1,
+    "parsing_res_list": [
+        {
+            "block_label": "header",
+            "block_content": "f4319887#9\niESAARbAAn:",
+            "block_bbox": [
+                138.6441192626953,
+                93.3893814086914,
+                381.34783935546875,
+                163.82127380371094
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "1oUx4R",
+            "block_bbox": [
+                139.25961303710938,
+                174.17897033691406,
+                255.37132263183594,
+                199.8765869140625
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "text",
+            "block_content": "ARAR,tETRHBRAAAfiAAA:EM,A\nE3iE\n.\nMAMFRAArAEM.BEARi*M\no$o\n.\nS",
+            "block_bbox": [
+                136.13241577148438,
+                215.69125366210938,
+                1052.7362060546875,
+                566.145263671875
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                136.72430419921875,
+                620.510009765625,
+                226.6331024169922,
+                645.359375
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                136.98414611816406,
+                662.8042602539062,
+                1046.7718505859375,
+                778.3906860351562
+            ],
+            "block_id": 5,
+            "block_order": 6
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

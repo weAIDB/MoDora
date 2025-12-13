@@ -1,0 +1,87 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/3.pdf",
+    "page_index": 2,
+    "parsing_res_list": [
+        {
+            "block_label": "header",
+            "block_content": "1 ",
+            "block_bbox": [
+                83.14253997802734,
+                52.73297882080078,
+                308.6961669921875,
+                100.27130126953125
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                335.7032470703125,
+                137.4474639892578,
+                549.3701782226562,
+                163.2311248779297
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                336.1084899902344,
+                185.49951171875,
+                525.9091186523438,
+                208.05908203125
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "text",
+            "block_content": "−10. 00%\n0. 00%\n10. 00%",
+            "block_bbox": [
+                331.2945556640625,
+                233.96224975585938,
+                1101.9361572265625,
+                316.3769226074219
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "figure_title",
+            "block_content": "",
+            "block_bbox": [
+                53.09896469116211,
+                346.12237548828125,
+                389.527587890625,
+                367.5790710449219
+            ],
+            "block_id": 5,
+            "block_order": 6
+        },
+        {
+            "block_label": "chart",
+            "block_content": "1$\n\nJ€%\n$6\nA1\nI$$\n12\n±\n*\n34#\n11# \ni\n3\n#\nS*t\n{}$\n\n37.\n4\n*\n3.1↑\n#\ntA4\n≠\n\ne\n8\n\n4\n1\nH2\n-50. 00%\n:t\nH 3\n#\n4\n×\n#\n#)\n4\nP\n*\nk\n4\ns4A\n4\nw\nHI\n*\n #\n&\n*\niFind. TWiEM\n1.2 \n474k*,*7t5s7121-.1k.#e2*2.\nx/*0.22%=4.*0**,£x/*2.19%2\nx/&/α& //#x&/t4.23x/\n1. 19%/1, 00%/0, 18%/0. 22%/1. 31%, = 4k #€/#/‡\n(/&/e$i/e//#&/e\ni2&/Ii&/&/#4e/&i2&/$#4/&{\n  z h  #j  −6. 31%/−1. 02%/−1. 55%/−1, 57%/1. 90%/2, 17%/2. 19%/1. 72%/\n1. 22%/−1. 95%/−0, 51%/−0. 08%/−0. 85%/−2. 40%/0. 91%.\n2755",
+            "block_bbox": [
+                54.07426834106445,
+                380.3209533691406,
+                1092.119873046875,
+                931.2591552734375
+            ],
+            "block_id": 6,
+            "block_order": 7
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

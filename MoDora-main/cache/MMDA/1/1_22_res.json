@@ -1,0 +1,27 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 22,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "1\nIns",
+            "block_bbox": [
+                474.00103759765625,
+                358.85443115234375,
+                924.7716674804688,
+                706.2567749023438
+            ],
+            "block_id": 0,
+            "block_order": 1
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

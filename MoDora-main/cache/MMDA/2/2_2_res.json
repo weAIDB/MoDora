@@ -1,0 +1,135 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/2.pdf",
+    "page_index": 2,
+    "parsing_res_list": [
+        {
+            "block_label": "header",
+            "block_content": "6n$#i#\n4869..32±414.4A64*4\nAAA.",
+            "block_bbox": [
+                138.5107879638672,
+                93.5759048461914,
+                381.1570129394531,
+                164.07223510742188
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "4*Z6",
+            "block_bbox": [
+                138.25132751464844,
+                174.42616271972656,
+                281.6061096191406,
+                199.5428924560547
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "text",
+            "block_content": "E-15%-15% P4i4M: -15542F19ak44465.\n73R9AA9.30%XEA8",
+            "block_bbox": [
+                136.21490478515625,
+                208.02073669433594,
+                1040.7659912109375,
+                272.9041748046875
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "h5w2mm.1\n:I",
+            "block_bbox": [
+                137.6844482421875,
+                326.9959716796875,
+                308.59478759765625,
+                350.3833312988281
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "text",
+            "block_content": "SAAHFHATEAO.$AATRLANSNAHSRAARMAS.HFSASXH\nAMHFAMH4EA90518MPHA.2AM44",
+            "block_bbox": [
+                135.78118896484375,
+                360.2798767089844,
+                1030.78125,
+                400.7611389160156
+            ],
+            "block_id": 5,
+            "block_order": 6
+        },
+        {
+            "block_label": "text",
+            "block_content": "ni3.xWmtih44.AAAdd\nMAi2i.W$A41X\nMSEPfAM.W42A(AkaAM4a4BERn)1*sJ1",
+            "block_bbox": [
+                136.1455078125,
+                419.88189697265625,
+                1031.208984375,
+                460.473876953125
+            ],
+            "block_id": 6,
+            "block_order": 7
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "h.3\nKW",
+            "block_bbox": [
+                138.51979064941406,
+                517.9281005859375,
+                252.75900268554688,
+                543.1138305664062
+            ],
+            "block_id": 7,
+            "block_order": 8
+        },
+        {
+            "block_label": "text",
+            "block_content": "M&A#%.W%M$41\n,aT4R1H,\n(s1x1f4I1AiEi, A1, 4. M1, 1,1$, 0Q. iM\n, i2,BBS) 2h431W3A,1**4M5041MMx$M6M250$",
+            "block_bbox": [
+                136.53289794921875,
+                551.6174926757812,
+                1041.398681640625,
+                641.175048828125
+            ],
+            "block_id": 8,
+            "block_order": 9
+        },
+        {
+            "block_label": "text",
+            "block_content": "1.#.1Mi.44A44\n4-H4HA444M41\nAHi#ihoAhtizhic.\nFHTURDMNFH.TNMAAMNKTMEAMM\nTWT,MM4AHAMH,5\n2,MMHA5Hkb.\n13a)\"iz β1t if ih\"s  if is,l i TiEt4 9 4 :000000029399\n$hM&RHAJ04MS\n3/3",
+            "block_bbox": [
+                135.87525939941406,
+                659.6864624023438,
+                1040.543701171875,
+                820.8743286132812
+            ],
+            "block_id": 9,
+            "block_order": 10
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                135.8684844970703,
+                839.5900268554688,
+                1041.2210693359375,
+                1026.2509765625
+            ],
+            "block_id": 10,
+            "block_order": 11
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

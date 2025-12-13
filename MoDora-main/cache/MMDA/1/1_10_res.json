@@ -1,0 +1,51 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 10,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "M3xMXA, ASHA1AE",
+            "block_bbox": [
+                109.04903411865234,
+                147.88247680664062,
+                459.7128601074219,
+                184.07632446289062
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "text",
+            "block_content": ",,,\nA\n;ToHAXAg\nEAX\n-\nH\n\nH--\n—\nH51\nTAXS\n\nR\n#\n#\nI\n4",
+            "block_bbox": [
+                107.85694122314453,
+                211.4735565185547,
+                1284.06298828125,
+                638.4783325195312
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "image",
+            "block_content": "1 DU\n/ockData\nW70P648\nC",
+            "block_bbox": [
+                130.1488037109375,
+                792.1949462890625,
+                1267.6336669921875,
+                1267.642333984375
+            ],
+            "block_id": 3,
+            "block_order": 4
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

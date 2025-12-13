@@ -1,0 +1,99 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/3.pdf",
+    "page_index": 8,
+    "parsing_res_list": [
+        {
+            "block_label": "header",
+            "block_content": "7: 4348)",
+            "block_bbox": [
+                83.82594299316406,
+                52.94264602661133,
+                308.6667175292969,
+                100.18156433105469
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                333.5315856933594,
+                125.00678253173828,
+                475.7569580078125,
+                144.79066467285156
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "1R20817-\n-\nTH4,H254",
+            "block_bbox": [
+                335.0933837890625,
+                229.81491088867188,
+                632.9351196289062,
+                256.7772216796875
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                335.0907897949219,
+                279.2346496582031,
+                500.4592590332031,
+                302.30816650390625
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "text",
+            "block_content": "ISA/TPxT(*FHE1M2\n1:titt/1ssre.tsttabsd*\nAAXA*AE#E*\n**$+&*44$*20224**\n469.\n*7*7$20224*R\n*#t*#*#77,ix*11205Mw,\noMw, xetiRdtik, Amihkout\n2tU.\ntif4700km",
+            "block_bbox": [
+                331.2708435058594,
+                327.3350830078125,
+                1102.5291748046875,
+                566.59912109375
+            ],
+            "block_id": 5,
+            "block_order": 6
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                335.4377746582031,
+                638.4417724609375,
+                500.00286865234375,
+                660.849853515625
+            ],
+            "block_id": 6,
+            "block_order": 7
+        },
+        {
+            "block_label": "text",
+            "block_content": "2MUAEMHTA#:\nx\n2X#.\n*9#11",
+            "block_bbox": [
+                331.264892578125,
+                685.6232299804688,
+                1103.5067138671875,
+                831.1704711914062
+            ],
+            "block_id": 7,
+            "block_order": 8
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

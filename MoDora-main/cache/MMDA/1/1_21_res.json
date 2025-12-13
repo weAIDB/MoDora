@@ -1,0 +1,147 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 21,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "$i$),",
+            "block_bbox": [
+                105.8121566772461,
+                148.83897399902344,
+                329.5283508300781,
+                203.9529266357422
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "text",
+            "block_content": "MESHO\nAAXt\nAR",
+            "block_bbox": [
+                192.33436584472656,
+                266.84796142578125,
+                795.1737670898438,
+                326.4403381347656
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "ane 17",
+            "block_bbox": [
+                119.06723022460938,
+                272.6237487792969,
+                163.22596740722656,
+                318.14593505859375
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "text",
+            "block_content": "**\", MAE3PME,\nTDiantazhiku",
+            "block_bbox": [
+                192.08529663085938,
+                381.2360534667969,
+                808.076416015625,
+                441.1817626953125
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "ESJ",
+            "block_bbox": [
+                120.58483123779297,
+                391.705810546875,
+                164.25852966308594,
+                435.84783935546875
+            ],
+            "block_id": 6,
+            "block_order": 7
+        },
+        {
+            "block_label": "text",
+            "block_content": "TalkingData",
+            "block_bbox": [
+                190.79994201660156,
+                501.5871276855469,
+                795.0431518554688,
+                560.9783325195312
+            ],
+            "block_id": 8,
+            "block_order": 9
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "E",
+            "block_bbox": [
+                120.86151885986328,
+                509.84173583984375,
+                164.1221160888672,
+                555.5523681640625
+            ],
+            "block_id": 9,
+            "block_order": 10
+        },
+        {
+            "block_label": "text",
+            "block_content": "2\n\nODAIL",
+            "block_bbox": [
+                190.72073364257812,
+                625.1683959960938,
+                794.4821166992188,
+                684.7144775390625
+            ],
+            "block_id": 12,
+            "block_order": 13
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "1",
+            "block_bbox": [
+                122.3900375366211,
+                636.260009765625,
+                165.435791015625,
+                681.5802612304688
+            ],
+            "block_id": 13,
+            "block_order": 14
+        },
+        {
+            "block_label": "text",
+            "block_content": "0041\nTR\nRARZ\nDXIAME\n",
+            "block_bbox": [
+                113.27783203125,
+                749.9563598632812,
+                743.5587158203125,
+                817.1807250976562
+            ],
+            "block_id": 16,
+            "block_order": 17
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                104.81439971923828,
+                922.6307373046875,
+                554.229736328125,
+                978.8950805664062
+            ],
+            "block_id": 19,
+            "block_order": 20
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

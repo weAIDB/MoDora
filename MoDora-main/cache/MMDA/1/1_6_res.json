@@ -1,0 +1,75 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 6,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": ",BELMFAEMIE#EESMA",
+            "block_bbox": [
+                104.97323608398438,
+                142.9165802001953,
+                1244.845703125,
+                202.67898559570312
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                112.95008087158203,
+                255.73399353027344,
+                190.72238159179688,
+                290.6805419921875
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "text",
+            "block_content": "F$I,\nITESMAT\n#F##CFDs",
+            "block_bbox": [
+                109.84906005859375,
+                321.1015319824219,
+                1281.0194091796875,
+                488.3800048828125
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "text",
+            "block_content": "0i-\n(CFDFCA",
+            "block_bbox": [
+                109.94640350341797,
+                573.65576171875,
+                1280.3507080078125,
+                674.3141479492188
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "text",
+            "block_content": "1COT,\nFCA\nA—E",
+            "block_bbox": [
+                109.66572570800781,
+                702.9277954101562,
+                1281.4552001953125,
+                868.9428100585938
+            ],
+            "block_id": 5,
+            "block_order": 6
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

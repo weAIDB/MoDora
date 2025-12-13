@@ -1,0 +1,75 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 7,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                111.54715728759766,
+                167.77471923828125,
+                188.17474365234375,
+                204.32186889648438
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "text",
+            "block_content": ",6T≠$,\n±T±$\nIt[MarketsinFinancialInstruments\n(MFID,ECI,\nπ##$",
+            "block_bbox": [
+                108.77906799316406,
+                231.2671661376953,
+                1282.16650390625,
+                397.66253662109375
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "text",
+            "block_content": "Korea FinancialInvestment Association)l,\n\n201791-\n.T*\n",
+            "block_bbox": [
+                107.63880920410156,
+                484.8066101074219,
+                1282.6474609375,
+                781.979248046875
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "",
+            "block_bbox": [
+                110.08544158935547,
+                868.4010620117188,
+                189.27200317382812,
+                903.334228515625
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "text",
+            "block_content": "g0\nWAAPGE",
+            "block_bbox": [
+                109.14460754394531,
+                931.7777709960938,
+                1282.5771484375,
+                1097.3856201171875
+            ],
+            "block_id": 5,
+            "block_order": 6
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

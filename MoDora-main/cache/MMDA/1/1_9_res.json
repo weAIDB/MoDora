@@ -1,0 +1,75 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 9,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "—",
+            "block_bbox": [
+                98.12503814697266,
+                148.6334228515625,
+                1288.4283447265625,
+                209.1663360595703
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "SS,X3",
+            "block_bbox": [
+                111.07491302490234,
+                261.7254638671875,
+                532.8297729492188,
+                297.3487243652344
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "text",
+            "block_content": "5001T\n",
+            "block_bbox": [
+                107.9281234741211,
+                325.4892883300781,
+                1258.0496826171875,
+                427.23114013671875
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "text",
+            "block_content": "35\n\nEUSHA\n\n\n",
+            "block_bbox": [
+                106.69519805908203,
+                513.3643798828125,
+                1283.5948486328125,
+                810.6135864257812
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "text",
+            "block_content": "W7AP8 07",
+            "block_bbox": [
+                106.37493133544922,
+                895.4837646484375,
+                1280.8905029296875,
+                996.0770874023438
+            ],
+            "block_id": 5,
+            "block_order": 6
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

@@ -1,0 +1,159 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/2.pdf",
+    "page_index": 0,
+    "parsing_res_list": [
+        {
+            "block_label": "header",
+            "block_content": "IF\nX#AN: HE4CH4",
+            "block_bbox": [
+                139.53822326660156,
+                93.82067108154297,
+                381.38470458984375,
+                164.54415893554688
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "doc_title",
+            "block_content": "0115.200120\n46:3422144177404K6P464178.61041",
+            "block_bbox": [
+                140.37506103515625,
+                173.84378051757812,
+                609.4692993164062,
+                206.7841033935547
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "text",
+            "block_content": "yv, raca.(0x,5",
+            "block_bbox": [
+                139.69189453125,
+                268.40911865234375,
+                322.6715087890625,
+                287.0549011230469
+            ],
+            "block_id": 4,
+            "block_order": 5
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                457.109619140625,
+                268.9295654296875,
+                657.1087646484375,
+                288.7331848144531
+            ],
+            "block_id": 6,
+            "block_order": 7
+        },
+        {
+            "block_label": "text",
+            "block_content": "812.74%",
+            "block_bbox": [
+                139.92018127441406,
+                301.8397521972656,
+                250.44757080078125,
+                320.2166748046875
+            ],
+            "block_id": 7,
+            "block_order": 8
+        },
+        {
+            "block_label": "text",
+            "block_content": "019,M5",
+            "block_bbox": [
+                457.3215637207031,
+                302.4582824707031,
+                673.8894653320312,
+                320.6265563964844
+            ],
+            "block_id": 8,
+            "block_order": 9
+        },
+        {
+            "block_label": "text",
+            "block_content": "4m9891735, 39%, 5, 13h40 4, 546:\nG",
+            "block_bbox": [
+                138.7676544189453,
+                360.0188293457031,
+                427.7897644042969,
+                375.99920654296875
+            ],
+            "block_id": 11,
+            "block_order": 12
+        },
+        {
+            "block_label": "paragraph_title",
+            "block_content": "ARMESMR,R$E",
+            "block_bbox": [
+                137.60264587402344,
+                406.03192138671875,
+                272.9621887207031,
+                428.0419921875
+            ],
+            "block_id": 13,
+            "block_order": 14
+        },
+        {
+            "block_label": "text",
+            "block_content": "AM3A#k6R*(8)\n1,20231256.2023360%±5\nA$.t4M \"1+4\"43x,2p 13£, 441i,\n0]*izx5,xA(6G42)(6GEAEi2itMfo",
+            "block_bbox": [
+                134.5221710205078,
+                454.1312255859375,
+                1046.4984130859375,
+                547.790283203125
+            ],
+            "block_id": 14,
+            "block_order": 15
+        },
+        {
+            "block_label": "text",
+            "block_content": "$*,tx4nk2$,6GAx1.$F6G#fx5E\n54,Ti*AMt2M*,6dtd\nAMM $64T64R 4 256T256R, 4t43523k$t, 1, 2$: 3, 5\n$Br*4,uICCFD,Edkd RIS, AtiMh OAM, tEE",
+            "block_bbox": [
+                135.92132568359375,
+                570.862548828125,
+                1047.5931396484375,
+                664.7945556640625
+            ],
+            "block_id": 15,
+            "block_order": 16
+        },
+        {
+            "block_label": "text",
+            "block_content": "Hoir*AmAFR.I$RH*.",
+            "block_bbox": [
+                135.10147094726562,
+                688.8328247070312,
+                1048.3321533203125,
+                782.3363037109375
+            ],
+            "block_id": 16,
+            "block_order": 17
+        },
+        {
+            "block_label": "text",
+            "block_content": "",
+            "block_bbox": [
+                135.62094116210938,
+                805.880859375,
+                1044.5048828125,
+                863.041259765625
+            ],
+            "block_id": 17,
+            "block_order": 18
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

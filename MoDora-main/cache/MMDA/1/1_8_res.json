@@ -1,0 +1,51 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 8,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "FF",
+            "block_bbox": [
+                114.10518646240234,
+                137.4943084716797,
+                189.7876434326172,
+                172.9691619873047
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "text",
+            "block_content": "AT\nCFTCF201777\nE#(),\n∠;¥(CFTC)\n24LgerX(\n#T*53",
+            "block_bbox": [
+                111.0947036743164,
+                210.65223693847656,
+                1281.8931884765625,
+                472.6064758300781
+            ],
+            "block_id": 2,
+            "block_order": 3
+        },
+        {
+            "block_label": "text",
+            "block_content": "\nAA866\n66\n$8lfx91\n$8lfte0\n18RT80\n8676889\n8t88609\nRRSE980\nBBZF\nL82T\nBB2T\n4\n\n\n335RU70\nA# (ERIA\n1MEATH\n86\n*1zm), E\n761826D\nH161806\ntMH\n01\n3373164\nG18RIRF\n81FBESE\nEEUEA",
+            "block_bbox": [
+                109.90705871582031,
+                576.732177734375,
+                1280.390380859375,
+                914.9681396484375
+            ],
+            "block_id": 3,
+            "block_order": 4
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

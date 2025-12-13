@@ -1,0 +1,39 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/1.pdf",
+    "page_index": 14,
+    "parsing_res_list": [
+        {
+            "block_label": "paragraph_title",
+            "block_content": "AM\nT\nW7AMK3#7#M\n2014.1",
+            "block_bbox": [
+                102.60990905761719,
+                151.229736328125,
+                950.8857421875,
+                211.31607055664062
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "table",
+            "block_content": "N$\n47\n2016.1\n$\\r }$\n47AA7AHA\n2016.1\nN}$\n\n2015\n$\\r }$\n\n2017.2\nA\nA\n2014\n$\\fr}$\nA\n2018.1\nA\n0R\n2014.10\nD\n*\n2014.7\nA\n\n2017.6\n$A}$\n\n2014.1\nA\nWA*\n$\n2013.1\nA\n\n2017.3\n1\nwww.blockdata.club\n194\n4194\nckData\nlockData\n12\n876P618",
+            "block_bbox": [
+                112.11125183105469,
+                248.45399475097656,
+                1285.875244140625,
+                1272.9344482421875
+            ],
+            "block_id": 2,
+            "block_order": 3
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}

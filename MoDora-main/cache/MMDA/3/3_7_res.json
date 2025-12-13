@@ -1,0 +1,75 @@
+{
+    "input_path": "/home/yukai/project/MoDora/datasets/MMDA/3.pdf",
+    "page_index": 7,
+    "parsing_res_list": [
+        {
+            "block_label": "header",
+            "block_content": "",
+            "block_bbox": [
+                82.84449768066406,
+                52.91606521606445,
+                309.12054443359375,
+                100.32245635986328
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "chart",
+            "block_content": "2021/4/27\n2021/5/27\n2021/6/27\n2021/7/27\n2021/8/27\n2021/9/27\n2021/10/27\n2021/11/27\n2021/12/27\n2022/1/27\n2021/11/27\n.* dPERC€:8  - 158.75m / 22. 4%+24v\n2021/12/27\n2022/1/27\n2022/2/27\n2022/3/27\n2022/4/27\n-182mm* 6* &PERC18 \n210mmJ* d * #PER\n* JPER0 € 8  - 166m / 22. 8%+\n* JPERc €.e.√ - 182mm/22. 8%+\n•*2PERC €:%. - 210mm/22. 8%+\n:PVInfolink.iE\n#PIafolinkMiz\n15/4\n45. 0\n40.0\n35.0\n30.0\n25. 0\n20.0\n15.0\n2021/1/27\n2021/2/27\n2021/3/27\n2021/4/27\n2021/5/27\n2021/6/27\n2021/7/27\n2021/8/27\n2021/9/27\n2021/10/27\n2021/11/27\n2021/12/27\n2022/1/27\n2022/2/27\n2022/3/27\n2022/4/27",
+            "block_bbox": [
+                45.41826248168945,
+                133.1097412109375,
+                552.193603515625,
+                554.5574340820312
+            ],
+            "block_id": 3,
+            "block_order": 4
+        },
+        {
+            "block_label": "text",
+            "block_content": "CPWosolIok,BisAkRR",
+            "block_bbox": [
+                40.667152404785156,
+                568.206298828125,
+                422.71466064453125,
+                588.726806640625
+            ],
+            "block_id": 5,
+            "block_order": 6
+        },
+        {
+            "block_label": "figure_title",
+            "block_content": "",
+            "block_bbox": [
+                93.54830932617188,
+                632.9918212890625,
+                408.5711669921875,
+                654.3206176757812
+            ],
+            "block_id": 6,
+            "block_order": 7
+        },
+        {
+            "block_label": "chart",
+            "block_content": "TA6E6HT33A34R14LAE341x.\ninitT(ft4i2307emte4fo1074etA4 \n#i*t4*4\n2\"4307en10-4tt\",5t2\n133,1825##50,5857.482,5977.\nRSE*NRHEStEAARERAA\n23.xH$AKAIA)M24kf2.(A\nzq.cn\n38#11",
+            "block_bbox": [
+                138.16529846191406,
+                669.7822875976562,
+                1043.2269287109375,
+                1114.761962890625
+            ],
+            "block_id": 7,
+            "block_order": 8
+        }
+    ],
+    "model_settings": {
+        "use_doc_preprocessor": true,
+        "use_seal_recognition": false,
+        "use_table_recognition": true,
+        "use_formula_recognition": true,
+        "use_chart_recognition": true,
+        "use_region_detection": true,
+        "format_block_content": false
+    }
+}
