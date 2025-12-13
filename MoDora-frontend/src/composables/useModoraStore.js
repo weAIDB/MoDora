@@ -354,6 +354,7 @@ export function useModoraStore() {
     return {
         state,
         sendMessage,
+        uploadFile: handleFileUpload, // Alias handleFileUpload to uploadFile
         handleFileUpload,
         setViewingDoc,
         openPdf,
