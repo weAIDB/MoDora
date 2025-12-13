@@ -13,7 +13,7 @@
   }
   
   .glass-panel {
-    @apply glass rounded-3xl transition-all duration-300;
+    @apply glass dark:glass-dark rounded-3xl transition-all duration-300;
   }
 
   /* 自定义滚动条 */
@@ -33,7 +33,12 @@
 
 /* 全局字体设置 */
 body {
-  @apply font-sans text-slate-700 antialiased;
+  @apply font-sans text-slate-700 dark:text-slate-200 antialiased select-none cursor-default;
   background: linear-gradient(135deg, #f5f3ff 0%, #fdf4ff 100%);
   background-attachment: fixed;
+}
+
+/* 深色模式背景 */
+.dark body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
 }

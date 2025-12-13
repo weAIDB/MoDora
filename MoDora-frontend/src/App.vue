@@ -22,15 +22,15 @@
         class="glass-panel w-[45%] h-full z-20 relative flex flex-col shrink-0 overflow-hidden border-none shadow-2xl"
       >
         <!-- 侧边栏头部 (仅在 Tree 模式下显示标题，PDFViewer 自带头部) -->
-        <div v-if="store.state.viewingDocTree" class="flex items-center justify-between px-6 py-4 border-b border-white/20 bg-white/50 backdrop-blur-sm z-10 shrink-0">
-          <h3 class="font-bold text-primary-900 flex items-center text-sm">
-            <i class="fa-solid fa-sitemap mr-2 text-primary-600"></i>
+        <div v-if="store.state.viewingDocTree" class="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 z-10 shrink-0">
+          <h3 class="font-bold text-primary-900 dark:text-primary-100 flex items-center text-sm">
+            <i class="fa-solid fa-sitemap mr-2 text-primary-600 dark:text-primary-400"></i>
             {{ store.state.viewingDocTree.name }}
-            <span class="ml-2 text-[10px] bg-primary-100 text-primary-600 px-2 py-0.5 rounded-full uppercase tracking-wide">Graph View</span>
+            <span class="ml-2 text-[10px] bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 px-2 py-0.5 rounded-full uppercase tracking-wide">Graph View</span>
           </h3>
           <button
             @click="store.closeSidePanel()"
-            class="text-slate-400 hover:text-slate-600 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/50"
+            class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-50 dark:hover:bg-slate-700"
           >
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
@@ -40,7 +40,7 @@
         <button
           v-if="store.state.viewingPdf"
           @click="store.closeSidePanel()"
-          class="absolute top-3 right-4 z-50 bg-white/80 hover:bg-white text-slate-500 hover:text-red-500 w-8 h-8 rounded-full flex items-center justify-center transition shadow-lg backdrop-blur-sm"
+          class="absolute top-3 right-4 z-50 bg-white/80 hover:bg-white dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-500 hover:text-red-500 w-8 h-8 rounded-full flex items-center justify-center transition shadow-lg backdrop-blur-sm"
           title="关闭侧边栏"
         >
           <i class="fa-solid fa-xmark"></i>

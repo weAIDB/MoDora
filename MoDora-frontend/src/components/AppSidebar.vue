@@ -6,11 +6,23 @@
   -->
   <aside class="flex flex-col h-full bg-transparent">
     <!-- 头部 -->
-    <div class="p-6 border-b border-white/20 flex items-center shrink-0">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white mr-3 shadow-lg shadow-primary-500/30">
-        <i class="fa-solid fa-book text-lg"></i>
+    <div class="h-16 px-6 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0 rounded-t-3xl">
+      <div class="flex items-center">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white mr-3 shadow-lg shadow-primary-500/30">
+          <i class="fa-solid fa-book text-lg"></i>
+        </div>
+        <h2 class="font-bold text-slate-800 dark:text-slate-100 text-lg tracking-tight">MoDora</h2>
       </div>
-      <h2 class="font-bold text-slate-800 text-lg tracking-tight">MoDora</h2>
+      
+      <!-- 主题切换按钮 -->
+      <button 
+        @click="toggleTheme" 
+        class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+        :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+      >
+        <i v-if="isDark" class="fa-solid fa-sun text-yellow-400"></i>
+        <i v-else class="fa-solid fa-moon"></i>
+      </button>
     </div>
 
     <!-- 列表区 -->
@@ -58,15 +70,15 @@
       <div class="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-6"></div>
 
       <!-- 文件列表 -->
-      <h3 class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-4 px-2">Knowledge Base ({{ store.state.knowledgeBase.length }})</h3>
+      <h3 class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 px-2">Knowledge Base ({{ store.state.knowledgeBase.length }})</h3>
       <ul class="space-y-3">
         <li v-for="doc in store.state.knowledgeBase" :key="doc.id"
             @click="store.setActiveDoc(doc.id)"
             class="group relative flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer duration-300"
             :class="[
               store.state.activeDocId === doc.id
-                ? 'bg-white shadow-md border-primary-100 ring-1 ring-primary-100'
-                : 'bg-white/40 border-transparent hover:bg-white hover:shadow-sm hover:border-white/60'
+                ? 'bg-white dark:bg-slate-800 shadow-md border-primary-100 dark:border-primary-900 ring-1 ring-primary-100 dark:ring-primary-900/50'
+                : 'bg-white/40 dark:bg-slate-800/40 border-transparent hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm hover:border-white/60 dark:hover:border-slate-700'
             ]"
         >
 
@@ -75,20 +87,20 @@
             <!-- 选中的文件图标更亮 -->
             <div 
               class="w-8 h-8 rounded-lg flex items-center justify-center mr-3 shrink-0 transition-colors"
-              :class="store.state.activeDocId === doc.id ? 'bg-primary-100 text-primary-600' : 'bg-slate-100 text-slate-400 group-hover:bg-primary-50 group-hover:text-primary-500'"
+              :class="store.state.activeDocId === doc.id ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400 dark:text-slate-500 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/30 group-hover:text-primary-500 dark:group-hover:text-primary-400'"
             >
               <i :class="getFileIcon(doc.type)"></i>
             </div>
             
             <div class="flex flex-col min-w-0">
               <span class="text-sm truncate select-none transition-colors font-medium"
-                :class="store.state.activeDocId === doc.id ? 'text-slate-800' : 'text-slate-600'"
+                :class="store.state.activeDocId === doc.id ? 'text-slate-800 dark:text-slate-200' : 'text-slate-600 dark:text-slate-400'"
               >
                 {{ doc.name }}
               </span>
               <!-- 选中状态的标记 -->
-              <span v-if="store.state.activeDocId === doc.id" class="text-[10px] text-primary-500 font-bold flex items-center mt-0.5">
-                <span class="w-1.5 h-1.5 bg-primary-500 rounded-full mr-1 animate-pulse"></span>
+              <span v-if="store.state.activeDocId === doc.id" class="text-[10px] text-primary-500 dark:text-primary-400 font-bold flex items-center mt-0.5">
+                <span class="w-1.5 h-1.5 bg-primary-500 dark:bg-primary-400 rounded-full mr-1 animate-pulse"></span>
                 Active
               </span>
             </div>
@@ -126,9 +138,11 @@
 
 <script setup>
 import { useModoraStore } from '../composables/useModoraStore';
+import { useDarkTheme } from '../composables/useDarkTheme';
 import { ref } from 'vue';
 
 const store = useModoraStore();
+const { isDark, toggleTheme } = useDarkTheme();
 const fileInputRef = ref(null);
 
 // 触发文件选择

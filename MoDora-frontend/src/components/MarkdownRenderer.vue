@@ -1,7 +1,7 @@
 <template>
-  <div class="prose prose-sm md:prose-base max-w-none break-words" 
+  <div class="prose prose-sm md:prose-base max-w-none break-words select-text cursor-text" 
        :class="[
-         isUser ? 'prose-invert text-white' : 'prose-slate text-slate-700'
+         isUser ? 'prose-invert text-white' : 'prose-slate text-slate-700 dark:text-slate-200 dark:prose-invert'
        ]"
        v-html="renderedContent">
   </div>
