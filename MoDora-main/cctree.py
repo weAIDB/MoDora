@@ -55,6 +55,10 @@ def get_metadata(root, level = 1, n0 = 2, max_workers = 8):
         d = 1
         D = 1
 
+        if 'children' not in node:
+             print(f"!!! Error: Node missing children: {node.keys()} Type: {node.get('type')}")
+             node['children'] = {}
+
         children = list(node['children'].values())
 
         # Recursive call

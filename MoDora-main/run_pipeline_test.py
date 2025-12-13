@@ -24,12 +24,13 @@ for input_file in input_files:
         continue
     
     try:
-        # Run preprocessing (OCR + Layout)
-        print(f"Step 1: Preprocessing {input_file}...")
-        preprocess(source_path, cache_base)
+        # Preprocess
+        print(f"Running preprocess for {source_path}...")
+        cp_dict = preprocess(source_path, cache_base)
+        print(f"Preprocess result keys: {cp_dict.keys() if cp_dict else 'None'}")
         
-        # Run tree construction
-        print(f"Step 2: Building Tree for {input_file}...")
+        # Build Tree
+        print(f"Building tree for {source_path}...")
         build_tree(source_path, cache_base)
         
         print(f"Successfully processed {input_file}")

@@ -98,84 +98,123 @@ def question_parsing(question):
 
 def qa(cctree, query, log_file=None, source_path=False):
 
-    if log_file is not None:    # Log
+    if log_file is not None:
         with open(log_file, "a") as f:
-            f.write(
-                f"{DELIMITER} Answering Query {DELIMITER}\n"
-            )
-            f.write(f"{query}\n")
+            f.write(f"{DELIMITER} Answering Query {DELIMITER}\n{query}\n")
 
     answer = "None"
+    
+    # 1. 准备两套数据容器
+    full_evidence = []    # 给 LLM 用 (全量)
+    full_locations = []   
+
+    display_evidence = [] # 给前端用 (Top 3 Distinct Pages)
+    display_locations = []
+
     parsed_res = question_parsing(query)
-    locations = parsed_res['location']
-    query = parsed_res['content']
+    locations = parsed_res.get('location', [])
+    semantic_query = parsed_res.get('content', query)
 
-    if log_file is not None:    # Log
+    if log_file is not None:
         with open(log_file, "a", encoding="utf-8") as f:
-            f.write(
-                f"{DELIMITER} Location Cues {DELIMITER}\n"
-            )
-            f.write(f"{locations}\n")
-    if log_file is not None:    # Log
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(
-                f"{DELIMITER} Semantic Cues {DELIMITER}\n"
-            )
-            f.write(f"{query}\n")
+            f.write(f"{DELIMITER} Location Cues {DELIMITER}\n{locations}\n")
+            f.write(f"{DELIMITER} Semantic Cues {DELIMITER}\n{semantic_query}\n")
 
+    # 执行检索
+    retrieved_text_dict, retrieved_bbox_dict = retrieve(
+        query=semantic_query, 
+        cctree=cctree, 
+        source_path=source_path, 
+        locations=locations, 
+        log_file=log_file
+    )
     
-    # 结合位置和语义的 Retrieve
-    retrieved_text, retrieved_bbox = retrieve(query=query, cctree=cctree, source_path=source_path, locations=locations, log_file=log_file)
+    # 2. 填充全量推理数据
+    if retrieved_text_dict:
+        full_evidence = list(retrieved_text_dict.values())
+    if retrieved_bbox_dict:
+        for bbox_list in retrieved_bbox_dict.values():
+            if isinstance(bbox_list, list):
+                full_locations.extend(bbox_list)
+
+    # --- 3. [修改] 严格按页去重筛选展示数据 ---
+    seen_pages = set()
+    MAX_PAGES = 3
     
+    # 新的存放容器
+    display_documents = [] 
+    
+    for path, bbox_list in retrieved_bbox_dict.items():
+        # Handle nodes without location (e.g. user-added nodes)
+        current_page = 0
+        if bbox_list:
+            current_page = bbox_list[0].get('page')
+        
+        # 逻辑：严格按页去重
+        if current_page in seen_pages:
+            continue
+            
+        if len(seen_pages) < MAX_PAGES:
+            seen_pages.add(current_page)
+            
+            # 【关键修改】构造一个完整的对象，而不是拆分到两个列表
+            doc_item = {
+                "page": current_page,
+                "content": retrieved_text_dict.get(path, ""),
+                "bboxes": bbox_list  # 这里放的是这个段落对应的 [box1, box2...]
+            }
+            display_documents.append(doc_item)
+
+    # 4. 执行推理 (使用全量数据 full_evidence)
     try:
-        schema = get_tree_schema(cctree['children']) # Hierarchical Information
-        if len(retrieved_text) > 0:
-            bbox_list = [bbox for location in retrieved_bbox.values() for bbox in location]
-            if True: # or -1 in page_list and position_vector == [-1, -1]:
-                retrieved_image = bbox_to_base64(source_path, bbox_list) # Cropped regions spliced vertically
-                answer = retrieved_reason(query, retrieved_text, retrieved_image, schema)
-            else:
-                retrieved_image = bbox_to_base64_2(source_path, bbox_list) # Cropped regions spliced by relative location relations
-                answer = retrieved_reason(query, retrieved_text, retrieved_image, schema)
+        if 'children' in cctree:
+             schema = get_tree_schema(cctree['children']) 
+        else:
+             schema = {}
+
+        if len(full_evidence) > 0:
+            # 修改：不再生成/使用图片进行推理，仅使用文本证据
+            # retrieved_image = bbox_to_base64(source_path, full_locations)
+            # 传入空图片占位，retrieved_reason 实际上只使用 prompt (文本)
+            answer = retrieved_reason(semantic_query, full_evidence, None, schema)
         else:
             answer = "None"
+            
     except Exception as e:
-        print(f"Errors in qa：{e}")
+        print(f"Errors in qa reasoning：{e}")
+        import traceback
+        traceback.print_exc()
         answer = "None"
 
-    if log_file is not None:    # Log
+    if log_file is not None:
         with open(log_file, "a", encoding="utf-8") as f:
-            f.write(
-                f"{DELIMITER} Retrieved Data  {DELIMITER}\n"
-            )
-            f.write(f"{retrieved_text}\n")
-
-            f.write(
-                f"{DELIMITER} Answer {DELIMITER}\n"
-            )
-            f.write(f"{answer}\n")
+            f.write(f"{DELIMITER} Answer {DELIMITER}\n{answer}\n")
     
-    # Check if evidence is found
-    final_check = check_answer(query=query, answer=answer)
-    if log_file is not None:    # Log
-        with open(log_file, 'a', encoding="utf-8") as f:
-            f.write(f"{DELIMITER} Final Check for Query {DELIMITER}\n")
-            f.write(f"{final_check}\n")
+    # 5. 最终校验
+    final_check = check_answer(query=semantic_query, answer=answer)
     
-    if final_check:
-        final_answer = answer
-        if log_file is not None:    # Log
-            with open(log_file, 'a', encoding="utf-8") as f:
-                f.write(f"{DELIMITER} Final Check Passed and Final Answer{DELIMITER}\n")
-                f.write(f"{final_answer}\n")
-    else:
-        # Answer based on whole doucment if evidence not found
-        whole_doc = pdf_to_base64(source_path)
-        simplify_tree(cctree['children']) 
-        final_answer = whole_reason(whole_doc, query, cctree)
-        if log_file is not None:    # Log
-            with open(log_file, 'a', encoding="utf-8") as f:
-                f.write(f"{DELIMITER} Final Answer for Whole Table Reasoning {DELIMITER}\n")
-                f.write(f"{final_answer}\n")
+    final_answer = answer
+    if not final_check:
+        # 这里的 whole_doc 仍然保留，用于全文档兜底推理 (whole_reason 可能会用到)
+        # whole_reason 内部使用的是 whole_reasoning_prompt (纯文本)
+        # 这里的 pdf_to_base64 其实也是多余的，whole_reason 签名是 (whole_doc, query, cctree)
+        # 检查 whole_reason 实现: prompt = whole_reasoning_prompt.format(query=query,data=cctree)
+        # 并没有用到 whole_doc (pdf图片)。
+        # 为了安全起见，暂时不动这个逻辑，除非确认 whole_reason 真的不用
+        whole_doc = pdf_to_base64(source_path) 
+        if 'children' in cctree:
+            simplify_tree(cctree['children']) 
+        final_answer = whole_reason(whole_doc, semantic_query, cctree)
 
-    return final_answer
+    # 6. 返回结果
+    return {
+        "answer": final_answer,
+        # "retrieved_image": retrieved_image, # 移除: 不再返回溯源图片
+        # 这是一个列表，长度严格为 3
+
+        # 前端遍历这个列表：
+        #   - item.content 用于显示文字
+        #   - item.page 用于跳转
+        #   - item.bboxes 用于在 PDF 上画高亮 (可能有多个框)
+        "documents": display_documents 
+    }

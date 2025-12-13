@@ -3,136 +3,304 @@
     "page_index": 21,
     "parsing_res_list": [
         {
-            "block_label": "paragraph_title",
-            "block_content": "$i$),",
-            "block_bbox": [
-                105.8121566772461,
-                148.83897399902344,
-                329.5283508300781,
-                203.9529266357422
-            ],
-            "block_id": 0,
-            "block_order": 1
-        },
-        {
             "block_label": "text",
-            "block_content": "MESHO\nAAXt\nAR",
+            "block_content": "我们关注每一个细分领域的头部项目，TopX只是我们展现",
             "block_bbox": [
-                192.33436584472656,
-                266.84796142578125,
-                795.1737670898438,
-                326.4403381347656
-            ],
-            "block_id": 2,
-            "block_order": 3
-        },
-        {
-            "block_label": "paragraph_title",
-            "block_content": "ane 17",
-            "block_bbox": [
-                119.06723022460938,
-                272.6237487792969,
-                163.22596740722656,
-                318.14593505859375
-            ],
-            "block_id": 3,
-            "block_order": 4
-        },
-        {
-            "block_label": "text",
-            "block_content": "**\", MAE3PME,\nTDiantazhiku",
-            "block_bbox": [
-                192.08529663085938,
-                381.2360534667969,
-                808.076416015625,
-                441.1817626953125
+                192.02890014648438,
+                381.1698913574219,
+                808.2221069335938,
+                441.2174072265625
             ],
             "block_id": 4,
             "block_order": 5
         },
         {
-            "block_label": "paragraph_title",
-            "block_content": "ESJ",
+            "block_label": "text",
+            "block_content": "我们只与业内顶尖的合作伙伴、区块链专家、行业分析师为伴，提供专业的数据服务。",
             "block_bbox": [
-                120.58483123779297,
-                391.705810546875,
-                164.25852966308594,
-                435.84783935546875
+                190.85821533203125,
+                501.55438232421875,
+                795.133544921875,
+                561.152099609375
             ],
             "block_id": 6,
             "block_order": 7
         },
         {
             "block_label": "text",
-            "block_content": "TalkingData",
+            "block_content": "我们拥有全球最全的区块链时刻扫描和追踪全球",
             "block_bbox": [
-                190.79994201660156,
-                501.5871276855469,
-                795.0431518554688,
-                560.9783325195312
+                190.84156799316406,
+                625.1080932617188,
+                794.3876953125,
+                684.827880859375
             ],
             "block_id": 8,
             "block_order": 9
         },
         {
             "block_label": "paragraph_title",
-            "block_content": "E",
+            "block_content": "门是链塔",
             "block_bbox": [
-                120.86151885986328,
-                509.84173583984375,
-                164.1221160888672,
-                555.5523681640625
+                113.23800659179688,
+                749.98291015625,
+                743.5942993164062,
+                817.1824951171875
             ],
             "block_id": 9,
             "block_order": 10
         },
         {
             "block_label": "text",
-            "block_content": "2\n\nODAIL",
+            "block_content": "智库推崇专注专心专业，坚持公开公正公平，“天赐时代睿见未来”，预见更多可能。",
             "block_bbox": [
-                190.72073364257812,
-                625.1683959960938,
-                794.4821166992188,
-                684.7144775390625
+                113.23800659179688,
+                749.98291015625,
+                743.5942993164062,
+                817.1824951171875
             ],
-            "block_id": 12,
-            "block_order": 13
+            "block_id": 10,
+            "block_order": 11
         },
         {
             "block_label": "paragraph_title",
-            "block_content": "1",
+            "block_content": "链塔智库合作伙伴",
             "block_bbox": [
-                122.3900375366211,
-                636.260009765625,
-                165.435791015625,
-                681.5802612304688
+                104.65505981445312,
+                922.965087890625,
+                554.1911010742188,
+                979.0623168945312
             ],
-            "block_id": 13,
-            "block_order": 14
+            "block_id": 11,
+            "block_order": 12
+        },
+        {
+            "block_label": "image",
+            "block_content": "31区",
+            "block_bbox": [
+                620.5413818359375,
+                1307.412109375,
+                673.30712890625,
+                1360.521484375
+            ],
+            "block_id": 18,
+            "block_order": 19
+        },
+        {
+            "block_label": "image",
+            "block_content": "rip 互链脉搏INTERCHAIN PULSE ",
+            "block_bbox": [
+                592.9561767578125,
+                1590.9549560546875,
+                762.7969360351562,
+                1641.4417724609375
+            ],
+            "block_id": 20,
+            "block_order": 21
         },
         {
             "block_label": "text",
-            "block_content": "0041\nTR\nRARZ\nDXIAME\n",
+            "block_content": "媒体深度合作伙伴（排名不分前后）：",
             "block_bbox": [
-                113.27783203125,
-                749.9563598632812,
-                743.5587158203125,
-                817.1807250976562
+                107.02948760986328,
+                1487.120361328125,
+                279.78436279296875,
+                1546.89208984375
             ],
-            "block_id": 16,
-            "block_order": 17
+            "block_id": 22,
+            "block_order": 23
+        },
+        {
+            "block_label": "image",
+            "block_content": "猛码财经",
+            "block_bbox": [
+                109.59087371826172,
+                1586.18212890625,
+                267.27972412109375,
+                1636.896240234375
+            ],
+            "block_id": 23,
+            "block_order": 24
+        },
+        {
+            "block_label": "image",
+            "block_content": "链路财经Linksfin.com ",
+            "block_bbox": [
+                344.5572204589844,
+                1589.6241455078125,
+                525.0927734375,
+                1640.3460693359375
+            ],
+            "block_id": 25,
+            "block_order": 26
+        },
+        {
+            "block_label": "image",
+            "block_content": "挖链网walianocn ",
+            "block_bbox": [
+                110.72222137451172,
+                1675.4913330078125,
+                296.9173583984375,
+                1737.78173828125
+            ],
+            "block_id": 26,
+            "block_order": 27
+        },
+        {
+            "block_label": "image",
+            "block_content": "区块链蓝海BLUE SEA OF BLOCK CHAIN ",
+            "block_bbox": [
+                365.167724609375,
+                1665.0233154296875,
+                506.82208251953125,
+                1737.8734130859375
+            ],
+            "block_id": 27,
+            "block_order": 28
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                824.5534057617188,
+                1578.8017578125,
+                964.718017578125,
+                1648.773681640625
+            ],
+            "block_id": 31,
+            "block_order": 32
         },
         {
             "block_label": "paragraph_title",
+            "block_content": "全球首家区块链数据服务提供商",
+            "block_bbox": [
+                937.49267578125,
+                254.99349975585938,
+                1218.993896484375,
+                351.1664733886719
+            ],
+            "block_id": 32,
+            "block_order": 33
+        },
+        {
+            "block_label": "image",
+            "block_content": "A ",
+            "block_bbox": [
+                878.3079833984375,
+                390.6478576660156,
+                1069.4415283203125,
+                583.576904296875
+            ],
+            "block_id": 33,
+            "block_order": 34
+        },
+        {
+            "block_label": "image",
+            "block_content": "A ",
+            "block_bbox": [
+                1112.9976806640625,
+                392.0855712890625,
+                1304.302490234375,
+                582.466064453125
+            ],
+            "block_id": 34,
+            "block_order": 35
+        },
+        {
+            "block_label": "text",
+            "block_content": "扫码关注众号",
+            "block_bbox": [
+                925.925048828125,
+                595.9058837890625,
+                1021.0914306640625,
+                656.2407836914062
+            ],
+            "block_id": 35,
+            "block_order": 36
+        },
+        {
+            "block_label": "text",
+            "block_content": "扫码进入小程序",
+            "block_bbox": [
+                1163.1795654296875,
+                595.81298828125,
+                1256.4132080078125,
+                655.9977416992188
+            ],
+            "block_id": 36,
+            "block_order": 37
+        },
+        {
+            "block_label": "image",
             "block_content": "",
             "block_bbox": [
-                104.81439971923828,
-                922.6307373046875,
-                554.229736328125,
-                978.8950805664062
+                909.5632934570312,
+                696.2313232421875,
+                967.880859375,
+                750.0027465820312
             ],
-            "block_id": 19,
-            "block_order": 20
+            "block_id": 37,
+            "block_order": 38
+        },
+        {
+            "block_label": "text",
+            "block_content": "网址：www.block ",
+            "block_bbox": [
+                976.4338989257812,
+                711.9324340820312,
+                1295.4010009765625,
+                737.8651733398438
+            ],
+            "block_id": 38,
+            "block_order": 39
+        },
+        {
+            "block_label": "image",
+            "block_content": "",
+            "block_bbox": [
+                912.7905883789062,
+                764.5135498046875,
+                969.2289428710938,
+                808.9931640625
+            ],
+            "block_id": 39,
+            "block_order": 40
+        },
+        {
+            "block_label": "text",
+            "block_content": "微信订阅号ID：liantazhiku ",
+            "block_bbox": [
+                977.0654907226562,
+                771.0512084960938,
+                1267.6661376953125,
+                800.0039672851562
+            ],
+            "block_id": 40,
+            "block_order": 41
+        },
+        {
+            "block_label": "text",
+            "block_content": "链道学社",
+            "block_bbox": [
+                824.5534057617188,
+                1578.8017578125,
+                964.718017578125,
+                1648.773681640625
+            ],
+            "block_id": 42,
+            "block_order": 43
+        },
+        {
+            "block_label": "image",
+            "block_content": "旷链社",
+            "block_bbox": [
+                1025.3541259765625,
+                1588.141357421875,
+                1185.015380859375,
+                1637.512939453125
+            ],
+            "block_id": 43,
+            "block_order": 44
         }
     ],
     "model_settings": {

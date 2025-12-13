@@ -4,15 +4,39 @@
     "parsing_res_list": [
         {
             "block_label": "paragraph_title",
-            "block_content": "",
+            "block_content": "A 链塔智库",
             "block_bbox": [
-                524.4039306640625,
-                311.07763671875,
-                896.7427368164062,
-                642.4357299804688
+                525.9681396484375,
+                310.4864807128906,
+                894.190185546875,
+                642.1984252929688
             ],
             "block_id": 0,
             "block_order": 1
+        },
+        {
+            "block_label": "doc_title",
+            "block_content": "2018全球数字资产衍生品 研究报告",
+            "block_bbox": [
+                78.38956451416016,
+                752.1848754882812,
+                1311.836181640625,
+                1041.9852294921875
+            ],
+            "block_id": 1,
+            "block_order": 2
+        },
+        {
+            "block_label": "text",
+            "block_content": "2018年7月12日",
+            "block_bbox": [
+                529.8726196289062,
+                1361.2840576171875,
+                860.4097290039062,
+                1409.933349609375
+            ],
+            "block_id": 2,
+            "block_order": 3
         }
     ],
     "model_settings": {

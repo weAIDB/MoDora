@@ -4,24 +4,36 @@
     "parsing_res_list": [
         {
             "block_label": "table",
-            "block_content": "3\n$3\n$3\nE\nf}$\nA\n#\nwww.blockdata.club\n−\n \n4\n  ",
+            "block_content": "",
             "block_bbox": [
-                114.78654479980469,
-                155.076171875,
-                1281.6373291015625,
-                498.716064453125
+                114.87158203125,
+                155.52206420898438,
+                1281.813232421875,
+                498.6459045410156
+            ],
+            "block_id": 0,
+            "block_order": 1
+        },
+        {
+            "block_label": "text",
+            "block_content": "连塔智库研究绘制",
+            "block_bbox": [
+                114.87158203125,
+                155.52206420898438,
+                1281.813232421875,
+                498.6459045410156
             ],
             "block_id": 1,
             "block_order": 2
         },
         {
             "block_label": "text",
-            "block_content": "",
+            "block_content": "www.blockdata.club ",
             "block_bbox": [
-                110.13003540039062,
-                508.1875305175781,
-                304.2162780761719,
-                533.8065795898438
+                114.87158203125,
+                155.52206420898438,
+                1281.813232421875,
+                498.6459045410156
             ],
             "block_id": 2,
             "block_order": 3

@@ -4,10 +4,11 @@ DELIMITER = "################"
 
 ######## Edit This
 BASE_DIR = "/home/yukai/project/MoDora/datasets/MMDA" # The path to the dataset
-CACHE_DIR = "cache" # The path to store the components and trees
-LOG_DIR = "log" # The path to store logs
-OUTPUT_DIR = "output" #The path to store execution results
-EVALUATION_DIR = "evaluation" # The path to store evaluation results
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+CACHE_DIR = os.path.join(PROJECT_ROOT, "cache") # The path to store the components and trees
+LOG_DIR = os.path.join(PROJECT_ROOT, "log") # The path to store logs
+OUTPUT_DIR = os.path.join(PROJECT_ROOT, "output") #The path to store execution results
+EVALUATION_DIR = os.path.join(PROJECT_ROOT, "evaluation") # The path to store evaluation results
 ENABLE_CACHE = False # False:complete test / True:starting from cache
 API_KEY = "sk-xxxx"
 API_URL = "https://www.dmxapi.cn/v1"

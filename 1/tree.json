@@ -1,0 +1,2745 @@
+{
+    "type": "root",
+    "metadata": "",
+    "data": "",
+    "location": [],
+    "children": {
+        "A 链塔智库Block Data ": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        521,
+                        282,
+                        909,
+                        633
+                    ],
+                    "page": 1
+                }
+            ],
+            "children": {}
+        },
+        "2018全球数字资产衍生品 研究报告\n": {
+            "type": "text",
+            "metadata": "2018年7月12日;日期记录",
+            "data": "\n\n 2018年7月12日",
+            "location": [
+                {
+                    "range": [
+                        46,
+                        751,
+                        1344,
+                        1052
+                    ],
+                    "page": 1
+                },
+                {
+                    "range": [
+                        523,
+                        1385,
+                        869,
+                        1436
+                    ],
+                    "page": 1
+                }
+            ],
+            "children": {}
+        },
+        "目录\nCONTENTS ": {
+            "type": "text",
+            "metadata": "数字资产衍生品定义与特点;平台对比及监管政策分析",
+            "data": "\n\n 1.数字资产衍生品综述\n\n1数字资产衍生品定义\n\nockD 7.2数字资产衍生品特点kData 库智库\n2.数字资产衍生品政策：部分国家明确监管\n3.数字资产衍生品分析：集中于期货合约交易\n4.数字资产期货与传统期货对比\n5.数字资产衍生品交易平台名单\n车\n\n智ata ta \n6.数字资产衍生品平台对比：产品同质化严重\nBlocl 6.1 BitMEX平台数字资产衍生品简述C Block \n6.2OKEx平台数字资产期货合约简述\n\n6.3BitMEX平台与OKEx平台对比\n",
+            "location": [
+                {
+                    "range": [
+                        86,
+                        0,
+                        572,
+                        254
+                    ],
+                    "page": 2
+                },
+                {
+                    "range": [
+                        94,
+                        348,
+                        1126,
+                        1545
+                    ],
+                    "page": 2
+                }
+            ],
+            "children": {}
+        },
+        "前言\n PREFACE ": {
+            "type": "text",
+            "metadata": "数字资产衍生品交易;平台竞争与监管分析",
+            "data": "\n\n 随着数字资产交易所竞争的日益激烈，许多新兴交易平台为寻求新的优势逐渐向数字资产衍生品交易平台靠拢。虽然老牌数字资产衍生品交易平台BitMEX只做数字资产衍生品相关交易，不做数字资产现货交易，但其交易量仍常居各大交易所日交易量第一名。\n\n\n 如近期计划上线的GAEA数字资产衍生品交易平台，就包含期货合约和永续掉期合约。而目前市场中大部分数字资产交易平台的期货合约交易同质化较为严重，同时存在高倍杠杆、期货价格波动大等高风险问题。\n\n\n 数字资产衍生品交易，尤其是期货合约交易，能定方面显示投资者对于市场未来信心（看多或看空），期货合约价格对数字资产未来价值走向有一定参考价值。\n\n 链塔智库BlockData对数字资产衍生品监管政策、数字资产衍生品交易平台运行机制及产品设计进行了研究和分析形成完整报告。\n",
+            "location": [
+                {
+                    "range": [
+                        60,
+                        0,
+                        487,
+                        246
+                    ],
+                    "page": 3
+                },
+                {
+                    "range": [
+                        73,
+                        340,
+                        1139,
+                        644
+                    ],
+                    "page": 3
+                },
+                {
+                    "range": [
+                        98,
+                        727,
+                        1130,
+                        956
+                    ],
+                    "page": 3
+                },
+                {
+                    "range": [
+                        108,
+                        1039,
+                        1135,
+                        1203
+                    ],
+                    "page": 3
+                },
+                {
+                    "range": [
+                        104,
+                        1284,
+                        1142,
+                        1459
+                    ],
+                    "page": 3
+                }
+            ],
+            "children": {}
+        },
+        "1.数字资产衍生品综述": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        28,
+                        31,
+                        703,
+                        108
+                    ],
+                    "page": 4
+                }
+            ],
+            "children": {}
+        },
+        "1.1数字资产衍生品定义": {
+            "type": "text",
+            "metadata": "数字资产衍生品;保证金交易",
+            "data": "\n\n 数字资产衍生品，是一种数字资产合约，其价值取决于一种或多种数字基础资产或指数，合约的基本种类包括期货、掉期和期权。数字资产衍生品还包括具有期货、掉期和期权中一种或多种特征的混合数字资产金融工具。\n\n 这种合约可以是标准化的也可以是非标准化的标准化合约是指其标的勿（基础资产）的交易价格、交易时间、资产特征、交易方式等都是事先标准化的，因此此类合约大多在交易所上市交易，如期货。非标准化合约指以上各项由交易的双方自行约定，因此具有很强的灵活性，比如远期协议。\n\n 数字资产衍生产品是与数字资产相关的派生物，通常是指从原生数字资产派生出来的数字资产金融工具。其特征是保证金交易，即只要支付一定比例的保证金就可进行全额交易，不需实际上的本金转移，合约的了结一般也采用现金差价结算的方式进行，只有在满期日以实物交割方式履约的合约才需要买方交足贷款。因此，数字资产衍生产品交易具有杠杆效应。保证金越低，杠杆效应越大，风险也就越大。\n",
+            "location": [
+                {
+                    "range": [
+                        33,
+                        144,
+                        572,
+                        202
+                    ],
+                    "page": 4
+                },
+                {
+                    "range": [
+                        40,
+                        276,
+                        1361,
+                        467
+                    ],
+                    "page": 4
+                },
+                {
+                    "range": [
+                        44,
+                        546,
+                        1370,
+                        802
+                    ],
+                    "page": 4
+                },
+                {
+                    "range": [
+                        35,
+                        890,
+                        1367,
+                        1280
+                    ],
+                    "page": 4
+                }
+            ],
+            "children": {}
+        },
+        "1.2数字资产衍生品特点": {
+            "type": "text",
+            "metadata": "数字资产衍生品；特点总结",
+            "data": "\n\n 数字资产衍生产品具有以下几个特点。",
+            "location": [
+                {
+                    "range": [
+                        2,
+                        23,
+                        560,
+                        92
+                    ],
+                    "page": 5
+                },
+                {
+                    "range": [
+                        23,
+                        150,
+                        700,
+                        209
+                    ],
+                    "page": 5
+                }
+            ],
+            "children": {}
+        },
+        "1、零和性": {
+            "type": "text",
+            "metadata": "零和博弈;合约交易",
+            "data": "\n\n 在数字资产衍生品交易中合约交易的双方盈亏完全负相关，并且净损益为零，因此称为”零和\"。\n",
+            "location": [
+                {
+                    "range": [
+                        25,
+                        293,
+                        233,
+                        335
+                    ],
+                    "page": 5
+                },
+                {
+                    "range": [
+                        20,
+                        368,
+                        1314,
+                        477
+                    ],
+                    "page": 5
+                }
+            ],
+            "children": {}
+        },
+        "跨期性": {
+            "type": "text",
+            "metadata": "数字资产衍生工具;跨期交易现金流",
+            "data": "\n\n 数字资产衍生工具是交易双方通过对数字资产币价变动的趋势预测，在未来某一时间按一定的条件进行交易或选择是否交易的合约。无论是哪一种数字资产衍生工具，都会影响交易者在未来一段时间内或未来某时间上的现金流，跨期交易的特点十分突出。这就要求交易的双方对数字资产币价的未来变动趋势作出判断，而判断的准确与否直接决定了交易者的交易盈亏。\n",
+            "location": [
+                {
+                    "range": [
+                        20,
+                        564,
+                        229,
+                        602
+                    ],
+                    "page": 5
+                },
+                {
+                    "range": [
+                        17,
+                        639,
+                        1320,
+                        1034
+                    ],
+                    "page": 5
+                }
+            ],
+            "children": {}
+        },
+        "联动性": {
+            "type": "text",
+            "metadata": "数字资产衍生品联动性;基础变量支付特征",
+            "data": "\n\n 联动性主要指数字资产衍生产品的价值与基础产品或基础变量紧密联系规则变动。通常，数字资产衍生产品与基础变量相联系的支付特征由衍生品合约所规定，其联动关系既可以是简单的线性关系，也可以表达为非线性函数或者分段函数。\n",
+            "location": [
+                {
+                    "range": [
+                        12,
+                        1129,
+                        226,
+                        1167
+                    ],
+                    "page": 5
+                },
+                {
+                    "range": [
+                        9,
+                        1197,
+                        1326,
+                        1453
+                    ],
+                    "page": 5
+                }
+            ],
+            "children": {}
+        },
+        "4、高风险性": {
+            "type": "text",
+            "metadata": "交易盈亏不稳定性;数字资产衍生产品风险",
+            "data": "\n\n 数字资产衍生产品的交易后果取决于交易者对基础产品未来价格的预测和判断的准确程度。基础产品价格的大幅变动决定了金融衍生产品交易盈亏的不稳定性，这是金融衍生产品具有高风险的重要诱因。连Block 心",
+            "location": [
+                {
+                    "range": [
+                        15,
+                        1548,
+                        267,
+                        1588
+                    ],
+                    "page": 5
+                },
+                {
+                    "range": [
+                        14,
+                        1611,
+                        1339,
+                        1809
+                    ],
+                    "page": 5
+                }
+            ],
+            "children": {}
+        },
+        "5、高杠杆性": {
+            "type": "text",
+            "metadata": "保证金制度;高风险高收益",
+            "data": "\n\n 衍生产品的交易采用保证金制度，即交易所需的最低资金只需满足基础资产价值的某个百分比，保证金可以分为初始保证金，维持保证金，并且在交易所交易时采取盯市制度，如果交易过程中的保证金比例低于维持保证金比例，那么将收到追加保证金通知，如果投资者没有及时追加保证金，其将被强行平仓，可见，衍生品交易具有高风险高收益的特点。",
+            "location": [
+                {
+                    "range": [
+                        14,
+                        28,
+                        274,
+                        75
+                    ],
+                    "page": 6
+                },
+                {
+                    "range": [
+                        16,
+                        112,
+                        1356,
+                        447
+                    ],
+                    "page": 6
+                }
+            ],
+            "children": {}
+        },
+        "契约性": {
+            "type": "text",
+            "metadata": "数字资产衍生产品交易;经济合同关系",
+            "data": "\n\n 数字资产衍生产品交易是对基础产品在未来某种条件下的权利和义务的处理，是一种建立在社会信用基础上的经济合同关系。",
+            "location": [
+                {
+                    "range": [
+                        18,
+                        515,
+                        229,
+                        557
+                    ],
+                    "page": 6
+                },
+                {
+                    "range": [
+                        16,
+                        592,
+                        1339,
+                        708
+                    ],
+                    "page": 6
+                }
+            ],
+            "children": {}
+        },
+        "7、交易对象的虚拟性": {
+            "type": "text",
+            "metadata": "数字资产衍生品合约;虚拟金融权利义务",
+            "data": "\n\n 数字资产衍生产品合约交易的对象是对基础金融工具在未来各种条件下处置的权利和义务，如期权的买权或卖权、互换的债务交换义务等，构成所谓“产品”，表现出一定的虚拟性。\n",
+            "location": [
+                {
+                    "range": [
+                        18,
+                        797,
+                        436,
+                        838
+                    ],
+                    "page": 6
+                },
+                {
+                    "range": [
+                        12,
+                        873,
+                        1339,
+                        1055
+                    ],
+                    "page": 6
+                }
+            ],
+            "children": {}
+        },
+        "交易目的的多重性": {
+            "type": "text",
+            "metadata": "风险转移;经济利益获取",
+            "data": "\n\n 数字资产衍生产品交易通常有套期保值、投机套利和资产负债管理等四大目的。其交易的主要目的并不在于所涉及的基础数字资产商品所有权的转移，而在于转移与该数字资产商品相关的价值变化的风险或通过风险投资获取经济利益。\n",
+            "location": [
+                {
+                    "range": [
+                        6,
+                        1147,
+                        430,
+                        1185
+                    ],
+                    "page": 6
+                },
+                {
+                    "range": [
+                        3,
+                        1219,
+                        1344,
+                        1472
+                    ],
+                    "page": 6
+                }
+            ],
+            "children": {}
+        },
+        "2.数字资产衍生品政策：部分国家明确监管": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        13,
+                        5,
+                        1314,
+                        108
+                    ],
+                    "page": 7
+                }
+            ],
+            "children": {}
+        },
+        "欧盟": {
+            "type": "text",
+            "metadata": "数字资产CFDs监管；投资者保护措施",
+            "data": "\n\n 2018年1月18日，欧盟金融监管机构欧洲证券及市场管理局（ESMA）发布报告，以保护投资者尤其是散户投资者为名，要求数字资产交易平台提供关于差价合约（追踪标的资产价格的复杂金融产品）的相关证据。\n\n ESMA称，其正在研究以数字资产为基础的CFDs是否属于其监管范围内的金融工具，如果落在监管范围内，则意味着ESMA有权取缔之。\n\n 此外，鉴于数字资产金融工具的剧烈波动性，监管机构正在研究是否在这些产品上采取更严格的杠杆率限制，乃至禁止产品营销，ESMA还在考虑完全禁止基于数字资产的CFDs。\n",
+            "location": [
+                {
+                    "range": [
+                        21,
+                        137,
+                        117,
+                        178
+                    ],
+                    "page": 7
+                },
+                {
+                    "range": [
+                        17,
+                        219,
+                        1356,
+                        418
+                    ],
+                    "page": 7
+                },
+                {
+                    "range": [
+                        12,
+                        505,
+                        1358,
+                        623
+                    ],
+                    "page": 7
+                },
+                {
+                    "range": [
+                        11,
+                        652,
+                        1360,
+                        842
+                    ],
+                    "page": 7
+                }
+            ],
+            "children": {}
+        },
+        "英国": {
+            "type": "text",
+            "metadata": "数字资产监管立场;衍生品监管机制",
+            "data": "\n\n 英国金融行为监管局（FCA）于2018年4月6日在其官网上发布声明明确了其在数字资产监管上的立场。FCA表示，数字资产本身及ICO并不受FC 监管，但数字资产衍生品 （如CFD、期权、期货等）会受到FCA的监\n\n 在英国当前的法律框架下，并没有赋予FCA监管数字资产或ICO代币的职权，但是，FCA有监管数字资产衍生品（CFD、期权、期货）的职权。英国政府目前对于数字资产及ICO的态度仍不明朗，但是对数字资产衍生品的态度已经明确，FCA将成为这些衍生品的监管机构，这对规范数字资产领域的投机行为有一定积极作用。\n库",
+            "location": [
+                {
+                    "range": [
+                        12,
+                        1009,
+                        113,
+                        1049
+                    ],
+                    "page": 7
+                },
+                {
+                    "range": [
+                        8,
+                        1075,
+                        1360,
+                        1262
+                    ],
+                    "page": 7
+                },
+                {
+                    "range": [
+                        16,
+                        1354,
+                        1359,
+                        1691
+                    ],
+                    "page": 7
+                }
+            ],
+            "children": {}
+        },
+        "法国": {
+            "type": "text",
+            "metadata": "加密数字资产衍生品监管;欧盟MiFID2法规",
+            "data": "\n\n Block Blocl (Autorite des Marches Financiers）发表声明，称加密数字资产衍生品必须受到欧盟金融改革规定的监管，相关规定已经于2018年1月1日生效。\n\n 根据规定，衍生品不能通过电子形式合法宣传，因此法国金融市场监管局要求数字资产衍生品不得出现在线上广告中。法国金融市场监管局依据的是欧盟新版《金融工具市场法规》[Marketsin FinancialInstruments Directive(MiFID2)]，该监管框架内规定了必须受到监管的衍生工具比如期权、期货、互换或远期现货交易以及相应的基础资产清单。",
+            "location": [
+                {
+                    "range": [
+                        26,
+                        44,
+                        122,
+                        96
+                    ],
+                    "page": 8
+                },
+                {
+                    "range": [
+                        31,
+                        138,
+                        1359,
+                        343
+                    ],
+                    "page": 8
+                },
+                {
+                    "range": [
+                        39,
+                        428,
+                        1334,
+                        758
+                    ],
+                    "page": 8
+                }
+            ],
+            "children": {}
+        },
+        "韩国": {
+            "type": "text",
+            "metadata": "韩国比特币衍生品禁令; 数字资产发行计划取消",
+            "data": "\n\n 2017年12月11日，韩国监管机构开始禁止比特币衍生品。在韩国金融投资协会(KoreaFinancial InvestmentAssociation)通报监管机构命令后，准备进行数字资产衍生品发行的公司全部取消了他们的原有计划。",
+            "location": [
+                {
+                    "range": [
+                        46,
+                        839,
+                        138,
+                        879
+                    ],
+                    "page": 8
+                },
+                {
+                    "range": [
+                        43,
+                        916,
+                        1322,
+                        1099
+                    ],
+                    "page": 8
+                }
+            ],
+            "children": {}
+        },
+        "日本": {
+            "type": "text",
+            "metadata": "虚拟货币交易监管; 数字资产交易所牌照",
+            "data": "\n\n lockData \n\n了一个30人的团队来监管虚拟货币交易。此后不久，该监管机构给11家数\n字资产交易所运营商颁发了运营牌照。\n\n",
+            "location": [
+                {
+                    "range": [
+                        40,
+                        1213,
+                        132,
+                        1252
+                    ],
+                    "page": 8
+                },
+                {
+                    "range": [
+                        36,
+                        1287,
+                        1332,
+                        1469
+                    ],
+                    "page": 8
+                }
+            ],
+            "children": {}
+        },
+        "美国": {
+            "type": "text",
+            "metadata": "虚拟货币实物转移系统;数字资产衍生品交易授权;区块链金融监管框架;跨境数字货币监管协作",
+            "data": "\n\n 哥商品交易所，衍生品巨头）的专利申请——虚拟货币实物转移系统(2015年11月提交）。其核心是把数字资产的转移与特定合约直接联系起来，没有清算方插足。\n\n\n 美国商品期货交易委员会（CFTC）于2017年7月7日授权区块链创业公司ledgerx正式注册成为互换交易执行基础设施（SEF），这也是第二家被授予数字资产衍生品交易权利的公司；美国商品交易期货委员会(CFTC)于2017年7月24日授权LedgerX获得成为数字资产衍生品清算机构(DCO)，允许其进行比特币等数字资产衍生品的交易与清算。\n\n\n 综合以上专利批准及相关业务授权，可以看出美国对数字资产衍生品持开放性态度，",
+            "location": [
+                {
+                    "range": [
+                        3,
+                        21,
+                        102,
+                        67
+                    ],
+                    "page": 9
+                },
+                {
+                    "range": [
+                        5,
+                        121,
+                        1367,
+                        427
+                    ],
+                    "page": 9
+                },
+                {
+                    "range": [
+                        9,
+                        547,
+                        1361,
+                        927
+                    ],
+                    "page": 9
+                },
+                {
+                    "range": [
+                        33,
+                        1041,
+                        1362,
+                        1168
+                    ],
+                    "page": 9
+                }
+            ],
+            "children": {
+                "Digital Currency Regulation Comparison Map": {
+                    "type": "image",
+                    "metadata": "Digital currency, regulatory frameworks, UK, France, Japan, South Korea, USA, EU, blockchain, financial supervision",
+                    "data": "The image is an infographic titled \"Digital Currency Regulation Comparison Map,\" created by \"链塔智库研究绘制\" (Chain Tower Think Tank Research) and sourced from \"www.blockdata.club.\" It visually compares the regulatory stances of seven major jurisdictions on digital currency derivatives: the UK, France, Japan, South Korea, the USA, and the EU. Each jurisdiction is represented by a colored location pin icon. The UK, France, and Japan are shown with blue pins and blue boxes indicating their respective national financial regulators (UK Financial Conduct Authority, French Autorité des Marchés Financiers, and Japan’s Financial Services Agency) have explicitly stated that digital currency derivatives fall under their regulatory purview. South Korea is depicted with a purple pin and box, stating it has a comprehensive ban on digital currency derivative issuance and trading. The USA is shown with a green pin and box, indicating that while multiple approvals are required for digital currency derivative businesses, the overall stance is open and supportive. The EU is represented with a purple pin and box, noting that it has issued the \"Financial Instruments Market Regulation\" and is currently evaluating whether digital currency derivatives fall within its regulatory scope. The layout is clean and hierarchical, using color-coding and directional arrows to link each country's regulatory position.",
+                    "location": [
+                        {
+                            "range": [
+                                348,
+                                1181,
+                                1057,
+                                1900
+                            ],
+                            "page": 9
+                        }
+                    ],
+                    "children": {}
+                }
+            }
+        },
+        "Z链塔智库3.数字资产衍生品分析：集中于期货合约交易": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        2,
+                        27,
+                        1374,
+                        139
+                    ],
+                    "page": 10
+                }
+            ],
+            "children": {}
+        },
+        "1、数字资产期货合约交易": {
+            "type": "text",
+            "metadata": "数字资产合约;交易权利义务;区块链金融衍生品;买方卖方关系",
+            "data": "\n\n 数字资产虚拟合约是合约交易的买卖对象，是由合约交易所统一制定的，规定了某一特定的时间交割一定数量商品的标准化合约。\n\n 在合约交易过程中，交易的双方将获得各自的权利和义务。例如合约买卖双方以50000元的价格成交了10份标的为一个BTC的合约，那么合约的买方即获得了在某月某日以50000元/个的价格买入10个BTC的权利和义务同样的，卖方也获得了在某月某日以50000元/个的价格卖出10个BTC的权利和义务。代表了买卖双方所拥有的权利和义务的合约，就是虚拟合约。V \n\n 在大多数时候，投资者并不会实际履行合约的权利和义务，而是在合约生效，也就是交割日之前，通过交易这份合约来获取收益。\n\n 链塔智库研究绘制",
+            "location": [
+                {
+                    "range": [
+                        13,
+                        158,
+                        510,
+                        212
+                    ],
+                    "page": 10
+                },
+                {
+                    "range": [
+                        5,
+                        232,
+                        1319,
+                        378
+                    ],
+                    "page": 10
+                },
+                {
+                    "range": [
+                        0,
+                        444,
+                        1334,
+                        789
+                    ],
+                    "page": 10
+                },
+                {
+                    "range": [
+                        0,
+                        858,
+                        1324,
+                        980
+                    ],
+                    "page": 10
+                },
+                {
+                    "range": [
+                        72,
+                        1862,
+                        353,
+                        1908
+                    ],
+                    "page": 10
+                }
+            ],
+            "children": {
+                "Digital Asset Futures Contract Mechanism": {
+                    "type": "image",
+                    "metadata": "Digital assets, futures contract, buyer, seller, blockchain, financial derivatives",
+                    "data": "The image is a flowchart illustrating the mechanism of a digital asset futures contract. It begins with a \"Buyer\" box on the top left, connected by an arrow to a blue box describing \"a contract to buy a specified quantity of digital assets at a predetermined price on a specified date.\" Below this, a purple box explains that \"both buyer and seller can profit through the transaction contract on the specified date.\" At the bottom, a blue box describes \"a contract to sell a specified quantity of digital assets at a predetermined price on a specified date,\" connected by an arrow from the purple box. An arrow from the bottom blue box points to a \"Seller\" box on the bottom right. The entire diagram is watermarked with \"链塔智库 BlockData\" and includes the text \"链塔智库研究绘制\" and \"www.blockdata.club\" at the bottom.",
+                    "location": [
+                        {
+                            "range": [
+                                0,
+                                1052,
+                                1166,
+                                1830
+                            ],
+                            "page": 10
+                        }
+                    ],
+                    "children": {}
+                }
+            }
+        },
+        "2、数字资产期权交易": {
+            "type": "text",
+            "metadata": "数字资产期权交易;权利金与履约义务;区块链金融衍生品;期权合约双方权利义务",
+            "data": "\n\n 数字资产的期权是一种选择权，数字资产期权的买方向卖方支付一定数额的权利金后，就获得这种权利，即拥有在一定时间内以一定的价格各（执行价格）出售或购买一定数量的标的物（可以是任何类型的数字资产）的权利（即期权交易）。期权的买方行使权利时，卖方必须按期权合约规定的内容履行义务。相反，买方可以放弃行使权利，此时买方只是损失权利金，同时，卖方则赚取权利金。数字资产期权的买方拥有执行期权的权利，无执行的义务；而期权的卖方只有履行期权的义务\nckDa \n\n 链塔智库研究绘制\n\n www.blockdata.club ",
+            "location": [
+                {
+                    "range": [
+                        18,
+                        53,
+                        437,
+                        100
+                    ],
+                    "page": 11
+                },
+                {
+                    "range": [
+                        13,
+                        131,
+                        1375,
+                        592
+                    ],
+                    "page": 11
+                },
+                {
+                    "range": [
+                        0,
+                        1298,
+                        257,
+                        1327
+                    ],
+                    "page": 11
+                },
+                {
+                    "range": [
+                        1079,
+                        1314,
+                        1342,
+                        1343
+                    ],
+                    "page": 11
+                }
+            ],
+            "children": {
+                "Options Contract Mechanism": {
+                    "type": "image",
+                    "metadata": "Options contract, buyer, seller, rights, obligations, blockchain, financial derivatives",
+                    "data": "The image is a flowchart illustrating the mechanism of an options contract between a buyer and a seller. At the top, the buyer (蓝色矩形) pays the seller (蓝色矩形) a certain option premium (买方向卖方支付一定权利金). The buyer obtains the right, but not the obligation, to buy or sell a specified quantity of the underlying asset at a predetermined price within a specific time period (买方获得在一段时间内以一定价格出售或购买一定数量标的物的权利). The buyer's right can be abandoned (买方权利可以放弃), while the seller's obligation cannot be avoided (卖方义务无法放弃). If the buyer chooses to abandon the contract, they lose the premium already paid (买方放弃执行合约时损失其支付的权利金). The buyer may choose not to execute the contract (买方可放弃执行合约内容), but the seller must fulfill the contract terms if the buyer exercises the option (卖方必须执行合约内容). The diagram uses arrows to indicate the flow of rights, obligations, and payments, with purple boxes emphasizing the key decision points. Watermarks for \"链捷智库研究绘制\" and \"www.blockdata.club\" are visible at the bottom.",
+                    "location": [
+                        {
+                            "range": [
+                                1,
+                                750,
+                                1394,
+                                1302
+                            ],
+                            "page": 11
+                        }
+                    ],
+                    "children": {}
+                }
+            }
+        },
+        "3、数字资产掉期交易": {
+            "type": "text",
+            "metadata": "数字资产掉期交易;衍生品期货风险",
+            "data": "\n\n 数字资产掉期交易是指，交易当事人双方约定在未来某一期间内相互交换他们认为具有等价经济价值的数字资产的交易。较为常见的是数字资产掉期交易和利率掉期交易。数字资产掉期交易，是指两种数字资产之间的交换交易、在一般情况下，是指两种数字资产资本的本金交换。利率掉期交易，是指相同种数字资产的资本不同种类利率之间的交换交易，一般不伴随本金的交换。数字资产掉期交易的目的包括两个方面，避免交易对（如BTC/USDT)兑换率变动引发的风险；二是利用不同交割期限兑换率的差异通过低买高卖，牟取利润\n\n\n 目前数字资产衍生品行业业务主要集中于期货合约交易方面，鲜有期权交易及掉期交易。且期货交易主要应用杠杆交易，没有过期货投资经验的投资者进入数字资产衍生品期货交易市场存在较大风险。期货市场合约价格能够从侧面表现出投资者对于数字资产现货的未来价值预估。",
+            "location": [
+                {
+                    "range": [
+                        21,
+                        58,
+                        446,
+                        100
+                    ],
+                    "page": 12
+                },
+                {
+                    "range": [
+                        14,
+                        133,
+                        1398,
+                        679
+                    ],
+                    "page": 12
+                },
+                {
+                    "range": [
+                        4,
+                        770,
+                        1392,
+                        1027
+                    ],
+                    "page": 12
+                }
+            ],
+            "children": {}
+        },
+        "4.数字资产期货与传统期货对比": {
+            "type": "text",
+            "metadata": "数字资产期货市场风险;数字资产现货期货关联性;数字资产衍生品;交易平台主营业务;数字资产上线时间;传统期货对比分析;市场价值与避险功能",
+            "data": "\n\n 传统期货市场中交易量及交易用户较为庞大，对于传统现货市场发现价值较大，甚至能从一定方面预示现货市场未来走向。在数字资产期货方面，目前较为成熟的专注于数字资产衍生品平台BitMEX，其平台中合约交易对于数字资产现货未来价值展望有一定参考价值(即对数字资产现货市场发现价值）。大部分数字资产衍生品的交易平台仍处于萌芽阶段，用户及交易量较少，平台中期货合约交易对于数字资产现货未来价值参考意义不\n\n 传统期货市场中可利用期货交易中的杠杆机制以少量资金对冲现货市场风险。而在数字资产期货市场中，由于其期货市场与现货市场关联性不强，导致两个市场独立存在。除小部分现货市场与期货市场关联性较强的数字资产衍生品交易平台外，大部分数字资产衍生品交易平台无法达到规避现货市场风险的作用，且由于数字资产期货市场杠杆倍率普遍较高、数字资产期货价格浮动较大等因素，反而使其期货市场风险大幅增加。\n\n 传统期货市场中存在套期保值的方法，由于某种商品的现货市场及期货市场受同一供求关系的影响，所以二者价格同涨同跌，由于在这两个市场上操作相反，所以盈亏相反。现货市场购买或销售实体货物时，可以在期货市场卖出或买入相同份额的合约，降低因现货市场价格出现不利变动时造成的损失。而在数字资产市场中，资产流动性较高，现货无定期买卖需求，基本不需套期保值。\n\n\n www.blockdata.club \n\n 塔智库研究绘制\n\n www.blockdata.club ",
+            "location": [
+                {
+                    "range": [
+                        5,
+                        0,
+                        1000,
+                        94
+                    ],
+                    "page": 13
+                },
+                {
+                    "range": [
+                        15,
+                        204,
+                        1387,
+                        613
+                    ],
+                    "page": 13
+                },
+                {
+                    "range": [
+                        12,
+                        703,
+                        1385,
+                        1103
+                    ],
+                    "page": 13
+                },
+                {
+                    "range": [
+                        3,
+                        1194,
+                        1374,
+                        1594
+                    ],
+                    "page": 13
+                },
+                {
+                    "range": [
+                        1125,
+                        414,
+                        1400,
+                        438
+                    ],
+                    "page": 14
+                },
+                {
+                    "range": [
+                        0,
+                        1263,
+                        211,
+                        1298
+                    ],
+                    "page": 15
+                },
+                {
+                    "range": [
+                        1109,
+                        1289,
+                        1382,
+                        1315
+                    ],
+                    "page": 15
+                }
+            ],
+            "children": {
+                "Comparison of Digital Asset Futures and Traditional Futures": {
+                    "type": "table",
+                    "metadata": "Digital Asset Futures, Traditional Futures, Market Value, Risk Avoidance, Correlation",
+                    "data": "The table compares digital asset futures and traditional futures across three key aspects: (1) \"Spot Market Discovery Value\" — digital asset futures are limited to BTC only, while traditional futures have relatively strong discovery value; (2) \"Whether it can hedge spot market risks\" — digital asset futures cannot hedge such risks, whereas traditional futures can; and (3) \"Correlation with spot market\" — the correlation for digital asset futures is weaker, while for traditional futures it is stronger. This comparison highlights the structural differences and market characteristics between the two types of futures.",
+                    "location": [
+                        {
+                            "range": [
+                                0,
+                                36,
+                                1398,
+                                403
+                            ],
+                            "page": 14
+                        }
+                    ],
+                    "children": {}
+                },
+                "5.数字资产衍生品交易平台名单": {
+                    "type": "table",
+                    "metadata": "数字资产, 衍生品, 交易平台, 主营业务, 上线时间",
+                    "data": "该表格列出了多个数字资产衍生品交易平台的基本信息，包括交易名称、是否仅做数字资产衍生产品、主营业务及上线时间。从内容看，部分平台如BitMEX、bitFlyer、Alt-options、BitStar、比权网、LedgerX和分子未来仅提供数字资产衍生品服务；而OKEX、火币PRO、Bitfinex、Exx、B网、DEW、中币交易所等则同时提供数字资产现货和期货交易。主营业务涵盖数字资产现货交易、期货交易、期权交易、清算、金融衍生品服务等。上线时间从2013年1月到2017年3月不等，显示了这些平台在不同时间点进入市场。该表旨在为用户提供对数字资产衍生品交易平台的概览，便于比较和选择。",
+                    "location": [
+                        {
+                            "range": [
+                                0,
+                                127,
+                                1398,
+                                1273
+                            ],
+                            "page": 15
+                        },
+                        {
+                            "range": [
+                                0,
+                                15,
+                                1006,
+                                86
+                            ],
+                            "page": 15
+                        }
+                    ],
+                    "children": {}
+                }
+            }
+        },
+        "6.数字资产衍生品平台对比：产品同质化严重": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        6,
+                        49,
+                        1391,
+                        148
+                    ],
+                    "page": 16
+                }
+            ],
+            "children": {}
+        },
+        "6.1BitMEX平台数字资产衍生品简述": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        15,
+                        173,
+                        849,
+                        240
+                    ],
+                    "page": 16
+                }
+            ],
+            "children": {}
+        },
+        "合约类型": {
+            "type": "text",
+            "metadata": "比特币期货合约;BitMEX交易平台",
+            "data": "\n\n BitMEX上提供了十几种期货和掉期合约产品。比特币是其中交易最活跃的品种（占平台交易总量99.99%以上），其下又分为三种合约类型：XBT （比特币/美元期货），XBJ（比特币/日元期货）和XBTUSD（比特币/美元永续掉期）。BitMEX近期的期货合约为XBTU18。代号中的XBT表示比特币，U18表示2018年9月底交割。每个季度会有新的期货产品出现，通常在前一个季度合约交割前半个月上线交易\n",
+            "location": [
+                {
+                    "range": [
+                        28,
+                        279,
+                        213,
+                        320
+                    ],
+                    "page": 16
+                },
+                {
+                    "range": [
+                        20,
+                        360,
+                        1374,
+                        750
+                    ],
+                    "page": 16
+                }
+            ],
+            "children": {}
+        },
+        "期货合约": {
+            "type": "text",
+            "metadata": "期货合约保证金机制;比特币计价收益计算",
+            "data": "\n\n 以期货合约XBT为例，每份XBT合约价值一美元，买卖合约不会用到美元本身，只要提供以比特币计价的保证金。若以6000美金的价格购入3000张合约，则需要3000/6000=0.5BTC的保证金。最终收益（以看多为例）ckDai 合约张数/最初价格-合约张数/最终价格=最终收益。",
+            "location": [
+                {
+                    "range": [
+                        18,
+                        839,
+                        203,
+                        880
+                    ],
+                    "page": 16
+                },
+                {
+                    "range": [
+                        13,
+                        916,
+                        1367,
+                        1168
+                    ],
+                    "page": 16
+                }
+            ],
+            "children": {}
+        },
+        "杠桿": {
+            "type": "text",
+            "metadata": "杠杆作用;期货合约风险",
+            "data": "\n\n “期货合约”中简化的例子没用到杠杆。杠杆可以辅助将资产最大化，用少量资金做大宗交易，但同时也面临增大仓位的风险。BitMEX的期货合约通常给予最大100x的杠杆倍率。在仓位不变的情况下，杠杆倍数只影响保证金的额度和相对回报率，与盈亏绝对值无关。杠杆越高，仓位所需的保证金越少。同等资金下，能开的仓位也越大，潜在回报越高。同时，强平价格更接近开仓价格，这意味着杠杆作用下的仓位相比普通仓位更经受不起价格波动，更容易由于价格逆行导致爆仓。BlockD Bloc ",
+            "location": [
+                {
+                    "range": [
+                        12,
+                        1257,
+                        114,
+                        1297
+                    ],
+                    "page": 16
+                },
+                {
+                    "range": [
+                        13,
+                        1335,
+                        1385,
+                        1811
+                    ],
+                    "page": 16
+                }
+            ],
+            "children": {}
+        },
+        "永续掉期": {
+            "type": "text",
+            "metadata": "资金费率机制;永续合约持仓规则",
+            "data": "\n\n 日，可以一直持仓。为了防止XBTUSD的交易价格过度偏离现货市场的标记价格，BitMEX会每分钟采样计算两者的价差，每隔八小时算出一个资金费率，让多方给空方（或者反向）缴费，从而把成交价朝向现货的成交价方向拉动。\n\n\n 资金费率可以在永续合约中查看，正数表示交易价偏高，多方要向空方缴费，反之多方会从空方收取费用。每天有三次缴费时间：北京时间凌晨4点，中午12点，傍晚8点。在这三个时刻持仓才参与缴费。即使在缴费时间前一秒钟平仓都不会受到影响。\n",
+            "location": [
+                {
+                    "range": [
+                        20,
+                        34,
+                        210,
+                        84
+                    ],
+                    "page": 17
+                },
+                {
+                    "range": [
+                        18,
+                        124,
+                        1382,
+                        457
+                    ],
+                    "page": 17
+                },
+                {
+                    "range": [
+                        12,
+                        556,
+                        1377,
+                        814
+                    ],
+                    "page": 17
+                }
+            ],
+            "children": {}
+        },
+        "6.2OKEx平台数字资产期货合约简述": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        12,
+                        903,
+                        872,
+                        954
+                    ],
+                    "page": 17
+                }
+            ],
+            "children": {}
+        },
+        "合约类型_1": {
+            "type": "text",
+            "metadata": "OKEx合约类型;数字资产保证金交易",
+            "data": "\n\n 目前OKEx根据合约时间长短提供三种合约交易，分别是当周、次周、季度。根据币种分为BTC ETH、ETC、BCH BTG、XRP及EOS \n\n 当周合约：指在距离交易日最近的周五下午4点进行交割的合约。\n\n c 公司\n\n\n 季度合约：指交割日为3,6,9,12月中距离当前最近的一个月份的最后一个周五下午4点进行交割的合约。\n\n\n 用用户选择合适的成交价格价格与数量。用户购买合约时，所需的保证金为\n成交时刻与合约价值等值的数字资产数量除以杠杆倍数。只有账户内数字Bloc 资产资本大于等于交易成功后保证金的数量，用户才能进行委托操作数字资产衍生品14",
+            "location": [
+                {
+                    "range": [
+                        15,
+                        1048,
+                        207,
+                        1087
+                    ],
+                    "page": 17
+                },
+                {
+                    "range": [
+                        10,
+                        1107,
+                        1376,
+                        1234
+                    ],
+                    "page": 17
+                },
+                {
+                    "range": [
+                        15,
+                        1311,
+                        1195,
+                        1373
+                    ],
+                    "page": 17
+                },
+                {
+                    "range": [
+                        12,
+                        1379,
+                        1317,
+                        1447
+                    ],
+                    "page": 17
+                },
+                {
+                    "range": [
+                        11,
+                        1447,
+                        1378,
+                        1592
+                    ],
+                    "page": 17
+                },
+                {
+                    "range": [
+                        0,
+                        1717,
+                        1384,
+                        1958
+                    ],
+                    "page": 17
+                }
+            ],
+            "children": {}
+        },
+        "期货合约_1": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        6,
+                        1692,
+                        205,
+                        1735
+                    ],
+                    "page": 17
+                }
+            ],
+            "children": {}
+        },
+        "杠杆": {
+            "type": "text",
+            "metadata": "杠杆倍率选择;保证金计算模式",
+            "data": "\n\n OKEx的期货合约给予最大20倍杠杆倍率，有10倍、20倍两种杠杆倍率供用户选择。采用全仓保证金模式时，账户内所有仓位持仓的风险和收益将合并计算，全仓保证金模式下，10倍杠杆开仓后，保证金率不低于90%，20倍杠杆开仓后，保证金率不低于80%。采用逐仓保证金模式时，每个合约的双向持仓将会独立计算其保证金和收益，只有开仓可用保证金大于等于开仓所需的保证金数量，用户才能进行委托。而逐仓保证金时，每个合致。ockDat ",
+            "location": [
+                {
+                    "range": [
+                        17,
+                        32,
+                        122,
+                        73
+                    ],
+                    "page": 18
+                },
+                {
+                    "range": [
+                        10,
+                        118,
+                        1399,
+                        591
+                    ],
+                    "page": 18
+                }
+            ],
+            "children": {}
+        },
+        "6.3 BitMEX平台与OKEx平台对比": {
+            "type": "text",
+            "metadata": "BitMEX合约特性;OKEx合约对比;永续合约;杠杆与保证金规则",
+            "data": "\n\n 连塔智库研究绘制\n\n www.blockdata.club \n\n BitMEX合约类型较为单一，除币种不同外，所有期货合约全部以月度交割，且大量交易集中在比特币；OKEx合约类型较为丰富，拥有周、两周及月度交割三个时间维度的合约类型。BitMEX杠杆倍率较为灵活，可自行调节，且最高杠杆倍率为100倍；OKEx杠杆倍率仅分为10倍、20倍两种。从投入回报率角度来看，BitMEX与OKEx的保证金率基本相同。而BitMEX平台拥有业内少见的掉期交易，也丰富了其平台业务。",
+            "location": [
+                {
+                    "range": [
+                        0,
+                        716,
+                        807,
+                        771
+                    ],
+                    "page": 18
+                },
+                {
+                    "range": [
+                        0,
+                        1236,
+                        232,
+                        1265
+                    ],
+                    "page": 18
+                },
+                {
+                    "range": [
+                        1121,
+                        1238,
+                        1390,
+                        1263
+                    ],
+                    "page": 18
+                },
+                {
+                    "range": [
+                        0,
+                        1373,
+                        1378,
+                        1766
+                    ],
+                    "page": 18
+                }
+            ],
+            "children": {
+                "Comparison of BitMEX and OKEx Futures Platforms": {
+                    "type": "table",
+                    "metadata": "BitMEX, OKEx, Futures Trading, Leverage, Margin Rules, Perpetual Contracts",
+                    "data": "The table provides a detailed comparison between BitMEX and OKEx in four key aspects of their futures trading platforms. In terms of contract types, BitMEX offers eight currency pairs and over ten types of contract products, whereas OKEx provides eight currency pairs and twenty-four contract products. Regarding leverage ratios, BitMEX allows users to set their own leverage up to a maximum of 100x, while OKEx only offers fixed leverage options of 10x and 20x. For margin rules, BitMEX calculates the margin as the contract size divided by the estimated value of the underlying digital asset at the time of the trade, while OKEx calculates it as the value of the digital asset at the time of the trade divided by the leverage ratio. Finally, concerning perpetual contracts, BitMEX supports them, but OKEx does not.",
+                    "location": [
+                        {
+                            "range": [
+                                0,
+                                838,
+                                1393,
+                                1225
+                            ],
+                            "page": 18
+                        }
+                    ],
+                    "children": {}
+                }
+            }
+        },
+        "以下是链塔智库BlockData对于数字资产衍生品平台现有产品的简要分析": {
+            "type": "text",
+            "metadata": "数字资产衍生品平台同质化；期货交易风险与市场参考价值",
+            "data": "\n\n 从产品设计角度来看，数字资产衍生品交易平台产品设计较为单一，同质化问题严重。\n\n\n 存在数字资产衍生品业务的平台多为将现货业务与期货业务相结合，投资者可利用数字资产期货规避部分数字资产现货风险，鲜有以此为导向性的交易平台。\n\n\n 交易对于数字资产现货（尤其是BTC）未来价值展望有一定参考价值。大部分专注于数字资产衍生品的交易平台仍处于萌芽阶段，用户及交易量较少，平台中期货合约交易对于数字资产现货未来价值参考意义不大。\n\n\n 数字资产期货交易相对于传统期货交易，波动较大，交易平台所提供杠杆较大，同时也提高了数字资产期货交易的风险\n",
+            "location": [
+                {
+                    "range": [
+                        20,
+                        24,
+                        1163,
+                        108
+                    ],
+                    "page": 19
+                },
+                {
+                    "range": [
+                        23,
+                        151,
+                        1286,
+                        277
+                    ],
+                    "page": 19
+                },
+                {
+                    "range": [
+                        25,
+                        359,
+                        1304,
+                        547
+                    ],
+                    "page": 19
+                },
+                {
+                    "range": [
+                        23,
+                        627,
+                        1308,
+                        944
+                    ],
+                    "page": 19
+                },
+                {
+                    "range": [
+                        21,
+                        1026,
+                        1313,
+                        1153
+                    ],
+                    "page": 19
+                }
+            ],
+            "children": {}
+        },
+        "结语\n CONCLUSION ": {
+            "type": "text",
+            "metadata": "数字资产衍生品交易;监管政策与风险特征",
+            "data": "\n\n 数字资产衍生品属于基于数字资产现货交易所衍生出的期货、掉期及期权交易。\n\n\n 部分国家已明确数字资产衍生品监管部门部分国家明令禁止数字资产衍生品，大部分国家未出台相关政策或在进行推敲。\n\n\n 数字资产衍生品中的期货交易、期权交易类似于传统金融衍生品的期货与期权交易，数字资产衍生品中的掉期交易可类比外汇的掉期交易。\n\n\n 货交易搭配进行\n\n\n 行，杠杆倍率较高，存在较高爆仓风险，需理性投资。\n\n 数字资产衍生品交易行业产品同质化严重，合约类型较为相似，各平台保证金费率较为合理，有待形成行业规则及各家差异化产品。\n车",
+            "location": [
+                {
+                    "range": [
+                        71,
+                        0,
+                        678,
+                        279
+                    ],
+                    "page": 20
+                },
+                {
+                    "range": [
+                        83,
+                        343,
+                        1196,
+                        454
+                    ],
+                    "page": 20
+                },
+                {
+                    "range": [
+                        76,
+                        525,
+                        1181,
+                        697
+                    ],
+                    "page": 20
+                },
+                {
+                    "range": [
+                        75,
+                        765,
+                        1157,
+                        942
+                    ],
+                    "page": 20
+                },
+                {
+                    "range": [
+                        69,
+                        1017,
+                        1136,
+                        1188
+                    ],
+                    "page": 20
+                },
+                {
+                    "range": [
+                        58,
+                        1262,
+                        1122,
+                        1392
+                    ],
+                    "page": 20
+                },
+                {
+                    "range": [
+                        47,
+                        1446,
+                        1110,
+                        1626
+                    ],
+                    "page": 20
+                }
+            ],
+            "children": {}
+        },
+        "法律声明2 LEGAL NOTICES ": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        22,
+                        0,
+                        729,
+                        247
+                    ],
+                    "page": 21
+                }
+            ],
+            "children": {}
+        },
+        "知识产权声明": {
+            "type": "text",
+            "metadata": "链塔智库报告;数据知识产权保护",
+            "data": "\n\n 本报告为链塔智库BlockData制作，报告中所有数据、表格、图片均受有关商标和著作权法律保护，部分数据采集自公开信息知识产权为原作者所有。我们相信数据的价值，我们同样相信分享也能创造价值，，我们",
+            "location": [
+                {
+                    "range": [
+                        42,
+                        338,
+                        367,
+                        394
+                    ],
+                    "page": 21
+                },
+                {
+                    "range": [
+                        45,
+                        438,
+                        1354,
+                        731
+                    ],
+                    "page": 21
+                }
+            ],
+            "children": {}
+        },
+        "免责条款": {
+            "type": "text",
+            "metadata": "区块链行业分析报告;风险提示声明",
+            "data": "\n\n 本报告中所载所有内容为链塔智库分析师通过访谈、市场调查、信息调研整理及其他方式方法获得，并结合链塔智库独有的数据和分析资源，建立相关预测模型估算而得，为区块链行业从业者提供基本参考，受研究方法和数据获取渠道所限，本报告只提供受众作为各类市场活动参考资料，不构成任何投资或交易买卖建议。如果访问者依据本报告信息进行投资或进行交易买卖而遭受损失，本公司对此不承担责任。\n",
+            "location": [
+                {
+                    "range": [
+                        58,
+                        810,
+                        273,
+                        865
+                    ],
+                    "page": 21
+                },
+                {
+                    "range": [
+                        54,
+                        914,
+                        1360,
+                        1338
+                    ],
+                    "page": 21
+                }
+            ],
+            "children": {}
+        },
+        "链塔智库": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        23,
+                        17,
+                        290,
+                        104
+                    ],
+                    "page": 22
+                }
+            ],
+            "children": {}
+        },
+        "链": {
+            "type": "text",
+            "metadata": "区块链数据赋能;行业顶尖合作;抽象设计;极简主义;几何形状;蓝色调;局部视角;简约美学",
+            "data": "\n\n 我们深刻认识到区块链数据的价值，专注用深度数据赋能区块链产业。\n\n\n 我们关注每一个细分领域的头部项目，TopX只是我们展现的手段。\n\n\n 我们只与业内顶尖的合作伙伴、区块链专家、行业分析师为伴，提供专业的数据服务。\n\n\n 我们拥有全球最全的区块链时刻扫描和追踪全球区块链动态。\n\n\n 我们是链塔智库推崇专注专心专业，坚持公开公正公平，“天赐时代睿见未来”，预见更多可能。",
+            "location": [
+                {
+                    "range": [
+                        44,
+                        191,
+                        98,
+                        252
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        133,
+                        193,
+                        806,
+                        279
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        135,
+                        344,
+                        815,
+                        415
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        132,
+                        481,
+                        800,
+                        547
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        127,
+                        614,
+                        802,
+                        680
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        23,
+                        747,
+                        749,
+                        827
+                    ],
+                    "page": 22
+                }
+            ],
+            "children": {
+                "Blue Square Icon": {
+                    "type": "image",
+                    "metadata": "abstract design, minimalist, geometric shape",
+                    "data": "The image displays a portion of a blue square icon with rounded corners, positioned against a plain white background. The visible parts suggest the icon is likely part of a larger design or interface element, with clean lines and a solid color fill. The composition is minimalistic, focusing on the geometric form without additional details or textures.",
+                    "location": [
+                        {
+                            "range": [
+                                26,
+                                317,
+                                125,
+                                419
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Blue Corner Element": {
+                    "type": "image",
+                    "metadata": "abstract design, minimalistic, blue color, partial view",
+                    "data": "The image displays a partial view of a solid blue shape with rounded corners, positioned in the bottom-right corner against a plain white background. The blue element appears to be a fragment of a larger graphic or interface component, with no additional details, text, or context visible.",
+                    "location": [
+                        {
+                            "range": [
+                                25,
+                                459,
+                                123,
+                                549
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Abstract Blue Shape": {
+                    "type": "image",
+                    "metadata": "abstract design, minimalist, blue color, geometric shape",
+                    "data": "The image displays a minimalist abstract design featuring a solid blue geometric shape positioned on the right side, set against a plain white background. The shape appears to be a vertical rectangle or bar with rounded edges, creating a clean and modern visual effect. The rest of the image is predominantly empty white space, emphasizing the simplicity and focus on the blue element.",
+                    "location": [
+                        {
+                            "range": [
+                                15,
+                                592,
+                                118,
+                                688
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                }
+            }
+        },
+        "链塔智库合作伙伴": {
+            "type": "text",
+            "metadata": "TalkingData大数据平台;媒体联合发布与深度合作;Bilibili动画视频平台;蓝色简约图标设计;空白白色背景;财经品牌标识;网易Dig媒体品牌;公司蓝红配色标志;区块链蓝色海洋科技金融;金融行业核能风格标志;模糊水印“智”与“Data”;中文字符艺术设计;财经金牛标志;品牌网站蓝色设计;部分文字水印",
+            "data": "\n\n 独家大数据支持平台：TalkingData \n\n 联合发布媒体（排名不分前后\n\n 猎云财经\n\n 星球日报O D A \n\n\n 媒体深度合作伙伴（排名不分前后）：\n\n 链道学社",
+            "location": [
+                {
+                    "range": [
+                        7,
+                        942,
+                        537,
+                        1006
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        5,
+                        1062,
+                        674,
+                        1108
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        6,
+                        1171,
+                        557,
+                        1212
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        371,
+                        1387,
+                        543,
+                        1436
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        689,
+                        1378,
+                        830,
+                        1439
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        9,
+                        1512,
+                        629,
+                        1551
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        920,
+                        1585,
+                        1041,
+                        1621
+                    ],
+                    "page": 22
+                }
+            ],
+            "children": {
+                "Blue Circle Icon": {
+                    "type": "image",
+                    "metadata": "blue circle, minimalistic design, icon, graphic element",
+                    "data": "The image displays a simple, solid blue circle positioned slightly off-center on a plain white background. The circle has a smooth, uniform color with no additional details, textures, or patterns, suggesting it is a basic graphic element or icon.",
+                    "location": [
+                        {
+                            "range": [
+                                613,
+                                1270,
+                                704,
+                                1324
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Bilibili Logo": {
+                    "type": "image",
+                    "metadata": "Bilibili, animation, video platform, Chinese online community",
+                    "data": "The image shows a partial view of the Bilibili logo, with the letters \"BIL\" visible in a stylized font. The logo is rendered in a light blue color against a white background, and the design features a modern, sleek aesthetic. The visible portion suggests the logo is part of a larger emblem, likely associated with the popular Chinese video-sharing and animation platform Bilibili.",
+                    "location": [
+                        {
+                            "range": [
+                                4,
+                                1261,
+                                273,
+                                1324
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Logo Fragment": {
+                    "type": "image",
+                    "metadata": "logo, partial text, stylized design, Chinese characters, watermark",
+                    "data": "The image displays a partial logo with a stylized yellow and black geometric shape on the left, followed by partially visible Chinese characters. Above the characters, faint, light gray text resembling \"BI\" is visible, suggesting it may be a watermark or part of a larger logo. The overall image is low-resolution and blurry, making finer details indistinct.",
+                    "location": [
+                        {
+                            "range": [
+                                354,
+                                1266,
+                                540,
+                                1328
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Blank Image": {
+                    "type": "image",
+                    "metadata": "blank, empty, white background",
+                    "data": "The image is entirely white with no visible content, objects, text, or patterns. It appears to be a blank or empty canvas with uniform white color across the entire frame.",
+                    "location": [
+                        {
+                            "range": [
+                                612,
+                                1379,
+                                673,
+                                1438
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Qian Neng Finance Logo": {
+                    "type": "image",
+                    "metadata": "Finance, Logo, Brand, Website, Blue Design",
+                    "data": "The image displays the logo for \"千氪财经\" (Qian Neng Finance). It features a stylized blue \"K\" symbol on the left, followed by the Chinese characters \"千氪财经\" in blue. Below the main text, the website address \"WWW.KG.COM\" is written in smaller blue letters. The overall design is clean and modern, using a blue color scheme to convey professionalism and trustworthiness in the financial sector.",
+                    "location": [
+                        {
+                            "range": [
+                                578,
+                                1580,
+                                775,
+                                1634
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "": {
+                    "type": "image",
+                    "metadata": "",
+                    "data": "",
+                    "location": [
+                        {
+                            "range": [
+                                583,
+                                1691,
+                                780,
+                                1754
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Logo of \"Wangyi Dig\"": {
+                    "type": "image",
+                    "metadata": "Logo, Wangyi, Dig, Chinese media, brand identity",
+                    "data": "The image displays the logo of \"Wangyi Dig,\" which consists of a stylized blue \"W\" shape with a gradient effect, accompanied by a small orange-red circular element resembling a sun or flame positioned at the upper right of the \"W.\" To the right of the graphic, the Chinese characters \"挖\" (Dig) are written in black, with smaller text beneath it that appears to be \"网\" (Network) or \"网信\" (Cyber Information), though partially obscured. The overall design conveys a modern, digital, and energetic brand identity.",
+                    "location": [
+                        {
+                            "range": [
+                                12,
+                                1572,
+                                221,
+                                1637
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Weilai Logo": {
+                    "type": "image",
+                    "metadata": "logo, company, blue, red, Chinese characters, stylized design",
+                    "data": "The image displays a logo consisting of a stylized blue hexagonal shape with interlocking lines forming a geometric pattern. At the center of the hexagon is a red circular element. To the right of the graphic, the Chinese character \"未\" (Weì) is shown in blue, followed by the partial English text \"weil\" in lowercase blue letters. The overall design suggests a modern and professional brand identity, likely for a company or organization named \"Weilai\" (未莱).",
+                    "location": [
+                        {
+                            "range": [
+                                12,
+                                1679,
+                                205,
+                                1737
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Blurred Text Fragment": {
+                    "type": "image",
+                    "metadata": "blurred text, faint, white background, partial visibility",
+                    "data": "The image displays a faint, out-of-focus text fragment that appears to be \"Block\" or similar, rendered in a light gray or pale color against a predominantly white background. The text is partially obscured and lacks sharp edges, suggesting either a low-resolution capture or intentional blurring. A faint, light purple horizontal line is visible in the lower-left corner, but its purpose or connection to the text is unclear. The overall content is minimal and abstract, with no discernible context or surrounding imagery.",
+                    "location": [
+                        {
+                            "range": [
+                                11,
+                                1774,
+                                238,
+                                1851
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "_1": {
+                    "type": "image",
+                    "metadata": "",
+                    "data": "",
+                    "location": [
+                        {
+                            "range": [
+                                289,
+                                1579,
+                                354,
+                                1643
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "金牛财经": {
+                    "type": "image",
+                    "metadata": "财经, 金牛, 标志, 品牌",
+                    "data": "图像展示了一个品牌标志，包含黑色的“金牛财经”四个汉字，字体简洁有力，位于画面中央。在文字的右侧，有一个橙黄色的牛形剪影图案，牛的姿态充满动感，似乎在奔跑或跳跃，象征着力量和进取。整体设计风格现代、专业，传达出财经领域的权威性和活力。背景为纯白色，使标志更加突出醒目。",
+                    "location": [
+                        {
+                            "range": [
+                                294,
+                                1690,
+                                505,
+                                1745
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "_2": {
+                    "type": "image",
+                    "metadata": "",
+                    "data": "",
+                    "location": [
+                        {
+                            "range": [
+                                319,
+                                1777,
+                                486,
+                                1867
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Blockchain Blue Sea Logo": {
+                    "type": "image",
+                    "metadata": "blockchain, blue sea, logo, technology, finance",
+                    "data": "The image displays a logo with the Chinese text \"区块链蓝海\" (Blockchain Blue Sea) in bold blue characters. To the left is a stylized graphic of a blue wave or ocean, incorporating a subtle sailboat motif. Below the Chinese text, the English translation \"BLUE SEA OF BLOCK CHAIN\" is written in smaller, uppercase blue letters. The overall design uses shades of blue, conveying a sense of technology, innovation, and vast potential, likely representing a company or initiative in the blockchain industry.",
+                    "location": [
+                        {
+                            "range": [
+                                370,
+                                1582,
+                                519,
+                                1638
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Nuclear Finance Logo": {
+                    "type": "image",
+                    "metadata": "Chinese characters, financial industry, nuclear energy, stylized design",
+                    "data": "The image displays a stylized logo featuring the Chinese characters \"核财\" (Hé cái), which translates to \"Nuclear Finance.\" The characters are rendered in a modern, bold font with a blue color scheme. The character \"核\" (nuclear) is prominently displayed, while the character \"财\" (finance) is partially overlaid with a red graphical element resembling a rising trend line or a stylized \"W,\" suggesting growth or financial performance. The design combines elements of nuclear energy and finance, likely representing a company or organization in the nuclear finance sector.",
+                    "location": [
+                        {
+                            "range": [
+                                826,
+                                1569,
+                                914,
+                                1633
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Watermark Text": {
+                    "type": "image",
+                    "metadata": "faint watermark, diagonal text, \"智\" and \"Data\"",
+                    "data": "The image displays a faint watermark text in diagonal orientation, with visible Chinese characters \"智\" and the English word \"Data\". The text appears semi-transparent against a plain white background, suggesting it is likely a watermark used for copyright or branding purposes.",
+                    "location": [
+                        {
+                            "range": [
+                                854,
+                                1682,
+                                1021,
+                                1766
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                }
+            }
+        },
+        "全球首家区块链数据服务提供商": {
+            "type": "text",
+            "metadata": "扫码关注公众号;金色财经;QR code;WeChat;digital payment;blockchain;technology;logo;globe;stylized letter G;circular design",
+            "data": "\n\n 扫码关注公众号\n\n 扫码进入小程序\n\n 网址：www.block 微信订阅号ID：liantazhiku \n\n 金色财经",
+            "location": [
+                {
+                    "range": [
+                        960,
+                        161,
+                        1281,
+                        318
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        944,
+                        579,
+                        1052,
+                        645
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        1211,
+                        574,
+                        1318,
+                        640
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        1005,
+                        698,
+                        1370,
+                        810
+                    ],
+                    "page": 22
+                },
+                {
+                    "range": [
+                        1092,
+                        1260,
+                        1282,
+                        1313
+                    ],
+                    "page": 22
+                }
+            ],
+            "children": {
+                "QR Code with Logo": {
+                    "type": "image",
+                    "metadata": "QR code, logo, digital link, blue border",
+                    "data": "The image displays a standard QR code with a blue border and rounded corners. At the center of the QR code, there is a distinct logo featuring a stylized \"M\" or mountain-like symbol in purple and white. The QR code is composed of black and white modules arranged in a square grid, designed for scanning by mobile devices or other digital readers to access a linked web page or digital content.",
+                    "location": [
+                        {
+                            "range": [
+                                890,
+                                363,
+                                1103,
+                                566
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "QR Code with Logo_1": {
+                    "type": "image",
+                    "metadata": "QR code, logo, WeChat, payment, digital payment",
+                    "data": "The image displays a QR code with a blue circular logo in the center featuring a white stylized \"M\" symbol. Surrounding the logo is a pattern of black dots arranged in a radial, sunburst-like design, typical of QR codes. In the bottom-right corner, there is a green circular icon with a white \"S\" symbol, likely indicating a specific service or platform. The QR code is enclosed within a rounded rectangular border.",
+                    "location": [
+                        {
+                            "range": [
+                                1151,
+                                348,
+                                1374,
+                                561
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Logo Image": {
+                    "type": "image",
+                    "metadata": "logo, globe, stylized letter G, circular design, abstract",
+                    "data": "The image displays a logo composed of a circular outline enclosing a stylized globe design. The globe is represented by intersecting curved lines forming latitude and longitude patterns, with a prominent stylized letter \"G\" integrated into the design. To the right of the circular logo, there are partially visible Chinese characters, suggesting additional text or branding elements. The overall design is minimalistic and modern, likely representing a global or international organization.",
+                    "location": [
+                        {
+                            "range": [
+                                931,
+                                688,
+                                996,
+                                751
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "WeChat Logo": {
+                    "type": "image",
+                    "metadata": "WeChat, social media, messaging app, logo, communication",
+                    "data": "The image displays the logo of WeChat, a popular Chinese social media and messaging application. The logo consists of a stylized speech bubble with a smiling face inside, featuring two dots for eyes and a curved line for a mouth. To the right of the logo, the Chinese character \"微\" (wēi), meaning \"micro,\" is visible, which is part of the app's name \"微信\" (Wēixìn), translating to \"WeChat.\" The design is simple and uses a monochrome, minimalist style.",
+                    "location": [
+                        {
+                            "range": [
+                                936,
+                                766,
+                                1000,
+                                817
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "Blockchain": {
+                    "type": "image",
+                    "metadata": "Blockchain, Technology, Digital, Web, Logo",
+                    "data": "The image displays the Chinese characters \"区块链\" (Blockchain) in bold blue font, positioned prominently. Above the text, there is a blue rectangular banner containing the text \"niaoX.com\" in white. The background is plain white, emphasizing the text and logo. The overall design suggests a digital or technological theme, likely representing a website or brand related to blockchain technology.",
+                    "location": [
+                        {
+                            "range": [
+                                1114,
+                                1579,
+                                1268,
+                                1637
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                },
+                "": {
+                    "type": "image",
+                    "metadata": "",
+                    "data": "",
+                    "location": [
+                        {
+                            "range": [
+                                1091,
+                                1691,
+                                1285,
+                                1752
+                            ],
+                            "page": 22
+                        }
+                    ],
+                    "children": {}
+                }
+            }
+        },
+        "A 链塔智库Block Data _1": {
+            "type": "text",
+            "metadata": "data analysis; text summarization",
+            "data": "",
+            "location": [
+                {
+                    "range": [
+                        463,
+                        326,
+                        939,
+                        690
+                    ],
+                    "page": 23
+                }
+            ],
+            "children": {}
+        },
+        "全球区块链数据服务提供商1600+项目入库/800+机构入驻/100+专家学者观点": {
+            "type": "text",
+            "metadata": "区块链项目库;行业数据分析;QR码;数字访问;支付功能;微信支付;紫色背景",
+            "data": "\n\n 扫码关注公众号ID:liantazhiku \n\n 扫码进入小程序\n\n 『链塔智库BlockData』，全景式扫描和追踪全球区块链公司/项目，提供深度数据服务，专注于区块链行业研究、分析、项目评级。全球最全的区块链项目库1600+(数据每周都在更新）。",
+            "location": [
+                {
+                    "range": [
+                        186,
+                        891,
+                        1209,
+                        1047
+                    ],
+                    "page": 23
+                },
+                {
+                    "range": [
+                        410,
+                        1517,
+                        591,
+                        1589
+                    ],
+                    "page": 23
+                },
+                {
+                    "range": [
+                        844,
+                        1516,
+                        949,
+                        1581
+                    ],
+                    "page": 23
+                },
+                {
+                    "range": [
+                        92,
+                        1678,
+                        1321,
+                        1762
+                    ],
+                    "page": 23
+                }
+            ],
+            "children": {
+                "QR Code with Logo": {
+                    "type": "image",
+                    "metadata": "QR code, logo, purple background, digital link",
+                    "data": "The image displays a square QR code with a purple border and a purple background. At the center of the QR code, there is a blue square containing a white stylized \"M\" logo. The QR code is composed of black and white modules arranged in a pattern for machine-readable data, and the overall design suggests it may link to a digital resource or service associated with the \"M\" brand or entity.",
+                    "location": [
+                        {
+                            "range": [
+                                368,
+                                1233,
+                                638,
+                                1497
+                            ],
+                            "page": 23
+                        }
+                    ],
+                    "children": {}
+                },
+                "QR Code with Logo_1": {
+                    "type": "image",
+                    "metadata": "QR code, logo, digital access, payment, WeChat Pay",
+                    "data": "The image displays a square QR code with a white background and a purple border. At the center is a circular logo featuring a stylized white \"M\" on a blue background. In the bottom right corner of the QR code, there is a small green circular icon with a white \"S\" inside, likely indicating a specific service or platform. The QR code is designed for scanning with mobile devices, typically to access digital content, services, or payment options.",
+                    "location": [
+                        {
+                            "range": [
+                                760,
+                                1236,
+                                1035,
+                                1498
+                            ],
+                            "page": 23
+                        }
+                    ],
+                    "children": {}
+                }
+            }
+        },
+        "Supplement": {
+            "type": "supplement",
+            "metadata": "Record supplement information like header, footer, original page number and aside text in the document",
+            "data": "",
+            "location": [],
+            "children": {
+                "header": {
+                    "type": "header",
+                    "metadata": "Record header information in the document",
+                    "data": "",
+                    "location": [],
+                    "children": {
+                        "Header of Page 9": {
+                            "type": "header",
+                            "metadata": "Z 链塔智库",
+                            "data": "Z 链塔智库",
+                            "location": [
+                                {
+                                    "range": [
+                                        1139,
+                                        0,
+                                        1374,
+                                        32
+                                    ],
+                                    "page": 9
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Header of Page 11": {
+                            "type": "header",
+                            "metadata": "Z 链塔智库",
+                            "data": "Z 链塔智库",
+                            "location": [
+                                {
+                                    "range": [
+                                        1149,
+                                        0,
+                                        1381,
+                                        39
+                                    ],
+                                    "page": 11
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Header of Page 16": {
+                            "type": "header",
+                            "metadata": "ZA 链塔智库",
+                            "data": "ZA 链塔智库",
+                            "location": [
+                                {
+                                    "range": [
+                                        1144,
+                                        0,
+                                        1375,
+                                        41
+                                    ],
+                                    "page": 16
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Header of Page 17": {
+                            "type": "header",
+                            "metadata": "Z链塔智库",
+                            "data": "Z链塔智库",
+                            "location": [
+                                {
+                                    "range": [
+                                        1157,
+                                        0,
+                                        1395,
+                                        35
+                                    ],
+                                    "page": 17
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Header of Page 19": {
+                            "type": "header",
+                            "metadata": "公链塔智库",
+                            "data": "公链塔智库",
+                            "location": [
+                                {
+                                    "range": [
+                                        1104,
+                                        0,
+                                        1328,
+                                        27
+                                    ],
+                                    "page": 19
+                                }
+                            ],
+                            "children": {}
+                        }
+                    }
+                },
+                "footer": {
+                    "type": "footer",
+                    "metadata": "Record footer information in the document",
+                    "data": "",
+                    "location": [],
+                    "children": {
+                        "Footer of Page 5": {
+                            "type": "footer",
+                            "metadata": "数字资产衍生品",
+                            "data": "数字资产衍生品",
+                            "location": [
+                                {
+                                    "range": [
+                                        1091,
+                                        1927,
+                                        1288,
+                                        1963
+                                    ],
+                                    "page": 5
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Footer of Page 6": {
+                            "type": "footer",
+                            "metadata": "数字资产衍生品",
+                            "data": "数字资产衍生品",
+                            "location": [
+                                {
+                                    "range": [
+                                        1099,
+                                        1935,
+                                        1294,
+                                        1978
+                                    ],
+                                    "page": 6
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Footer of Page 7": {
+                            "type": "footer",
+                            "metadata": "数字资产衍生品",
+                            "data": "数字资产衍生品",
+                            "location": [
+                                {
+                                    "range": [
+                                        1108,
+                                        1934,
+                                        1304,
+                                        1971
+                                    ],
+                                    "page": 7
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Footer of Page 8": {
+                            "type": "footer",
+                            "metadata": "数字资产衍生品",
+                            "data": "数字资产衍生品",
+                            "location": [
+                                {
+                                    "range": [
+                                        1088,
+                                        1942,
+                                        1278,
+                                        1979
+                                    ],
+                                    "page": 8
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Footer of Page 9": {
+                            "type": "footer",
+                            "metadata": "www.blockdata.club 数字资产衍生品",
+                            "data": "www.blockdata.club 数字资产衍生品",
+                            "location": [
+                                {
+                                    "range": [
+                                        816,
+                                        1898,
+                                        1059,
+                                        1921
+                                    ],
+                                    "page": 9
+                                },
+                                {
+                                    "range": [
+                                        1106,
+                                        1930,
+                                        1294,
+                                        1959
+                                    ],
+                                    "page": 9
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Footer of Page 12": {
+                            "type": "footer",
+                            "metadata": "[able_资产]",
+                            "data": "[able_资产]",
+                            "location": [
+                                {
+                                    "range": [
+                                        1107,
+                                        1954,
+                                        1311,
+                                        1980
+                                    ],
+                                    "page": 12
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Footer of Page 13": {
+                            "type": "footer",
+                            "metadata": "数字资产衍生品",
+                            "data": "数字资产衍生品",
+                            "location": [
+                                {
+                                    "range": [
+                                        1109,
+                                        1931,
+                                        1303,
+                                        1977
+                                    ],
+                                    "page": 13
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Footer of Page 16": {
+                            "type": "footer",
+                            "metadata": "数字资产衍生品",
+                            "data": "数字资产衍生品",
+                            "location": [
+                                {
+                                    "range": [
+                                        1103,
+                                        1939,
+                                        1309,
+                                        1972
+                                    ],
+                                    "page": 16
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Footer of Page 18": {
+                            "type": "footer",
+                            "metadata": "数字资产衍生品",
+                            "data": "数字资产衍生品",
+                            "location": [
+                                {
+                                    "range": [
+                                        1099,
+                                        1932,
+                                        1302,
+                                        1965
+                                    ],
+                                    "page": 18
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Footer of Page 20": {
+                            "type": "footer",
+                            "metadata": "数字资产衍生品",
+                            "data": "数字资产衍生品",
+                            "location": [
+                                {
+                                    "range": [
+                                        1093,
+                                        1903,
+                                        1291,
+                                        1933
+                                    ],
+                                    "page": 20
+                                }
+                            ],
+                            "children": {}
+                        }
+                    }
+                },
+                "number": {
+                    "type": "number",
+                    "metadata": "Record original number of pages in the document",
+                    "data": "",
+                    "location": [],
+                    "children": {
+                        "Original number of Page 4": {
+                            "type": "number",
+                            "metadata": "01",
+                            "data": "01",
+                            "location": [
+                                {
+                                    "range": [
+                                        1312,
+                                        1952,
+                                        1367,
+                                        1980
+                                    ],
+                                    "page": 4
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 5": {
+                            "type": "number",
+                            "metadata": "02",
+                            "data": "02",
+                            "location": [
+                                {
+                                    "range": [
+                                        1308,
+                                        1921,
+                                        1366,
+                                        1961
+                                    ],
+                                    "page": 5
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 6": {
+                            "type": "number",
+                            "metadata": "03",
+                            "data": "03",
+                            "location": [
+                                {
+                                    "range": [
+                                        1315,
+                                        1926,
+                                        1372,
+                                        1969
+                                    ],
+                                    "page": 6
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 7": {
+                            "type": "number",
+                            "metadata": "04",
+                            "data": "04",
+                            "location": [
+                                {
+                                    "range": [
+                                        1326,
+                                        1928,
+                                        1382,
+                                        1966
+                                    ],
+                                    "page": 7
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 8": {
+                            "type": "number",
+                            "metadata": "05",
+                            "data": "05",
+                            "location": [
+                                {
+                                    "range": [
+                                        1299,
+                                        1932,
+                                        1354,
+                                        1975
+                                    ],
+                                    "page": 8
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 9": {
+                            "type": "number",
+                            "metadata": "06",
+                            "data": "06",
+                            "location": [
+                                {
+                                    "range": [
+                                        1316,
+                                        1923,
+                                        1374,
+                                        1962
+                                    ],
+                                    "page": 9
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 11": {
+                            "type": "number",
+                            "metadata": "08",
+                            "data": "08",
+                            "location": [
+                                {
+                                    "range": [
+                                        1314,
+                                        1954,
+                                        1372,
+                                        1980
+                                    ],
+                                    "page": 11
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 12": {
+                            "type": "number",
+                            "metadata": "09",
+                            "data": "09",
+                            "location": [
+                                {
+                                    "range": [
+                                        1334,
+                                        1943,
+                                        1399,
+                                        1980
+                                    ],
+                                    "page": 12
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 13": {
+                            "type": "number",
+                            "metadata": "10",
+                            "data": "10",
+                            "location": [
+                                {
+                                    "range": [
+                                        1316,
+                                        1924,
+                                        1371,
+                                        1963
+                                    ],
+                                    "page": 13
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 15": {
+                            "type": "number",
+                            "metadata": "12",
+                            "data": "12",
+                            "location": [
+                                {
+                                    "range": [
+                                        1317,
+                                        1949,
+                                        1375,
+                                        1978
+                                    ],
+                                    "page": 15
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 16": {
+                            "type": "number",
+                            "metadata": "13",
+                            "data": "13",
+                            "location": [
+                                {
+                                    "range": [
+                                        1333,
+                                        1933,
+                                        1394,
+                                        1976
+                                    ],
+                                    "page": 16
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 18": {
+                            "type": "number",
+                            "metadata": "15",
+                            "data": "15",
+                            "location": [
+                                {
+                                    "range": [
+                                        1327,
+                                        1926,
+                                        1383,
+                                        1967
+                                    ],
+                                    "page": 18
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 19": {
+                            "type": "number",
+                            "metadata": "16",
+                            "data": "16",
+                            "location": [
+                                {
+                                    "range": [
+                                        1318,
+                                        1951,
+                                        1380,
+                                        1980
+                                    ],
+                                    "page": 19
+                                }
+                            ],
+                            "children": {}
+                        },
+                        "Original number of Page 20": {
+                            "type": "number",
+                            "metadata": "17",
+                            "data": "17",
+                            "location": [
+                                {
+                                    "range": [
+                                        1317,
+                                        1897,
+                                        1376,
+                                        1935
+                                    ],
+                                    "page": 20
+                                }
+                            ],
+                            "children": {}
+                        }
+                    }
+                },
+                "aside": {
+                    "type": "aside_text",
+                    "metadata": "Record aside text in the document",
+                    "data": "",
+                    "location": [],
+                    "children": {}
+                }
+            }
+        }
+    }
+}

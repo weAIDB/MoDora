@@ -1,55 +1,97 @@
 <template>
   <div class="flex h-screen w-screen overflow-hidden bg-slate-50 font-sans text-slate-800">
-    <!-- 1. 左侧侧边栏 -->
+    <!-- 1. 左侧侧边栏 (保持不变) -->
     <AppSidebar />
 
-    <!-- 2. 右侧聊天区 -->
-    <ChatWindow />
+    <!-- 2. 中间聊天区 (自适应宽度) -->
+    <div class="flex-1 flex flex-col min-w-0 bg-white relative">
+      <ChatWindow />
+    </div>
 
-    <!-- 3. 文档结构树弹窗 (Overlay) -->
-    <transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="opacity-0 -translate-y-2"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 -translate-y-2"
-    >
-      <div v-if="store.state.viewingDocTree" class="absolute top-20 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-        <!-- 宽度调整为 max-w-5xl 以提供更大的编辑视野 -->
-        <div class="bg-white rounded-xl shadow-xl border border-indigo-100 p-4 w-full max-w-7xl pointer-events-auto">
-          <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
-            <h3 class="font-bold text-indigo-900 flex items-center">
-              <i class="fa-solid fa-sitemap mr-2"></i>
-              {{ store.state.viewingDocTree.name }}
-              <span class="ml-2 text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">编辑模式</span>
-            </h3>
-            <button @click="store.setViewingDoc(null)" class="text-slate-400 hover:text-slate-600 transition-colors">
-              <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-          </div>
-
-          <!-- 核心修改：这里替换成了新的交互式组件 -->
-          <InteractiveTree />
+    <!-- 3. 右侧通用侧边栏 (PDF 或 Tree) -->
+    <transition name="slide-right">
+      <div
+        v-if="store.state.viewingPdf || store.state.viewingDocTree"
+        class="w-[45%] h-full border-l border-slate-200 bg-white shadow-xl z-20 relative flex flex-col shrink-0"
+      >
+        <!-- 侧边栏头部 (仅在 Tree 模式下显示标题，PDFViewer 自带头部) -->
+        <div v-if="store.state.viewingDocTree" class="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-white z-10 shrink-0">
+          <h3 class="font-bold text-indigo-900 flex items-center text-sm">
+            <i class="fa-solid fa-sitemap mr-2"></i>
+            {{ store.state.viewingDocTree.name }}
+            <span class="ml-2 text-[10px] bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full uppercase tracking-wide">Graph View</span>
+          </h3>
+          <button
+            @click="store.closeSidePanel()"
+            class="text-slate-400 hover:text-slate-600 transition-colors w-6 h-6 flex items-center justify-center rounded-md hover:bg-slate-100"
+          >
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
         </div>
+
+        <!-- PDF 关闭按钮 (PDFViewer 内部没有统一关闭，我们悬浮在角落) -->
+        <button
+          v-if="store.state.viewingPdf"
+          @click="store.closeSidePanel()"
+          class="absolute top-2.5 right-3 z-50 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-red-500 w-8 h-8 rounded-full flex items-center justify-center transition shadow-sm border border-slate-200"
+          title="关闭侧边栏"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- 内容区域 -->
+        <div class="flex-1 overflow-hidden relative">
+          <!-- A. PDF 阅读器 -->
+          <PDFViewer
+            v-if="store.state.viewingPdf"
+            :key="'pdf-' + store.state.viewingPdf.url"
+            :source="store.state.viewingPdf.url"
+            :initial-page="store.state.viewingPdf.page"
+            :file-name="store.state.viewingPdf.name"
+            :highlight-bboxes="store.state.viewingPdf.bboxes"
+          />
+
+          <!-- B. 文档结构树 (Vue Flow) -->
+          <InteractiveTree
+            v-else-if="store.state.viewingDocTree"
+            :key="'tree-' + store.state.viewingDocTree.id"
+          />
+        </div>
+
       </div>
     </transition>
+
   </div>
 </template>
 
 <script setup>
 import AppSidebar from './components/AppSidebar.vue';
 import ChatWindow from './components/ChatWindow.vue';
-// 1. 引入我们刚写好的 Vue Flow 组件
 import InteractiveTree from './components/InteractiveTree.vue';
+import PDFViewer from './components/PDFViewer.vue';
 import { useModoraStore } from './composables/useModoraStore';
 
 const store = useModoraStore();
-
-// 注意：Mermaid 相关的代码和 import 已经被移除了，因为 App.vue 现在不需要它们了
-// (ChatWindow 内部仍然在使用 MermaidDiagram，互不影响)
 </script>
 
 <style>
-/* 确保没有任何全局样式冲突 */
+/* 右侧滑入动画 */
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* 更平滑的曲线 */
+}
+
+.slide-right-enter-from,
+.slide-right-leave-to {
+  transform: translateX(100%);
+  width: 0 !important;
+  opacity: 0.5;
+}
+
+.slide-right-enter-to,
+.slide-right-leave-from {
+  transform: translateX(0);
+  width: 45%;
+  opacity: 1;
+}
 </style>
