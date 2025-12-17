@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 
+// Updated to ensure fresh load
 // 1. 初始文件列表
 const INITIAL_DOCS = [
     { id: 1, name: "1.pdf", type: "pdf" },
@@ -130,7 +131,11 @@ export function useModoraStore() {
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ file_name: activeFile, query: currentQuery })
+                body: JSON.stringify({ 
+                    file_name: activeFile, 
+                    query: currentQuery,
+                    settings: state.settings // 传递全局设置
+                })
             });
 
             if (!response.ok) {
@@ -214,6 +219,8 @@ export function useModoraStore() {
         try {
             const formData = new FormData();
             formData.append("file", file);
+            // 传递全局设置 (作为 JSON 字符串)
+            formData.append("settings", JSON.stringify(state.settings));
 
             const response = await fetch('/api/upload', {
                 method: 'POST',
