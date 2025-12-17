@@ -12,7 +12,7 @@ from qa import *
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-def pipeline(id, source_path, cache_dir, query="", log_dir = None, use_cache=False):
+def pipeline(id, source_path, cache_dir, query="", log_dir = None, use_cache=False, config=None):
     # Prepare
     cache_path = os.path.join(cache_dir, os.path.splitext(os.path.basename(source_path))[0])
     cp_path = os.path.join(cache_path, "cp.json")
@@ -24,9 +24,9 @@ def pipeline(id, source_path, cache_dir, query="", log_dir = None, use_cache=Fal
         log_file = None
     if not use_cache:
         # Preprocessing
-        preprocess(source_path, cache_dir)
+        preprocess(source_path, cache_dir, config=config)
         # Tree construction
-        build_tree(source_path, cache_dir)
+        build_tree(source_path, cache_dir, config=config)
 
     cctree = {}
     try:
@@ -38,7 +38,7 @@ def pipeline(id, source_path, cache_dir, query="", log_dir = None, use_cache=Fal
         return ""
     
     # Tree based analysis
-    final_answer = qa(cctree, query, log_file, source_path)
+    final_answer = qa(cctree, query, log_file, source_path, config=config)
     return final_answer
     
 

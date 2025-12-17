@@ -7,6 +7,34 @@ from constants import *
 from retrieve import *
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+def call_gpt_wrapper(prompt, config=None):
+    if config:
+        # 如果是本地模型，且在 constants.py 中我们知道本地模型不需要 API Key
+        # 但这里 api_utils.py 的 gpt_generate 已经适配了 OpenAI 格式
+        # 如果 config['qaModel'] 是 'qwen-vl-local'，我们需要特殊处理吗？
+        # 不需要，因为我们已经在 api_utils.py 中移除了 call_qwen_*
+        # 等等，如果用户选了 'qwen-vl-local'，我们应该如何处理？
+        # 目前 api_utils.py 的 gpt_generate 是纯 OpenAI 调用。
+        # 如果要支持本地模型，我们需要在 api_utils.py 中恢复 call_qwen_* 的能力，或者让本地模型也提供 OpenAI 兼容接口。
+        # 考虑到之前的修改，api_utils.py 已经删除了 call_qwen_* 的引用。
+        # 这是一个关键点！
+        
+        # 临时方案：如果 model 是 qwen-vl-local，我们假设它不可用或者抛错，
+        # 或者我们需要恢复 api_utils.py 的本地调用能力。
+        # 鉴于用户要求“保留gemini和gpt”，且“默认是本地Qwen”，
+        # 这意味着我们需要支持双模式：OpenAI API 和 本地 Qwen。
+        
+        # 让我们先按照 OpenAI 格式传参。如果用户选了本地 Qwen，
+        # 我们需要在 api_utils.py 中做判断。
+        
+        return gpt_generate(
+            prompt, 
+            key=config.get('apiKey') or API_KEY, 
+            url=config.get('baseUrl') or API_URL, 
+            base_model=config.get('qaModel') or MODEL
+        )
+    return gpt_generate(prompt)
+
 def simplify_tree(cctree):
     for index, sub_tree in cctree.items():
         del sub_tree['type']
@@ -21,19 +49,19 @@ def get_tree_schema(cctree):
             schema[index] = sub_tree_schema
     return schema
 
-def whole_reason(whole_doc, query, cctree):
+def whole_reason(whole_doc, query, cctree, config=None):
     prompt = whole_reasoning_prompt.format(query=query,data=cctree)
-    res = gpt_generate(prompt)
+    res = call_gpt_wrapper(prompt, config)
     return res
 
-def retrieved_reason(query, retrieved_text, retrieved_image, schema):
+def retrieved_reason(query, retrieved_text, retrieved_image, schema, config=None):
     prompt = retrieved_reasoning_prompt.format(query=query, evidence=retrieved_text, schema=schema)
-    res = gpt_generate(prompt)
+    res = call_gpt_wrapper(prompt, config)
     return res
 
-def check_answer(query, answer):
+def check_answer(query, answer, config=None):
     prompt = check_answer_prompt.format(query=query, answer=answer)
-    res = gpt_generate(prompt)
+    res = call_gpt_wrapper(prompt, config)
     return bool_string(res)
 
 def parse_response(resp):
@@ -91,12 +119,12 @@ def parse_response(resp):
         print(f"解析响应时出错: {e}")
         return {'location': [{'page':0, 'grids':[]}], 'content': ''}
 
-def question_parsing(question):
+def question_parsing(question, config=None):
     prompt = question_parsing_prompt.replace("__QUESTION_PLACEHOLDER__", question)
-    res = gpt_generate(prompt)
+    res = call_gpt_wrapper(prompt, config)
     return parse_response(res)
 
-def qa(cctree, query, log_file=None, source_path=False):
+def qa(cctree, query, log_file=None, source_path=False, config=None):
 
     if log_file is not None:
         with open(log_file, "a") as f:
@@ -176,7 +204,7 @@ def qa(cctree, query, log_file=None, source_path=False):
             # 修改：不再生成/使用图片进行推理，仅使用文本证据
             # retrieved_image = bbox_to_base64(source_path, full_locations)
             # 传入空图片占位，retrieved_reason 实际上只使用 prompt (文本)
-            answer = retrieved_reason(semantic_query, full_evidence, None, schema)
+            answer = retrieved_reason(semantic_query, full_evidence, None, schema, config=config)
         else:
             answer = "None"
             
@@ -191,7 +219,7 @@ def qa(cctree, query, log_file=None, source_path=False):
             f.write(f"{DELIMITER} Answer {DELIMITER}\n{answer}\n")
     
     # 5. 最终校验
-    final_check = check_answer(query=semantic_query, answer=answer)
+    final_check = check_answer(query=semantic_query, answer=answer, config=config)
     
     final_answer = answer
     if not final_check:
@@ -204,7 +232,7 @@ def qa(cctree, query, log_file=None, source_path=False):
         whole_doc = pdf_to_base64(source_path) 
         if 'children' in cctree:
             simplify_tree(cctree['children']) 
-        final_answer = whole_reason(whole_doc, semantic_query, cctree)
+        final_answer = whole_reason(whole_doc, semantic_query, cctree, config)
 
     # 6. 返回结果
     return {

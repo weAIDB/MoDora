@@ -23,7 +23,7 @@ def cp_init(cp_type="",title="",metadata="",data="",location=None):
     }
     return cp
 
-def get_components(source_path, cache_path):
+def get_components(source_path, cache_path, config=None):
     # Initial sequence
     bbox_list = []
     cp_dict = {
@@ -149,7 +149,7 @@ def get_components(source_path, cache_path):
     # Template-Based Information Enrichment
     for cp in cp_dict['body']:
         if cp['type'] in ["image", "chart", "table"]:
-            title, metadata, data = information_enrichment(source_path, cp['location'], cp['type'])
+            title, metadata, data = information_enrichment(source_path, cp['location'], cp['type'], config=config)
             cp['title'] = title if cp['title'] == "Default Title" else cp['title']
             cp['metadata'] = metadata
             cp['data'] = data if cp['data'] == "" else cp['data']
@@ -157,20 +157,29 @@ def get_components(source_path, cache_path):
     return cp_dict
     
 
-def information_enrichment(source_path, location, cp_type):
+def information_enrichment(source_path, location, cp_type, config=None):
     base64_figure = bbox_to_base64(source_path, location)
-    return qwen_annotation(base64_figure, cp_type)
+    return qwen_annotation(base64_figure, cp_type, config=config)
 
-def preprocess(source_path,cache_dir):
+def preprocess(source_path,cache_dir, config=None):
     # Prepare
     cache_path = os.path.join(cache_dir, os.path.splitext(os.path.basename(source_path))[0])
     os.makedirs(cache_path, exist_ok=True)
     cp_path = os.path.join(cache_path, "cp.json")
 
     try:
-        # OCR-based preprocess
-        paddle_generate(source_path, cache_path)
-        cp_dict = get_components(source_path, cache_path)
+        # Layout Analysis (Paddle or Gemini)
+        # 优先使用 config 中的配置，否则使用全局 LAYOUT_MODEL
+        current_layout_model = config.get('layoutModel') if config else LAYOUT_MODEL
+        
+        if current_layout_model == "gemini":
+            from call_gemini import gemini_generate
+            gemini_generate(source_path, cache_path)
+        else:
+            from call_paddle import paddle_generate
+            paddle_generate(source_path, cache_path)
+
+        cp_dict = get_components(source_path, cache_path, config=config)
         
     except Exception as e:
         print(f"Error in preprocessing: {e}")

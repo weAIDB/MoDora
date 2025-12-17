@@ -1,22 +1,38 @@
 import os
+import sys
+
+# Add current directory to path
+sys.path.append(os.getcwd())
+
 from preprocess import preprocess
 from cctree import build_tree
 from constants import BASE_DIR, CACHE_DIR
 
 # Define the list of files to process
-input_files = ["1.pdf", "2.pdf", "3.pdf"]
+input_files = ["100.pdf"]  # Only test 100.pdf
 
-# Calculate cache directory to match main.py logic
-cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
+# Correct base directory for datasets
+# Note: User's BASE_DIR in constants might be pointing to MMDA, let's check
+# If BASE_DIR is .../datasets/MMDA, then we can just use "100.pdf"
 
 print(f"Batch processing: {input_files}")
 print(f"Base Directory: {BASE_DIR}")
-print(f"Cache Directory: {cache_base}")
+print(f"Cache Directory: {CACHE_DIR}")
 
 for input_file in input_files:
     source_path = os.path.join(BASE_DIR, input_file)
+    # If BASE_DIR is not MMDA, try to append MMDA
+    if not os.path.exists(source_path):
+         source_path = os.path.join(os.path.dirname(BASE_DIR), "datasets/MMDA", input_file)
+    
+    # Calculate cache base properly
+    # cache_base needs to be a directory where the folder "100" (basename of pdf) will be created inside
+    cache_base = CACHE_DIR
+
     print(f"\n{'='*40}")
     print(f"Processing {input_file}...")
+    print(f"Source Path: {source_path}")
+    print(f"Cache Base: {cache_base}")
     print(f"{'='*40}")
 
     if not os.path.exists(source_path):
@@ -40,5 +56,4 @@ for input_file in input_files:
         import traceback
         traceback.print_exc()
 
-print("\nBatch processing completed.")
-print("You can now start the backend server via 'python main.py' and request these files.")
+print("\nTest completed.")

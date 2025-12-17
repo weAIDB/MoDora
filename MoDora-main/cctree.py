@@ -17,19 +17,43 @@ def deep_update(dict1, dict2):
         else:
             dict1[key] = value
 
-def generate_levels(raw_title_list, base64_image):
+def generate_levels(raw_title_list, base64_image, config=None):
     prompt = title_extract_prompt.format(raw_list = raw_title_list)
-    res = gpt_generate_pdf(base64_image, prompt)
+    if config:
+        res = gpt_generate_pdf(
+            base64_image, prompt, 
+            key=config.get('apiKey') or API_KEY, 
+            url=config.get('baseUrl') or API_URL, 
+            base_model=config.get('treeModel') or MODEL
+        )
+    else:
+        res = gpt_generate_pdf(base64_image, prompt)
     return res
 
-def generate_metadata(data, n0):
+def generate_metadata(data, n0, config=None):
     prompt = metadata_generation_prompt.format(data = data, n0 = n0)
-    res = gpt_generate(prompt)
+    if config:
+        res = gpt_generate(
+            prompt, 
+            key=config.get('apiKey') or API_KEY, 
+            url=config.get('baseUrl') or API_URL, 
+            base_model=config.get('treeModel') or MODEL
+        )
+    else:
+        res = gpt_generate(prompt)
     return ';'.join(res.split(';')[:n0])
 
-def integrate_metadata(data, number):
+def integrate_metadata(data, number, config=None):
     prompt = metadata_integration_prompt.format(data = data, number = number)
-    res = gpt_generate(prompt)
+    if config:
+        res = gpt_generate(
+            prompt, 
+            key=config.get('apiKey') or API_KEY, 
+            url=config.get('baseUrl') or API_URL, 
+            base_model=config.get('treeModel') or MODEL
+        )
+    else:
+        res = gpt_generate(prompt)
     return ';'.join(res.split(';')[:number])
 
 def calculate_n_i(D_i, d_i, n_im1, k = 2):
@@ -44,7 +68,7 @@ def calculate_n_i(D_i, d_i, n_im1, k = 2):
     
     return math.ceil(n_i)
 
-def get_metadata(root, level = 1, n0 = 2, max_workers = 8):
+def get_metadata(root, level = 1, n0 = 2, max_workers = 8, config=None):
     # Concurrent metadata generation
     sem = threading.BoundedSemaphore(value=max_workers)
 
@@ -87,13 +111,13 @@ def get_metadata(root, level = 1, n0 = 2, max_workers = 8):
         # Current node Execution
         if node['type'] == "text":
             # Generate self metadata
-            node['metadata'] = generate_metadata(node['data'], n0)
+            node['metadata'] = generate_metadata(node['data'], n0, config=config)
 
             # For non-leaf text
             if n_children > 0:
                 n = calculate_n_i(D, d, n_children)
                 data = [node['metadata']] + [c['metadata'] for c in children]
-                node['metadata'] = integrate_metadata(data, n)
+                node['metadata'] = integrate_metadata(data, n, config=config)
             # For leaf text
             else:
                 D = level
@@ -218,7 +242,7 @@ def construct(cp_dict):
 
     return root
 
-def build_tree(source_path, cache_dir):
+def build_tree(source_path, cache_dir, config=None):
     # Prepare
     cache_path = os.path.join(cache_dir, os.path.splitext(os.path.basename(source_path))[0])
     cp_path = os.path.join(cache_path, "cp.json")
@@ -245,7 +269,7 @@ def build_tree(source_path, cache_dir):
 
             base64_image = bbox_to_base64(source_path, title_bbox_list)
             try:
-                title_list = ast.literal_eval(generate_levels(raw_title_list, base64_image))
+                title_list = ast.literal_eval(generate_levels(raw_title_list, base64_image, config=config))
                 with open(title_path, "f", encoding="utf-8") as f:
                     title_list = json.load(f)
             except Exception as e:
@@ -266,7 +290,7 @@ def build_tree(source_path, cache_dir):
             cctree = {}
         
         # Summarization
-        get_metadata(cctree)
+        get_metadata(cctree, config=config)
         
     with open(tree_path, "w", encoding="utf-8") as f:
         json.dump(cctree, f, ensure_ascii=False, indent=4)

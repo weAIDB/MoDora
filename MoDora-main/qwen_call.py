@@ -8,15 +8,33 @@ from sentence_transformers import SentenceTransformer
 from prompt_template import *
 from constants import *
 
-# 初始化模型
-qwen_vl_model = Qwen3VLForConditionalGeneration.from_pretrained(
-    VL_MODEL_PATH, torch_dtype="auto", device_map="auto"
-)
-qwen_vl_processor = AutoProcessor.from_pretrained(VL_MODEL_PATH)
+# 初始化模型 (Lazy Load)
+qwen_vl_model = None
+qwen_vl_processor = None
+qwen_em_model = None
 
-qwen_em_model = SentenceTransformer(
-    EM_MODEL_PATH, device="cpu"
-)
+def ensure_model_loaded():
+    global qwen_vl_model, qwen_vl_processor, qwen_em_model
+    if qwen_vl_model is None:
+        print("Loading local Qwen models...")
+        qwen_vl_model = Qwen3VLForConditionalGeneration.from_pretrained(
+            VL_MODEL_PATH, torch_dtype="auto", device_map="auto"
+        )
+        qwen_vl_processor = AutoProcessor.from_pretrained(VL_MODEL_PATH)
+        
+        qwen_em_model = SentenceTransformer(
+            EM_MODEL_PATH, device="cpu"
+        )
+        print("Local Qwen models loaded.")
+
+# qwen_vl_model = Qwen3VLForConditionalGeneration.from_pretrained(
+#     VL_MODEL_PATH, torch_dtype="auto", device_map="auto"
+# )
+# qwen_vl_processor = AutoProcessor.from_pretrained(VL_MODEL_PATH)
+
+# qwen_em_model = SentenceTransformer(
+#     EM_MODEL_PATH, device="cpu"
+# )
 
 # --- 树结构处理工具函数 (保持不变) ---
 def flat_tree(sub_tree):
@@ -143,7 +161,8 @@ def call_qwen_vl(prompt, base64_image):
     return output_text[0]
 
 # --- 标注函数 (保持不变) ---
-def qwen_annotation(base64_image, cp_type):
+def qwen_annotation(base64_image, cp_type, config=None):
+    from api_utils import gpt_generate_pdf
     prompt_map = {
         "table": table_enrichment_prompt,
         "chart": chart_enrichment_prompt, 
@@ -159,7 +178,17 @@ def qwen_annotation(base64_image, cp_type):
     content = "Default Content"
     
     while not flag and cnt<3:
-        text = call_qwen_vl(prompt,base64_image)
+        # Redirect call to Gemini via api_utils
+        # Use treeModel as the default for enrichment if not specified, or fallback to MODEL
+        # Enrichment is part of tree construction/preprocessing
+        base_model = config.get('treeModel') if config else MODEL
+        
+        text = gpt_generate_pdf(
+            base64_image, prompt,
+            key=config.get('apiKey') or API_KEY,
+            url=config.get('baseUrl') or API_URL,
+            base_model=base_model
+        )
         match = re.search(pattern, text, re.DOTALL)
         
         if match:

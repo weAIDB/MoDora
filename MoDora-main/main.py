@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 import shutil
 from fastapi import UploadFile, File, BackgroundTasks
+# from fastapi import UploadFile, File, BackgroundTasks, Form # 重复导入
 from preprocess import preprocess
 from cctree import build_tree
 
@@ -65,6 +66,7 @@ def get_pdf_image(file_name: str, page_index: int):
 class ChatRequest(BaseModel):
     file_name: str  # 例如: "1.pdf"
     query: str      # 例如: "这篇文章讲了什么？"
+    settings: Optional[Dict] = None # 前端传来的配置
 
 class RetrievalItem(BaseModel):
     page: int
@@ -383,7 +385,7 @@ def update_node_endpoint(request: NodeUpdate):
 # key: filename, value: status ("processing", "completed", "failed")
 task_status_store = {}
 
-def process_document_task(file_path: str):
+def process_document_task(file_path: str, config: Optional[Dict] = None):
     """
     后台任务：对上传的文件进行预处理和树构建
     """
@@ -398,12 +400,14 @@ def process_document_task(file_path: str):
             os.makedirs(cache_base)
             
         print(f"后台任务开始: 处理文件 {file_path} -> cache: {cache_base}")
+        if config:
+            print(f"Using Config: {config}")
         
         # 1. 预处理 (OCR, 布局分析等)
-        preprocess(file_path, cache_base)
+        preprocess(file_path, cache_base, config=config)
         
         # 2. 构建层级树
-        build_tree(file_path, cache_base)
+        build_tree(file_path, cache_base, config=config)
         
         print(f"后台任务完成: {file_path}")
         task_status_store[filename] = "completed"
@@ -428,8 +432,23 @@ def get_task_status(filename: str):
             
     return {"status": status}
 
+from fastapi import UploadFile, File, BackgroundTasks, Form
+
 @app.post("/api/upload")
-async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+async def upload_file(
+    background_tasks: BackgroundTasks, 
+    file: UploadFile = File(...),
+    settings: Optional[str] = Form(None)
+):
+    # 解析 settings
+    config = None
+    if settings:
+        try:
+            config = json.loads(settings)
+            print(f"Upload received settings: {config}")
+        except json.JSONDecodeError:
+            print("Failed to parse settings JSON")
+
     # 确保保存目录存在
     if not os.path.exists(BASE_DIR):
         os.makedirs(BASE_DIR)
@@ -447,7 +466,7 @@ async def upload_file(background_tasks: BackgroundTasks, file: UploadFile = File
     task_status_store[file.filename] = "pending"
     
     # 添加后台处理任务
-    background_tasks.add_task(process_document_task, file_location)
+    background_tasks.add_task(process_document_task, file_location, config=config)
     
     return {
         "filename": file.filename, 
@@ -498,7 +517,8 @@ def chat_endpoint(request: ChatRequest):
             cctree=cctree, 
             query=query, 
             log_file=log_file, 
-            source_path=source_path
+            source_path=source_path,
+            config=request.settings
         )
         # ==================== 🐛 DEBUG START ====================
         print("\n" + "="*30 + " DEBUG LOG " + "="*30)
@@ -678,6 +698,16 @@ async def get_document_tree(request: TreeRequest):
 
 # --- 启动入口 ---
 if __name__ == "__main__":
+    # Preload local models
+    try:
+        print("Preloading local Qwen models...")
+        from qwen_call import ensure_model_loaded
+        ensure_model_loaded()
+        print("Local Qwen models preloaded successfully.")
+    except Exception as e:
+        print(f"Warning: Failed to preload local models: {e}")
+        print("Models will be loaded lazily upon first request.")
+
     # 启动服务，监听 8000 端口
     print("启动 FastAPI 服务...")
     print(f"PDF 搜索路径: {BASE_DIR}")
