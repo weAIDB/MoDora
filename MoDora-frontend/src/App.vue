@@ -8,7 +8,10 @@
     
     <!-- 1. 左侧侧边栏 -->
     <!-- 添加 glass-panel 类，实现磨砂和圆角 -->
-    <AppSidebar class="glass-panel w-full md:w-72 shrink-0 h-full border-none shadow-2xl" />
+    <AppSidebar 
+      class="glass-panel w-full md:w-72 shrink-0 h-full border-none shadow-2xl" 
+      @open-settings="showSettings = true"
+    />
 
     <!-- 2. 中间聊天区 -->
     <div class="glass-panel flex-1 flex flex-col min-w-0 relative overflow-hidden border-none shadow-2xl">
@@ -68,17 +71,23 @@
       </div>
     </transition>
 
+    <!-- 设置弹窗 -->
+    <SettingsModal :is-open="showSettings" @close="showSettings = false" />
+
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import AppSidebar from './components/AppSidebar.vue';
 import ChatWindow from './components/ChatWindow.vue';
 import InteractiveTree from './components/InteractiveTree.vue';
 import PDFViewer from './components/PDFViewer.vue';
+import SettingsModal from './components/SettingsModal.vue';
 import { useModoraStore } from './composables/useModoraStore';
 
 const store = useModoraStore();
+const showSettings = ref(false);
 </script>
 
 <style>

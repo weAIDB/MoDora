@@ -35,7 +35,14 @@ const state = reactive({
     uploadProgress: 0,
     viewingDocTree: null,
     viewingPdf: null,
-    inputMessage: ''
+    inputMessage: '',
+    settings: JSON.parse(localStorage.getItem('modora_settings')) || {
+        apiKey: '',
+        baseUrl: 'https://api.aiaiapi.com/v1',
+        layoutModel: 'paddle',
+        treeModel: 'qwen-vl-local',
+        qaModel: 'qwen-vl-local'
+    }
 });
 
 // 辅助：生成 Mermaid 图表 (仅保留文档树)
@@ -351,6 +358,14 @@ export function useModoraStore() {
         }
     };
 
+    // 动作：更新设置
+    const updateSettings = (newSettings) => {
+        state.settings = { ...state.settings, ...newSettings };
+        localStorage.setItem('modora_settings', JSON.stringify(state.settings));
+        console.log("Settings updated:", state.settings);
+        // 这里可以触发后端 API 更新配置（如果需要）
+    };
+
     return {
         state,
         sendMessage,
@@ -362,6 +377,7 @@ export function useModoraStore() {
         closeSidePanel,
         setActiveDoc, // 导出新方法
         updateTreeNode,
-        saveTreeStructure
+        saveTreeStructure,
+        updateSettings
     };
 }

@@ -14,15 +14,26 @@
         <h2 class="font-bold text-slate-800 dark:text-slate-100 text-lg tracking-tight">MoDora</h2>
       </div>
       
-      <!-- 主题切换按钮 -->
-      <button 
-        @click="toggleTheme" 
-        class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-        :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
-      >
-        <i v-if="isDark" class="fa-solid fa-sun text-yellow-400"></i>
-        <i v-else class="fa-solid fa-moon"></i>
-      </button>
+      <div class="flex items-center">
+        <!-- 设置按钮 -->
+        <button 
+          @click="$emit('open-settings')"
+          class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors mr-2"
+          title="Global Settings"
+        >
+          <i class="fa-solid fa-gear"></i>
+        </button>
+
+        <!-- 主题切换按钮 -->
+        <button 
+          @click="toggleTheme" 
+          class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+          :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        >
+          <i v-if="isDark" class="fa-solid fa-sun text-yellow-400"></i>
+          <i v-else class="fa-solid fa-moon"></i>
+        </button>
+      </div>
     </div>
 
     <!-- 列表区 -->
