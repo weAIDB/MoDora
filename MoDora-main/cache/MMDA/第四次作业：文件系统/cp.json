@@ -108,9 +108,9 @@
         },
         {
             "type": "image",
-            "title": "Root Process Tree",
-            "metadata": "Linux system, systemd, process hierarchy, root process, child processes",
-            "data": "The image displays a text-based output showing the root process and its child processes in a Linux system. The title \"Root Process\" is at the top. Below it, several child processes are listed with their process IDs (PIDs) and corresponding service names in parentheses: PID 578 (systemd-journal), PID 589 (systemd-oomd), PID 616 (systemd-timesyn), PID 621 (systemd-udevd), and PID 628 (systemd-resolve). At the end, it indicates \"... and 29 more children,\" implying that there are additional child processes not fully displayed. The background is a dark purple terminal-like interface with white text.",
+            "title": "Root Process Children List",
+            "metadata": "Linux system, systemd, process tree, root process, child processes",
+            "data": "The image displays a terminal-style output showing the children of the root process in a Linux system. The title \"Root Process\" is at the top. Below it, a list of child processes is shown, each with a PID (Process ID) and its corresponding service name in parentheses: Child: 578 (systemd-journal), Child: 589 (systemd-oomd), Child: 616 (systemd-timesyn), Child: 621 (systemd-udevd), Child: 628 (systemd-resolve). At the bottom, it indicates \"... and 29 more children,\" implying there are additional child processes not fully listed. The background is dark purple, and the text is white, typical of a Linux terminal interface.",
             "location": [
                 {
                     "range": [

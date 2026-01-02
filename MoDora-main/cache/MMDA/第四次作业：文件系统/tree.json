@@ -1,13 +1,13 @@
 {
     "type": "root",
-    "metadata": "",
+    "metadata": "process status file; directory information storage; Linux进程信息模拟实现; C语言内核模块开发; systemd进程管理; Linux系统进程树; document header recording; document footer recording; original page number recording; aside text recording; document metadata supplementation",
     "data": "",
     "location": [],
     "children": {
         "Default Title": {
             "type": "text",
-            "metadata": "process status file; directory information summary",
-            "data": "",
+            "metadata": "process status file; directory information storage",
+            "data": "\n\n 4、每个目录下包含一个名为\"status\"的文件，其中存储了关于该进程的精选信息，包括但不限于PID、运行状态、内存占用和CPU时间。\n",
             "location": [
                 {
                     "range": [
@@ -23,8 +23,8 @@
         },
         "任务说明": {
             "type": "text",
-            "metadata": "Linux进程模拟实现;C语言内核模块;systemd进程管理;Linux系统进程层级",
-            "data": "",
+            "metadata": "Linux进程信息模拟实现;C语言内核模块开发;systemd进程管理;Linux系统进程树",
+            "data": "\n\n 1.使用c语言完成相应的功能编写；\n\n 2.可以参考Linux kernel中的procfs代码;\n\n 3.采用合适的数据结构模拟实现对应功能，对函数的命名和参数个数不做强制要求；\n\n 4.提交材料包括实验报告（文件类型不限）、演示视频和源代码，请一起压缩并命令为“学号-姓名操作系统第四次作业.zip\"，实验报告要求内容详实，包含但不限于实验内容、实验思路、实验源码与\n\n 1、需要在Linux环境下进行实验，开发平台和系统不限，需要在演示视频中有所体现（服务器、虚拟\n\n 2、独立完成源代码、实验报告和演示视频，抄袭者不得分。\n\n /home/eternal/tprocfs\"compiler differs from the one used to build the kernel built by:x8664-linux gnu -gcc -14(Ubuntu 14.2.0-19ubuntu2) 14.2.0gcc-14(Ubuntu 14.2.019ubuntu2）14.2.0.symvers \n.mod.o \ncommon.o \ngeneration for tprocfs.ko due tounavailabilityofvmlinux /home/eternal/tprocfs\"\n\n 查看第一个进程的信息cat /tproc/1/status ",
             "location": [
                 {
                     "range": [
@@ -109,17 +109,10 @@
                 }
             ],
             "children": {
-                "特别注意": {
-                    "type": "text",
-                    "metadata": "特别注意",
-                    "data": "提交AI使用说明",
-                    "location": [],
-                    "children": {}
-                },
-                "Root Process Tree": {
+                "Root Process Children List": {
                     "type": "image",
-                    "metadata": "Linux system, systemd, process hierarchy, root process, child processes",
-                    "data": "",
+                    "metadata": "Linux system, systemd, process tree, root process, child processes",
+                    "data": "The image displays a terminal-style output showing the children of the root process in a Linux system. The title \"Root Process\" is at the top. Below it, a list of child processes is shown, each with a PID (Process ID) and its corresponding service name in parentheses: Child: 578 (systemd-journal), Child: 589 (systemd-oomd), Child: 616 (systemd-timesyn), Child: 621 (systemd-udevd), Child: 628 (systemd-resolve). At the bottom, it indicates \"... and 29 more children,\" implying there are additional child processes not fully listed. The background is dark purple, and the text is white, typical of a Linux terminal interface.",
                     "location": [
                         {
                             "range": [

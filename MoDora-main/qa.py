@@ -7,6 +7,56 @@ from constants import *
 from retrieve import *
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+def merge_multi_docs(source_paths_map):
+    """
+    Merge multiple document trees into a single tree.
+    Args:
+        source_paths_map: dict {filename: absolute_path}
+    """
+    root = {
+        'type': 'MROOT',
+        'metadata': 'Multi-document root',
+        'data': 'Multi-document root',
+        'location': [],
+        'children': {}
+    }
+    
+    for filename, path in source_paths_map.items():
+        # Assuming cache follows the standard naming convention
+        # Logic matches main.py: CACHE_DIR / dataset_name / doc_name / tree.json
+        doc_cache_name = os.path.splitext(os.path.basename(path))[0]
+        cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
+        tree_path = os.path.join(cache_base, doc_cache_name, "tree.json")
+        
+        try:
+            if os.path.exists(tree_path):
+                with open(tree_path, 'r', encoding='utf-8') as f:
+                    cctree = json.load(f)
+                    # Inject source_path into the document root
+                    cctree['source_path'] = path
+                    
+                    # Ensure document root has metadata (summary)
+                    if not cctree.get('metadata'):
+                        # 尝试从 children 聚合 metadata
+                        children_meta = [child.get('metadata', '') for child in cctree.get('children', {}).values()]
+                        # 过滤掉空的
+                        children_meta = [m for m in children_meta if m]
+                        
+                        if children_meta:
+                            # 简单截取前几个作为摘要，或者调用 integrate_metadata (需要 import cctree)
+                            # 为了避免循环引用，我们这里简单拼接
+                            cctree['metadata'] = "; ".join(children_meta[:5])
+                        else:
+                             cctree['metadata'] = f"Document: {filename}"
+                    
+                    root['children'][filename] = cctree
+            else:
+                print(f"Warning: Tree cache not found for {filename} at {tree_path}")
+        except Exception as e:
+            print(f"Failed to load tree for {filename}: {e}")
+            
+    return root
+
 def call_gpt_wrapper(prompt, config=None):
     if config:
         # 如果是本地模型，且在 constants.py 中我们知道本地模型不需要 API Key
@@ -139,7 +189,7 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
     display_evidence = [] # 给前端用 (Top 3 Distinct Pages)
     display_locations = []
 
-    parsed_res = question_parsing(query)
+    parsed_res = question_parsing(query, config=config)
     locations = parsed_res.get('location', [])
     semantic_query = parsed_res.get('content', query)
 
@@ -154,7 +204,8 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
         cctree=cctree, 
         source_path=source_path, 
         locations=locations, 
-        log_file=log_file
+        log_file=log_file,
+        config=config
     )
     
     # 2. 填充全量推理数据
@@ -185,11 +236,19 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
         if len(seen_pages) < MAX_PAGES:
             seen_pages.add(current_page)
             
+            # Determine file name
+            fname = None
+            if bbox_list and 'source_path' in bbox_list[0]:
+                fname = os.path.basename(bbox_list[0]['source_path'])
+            elif source_path:
+                fname = os.path.basename(source_path)
+
             # 【关键修改】构造一个完整的对象，而不是拆分到两个列表
             doc_item = {
                 "page": current_page,
                 "content": retrieved_text_dict.get(path, ""),
-                "bboxes": bbox_list  # 这里放的是这个段落对应的 [box1, box2...]
+                "bboxes": bbox_list,  # 这里放的是这个段落对应的 [box1, box2...]
+                "file_name": fname
             }
             display_documents.append(doc_item)
 
@@ -228,8 +287,11 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
         # 这里的 pdf_to_base64 其实也是多余的，whole_reason 签名是 (whole_doc, query, cctree)
         # 检查 whole_reason 实现: prompt = whole_reasoning_prompt.format(query=query,data=cctree)
         # 并没有用到 whole_doc (pdf图片)。
-        # 为了安全起见，暂时不动这个逻辑，除非确认 whole_reason 真的不用
-        whole_doc = pdf_to_base64(source_path) 
+        
+        whole_doc = None
+        if source_path:
+            whole_doc = pdf_to_base64(source_path) 
+            
         if 'children' in cctree:
             simplify_tree(cctree['children']) 
         final_answer = whole_reason(whole_doc, semantic_query, cctree, config)
@@ -244,5 +306,5 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
         #   - item.content 用于显示文字
         #   - item.page 用于跳转
         #   - item.bboxes 用于在 PDF 上画高亮 (可能有多个框)
-        "documents": display_documents 
+        "retrieved_documents": display_documents 
     }

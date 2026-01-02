@@ -15,6 +15,7 @@ API_URL = "https://api.aiaiapi.com/v1"
 MODEL = "gemini-2.5-flash"
 VL_MODEL_PATH = "/home/yukai/project/modora-frontend/models/Qwen3-VL-8B-Instruct"
 EM_MODEL_PATH = "/home/yukai/project/modora-frontend/models/Qwen3-Embedding-8B"
+LAYOUT_MODEL = "paddle" # "paddle" or "gemini"
 
 
 

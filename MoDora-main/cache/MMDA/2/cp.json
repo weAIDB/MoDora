@@ -302,9 +302,9 @@
         },
         {
             "type": "image",
-            "title": "QR Code with Logo",
-            "metadata": "QR code, logo, red square, white background",
-            "data": "The image displays a QR code with a white background. At the center of the QR code, there is a red square containing a white stylized logo that resembles a circular arrow or a simplified \"S\" shape. The QR code is composed of black and white modules arranged in a square grid pattern, typical for encoding data. The logo is embedded within the code, likely indicating a specific brand or organization associated with the QR code.",
+            "title": "QR Code with Embedded Red Logo",
+            "metadata": "QR code, scannable code, barcode, red logo, white symbol, mobile application, digital link",
+            "data": "The image displays a standard black and white QR code. In the very center of the QR code, there is an embedded logo. This logo consists of a red square with slightly rounded corners, inside which is a white, stylized symbol. The white symbol appears to be a symmetrical design, possibly representing a letter 'S' or two interlinked arrows pointing in opposite vertical directions, creating a dynamic and modern look. The surrounding QR code pattern is intricate and dense, typical for encoding a significant amount of data, likely for a website, application download, or other digital content.",
             "location": [
                 {
                     "range": [

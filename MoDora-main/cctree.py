@@ -73,6 +73,9 @@ def get_metadata(root, level = 1, n0 = 2, max_workers = 8, config=None):
     sem = threading.BoundedSemaphore(value=max_workers)
 
     def _compute(node, level, executor):
+        if not node:
+            return 0, 1, 1
+
         # Initial parameters
         n_children = 0
         n = n0
@@ -80,7 +83,7 @@ def get_metadata(root, level = 1, n0 = 2, max_workers = 8, config=None):
         D = 1
 
         if 'children' not in node:
-             print(f"!!! Error: Node missing children: {node.keys()} Type: {node.get('type')}")
+             print(f"!!! Warning: Node missing children: {node.keys()} Type: {node.get('type')}")
              node['children'] = {}
 
         children = list(node['children'].values())
@@ -109,14 +112,18 @@ def get_metadata(root, level = 1, n0 = 2, max_workers = 8, config=None):
             n_children += n_child
 
         # Current node Execution
-        if node['type'] == "text":
+        node_type = node.get('type')
+        if node_type == "text" or node_type == "root": # 允许 root 节点生成/聚合 metadata
             # Generate self metadata
-            node['metadata'] = generate_metadata(node['data'], n0, config=config)
-
-            # For non-leaf text
+            if node_type == 'text':
+                node['metadata'] = generate_metadata(node['data'], n0, config=config)
+            
+            # For non-leaf text or root
             if n_children > 0:
                 n = calculate_n_i(D, d, n_children)
-                data = [node['metadata']] + [c['metadata'] for c in children]
+                # 如果是 root，可能没有 data 字段作为基础，仅依赖 children 的 metadata
+                base_meta = node.get('metadata', '') 
+                data = [base_meta] + [c['metadata'] for c in children]
                 node['metadata'] = integrate_metadata(data, n, config=config)
             # For leaf text
             else:
@@ -270,8 +277,8 @@ def build_tree(source_path, cache_dir, config=None):
             base64_image = bbox_to_base64(source_path, title_bbox_list)
             try:
                 title_list = ast.literal_eval(generate_levels(raw_title_list, base64_image, config=config))
-                with open(title_path, "f", encoding="utf-8") as f:
-                    title_list = json.load(f)
+                with open(title_path, "w", encoding="utf-8") as f:
+                    json.dump(title_list, f, ensure_ascii=False, indent=4)
             except Exception as e:
                 title_list = []
 

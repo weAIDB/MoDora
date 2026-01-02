@@ -12,18 +12,19 @@
     <!-- 消息列表 -->
     <div id="chat-container" class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar scroll-smooth pb-32">
       <!-- 欢迎语 (空状态) -->
-      <div v-if="store.state.messages.length === 0" class="flex flex-col items-center justify-center h-full text-slate-400 opacity-60">
+      <div v-if="!currentMessages || currentMessages.length === 0" class="flex flex-col items-center justify-center h-full text-slate-400 opacity-60">
         <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/50 dark:to-secondary-900/50 flex items-center justify-center mb-6 animate-float">
           <i class="fa-solid fa-robot text-4xl text-primary-400"></i>
         </div>
         <p class="text-sm">有什么我可以帮你的吗？</p>
       </div>
 
-      <div v-for="(msg, idx) in store.state.messages" :key="idx"
-           class="flex w-full group animate-fade-in"
-           :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+      <template v-if="currentMessages">
+        <div v-for="(msg, idx) in currentMessages" :key="idx"
+             class="flex w-full group animate-fade-in"
+             :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
 
-        <!-- AI 头像 -->
+          <!-- AI 头像 -->
         <div v-if="msg.role === 'assistant'" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-white/50 dark:border-white/10 flex items-center justify-center text-primary-500 mr-4 mt-1 shadow-sm flex-shrink-0 backdrop-blur-sm">
            <i class="fa-solid fa-robot text-lg"></i>
         </div>
@@ -94,6 +95,7 @@
           </div>
         </div>
       </div>
+      </template>
 
       <!-- 思考中状态 -->
       <div v-if="store.state.isThinking" class="flex w-full justify-start animate-fade-in">
@@ -146,11 +148,17 @@
 </template>
 
 <script setup>
-import { nextTick, watch, onMounted } from 'vue';
+import { nextTick, watch, onMounted, computed } from 'vue';
 import { useModoraStore } from '../composables/useModoraStore';
 import MarkdownRenderer from './MarkdownRenderer.vue';
 
 const store = useModoraStore();
+
+// 计算当前会话的消息列表
+const currentMessages = computed(() => {
+    const session = store.getActiveSession();
+    return session ? session.messages : [];
+});
 
 const scrollToBottom = async () => {
   await nextTick();
@@ -177,7 +185,7 @@ const copyToClipboard = async (text) => {
 };
 
 // 监听消息列表变化，自动滚动到底部
-watch(() => store.state.messages.length, () => {
+watch(() => currentMessages.value.length, () => {
   scrollToBottom();
 });
 

@@ -1,42 +1,53 @@
 import { reactive } from 'vue';
 
-// Updated to ensure fresh load
-// 1. 初始文件列表
-const INITIAL_DOCS = [
-    { id: 1, name: "1.pdf", type: "pdf" },
-    { id: 2, name: "2.pdf", type: "pdf" },
-    { id: 3, name: "3.pdf", type: "pdf" }
-];
+// 辅助：生成 ID
+const generateId = () => 'sess_' + Math.random().toString(36).substr(2, 9);
 
 // 辅助：创建初始欢迎消息
-const createWelcomeMessage = (docName) => [
+const createWelcomeMessage = () => [
     {
         role: "assistant",
-        content: docName 
-            ? `你好！我是文档 **${docName}** 的助手。请问有什么可以帮你的？`
-            : "你好！请在左侧点击选择一个文档，然后开始提问。",
+        content: "你好！请上传文档，我会为你分析并回答相关问题。",
         isTyping: false
     }
 ];
 
-// 初始化每个文档的会话历史
-const initialSessions = {};
-INITIAL_DOCS.forEach(doc => {
-    initialSessions[doc.id] = createWelcomeMessage(doc.name);
-});
+// 辅助：创建默认文档列表
+const createDefaultDocs = () => [];
+
+// 初始默认会话
+const DEFAULT_SESSION = {
+    id: generateId(),
+    name: "New Chat",
+    docs: createDefaultDocs(),
+    messages: createWelcomeMessage(),
+    createdAt: new Date()
+};
 
 // 核心状态
 const state = reactive({
-    chatSessions: initialSessions, // 存储所有文档的会话历史 { docId: [messages] }
-    messages: initialSessions[1],  // 当前显示的会话 (引用 chatSessions 中的某个数组)
-    knowledgeBase: [...INITIAL_DOCS],
-    activeDocId: 1, // 新增：当前被选中的文档 ID (默认选中第一个)
+    sessions: [DEFAULT_SESSION], // 会话列表
+    activeSessionId: DEFAULT_SESSION.id, // 当前激活的会话 ID
+    
+    // 界面状态
     isThinking: false,
     isUploading: false,
     uploadProgress: 0,
-    viewingDocTree: null,
-    viewingPdf: null,
+    
+    // 侧边栏/预览状态
+    viewingDocTree: null, // 当前查看树的文档对象 {name, id}
+    viewingPdf: null,     // 当前查看的PDF对象
     inputMessage: '',
+    
+    // 统计状态
+    docStats: null,
+    sessionStats: null,
+    
+    // 知识库与标签状态
+    kbDocs: {},      // { filename: { tags, semantic_tags, added_at } }
+    globalTags: [],  // 所有已存在的标签
+    
+    // 全局设置
     settings: JSON.parse(localStorage.getItem('modora_settings')) || {
         apiKey: '',
         baseUrl: 'https://api.aiaiapi.com/v1',
@@ -46,48 +57,90 @@ const state = reactive({
     }
 });
 
-// 辅助：生成 Mermaid 图表 (仅保留文档树)
-const generateGraph = {
-    tree(docName) {
-        return `
-        graph LR
-            root["📄 ${docName}"]:::rootNode
-            c1["章节解析中..."]
-            root --> c1
-            classDef rootNode fill:#4f46e5,stroke:#312e81,color:white;
-        `;
-    }
-};
-
 export function useModoraStore() {
 
-    // 动作：切换当前提问的文档
-    const setActiveDoc = (id) => {
-        if (state.activeDocId === id) return; // 如果已经是当前文档，不做操作
+    // 获取当前会话对象
+    const getActiveSession = () => {
+        return state.sessions.find(s => s.id === state.activeSessionId) || state.sessions[0];
+    };
 
-        state.activeDocId = id;
+    // 动作：切换当前会话
+    const setActiveSession = (sessionId) => {
+        if (state.activeSessionId === sessionId) return;
+        state.activeSessionId = sessionId;
         
-        // 切换消息上下文
-        // 确保该文档有会话历史
-        if (!state.chatSessions[id]) {
-            const doc = state.knowledgeBase.find(d => d.id === id);
-            state.chatSessions[id] = createWelcomeMessage(doc ? doc.name : "");
+        // 切换会话时，重置右侧面板（或者可以保留之前的状态？）
+        // 简单起见，先关闭右侧面板，避免显示不属于当前会话的文档
+        closeSidePanel();
+    };
+
+    // 动作：新建会话
+    const createNewSession = () => {
+        const newSession = {
+            id: generateId(),
+            name: "New Chat",
+            docs: createDefaultDocs(),
+            messages: createWelcomeMessage(),
+            createdAt: new Date()
+        };
+        // 添加到列表开头
+        state.sessions.unshift(newSession);
+        // 自动激活
+        setActiveSession(newSession.id);
+    };
+
+    // 动作：删除会话
+    const deleteSession = (sessionId) => {
+        const index = state.sessions.findIndex(s => s.id === sessionId);
+        if (index === -1) return;
+        
+        state.sessions.splice(index, 1);
+        
+        // 如果删除了当前会话，需要激活另一个
+        if (state.activeSessionId === sessionId) {
+            if (state.sessions.length > 0) {
+                state.activeSessionId = state.sessions[0].id;
+            } else {
+                // 如果删空了，自动创建一个新的
+                createNewSession();
+            }
         }
-        
-        // 将 state.messages 指向对应文档的数组引用
-        state.messages = state.chatSessions[id];
+    };
+
+    // 动作：重命名会话
+    const renameSession = (sessionId, newName) => {
+        const session = state.sessions.find(s => s.id === sessionId);
+        if (session) {
+            session.name = newName;
+        }
     };
 
     // 打开 PDF 动作
     const openPdf = (fileId, page = 1, bboxes = []) => {
-        const doc = state.knowledgeBase.find(d => d.id === fileId) || state.knowledgeBase[0];
+        // fileId 其实没多大用了，主要靠 file_name
+        // 这里假设 fileId 就是 file_name 或者在 docs 里的 id
+        // 为了兼容旧逻辑，我们先在当前会话的 docs 里找
+        const session = getActiveSession();
+        let doc = session.docs.find(d => d.id === fileId);
+        
+        // 如果找不到，可能是引用跳转过来的，尝试用 name 找
+        if (!doc) {
+             // 这里的 fileId 有时候传的是 name (在旧逻辑里混用了)
+             doc = session.docs.find(d => d.name === fileId);
+        }
+
+        // 依然找不到？可能是跨会话引用（理论上不该发生），或者默认 fallback
+        if (!doc && session.docs.length > 0) doc = session.docs[0];
+        
+        if (!doc) return; // 真的没有文档
+
         const fileUrl = `/api/files/${encodeURIComponent(doc.name)}`;
 
         state.viewingPdf = {
             url: fileUrl,
             page: page,
             name: doc.name,
-            bboxes: bboxes || [] // 新增：传递高亮框，确保不为 null
+            bboxes: bboxes || [] 
         };
 
         // 互斥：关闭结构树
@@ -113,15 +166,29 @@ export function useModoraStore() {
         const text = state.inputMessage.trim();
         if (!text) return;
 
-        state.messages.push({ role: "user", content: text });
+        const session = getActiveSession();
+        
+        session.messages.push({ role: "user", content: text });
         const currentQuery = text;
         state.inputMessage = '';
         state.isThinking = true;
 
-        // --- 核心修改：使用 activeDocId 获取当前文件名 ---
-        const activeDocObj = state.knowledgeBase.find(d => d.id === state.activeDocId) || state.knowledgeBase[0];
-        const activeFile = activeDocObj.name;
-        const activeFileId = activeDocObj.id;
+        // --- 获取当前会话的所有文档 ---
+        const fileNames = session.docs.map(d => d.name);
+        
+        // 如果没有文档，提示用户上传
+        if (fileNames.length === 0) {
+            state.isThinking = false;
+            session.messages.push({
+                role: "assistant",
+                content: "请先上传至少一个文档，然后我才能回答你的问题。",
+                isTyping: false
+            });
+            return;
+        }
+
+        // 默认激活的文件名（用于 fallback）
+        const activeFile = fileNames[0];
 
         let answer = "";
         let citations = [];
@@ -132,7 +199,8 @@ export function useModoraStore() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    file_name: activeFile, 
+                    file_names: fileNames, // 发送多文件列表
+                    file_name: fileNames[0], // 兼容旧接口
                     query: currentQuery,
                     settings: state.settings // 传递全局设置
                 })
@@ -155,10 +223,19 @@ export function useModoraStore() {
             citations = retrievedDocs.map((doc) => {
                 let snippetText = doc.content || "引用详情...";
                 if (snippetText.length > 60) snippetText = snippetText.substring(0, 60) + "...";
+                
+                // 尝试根据 file_name 找到对应的 fileId (用于 openPdf)
+                let docId = null;
+                if (doc.file_name) {
+                    const foundDoc = session.docs.find(d => d.name === doc.file_name);
+                    if (foundDoc) docId = foundDoc.id;
+                }
+                // Fallback
+                if (!docId && session.docs.length > 0) docId = session.docs[0].id;
 
                 return {
-                    fileId: activeFileId, // 绑定到当前选中的文件
-                    fileName: activeFile,
+                    fileId: docId, 
+                    fileName: doc.file_name || activeFile,
                     page: doc.page,
                     snippet: snippetText,
                     bboxes: doc.bboxes
@@ -171,9 +248,7 @@ export function useModoraStore() {
             if (error.message.includes("404")) {
                 answer += "\n\n💡 提示: 请检查后端数据集路径及文件完整性。";
             }
-            citations = [
-                { fileId: activeFileId, fileName: activeFile, page: 1, snippet: "(模拟) API 出错时的 fallback 引用" }
-            ];
+            citations = [];
         } finally {
             state.isThinking = false;
 
@@ -184,9 +259,9 @@ export function useModoraStore() {
                 citations: citations
             };
 
-            state.messages.push(newMsg);
+            session.messages.push(newMsg);
 
-            const activeMsg = state.messages[state.messages.length - 1];
+            const activeMsg = session.messages[session.messages.length - 1];
 
             let i = 0;
             const timer = setInterval(() => {
@@ -199,8 +274,55 @@ export function useModoraStore() {
             }, 30);
         }
     };
+    
+    // 更新树节点
+    const updateTreeNode = async (fileName, nodePath, action, newData) => {
+        try {
+            const response = await fetch('/api/tree/node/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file_name: fileName,
+                    action: action,
+                    target_path: nodePath,
+                    new_data: newData
+                })
+            });
+            if (!response.ok) throw new Error("Update failed");
+            return await response.json();
+        } catch (e) {
+            console.error("Update node error:", e);
+            throw e;
+        }
+    };
+    
+    // 保存整个树结构
+    const saveTreeStructure = async (fileName, elements) => {
+        try {
+             const response = await fetch('/api/tree/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    file_name: fileName,
+                    elements: elements
+                })
+            });
+            if (!response.ok) throw new Error("Save failed");
+            return await response.json();
+        } catch (e) {
+             console.error("Save tree error:", e);
+             throw e;
+        }
+    };
 
-    const handleFileUpload = async (file) => {
+    // 动作：更新设置
+    const updateSettings = (newSettings) => {
+        state.settings = { ...state.settings, ...newSettings };
+        localStorage.setItem('modora_settings', JSON.stringify(state.settings));
+        console.log("Settings updated:", state.settings);
+    };
+
+    const uploadFile = async (file) => {
         if (!file) return;
         state.isUploading = true;
         state.uploadProgress = 0;
@@ -209,7 +331,6 @@ export function useModoraStore() {
         let pollTimer = null;
 
         // 阶段 1: 模拟上传进度 (0-40%)
-        // 假设上传和初步响应比较快
         progressTimer = setInterval(() => {
             if (state.uploadProgress < 40) {
                 state.uploadProgress += 2;
@@ -219,7 +340,6 @@ export function useModoraStore() {
         try {
             const formData = new FormData();
             formData.append("file", file);
-            // 传递全局设置 (作为 JSON 字符串)
             formData.append("settings", JSON.stringify(state.settings));
 
             const response = await fetch('/api/upload', {
@@ -227,23 +347,20 @@ export function useModoraStore() {
                 body: formData
             });
 
-            clearInterval(progressTimer); // 停止第一阶段模拟
+            clearInterval(progressTimer); 
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.detail || `Upload failed with status ${response.status}`);
             }
 
-            // 上传成功，进入处理阶段，进度条跳到 40%
             state.uploadProgress = 40;
             const data = await response.json();
             const filename = data.filename;
 
             // 阶段 2: 轮询后台状态 (40% -> 99%)
-            // 同时开启一个慢速的进度条模拟，让用户感觉还在动
             progressTimer = setInterval(() => {
                 if (state.uploadProgress < 95) {
-                    // 越往后越慢
                     const increment = state.uploadProgress > 80 ? 0.2 : 0.5;
                     state.uploadProgress = Math.min(state.uploadProgress + increment, 95);
                 }
@@ -254,7 +371,7 @@ export function useModoraStore() {
                 pollTimer = setInterval(async () => {
                     try {
                         const statusRes = await fetch(`/api/task/status/${encodeURIComponent(filename)}`);
-                        if (!statusRes.ok) return; // 忽略网络错误，继续轮询
+                        if (!statusRes.ok) return; 
                         
                         const statusData = await statusRes.json();
                         const status = statusData.status;
@@ -269,122 +386,194 @@ export function useModoraStore() {
                             clearInterval(progressTimer);
                             reject(new Error("Background processing failed"));
                         }
-                        // processing 或 pending 状态，继续等待
                     } catch (e) {
                         console.error("Polling error:", e);
                     }
-                }, 2000); // 每 2 秒轮询一次
+                }, 2000); 
             });
 
-            // 处理完成后的逻辑
-            // 稍微停顿一下，让用户看到 100%
             await new Promise(resolve => setTimeout(resolve, 500));
             
-            // 上传成功后添加到列表
+            // 上传成功后添加到当前会话
             const ext = filename.split('.').pop().toLowerCase();
             const newDoc = {
-                id: state.knowledgeBase.length + 1, // 简单的 ID 生成策略
+                id: 'doc_' + Math.random().toString(36).substr(2, 9),
                 name: filename,
                 type: ext
             };
             
-            state.knowledgeBase.push(newDoc);
+            const session = getActiveSession();
+            session.docs.push(newDoc);
             
-            // 初始化新文档的会话历史
-            state.chatSessions[newDoc.id] = createWelcomeMessage(newDoc.name);
-
-            // 可选：自动选中新上传的文件
-            setActiveDoc(newDoc.id);
+            // 刷新知识库数据
+            await fetchKbDocs();
+            await fetchGlobalTags();
             
-            // 提示消息
-            state.messages.push({
-                role: "assistant",
-                content: `✅ 文件 **${filename}** 处理完成！您现在可以开始提问了。`,
-                isTyping: false
-            });
-
-        } catch (error) {
-            clearInterval(progressTimer);
-            if (pollTimer) clearInterval(pollTimer);
-            console.error("Upload error:", error);
-            state.messages.push({
-                role: "assistant",
-                content: `❌ 文件处理失败: ${error.message}`,
-                isTyping: false
-            });
+            // 如果是第一个文档，自动改会话名（可选）
+            if (session.name === "New Chat") {
+                session.name = filename;
+            }
+            
+            alert("文档处理完成！");
+            
+        } catch (e) {
+            console.error("Upload Error:", e);
+            alert("上传失败: " + e.message);
         } finally {
             state.isUploading = false;
             state.uploadProgress = 0;
+            if (progressTimer) clearInterval(progressTimer);
+            if (pollTimer) clearInterval(pollTimer);
         }
     };
 
-    // --- 树结构操作 ---
-    const updateTreeNode = async (fileName, action, targetPath, newData = null) => {
+    // 动作：获取知识库所有文档
+    const fetchKbDocs = async () => {
         try {
-            const response = await fetch('/api/tree/node/update', {
+            const res = await fetch('/api/kb/docs');
+            if (res.ok) {
+                state.kbDocs = await res.json();
+            }
+        } catch (e) {
+            console.error("Failed to fetch KB docs:", e);
+        }
+    };
+
+    // 动作：获取全局标签库
+    const fetchGlobalTags = async () => {
+        try {
+            const res = await fetch('/api/kb/tags');
+            if (res.ok) {
+                state.globalTags = await res.json();
+            }
+        } catch (e) {
+            console.error("Failed to fetch global tags:", e);
+        }
+    };
+
+    // 动作：更新文档标签
+    const updateDocTags = async (fileName, tags) => {
+        try {
+            const res = await fetch('/api/kb/doc/tags', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    file_name: fileName,
-                    action: action,
-                    target_path: targetPath,
-                    new_data: newData
-                })
+                body: JSON.stringify({ file_name: fileName, tags })
             });
-
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.detail || 'Update failed');
+            if (res.ok) {
+                // 更新本地缓存
+                if (state.kbDocs[fileName]) {
+                    state.kbDocs[fileName].tags = tags;
+                }
+                // 重新获取全局标签库，因为可能新增了标签
+                await fetchGlobalTags();
+                
+                // 如果当前正在看这个文档的统计，也更新一下
+                if (state.docStats && state.docStats.file_name === fileName) {
+                    state.docStats.tags = tags;
+                }
             }
-            return true;
-        } catch (error) {
-            console.error('Failed to update tree node:', error);
-            throw error;
+        } catch (e) {
+            console.error("Failed to update doc tags:", e);
         }
     };
 
-    const saveTreeStructure = async (fileName, elements) => {
+    // 动作：从知识库添加文档到当前会话
+    const addDocFromKb = (fileName) => {
+        const session = getActiveSession();
+        // 检查是否已存在
+        if (session.docs.find(d => d.name === fileName)) {
+            return;
+        }
+        
+        const ext = fileName.split('.').pop().toLowerCase();
+        const newDoc = {
+            id: 'doc_' + Math.random().toString(36).substr(2, 9),
+            name: fileName,
+            type: ext
+        };
+        session.docs.push(newDoc);
+        
+        if (session.name === "New Chat") {
+            session.name = fileName;
+        }
+    };
+
+    // 动作：从全局库中删除标签
+    const deleteGlobalTag = async (tag) => {
         try {
-            const response = await fetch('/api/tree/update', {
+            const res = await fetch(`/api/kb/tag/${encodeURIComponent(tag)}`, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                // 更新本地缓存
+                state.globalTags = state.globalTags.filter(t => t !== tag);
+                // 同时更新所有文档的标签显示（如果已加载）
+                for (const name in state.kbDocs) {
+                    state.kbDocs[name].tags = state.kbDocs[name].tags.filter(t => t !== tag);
+                    state.kbDocs[name].semantic_tags = state.kbDocs[name].semantic_tags.filter(t => t !== tag);
+                }
+            }
+        } catch (e) {
+            console.error("Failed to delete global tag:", e);
+        }
+    };
+    // 动作：获取单文档统计
+    const fetchDocStats = async (fileName) => {
+        try {
+            const res = await fetch(`/api/docs/stats/${encodeURIComponent(fileName)}`);
+            if (res.ok) {
+                state.docStats = await res.json();
+            }
+        } catch (e) {
+            console.error("Failed to fetch doc stats:", e);
+        }
+    };
+
+    // 动作：获取当前 Session 所有文档统计
+    const fetchSessionStats = async () => {
+        const session = getActiveSession();
+        const fileNames = session.docs.map(d => d.name);
+        if (fileNames.length === 0) {
+            state.sessionStats = null;
+            return;
+        }
+
+        try {
+            const res = await fetch('/api/session/stats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    file_name: fileName,
-                    elements: elements
-                })
+                body: JSON.stringify({ file_names: fileNames })
             });
-
-            if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.detail || 'Save failed');
+            if (res.ok) {
+                state.sessionStats = await res.json();
             }
-            return await response.json();
-        } catch (error) {
-            console.error('Failed to save tree structure:', error);
-            throw error;
+        } catch (e) {
+            console.error("Failed to fetch session stats:", e);
         }
-    };
-
-    // 动作：更新设置
-    const updateSettings = (newSettings) => {
-        state.settings = { ...state.settings, ...newSettings };
-        localStorage.setItem('modora_settings', JSON.stringify(state.settings));
-        console.log("Settings updated:", state.settings);
-        // 这里可以触发后端 API 更新配置（如果需要）
     };
 
     return {
         state,
-        sendMessage,
-        uploadFile: handleFileUpload, // Alias handleFileUpload to uploadFile
-        handleFileUpload,
-        setViewingDoc,
+        getActiveSession,
+        setActiveSession,
+        createNewSession,
+        deleteSession,
+        renameSession,
         openPdf,
-        closePdf,
+        setViewingDoc,
         closeSidePanel,
-        setActiveDoc, // 导出新方法
-        updateTreeNode,
+        closePdf,
+        sendMessage,
+        uploadFile,
         saveTreeStructure,
-        updateSettings
+        updateTreeNode,
+        updateSettings,
+        fetchKbDocs,
+        fetchGlobalTags,
+        updateDocTags,
+        fetchDocStats,
+        fetchSessionStats,
+        addDocFromKb,
+        deleteGlobalTag
     };
 }

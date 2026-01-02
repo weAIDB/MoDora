@@ -126,8 +126,8 @@ const useImageMode = computed(() => {
 
 const imageUrl = computed(() => {
     if (!props.fileName || !currentPage.value) return '';
-    // 注意：请确保此 URL 与你的后端地址匹配
-    return `http://localhost:8000/api/pdf/${props.fileName}/${currentPage.value}/image`;
+    // 使用相对路径，以便通过 Vite 代理
+    return `/api/pdf/${props.fileName}/${currentPage.value}/image`;
 });
 
 const handleImageLoad = (e) => {

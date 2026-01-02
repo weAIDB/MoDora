@@ -177,11 +177,14 @@ def qwen_annotation(base64_image, cp_type, config=None):
     metadata = "Default Metadata"
     content = "Default Content"
     
+    if config is None:
+        config = {}
+    
     while not flag and cnt<3:
         # Redirect call to Gemini via api_utils
         # Use treeModel as the default for enrichment if not specified, or fallback to MODEL
         # Enrichment is part of tree construction/preprocessing
-        base_model = config.get('treeModel') if config else MODEL
+        base_model = config.get('treeModel') or MODEL
         
         text = gpt_generate_pdf(
             base64_image, prompt,

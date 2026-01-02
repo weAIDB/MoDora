@@ -186,7 +186,12 @@ def preprocess(source_path,cache_dir, config=None):
         print(traceback.format_exc())
         cp_dict = {
             'body':[],
-            'supplement':{}
+            'supplement':{
+                'header': {},
+                'footer': {},
+                'number': {},
+                'aside': {}
+            }
         }
     
     with open(cp_path, "w", encoding="utf-8") as f:

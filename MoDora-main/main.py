@@ -9,10 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import shutil
-from fastapi import UploadFile, File, BackgroundTasks
-# from fastapi import UploadFile, File, BackgroundTasks, Form # 重复导入
+from fastapi import UploadFile, File, BackgroundTasks, Form
 from preprocess import preprocess
 from cctree import build_tree
+from stati import get_components, get_trees
+from kb_manager import kb_manager
 
 # 引入你的后端核心模块
 from qa import qa
@@ -64,7 +65,8 @@ def get_pdf_image(file_name: str, page_index: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 class ChatRequest(BaseModel):
-    file_name: str  # 例如: "1.pdf"
+    file_name: Optional[str] = None  # 单文件兼容
+    file_names: Optional[List[str]] = None # 多文件支持
     query: str      # 例如: "这篇文章讲了什么？"
     settings: Optional[Dict] = None # 前端传来的配置
 
@@ -73,6 +75,7 @@ class RetrievalItem(BaseModel):
     content: str
     bboxes: List[Any]  # 这一项对应的所有高亮框
     score: Optional[float] = 0.0
+    file_name: Optional[str] = None # 所属文件名
 
 class ChatResponse(BaseModel):
     answer: str
@@ -90,6 +93,31 @@ class TreeResponse(BaseModel):
 class TreeUpdateRequest(BaseModel):
     file_name: str
     elements: list  # Vue Flow 的 elements (nodes 和 edges)
+
+class DocStatsResponse(BaseModel):
+    pages: int
+    counts: Dict[str, int]
+    variance: float
+    nodes: int
+    leaves: int
+    depth: int
+    tags: List[str] = []
+    semantic_tags: List[str] = []
+
+class SessionStatsRequest(BaseModel):
+    file_names: List[str]
+
+class SessionStatsResponse(BaseModel):
+    total_files: int
+    avg_pages: float
+    avg_nodes: float
+    avg_depth: float
+    total_counts: Dict[str, int]
+    avg_variance: float
+
+class UpdateTagsRequest(BaseModel):
+    file_name: str
+    tags: List[str]
 
 def reconstruct_tree_from_elements(elements, original_tree, file_name):
     """
@@ -385,6 +413,47 @@ def update_node_endpoint(request: NodeUpdate):
 # key: filename, value: status ("processing", "completed", "failed")
 task_status_store = {}
 
+from datetime import datetime
+
+def generate_auto_tags(file_path: str, cache_base: str):
+    """
+    根据统计数据自动生成标签
+    """
+    doc_name = os.path.splitext(os.path.basename(file_path))[0]
+    cache_path = os.path.join(cache_base, doc_name)
+    
+    tags = []
+    try:
+        counts, variance, page_count = get_components(cache_path)
+        nodes, leaves, depth = get_trees(cache_path)
+        
+        # 1. 尺寸类
+        if page_count > 20: tags.append("Long")
+        elif page_count > 5: tags.append("Medium")
+        else: tags.append("Short")
+        
+        # 2. 内容类
+        if counts.get('table', 0) > 3: tags.append("Table-Rich")
+        if counts.get('chart', 0) > 3: tags.append("Chart-Rich")
+        if counts.get('image', 0) > 5: tags.append("Image-Rich")
+        
+        # 3. 结构类
+        if variance > 0.5: tags.append("Complex Layout")
+        if depth > 5: tags.append("Deep Hierarchy")
+        
+    except Exception as e:
+        print(f"Error generating auto tags: {e}")
+        
+    return tags
+
+def generate_semantic_tags(file_path: str, cache_base: str, config: Optional[Dict] = None):
+    """
+    调用 LLM 生成语义标签 (预留接口)
+    """
+    # 这里可以读取 cp.json 的前几个文本块，调用 LLM 总结
+    # 暂时返回一些通用占位符，模拟 LLM 行为
+    return ["Automated Analysis"]
+
 def process_document_task(file_path: str, config: Optional[Dict] = None):
     """
     后台任务：对上传的文件进行预处理和树构建
@@ -394,28 +463,36 @@ def process_document_task(file_path: str, config: Optional[Dict] = None):
         task_status_store[filename] = "processing"
         
         # 确保缓存目录存在
-        # 注意：这里的逻辑与 pipeline.py 保持一致
         cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
         if not os.path.exists(cache_base):
             os.makedirs(cache_base)
             
-        print(f"后台任务开始: 处理文件 {file_path} -> cache: {cache_base}")
-        if config:
-            print(f"Using Config: {config}")
+        print(f"后台任务开始: 处理文件 {file_path}")
         
-        # 1. 预处理 (OCR, 布局分析等)
+        # 1. 预处理
         preprocess(file_path, cache_base, config=config)
         
         # 2. 构建层级树
         build_tree(file_path, cache_base, config=config)
         
-        print(f"后台任务完成: {file_path}")
+        # 3. 自动生成标签并更新知识库
+        auto_tags = generate_auto_tags(file_path, cache_base)
+        semantic_tags = generate_semantic_tags(file_path, cache_base, config)
+        
+        kb_manager.update_doc_info(filename, {
+            "tags": auto_tags,
+            "semantic_tags": semantic_tags,
+            "added_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
+        
+        print(f"后台任务完成: {file_path}, 自动标签: {auto_tags}")
         task_status_store[filename] = "completed"
         
     except Exception as e:
         print(f"后台任务出错: {file_path}, 错误: {str(e)}")
+        import traceback
+        traceback.print_exc()
         task_status_store[filename] = "failed"
-        # 这里可以添加更复杂的错误处理，比如记录到错误日志文件
 
 @app.get("/api/task/status/{filename}")
 def get_task_status(filename: str):
@@ -474,114 +551,119 @@ async def upload_file(
         "message": "文件上传成功，正在后台进行预处理，请稍候提问。"
     }
 
+# --- 2.8 知识库与标签管理接口 ---
+
+@app.get("/api/kb/docs")
+def get_kb_docs():
+    """获取知识库中的所有文档及其元数据"""
+    return kb_manager.get_all_docs()
+
+@app.get("/api/kb/tags")
+def get_kb_tags():
+    """获取全局标签库"""
+    return kb_manager.get_tag_library()
+
+@app.post("/api/kb/doc/tags")
+def update_kb_doc_tags(request: UpdateTagsRequest):
+    """更新文档的标签"""
+    kb_manager.update_doc_tags(request.file_name, request.tags)
+    return {"status": "success"}
+
+@app.delete("/api/kb/tag/{tag}")
+def delete_kb_tag(tag: str):
+    """从全局库中删除标签"""
+    kb_manager.delete_tag_from_library(tag)
+    return {"status": "success"}
+
 # --- 3. 核心问答接口 ---
 @app.post("/api/chat", response_model=ChatResponse)
 def chat_endpoint(request: ChatRequest):
-    file_name = request.file_name
-    query = request.query
-
-    print(f"收到请求 -> 文件: {file_name}, 问题: {query}")
-
-    # --- A. 路径推导逻辑 (复用 test_qa.py 的逻辑) ---
-    # 1. 源文件路径 (PDF)
-    # 假设文件就在 BASE_DIR 下 (即 /datasets/MMDA/MMDA_complete/1.pdf)
-    source_path = os.path.join(BASE_DIR, file_name)
+    file_names = request.file_names
+    # Fallback to single file_name if file_names is missing
+    if not file_names and request.file_name:
+        file_names = [request.file_name]
     
-    # 2. 缓存文件路径 (Tree JSON)
-    # 逻辑: cache/MMDA_complete/1/tree.json
-    doc_name = os.path.splitext(file_name)[0]  # 去掉后缀, "1.pdf" -> "1"
-    cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR)) # cache/MMDA_complete
-    tree_path = os.path.join(cache_base, doc_name, "tree.json")
+    if not file_names:
+        raise HTTPException(status_code=400, detail="File name(s) required")
 
-    # --- B. 校验文件是否存在 ---
-    if not os.path.exists(source_path):
-        raise HTTPException(status_code=404, detail=f"Source file not found: {source_path}")
+    print(f"收到请求 -> 文件: {file_names}, 问题: {request.query}")
+
+    # 1. 准备 source_paths_map 和 source_path (兼容单文件)
+    source_paths_map = {}
+    for fname in file_names:
+        s_path = os.path.join(BASE_DIR, fname)
+        if not os.path.exists(s_path):
+             raise HTTPException(status_code=404, detail=f"File not found: {fname}")
+        source_paths_map[fname] = s_path
+
+    # 2. 获取 cctree
+    cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
     
-    if not os.path.exists(tree_path):
-        raise HTTPException(status_code=404, detail=f"Tree cache not found for: {file_name}. Please ensure pipeline has run.")
+    qa_source_path = None
+    cctree = None
 
-    # --- C. 加载文档树 ---
-    try:
-        with open(tree_path, "r", encoding="utf-8") as f:
-            cctree = json.load(f)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to load tree.json: {str(e)}")
+    if len(file_names) == 1:
+        # 单文件模式：保持原有逻辑
+        single_fname = file_names[0]
+        qa_source_path = source_paths_map[single_fname]
+        doc_name = os.path.splitext(single_fname)[0]
+        tree_path = os.path.join(cache_base, doc_name, "tree.json")
+        
+        if not os.path.exists(tree_path):
+             raise HTTPException(status_code=404, detail=f"Tree cache not found for {single_fname}. Please wait for processing.")
+        
+        try:
+            with open(tree_path, "r", encoding="utf-8") as f:
+                cctree = json.load(f)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to load tree: {e}")
+            
+    else:
+        # 多文件模式
+        from qa import merge_multi_docs 
+        cctree = merge_multi_docs(source_paths_map)
+        # qa_source_path 保持为 None，因为路径在 cctree 节点里
 
-    # --- D. 执行问答 (QA) ---
-    # 创建一个临时的日志文件来捕获推理过程
+    # 3. 执行 QA
     req_id = str(uuid.uuid4())[:8]
     log_file = os.path.join(LOG_DIR, f"api_req_{req_id}.log")
-
+    
     try:
+        # qa 返回 {"answer": ..., "documents": ...}
         qa_result = qa(
             cctree=cctree, 
-            query=query, 
+            query=request.query, 
             log_file=log_file, 
-            source_path=source_path,
+            source_path=qa_source_path, 
             config=request.settings
         )
-        # ==================== 🐛 DEBUG START ====================
-        print("\n" + "="*30 + " DEBUG LOG " + "="*30)
         
-        # Adapt to new qa() return structure which uses 'documents' instead of 'locations'/'evidence'
-        documents_debug = qa_result.get("documents", [])
-        raw_locs = []
-        raw_evidence = []
-        
-        for doc in documents_debug:
-            if 'bboxes' in doc and isinstance(doc['bboxes'], list):
-                raw_locs.extend(doc['bboxes'])
-            if 'content' in doc:
-                raw_evidence.append(doc['content'])
-        
-        print(f"DEBUG: 返回的位置列表长度 (Items Count): {len(raw_locs)}")
-        print(f"DEBUG: 返回的证据列表长度 (Evidence Count): {len(raw_evidence)}")
-        
-        # 打印去重后的页码，看看实际包含了哪些页
-        debug_pages = [loc.get('page') for loc in raw_locs if isinstance(loc, dict)]
-        unique_debug_pages = list(set(debug_pages))
-        print(f"DEBUG: 包含的所有页码 (Raw Pages): {debug_pages}")
-        print(f"DEBUG: 唯一页码 (Unique Pages): {unique_debug_pages}")
-        print(f"DEBUG: 唯一页码数量: {len(unique_debug_pages)}")
-        
-        # 检查是否真的超过3个不同页码
-        if len(unique_debug_pages) > 3:
-            print("❌ 错误：页码数量超过了 3 个！")
-        else:
-            print("✅ 正常：页码数量控制在 3 个以内。")
-
-        # 检查是否有同一页的重复内容（如果你的需求是同一页只显示一个框）
-        # 如果你发现 raw_locs 长度很大，但 unique_debug_pages 只有 3，说明同一页有很多个框
-        print("="*71 + "\n")
-        # ==================== 🐛 DEBUG END ====================
-
         # 读取日志内容
         log_content = ""
         if os.path.exists(log_file):
             with open(log_file, "r", encoding="utf-8") as f:
                 log_content = f.read()
-        
-        documents = []
-        for doc in qa_result.get("documents", []):
-            # 直接使用树中的 bbox (2x)，因为前端展示的 PDF 图片也是 2x 的
-            # 不需要再乘以 0.5，否则框会变小且位置错误
-            documents.append(RetrievalItem(
-                page=doc['page'],
-                content=doc['content'],
-                bboxes=doc.get('bboxes', [])
-            ))
 
+        documents = []
+         # Use the correct key from qa result
+        for doc in qa_result.get("retrieved_documents", []):
+             documents.append(RetrievalItem(
+                 page=doc.get('page', 0),
+                 content=doc.get('content', ""),
+                 bboxes=doc.get('bboxes', []),
+                 file_name=doc.get('file_name')
+             ))
+            
         return ChatResponse(
             answer=qa_result.get("answer", "No answer"),
             reasoning_log=log_content,
-            # retrieved_image=qa_result.get("retrieved_image", ""),
-            retrieved_documents=documents # 返回新字段
+            retrieved_documents=documents
         )
 
     except Exception as e:
         import traceback
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"QA Execution Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"QA process failed: {str(e)}")
 
 def convert_tree_to_vueflow(cctree, root_label="Document Root"):
     nodes = []
@@ -696,6 +778,116 @@ async def get_document_tree(request: TreeRequest):
     
     return TreeResponse(elements=elements)
 
+# --- 2.7 知识库与标签接口 ---
+class TagUpdate(BaseModel):
+    file_name: str
+    tags: List[str]
+
+@app.get("/api/kb/docs")
+async def get_kb_docs():
+    return kb_manager.get_all_docs()
+
+@app.get("/api/kb/tags")
+async def get_kb_tags():
+    return kb_manager.get_tag_library()
+
+@app.post("/api/docs/tags/update")
+async def update_doc_tags(request: TagUpdate):
+    kb_manager.update_doc_info(request.file_name, {"tags": request.tags})
+    return {"status": "success"}
+
+@app.post("/api/kb/tags/add")
+async def add_global_tag(tag: str):
+    kb_manager.add_to_tag_library(tag)
+    return {"status": "success"}
+
+@app.delete("/api/kb/tags/delete/{tag}")
+async def delete_global_tag(tag: str):
+    kb_manager.remove_from_tag_library(tag)
+    return {"status": "success"}
+
+# --- 2.6 统计接口 ---
+@app.get("/api/docs/stats/{file_name}", response_model=DocStatsResponse)
+async def get_doc_stats(file_name: str):
+    doc_name = os.path.splitext(file_name)[0]
+    cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
+    cache_path = os.path.join(cache_base, doc_name)
+    
+    if not os.path.exists(cache_path):
+        raise HTTPException(status_code=404, detail=f"Stats not found for {file_name}")
+        
+    try:
+        counts, variance, page_count = get_components(cache_path)
+        nodes, leaves, depth = get_trees(cache_path)
+        
+        # 从知识库获取持久化的标签
+        doc_info = kb_manager.get_doc_info(file_name)
+        tags = doc_info.get("tags", []) if doc_info else []
+        semantic_tags = doc_info.get("semantic_tags", []) if doc_info else []
+        
+        return DocStatsResponse(
+            pages=page_count,
+            counts=counts,
+            variance=variance,
+            nodes=nodes,
+            leaves=leaves,
+            depth=depth,
+            tags=tags,
+            semantic_tags=semantic_tags
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/session/stats", response_model=SessionStatsResponse)
+async def get_session_stats(request: SessionStatsRequest):
+    file_names = request.file_names
+    if not file_names:
+        return SessionStatsResponse(
+            total_files=0, avg_pages=0, avg_nodes=0, avg_depth=0,
+            total_counts={'chart':0, 'image':0, 'table':0, 'layout_misc':0, 'text':0},
+            avg_variance=0
+        )
+        
+    cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
+    
+    total_pages = 0
+    total_nodes = 0
+    total_depth = 0
+    total_counts = {'chart':0, 'image':0, 'table':0, 'layout_misc':0, 'text':0}
+    total_variance = 0
+    valid_count = 0
+    
+    for file_name in file_names:
+        doc_name = os.path.splitext(file_name)[0]
+        cache_path = os.path.join(cache_base, doc_name)
+        
+        if os.path.exists(cache_path):
+            try:
+                counts, variance, page_count = get_components(cache_path)
+                nodes, leaves, depth = get_trees(cache_path)
+                
+                total_pages += page_count
+                total_nodes += nodes
+                total_depth += depth
+                total_variance += variance
+                for k, v in counts.items():
+                    total_counts[k] = total_counts.get(k, 0) + v
+                valid_count += 1
+            except:
+                continue
+                
+    if valid_count == 0:
+        raise HTTPException(status_code=404, detail="No valid stats found for session files")
+        
+    return SessionStatsResponse(
+        total_files=valid_count,
+        avg_pages=total_pages / valid_count,
+        avg_nodes=total_nodes / valid_count,
+        avg_depth=total_depth / valid_count,
+        total_counts=total_counts,
+        avg_variance=total_variance / valid_count
+    )
+
 # --- 启动入口 ---
 if __name__ == "__main__":
     # Preload local models
@@ -708,8 +900,8 @@ if __name__ == "__main__":
         print(f"Warning: Failed to preload local models: {e}")
         print("Models will be loaded lazily upon first request.")
 
-    # 启动服务，监听 8000 端口
+    # 启动服务，监听 8005 端口
     print("启动 FastAPI 服务...")
     print(f"PDF 搜索路径: {BASE_DIR}")
     print(f"Cache 搜索路径: {os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))}")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8005)
