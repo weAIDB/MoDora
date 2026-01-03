@@ -1,9 +1,11 @@
 import re
 import ast
 import json
+import traceback
 from api_utils import *
 from prompt_template import *
 from constants import *
+from logger import logger
 from retrieve import *
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -51,32 +53,14 @@ def merge_multi_docs(source_paths_map):
                     
                     root['children'][filename] = cctree
             else:
-                print(f"Warning: Tree cache not found for {filename} at {tree_path}")
+                logger.warning(f"Warning: Tree cache not found for {filename} at {tree_path}")
         except Exception as e:
-            print(f"Failed to load tree for {filename}: {e}")
+            logger.error(f"Failed to load tree for {filename}: {e}")
             
     return root
 
 def call_gpt_wrapper(prompt, config=None):
     if config:
-        # 如果是本地模型，且在 constants.py 中我们知道本地模型不需要 API Key
-        # 但这里 api_utils.py 的 gpt_generate 已经适配了 OpenAI 格式
-        # 如果 config['qaModel'] 是 'qwen-vl-local'，我们需要特殊处理吗？
-        # 不需要，因为我们已经在 api_utils.py 中移除了 call_qwen_*
-        # 等等，如果用户选了 'qwen-vl-local'，我们应该如何处理？
-        # 目前 api_utils.py 的 gpt_generate 是纯 OpenAI 调用。
-        # 如果要支持本地模型，我们需要在 api_utils.py 中恢复 call_qwen_* 的能力，或者让本地模型也提供 OpenAI 兼容接口。
-        # 考虑到之前的修改，api_utils.py 已经删除了 call_qwen_* 的引用。
-        # 这是一个关键点！
-        
-        # 临时方案：如果 model 是 qwen-vl-local，我们假设它不可用或者抛错，
-        # 或者我们需要恢复 api_utils.py 的本地调用能力。
-        # 鉴于用户要求“保留gemini和gpt”，且“默认是本地Qwen”，
-        # 这意味着我们需要支持双模式：OpenAI API 和 本地 Qwen。
-        
-        # 让我们先按照 OpenAI 格式传参。如果用户选了本地 Qwen，
-        # 我们需要在 api_utils.py 中做判断。
-        
         return gpt_generate(
             prompt, 
             key=config.get('apiKey') or API_KEY, 
@@ -161,12 +145,12 @@ def parse_response(resp):
             'content': content_match.group(1).strip() if content_match else parsed.get('content', '')
         }
         
-    except json.JSONDecodeError as e:
-        print(f"JSON解析错误: {e}")
-        print(f"原始location字符串: {location_str}")
+    except (json.JSONDecodeError, ValueError, SyntaxError) as e:
+        logger.error(f"JSON解析错误: {e}")
+        logger.error(f"原始location字符串: {location_str}")
         return {'location': [], 'content': ''}
     except Exception as e:
-        print(f"解析响应时出错: {e}")
+        logger.error(f"解析响应时出错: {e}")
         return {'location': [{'page':0, 'grids':[]}], 'content': ''}
 
 def question_parsing(question, config=None):
@@ -177,8 +161,7 @@ def question_parsing(question, config=None):
 def qa(cctree, query, log_file=None, source_path=False, config=None):
 
     if log_file is not None:
-        with open(log_file, "a") as f:
-            f.write(f"{DELIMITER} Answering Query {DELIMITER}\n{query}\n")
+        log_file.info(f"{DELIMITER} Answering Query {DELIMITER}\n{query}\n")
 
     answer = "None"
     
@@ -194,9 +177,8 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
     semantic_query = parsed_res.get('content', query)
 
     if log_file is not None:
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(f"{DELIMITER} Location Cues {DELIMITER}\n{locations}\n")
-            f.write(f"{DELIMITER} Semantic Cues {DELIMITER}\n{semantic_query}\n")
+        log_file.info(f"{DELIMITER} Location Cues {DELIMITER}\n{locations}\n")
+        log_file.info(f"{DELIMITER} Semantic Cues {DELIMITER}\n{semantic_query}\n")
 
     # 执行检索
     retrieved_text_dict, retrieved_bbox_dict = retrieve(
@@ -268,14 +250,12 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
             answer = "None"
             
     except Exception as e:
-        print(f"Errors in qa reasoning：{e}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Errors in qa reasoning：{e}")
+        logger.error(traceback.format_exc())
         answer = "None"
 
     if log_file is not None:
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(f"{DELIMITER} Answer {DELIMITER}\n{answer}\n")
+        log_file.info(f"{DELIMITER} Answer {DELIMITER}\n{answer}\n")
     
     # 5. 最终校验
     final_check = check_answer(query=semantic_query, answer=answer, config=config)

@@ -14,12 +14,22 @@ from preprocess import preprocess
 from cctree import build_tree
 from stati import get_components, get_trees
 from kb_manager import kb_manager
+from logger import logger, modora_logger
 
 # 引入你的后端核心模块
 from qa import qa
 from constants import BASE_DIR, CACHE_DIR, LOG_DIR
 
 app = FastAPI(title="MoDora Chat API")
+
+@app.middleware("http")
+async def log_requests(request, call_next):
+    import time
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    logger.info(f"Method: {request.method} Path: {request.url.path} Status: {response.status_code} Duration: {duration:.2f}s")
+    return response
 
 app.mount("/api/files", StaticFiles(directory=BASE_DIR), name="files")
 
@@ -61,7 +71,7 @@ def get_pdf_image(file_name: str, page_index: int):
         return StreamingResponse(io.BytesIO(img_data), media_type="image/png")
         
     except Exception as e:
-        print(f"Error generating PDF image: {e}")
+        logger.error(f"Error generating PDF image: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 class ChatRequest(BaseModel):
@@ -277,26 +287,26 @@ def update_tree_endpoint(request: TreeUpdateRequest):
             original_tree_dict = json.load(f)
             
         # 3. Reconstruct tree structure
-        print(f"Reconstructing tree for {file_name}...")
+        logger.info(f"Reconstructing tree for {file_name}...")
         new_tree_dict = reconstruct_tree_from_elements(elements, original_tree_dict, file_name)
         
         # 4. Validate tree structure
-        print("Validating tree structure...")
+        logger.info("Validating tree structure...")
         validate_tree_structure(new_tree_dict)
         
         # 5. Save (Re-compile)
-        print(f"Saving (Re-compiling) tree to {tree_path}...")
+        logger.info(f"Saving (Re-compiling) tree to {tree_path}...")
         with open(tree_path, "w", encoding="utf-8") as f:
             json.dump(new_tree_dict, f, ensure_ascii=False, indent=4)
             
         return {"status": "success", "message": "Tree structure validated and re-compiled successfully."}
 
     except ValueError as ve:
-        print(f"Validation Error: {str(ve)}")
+        logger.error(f"Validation Error: {str(ve)}")
         raise HTTPException(status_code=400, detail=f"Invalid tree structure: {str(ve)}")
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Compilation Error: {str(e)}")
+        logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -442,9 +452,8 @@ def generate_auto_tags(file_path: str, cache_base: str):
         if depth > 5: tags.append("Deep Hierarchy")
         
     except Exception as e:
-        print(f"Error generating auto tags: {e}")
-        
-    return tags
+        logger.error(f"Error generating auto tags: {e}")
+        return []
 
 def generate_semantic_tags(file_path: str, cache_base: str, config: Optional[Dict] = None):
     """
@@ -467,7 +476,7 @@ def process_document_task(file_path: str, config: Optional[Dict] = None):
         if not os.path.exists(cache_base):
             os.makedirs(cache_base)
             
-        print(f"后台任务开始: 处理文件 {file_path}")
+        logger.info(f"后台任务开始: 处理文件 {file_path}")
         
         # 1. 预处理
         preprocess(file_path, cache_base, config=config)
@@ -485,13 +494,12 @@ def process_document_task(file_path: str, config: Optional[Dict] = None):
             "added_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
         
-        print(f"后台任务完成: {file_path}, 自动标签: {auto_tags}")
+        logger.info(f"后台任务完成: {file_path}, 自动标签: {auto_tags}")
         task_status_store[filename] = "completed"
         
     except Exception as e:
-        print(f"后台任务出错: {file_path}, 错误: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"后台任务出错: {file_path}, 错误: {str(e)}")
+        logger.error(traceback.format_exc())
         task_status_store[filename] = "failed"
 
 @app.get("/api/task/status/{filename}")
@@ -522,9 +530,10 @@ async def upload_file(
     if settings:
         try:
             config = json.loads(settings)
-            print(f"Upload received settings: {config}")
+            logger.info(f"Upload received settings: {config}")
         except json.JSONDecodeError:
-            print("Failed to parse settings JSON")
+            logger.warning("Failed to parse settings JSON")
+            config = {}
 
     # 确保保存目录存在
     if not os.path.exists(BASE_DIR):
@@ -586,7 +595,7 @@ def chat_endpoint(request: ChatRequest):
     if not file_names:
         raise HTTPException(status_code=400, detail="File name(s) required")
 
-    print(f"收到请求 -> 文件: {file_names}, 问题: {request.query}")
+    logger.info(f"收到请求 -> 文件: {file_names}, 问题: {request.query}")
 
     # 1. 准备 source_paths_map 和 source_path (兼容单文件)
     source_paths_map = {}
@@ -626,6 +635,7 @@ def chat_endpoint(request: ChatRequest):
 
     # 3. 执行 QA
     req_id = str(uuid.uuid4())[:8]
+    req_logger = modora_logger.get_request_logger(req_id)
     log_file = os.path.join(LOG_DIR, f"api_req_{req_id}.log")
     
     try:
@@ -633,7 +643,7 @@ def chat_endpoint(request: ChatRequest):
         qa_result = qa(
             cctree=cctree, 
             query=request.query, 
-            log_file=log_file, 
+            log_file=req_logger, 
             source_path=qa_source_path, 
             config=request.settings
         )
@@ -892,16 +902,16 @@ async def get_session_stats(request: SessionStatsRequest):
 if __name__ == "__main__":
     # Preload local models
     try:
-        print("Preloading local Qwen models...")
         from qwen_call import ensure_model_loaded
+        logger.info("Preloading local Qwen models...")
         ensure_model_loaded()
-        print("Local Qwen models preloaded successfully.")
+        logger.info("Local Qwen models preloaded successfully.")
     except Exception as e:
-        print(f"Warning: Failed to preload local models: {e}")
-        print("Models will be loaded lazily upon first request.")
+        logger.warning(f"Warning: Failed to preload local models: {e}")
+        logger.warning("Models will be loaded lazily upon first request.")
 
     # 启动服务，监听 8005 端口
-    print("启动 FastAPI 服务...")
-    print(f"PDF 搜索路径: {BASE_DIR}")
-    print(f"Cache 搜索路径: {os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))}")
+    logger.info("启动 FastAPI 服务...")
+    logger.info(f"PDF 搜索路径: {BASE_DIR}")
+    logger.info(f"Cache 搜索路径: {os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))}")
     uvicorn.run(app, host="0.0.0.0", port=8005)

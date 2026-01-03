@@ -1,5 +1,6 @@
 import os
 import json
+from logger import logger
 from typing import List, Dict, Any, Optional
 
 CACHE_DIR = "cache"
@@ -21,7 +22,7 @@ class KnowledgeBaseManager:
             with open(self.kb_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception as e:
-            print(f"Error loading KB: {e}")
+            logger.error(f"Error loading KB: {e}")
             return {"docs": {}, "tag_library": []}
 
     def _save_kb(self, data: Optional[Dict] = None):
@@ -31,7 +32,7 @@ class KnowledgeBaseManager:
             with open(self.kb_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
         except Exception as e:
-            print(f"Error saving KB: {e}")
+            logger.error(f"Error saving KB: {e}")
 
     def update_doc_info(self, file_name: str, info: Dict):
         """Update or add document info in KB"""

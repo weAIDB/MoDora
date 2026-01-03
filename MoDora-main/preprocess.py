@@ -6,6 +6,7 @@ import traceback
 from pydantic import BaseModel, Field
 from call_paddle import paddle_generate
 from constants import *
+from logger import logger
 from qwen_call import qwen_annotation
 from api_utils import bbox_to_base64
 
@@ -41,7 +42,7 @@ def get_components(source_path, cache_path, config=None):
     pattern = re.compile(r'^(.+)_(\d+)_res\.json$')
     matching_files = [filename for filename in files if pattern.match(filename)]
     matching_files = sorted(matching_files, key=lambda x: int(pattern.match(x).group(2)))
-    print(matching_files)
+    logger.debug(f"Preprocessing matching files: {matching_files}")
 
     for file in matching_files:
         with open(os.path.join(cache_path, file), 'r', encoding='utf-8') as f:
@@ -182,8 +183,8 @@ def preprocess(source_path,cache_dir, config=None):
         cp_dict = get_components(source_path, cache_path, config=config)
         
     except Exception as e:
-        print(f"Error in preprocessing: {e}")
-        print(traceback.format_exc())
+        logger.error(f"Error in preprocessing: {e}")
+        logger.error(traceback.format_exc())
         cp_dict = {
             'body':[],
             'supplement':{

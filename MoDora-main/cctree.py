@@ -9,6 +9,7 @@ from prompt_template import *
 import threading
 from concurrent.futures import ThreadPoolExecutor, Future
 import math
+from logger import logger
 
 def deep_update(dict1, dict2):
     for key, value in dict2.items():
@@ -83,7 +84,7 @@ def get_metadata(root, level = 1, n0 = 2, max_workers = 8, config=None):
         D = 1
 
         if 'children' not in node:
-             print(f"!!! Warning: Node missing children: {node.keys()} Type: {node.get('type')}")
+             logger.warning(f"!!! Warning: Node missing children: {node.keys()} Type: {node.get('type')}")
              node['children'] = {}
 
         children = list(node['children'].values())
@@ -261,7 +262,8 @@ def build_tree(source_path, cache_dir, config=None):
             cp_dict = json.load(f)
 
     except Exception as e:
-        print(f"Fail to load components when constructing tree: {e}")
+        logger.error(f"Fail to load components when constructing tree: {e}")
+        return
 
     if not cp_dict:
         title_list = []
@@ -292,7 +294,7 @@ def build_tree(source_path, cache_dir, config=None):
             # Construction
             cctree = construct(cp_dict)
         except Exception as e:
-            print(f"!!! Error in build_tree logic: {e}")
+            logger.error(f"!!! Error in build_tree logic: {e}")
             title_list = []
             cctree = {}
         

@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from api_utils import *
 from prompt_template import *
 from constants import *
+from logger import logger
 from qwen_call import call_qwen_em
 
 def bool_string(s):
@@ -45,15 +46,12 @@ def select_children(keys, query ,path="None", metadata_map="None", config=None):
     res = gpt_generate(prompt, key=key, url=url, base_model=base_model)
     return res
 
-log_lock = threading.Lock()
 def _safe_log(log_file, *lines):
     if not log_file:
         return
     try:
-        with log_lock:
-            with open(log_file, "a", encoding="utf-8") as f:
-                for ln in lines:
-                    f.write(str(ln) + ("\n" if not str(ln).endswith("\n") else ""))
+        for ln in lines:
+            log_file.info(str(ln))
     except Exception:
         pass
 
@@ -164,8 +162,8 @@ def _process_excluded_key(excluded_key, path, node, query, log_file, config=None
                       f"{s_path}: {embed_res}")
             return s_path, embed_res
     except Exception as e:
-        print(f"Fallback fails: {e}")
-    return None
+        logger.error(f"Fallback fails: {e}")
+        return None
 
 def _process_single_node(path, node, query, log_file, source_path, locations, inner_max_workers=None, config=None):
     # Forward search and backward verification for a node
@@ -234,8 +232,9 @@ def _process_single_node(path, node, query, log_file, source_path, locations, in
                     selected_children[path + "--" + key] = child_node # Record path
 
     except Exception as e:
-        print(f"Retrieval on node {path} fails: {e}")
+        logger.error(f"Retrieval on node {path} fails: {e}")
         # traceback.print_exc()
+        return []
 
     return retrieve_result, retrieve_bbox, selected_children
 
@@ -265,7 +264,7 @@ def select_and_check_by_level(cur_level, query, log_file, source_path, locations
                 retrieve_bbox.update(rb)
                 selected_children.update(sc)
             except Exception as e:
-                print(f"Retrieval fails: {futures[fut]} -> {e}")
+                logger.error(f"Retrieval fails: {futures[fut]} -> {e}")
 
     # Go to the next level
     sub_result, sub_bbox = select_and_check_by_level(

@@ -10,6 +10,7 @@ import io
 import base64
 
 from constants import *
+from logger import logger
 # from qwen_call import *
 
 def pdf_to_base64(pdf_path):
@@ -42,7 +43,7 @@ def pdf_to_base64(pdf_path):
         return base64_image
 
     except Exception as e:
-        print(f"Error in pdf_to_base64：{e}")
+        logger.error(f"Error in pdf_to_base64：{e}")
         # Replace with blank 1x1 square
         empty_image = Image.new("RGB", (1, 1), color=(255, 255, 255))
         buffered = io.BytesIO()
@@ -101,7 +102,7 @@ def bbox_to_base64(pdf_path, bbox_list):
 
     except Exception as e:
         # Replace with blank 1x1 square
-        print(f"!!! Error in bbox_to_base64: {e}")  # <--- 添加这一行
+        logger.error(f"!!! Error in bbox_to_base64: {e}")
         empty_image = Image.new("RGB", (1, 1), color=(255, 255, 255))
         buffered = io.BytesIO()
         empty_image.save(buffered, format="PNG")
@@ -200,13 +201,13 @@ def bbox_to_base64_2(pdf_path, bbox_list):
 def gpt_generate(prompt, key=API_KEY, url=API_URL, base_model = MODEL):
     # Support Local Model
     if base_model == 'qwen-vl-local':
-        print(f"[Model Call] Using Local Model: {base_model}")
+        logger.info(f"[Model Call] Using Local Model: {base_model}")
         from qwen_call import call_qwen_vl_textonly, ensure_model_loaded
         ensure_model_loaded()
         return call_qwen_vl_textonly(prompt)
 
     # Call LLM
-    print(f"[Model Call] Using Remote API: {base_model} at {url}")
+    logger.info(f"[Model Call] Using Remote API: {base_model} at {url}")
     client = OpenAI(
         base_url=url,
         api_key=key
@@ -233,7 +234,7 @@ def gpt_generate(prompt, key=API_KEY, url=API_URL, base_model = MODEL):
 
         except Exception as e:
             cnt += 1
-            print(f"LLM Error: {e}. Try for time {cnt}！")
+            logger.error(f"LLM Error: {e}. Try for time {cnt}！")
             import time; time.sleep(0.1)
 
     return res
@@ -241,13 +242,13 @@ def gpt_generate(prompt, key=API_KEY, url=API_URL, base_model = MODEL):
 def gpt_generate_pdf(base64_image, prompt, key=API_KEY, url=API_URL, base_model = MODEL):
     # Support Local Model
     if base_model == 'qwen-vl-local':
-        print(f"[Model Call] Using Local Model (Vision): {base_model}")
+        logger.info(f"[Model Call] Using Local Model (Vision): {base_model}")
         from qwen_call import call_qwen_vl, ensure_model_loaded
         ensure_model_loaded()
         return call_qwen_vl(prompt, base64_image)
 
     # Call MLLM
-    print(f"[Model Call] Using Remote API (Vision): {base_model} at {url}")
+    logger.info(f"[Model Call] Using Remote API (Vision): {base_model} at {url}")
     client = OpenAI(
         base_url=url,
         api_key=key
@@ -282,7 +283,7 @@ def gpt_generate_pdf(base64_image, prompt, key=API_KEY, url=API_URL, base_model 
 
         except Exception as e:
             cnt += 1
-            print(f"MLLM Error: {e}. Try for time {cnt}！")
+            logger.error(f"MLLM Error: {e}. Try for time {cnt}！")
             import time; time.sleep(0.1)
 
     return res

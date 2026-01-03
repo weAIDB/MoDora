@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import re
 from transformers import Qwen3VLForConditionalGeneration, AutoTokenizer, AutoProcessor
+from logger import logger
 from qwen_vl_utils import process_vision_info
 from sentence_transformers import SentenceTransformer
 from prompt_template import *
@@ -16,7 +17,7 @@ qwen_em_model = None
 def ensure_model_loaded():
     global qwen_vl_model, qwen_vl_processor, qwen_em_model
     if qwen_vl_model is None:
-        print("Loading local Qwen models...")
+        logger.info("Loading local Qwen models...")
         qwen_vl_model = Qwen3VLForConditionalGeneration.from_pretrained(
             VL_MODEL_PATH, torch_dtype="auto", device_map="auto"
         )
@@ -25,7 +26,7 @@ def ensure_model_loaded():
         qwen_em_model = SentenceTransformer(
             EM_MODEL_PATH, device="cpu"
         )
-        print("Local Qwen models loaded.")
+        logger.info("Local Qwen models loaded.")
 
 # qwen_vl_model = Qwen3VLForConditionalGeneration.from_pretrained(
 #     VL_MODEL_PATH, torch_dtype="auto", device_map="auto"
@@ -201,6 +202,6 @@ def qwen_annotation(base64_image, cp_type, config=None):
             flag = True
         else:
             cnt = cnt + 1
-            print(f"Fail to parse Qwen-VL output. The output is {text}. Try for time {cnt}！")
+            logger.error(f"Fail to parse Qwen-VL output. The output is {text}. Try for time {cnt}！")
 
     return title, metadata, content

@@ -5,6 +5,7 @@ import multiprocessing
 import time
 
 from constants import *
+from logger import logger
 from preprocess import preprocess
 from cctree import build_tree
 from prompt_template import *
@@ -34,7 +35,7 @@ def pipeline(id, source_path, cache_dir, query="", log_dir = None, use_cache=Fal
             cctree = json.load(f)
 
     except Exception as e:
-        print(f"Fail to read from cache: {e}")
+        logger.error(f"Fail to read from cache: {e}")
         return ""
     
     # Tree based analysis
@@ -61,7 +62,7 @@ def process_item(item, processed_docs, source_dir, pipeline, cache_dir, log_dir,
         item['prediction'] = answer
         return item
     except Exception as e:
-        print(f"Error processing item {item}: {e}")
+        logger.error(f"Error processing item {item}: {e}")
         return None
 
 def run_on_dataset(source_dir, cache_dir, log_dir = None, output_dir = None, enable_cache = False):
@@ -99,7 +100,7 @@ def run_on_dataset(source_dir, cache_dir, log_dir = None, output_dir = None, ena
                     with open(os.path.join(output_dir, "res.json"), "w", encoding="utf-8") as f:
                         json.dump(results, f, ensure_ascii=False, indent=4)
             except Exception as e:
-                print(f"Error in future for item {item}: {e}")
+                logger.error(f"Error in future for item {item}: {e}")
 
 def main():
     source_dir = BASE_DIR

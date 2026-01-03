@@ -2,6 +2,7 @@ import os
 import re
 import json
 import math
+from logger import logger
 from statistics import pvariance, mean # 总体方差
 
 
@@ -131,14 +132,14 @@ def count_all(source_root):
     zero_ratio = zero_dirs/total_dirs
     
 
-    print("\n===== 汇总统计结果 =====")
-    print(f"平均文档页数: {avg_pages:.2f}")
+    logger.info("\n===== 汇总统计结果 =====")
+    logger.info(f"平均文档页数: {avg_pages:.2f}")
     for k, v in avg_counts.items():
-        print(f"{k:12s}: 平均元素数量 = {v:.2f}")
-    print(f"平均元素标准差: {avg_var:.4f}")
-    print(f"平均树节点数: {avg_nodes:.2f}")
-    print(f"平均叶节点数: {avg_leaves:.2f}")
-    print(f"平均树最大深度: {avg_deep:.2f}")
-    print(f"单调文档: {zero_dirs}/{total_dirs} ({zero_ratio:.2f}%)")
+        logger.info(f"{k:12s}: 平均元素数量 = {v:.2f}")
+    logger.info(f"平均元素标准差: {avg_var:.4f}")
+    logger.info(f"平均树节点数: {avg_nodes:.2f}")
+    logger.info(f"平均叶节点数: {avg_leaves:.2f}")
+    logger.info(f"平均树最大深度: {avg_deep:.2f}")
+    logger.info(f"单调文档: {zero_dirs}/{total_dirs} ({zero_ratio:.2f}%)")
 
     return avg_counts, avg_var
