@@ -199,8 +199,11 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
                 full_locations.extend(bbox_list)
 
     # --- 3. [修改] 严格按页去重筛选展示数据 ---
-    seen_pages = set()
-    MAX_PAGES = 3
+    seen_page_identifiers = set() # 使用 (file_name, page) 唯一标识
+    
+    # 根据是否是多文档模式调整最大显示页数
+    is_multi_doc = cctree.get('type') == 'MROOT'
+    max_display_pages = 10 if is_multi_doc else 5 
     
     # 新的存放容器
     display_documents = [] 
@@ -211,21 +214,24 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
         if bbox_list:
             current_page = bbox_list[0].get('page')
         
-        # 逻辑：严格按页去重
-        if current_page in seen_pages:
+        # Determine file name
+        fname = None
+        if bbox_list and 'source_path' in bbox_list[0]:
+            fname = os.path.basename(bbox_list[0]['source_path'])
+        elif source_path:
+            fname = os.path.basename(source_path)
+        
+        # 唯一标识符：文件名 + 页码
+        page_id = (fname, current_page)
+        
+        # 逻辑：按 (文件, 页码) 去重
+        if page_id in seen_page_identifiers:
             continue
             
-        if len(seen_pages) < MAX_PAGES:
-            seen_pages.add(current_page)
+        if len(seen_page_identifiers) < max_display_pages:
+            seen_page_identifiers.add(page_id)
             
-            # Determine file name
-            fname = None
-            if bbox_list and 'source_path' in bbox_list[0]:
-                fname = os.path.basename(bbox_list[0]['source_path'])
-            elif source_path:
-                fname = os.path.basename(source_path)
-
-            # 【关键修改】构造一个完整的对象，而不是拆分到两个列表
+            # 构造一个完整的对象
             doc_item = {
                 "page": current_page,
                 "content": retrieved_text_dict.get(path, ""),
@@ -262,12 +268,6 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
     
     final_answer = answer
     if not final_check:
-        # 这里的 whole_doc 仍然保留，用于全文档兜底推理 (whole_reason 可能会用到)
-        # whole_reason 内部使用的是 whole_reasoning_prompt (纯文本)
-        # 这里的 pdf_to_base64 其实也是多余的，whole_reason 签名是 (whole_doc, query, cctree)
-        # 检查 whole_reason 实现: prompt = whole_reasoning_prompt.format(query=query,data=cctree)
-        # 并没有用到 whole_doc (pdf图片)。
-        
         whole_doc = None
         if source_path:
             whole_doc = pdf_to_base64(source_path) 
@@ -279,12 +279,5 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
     # 6. 返回结果
     return {
         "answer": final_answer,
-        # "retrieved_image": retrieved_image, # 移除: 不再返回溯源图片
-        # 这是一个列表，长度严格为 3
-
-        # 前端遍历这个列表：
-        #   - item.content 用于显示文字
-        #   - item.page 用于跳转
-        #   - item.bboxes 用于在 PDF 上画高亮 (可能有多个框)
         "retrieved_documents": display_documents 
     }
