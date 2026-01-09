@@ -2,7 +2,7 @@ import copy
 
 class TreeNode:
 
-    def __init__(self, title, typ=None, metadata=None, data=None, location=None, children=None, path=None):
+    def __init__(self, title, typ=None, metadata=None, data=None, location=None, children=None, path=None, impact=0):
         self.title = title
         self.type = typ
         self.metadata = metadata
@@ -10,6 +10,7 @@ class TreeNode:
         self.location = location
         self.children = [] if children is None else children
         self.path = [] if path is None else path
+        self.impact = impact
 
     def insert_child(self, child_node):
         child_node.path = self.path + [child_node.title]
@@ -52,6 +53,7 @@ class TreeNode:
             "metadata":self.metadata,
             "data":self.data,
             "location":self.location,
+            "impact":self.impact,
             "children":{}
         }
 
@@ -67,7 +69,8 @@ def clone_tree(node):
         data=copy.deepcopy(node.data),
         location=copy.deepcopy(node.location),
         children=[],
-        path=copy.deepcopy(node.path)
+        path=copy.deepcopy(node.path),
+        impact=node.impact
     )
 
     for child in node.children:
@@ -77,11 +80,11 @@ def clone_tree(node):
 
 def dict_to_tree(dict_node, root_title="ROOT", path=None):
 
-    root = TreeNode(title=root_title, typ=dict_node['type'], metadata=dict_node['metadata'], data=dict_node['data'], location=dict_node['location'], path = path+[root_title] if path else [root_title])
+    root = TreeNode(title=root_title, typ=dict_node['type'], metadata=dict_node['metadata'], data=dict_node['data'], location=dict_node['location'], path = path+[root_title] if path else [root_title], impact=dict_node.get('impact', 0))
 
     def add_subtree(dict_node, root):
         for sub_title, dict_child in dict_node['children'].items():
-            child_node = TreeNode(title=sub_title, typ=dict_child['type'], metadata=dict_child['metadata'], data=dict_child['data'], location=dict_child['location'])
+            child_node = TreeNode(title=sub_title, typ=dict_child['type'], metadata=dict_child['metadata'], data=dict_child['data'], location=dict_child['location'], impact=dict_child.get('impact', 0))
             root.insert_child(child_node)
             add_subtree(dict_child, child_node)
     

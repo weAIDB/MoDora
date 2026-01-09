@@ -1,6 +1,7 @@
 import re
 import ast
 import json
+import os
 import traceback
 from api_utils import *
 from prompt_template import *
@@ -158,6 +159,82 @@ def question_parsing(question, config=None):
     res = call_gpt_wrapper(prompt, config)
     return parse_response(res)
 
+def update_and_save_tree(cctree, node_impacts, fallback_source_path=None):
+    """
+    Updates the in-memory tree with impacts and saves changes to disk.
+    Handles both single-doc (root) and multi-doc (MROOT) trees.
+    """
+    if not node_impacts:
+        return
+
+    # Helper to update a single tree node
+    def update_node(node, path_parts, impact):
+        current = node
+        # path_parts example: ['Section1', 'Subsection2']
+        # Note: 'root' is already consumed or handled
+        
+        # If no more parts, update current node
+        if not path_parts:
+            current['impact'] = current.get('impact', 0) + impact
+            return
+
+        # Traverse children
+        next_key = path_parts[0]
+        if 'children' in current and next_key in current['children']:
+            update_node(current['children'][next_key], path_parts[1:], impact)
+    
+    # Identify modified documents (to minimize disk writes)
+    modified_docs = set()
+
+    # Apply impacts
+    for path, impact in node_impacts.items():
+        parts = path.split('--')
+        # parts[0] is always 'root'
+        
+        if cctree.get('type') == 'MROOT':
+            # Multi-doc structure: root -> filename -> ...
+            if len(parts) < 2: 
+                continue # Impact on MROOT itself? Ignore for now
+            
+            filename = parts[1]
+            if filename in cctree['children']:
+                doc_root = cctree['children'][filename]
+                # Update the document tree
+                # Path relative to doc root: parts[2:]
+                update_node(doc_root, parts[2:], impact)
+                modified_docs.add(filename)
+        else:
+            # Single-doc structure: root -> ...
+            update_node(cctree, parts[1:], impact)
+            modified_docs.add("SINGLE_DOC")
+
+    # Save to disk
+    # Logic to derive tree.json path matches merge_multi_docs
+    cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
+    
+    docs_to_save = []
+    if cctree.get('type') == 'MROOT':
+        for fname in modified_docs:
+            docs_to_save.append(cctree['children'][fname])
+    elif "SINGLE_DOC" in modified_docs:
+        docs_to_save.append(cctree)
+
+    for doc_tree in docs_to_save:
+        source_path = doc_tree.get('source_path') or fallback_source_path
+        if not source_path:
+            logger.warning("Cannot save tree: missing source_path")
+            continue
+            
+        doc_cache_name = os.path.splitext(os.path.basename(source_path))[0]
+        tree_path = os.path.join(cache_base, doc_cache_name, "tree.json")
+        
+        try:
+            with open(tree_path, 'w', encoding='utf-8') as f:
+                json.dump(doc_tree, f, ensure_ascii=False, indent=4)
+                
+        except Exception as e:
+            logger.error(f"Failed to save updated tree to {tree_path}: {e}")
+
 def qa(cctree, query, log_file=None, source_path=False, config=None):
 
     if log_file is not None:
@@ -181,7 +258,7 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
         log_file.info(f"{DELIMITER} Semantic Cues {DELIMITER}\n{semantic_query}\n")
 
     # 执行检索
-    retrieved_text_dict, retrieved_bbox_dict = retrieve(
+    retrieved_text_dict, retrieved_bbox_dict, node_impacts = retrieve(
         query=semantic_query, 
         cctree=cctree, 
         source_path=source_path, 
@@ -189,6 +266,12 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
         log_file=log_file,
         config=config
     )
+    
+    # 持久化 node_impacts 到 tree.json
+    try:
+        update_and_save_tree(cctree, node_impacts, source_path)
+    except Exception as e:
+        logger.error(f"Failed to persist node impacts: {e}")
     
     # 2. 填充全量推理数据
     if retrieved_text_dict:
@@ -279,5 +362,6 @@ def qa(cctree, query, log_file=None, source_path=False, config=None):
     # 6. 返回结果
     return {
         "answer": final_answer,
-        "retrieved_documents": display_documents 
+        "retrieved_documents": display_documents,
+        "node_impacts": node_impacts
     }

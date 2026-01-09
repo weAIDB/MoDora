@@ -170,6 +170,7 @@ def _process_single_node(path, node, query, log_file, source_path, locations, in
     retrieve_result = {}
     retrieve_bbox = {}
     selected_children = {}
+    node_impacts = {}
 
     try:
         base_path = path.split('--')[-1] if '--' in path else path
@@ -183,13 +184,14 @@ def _process_single_node(path, node, query, log_file, source_path, locations, in
             base64_image = bbox_to_base64(current_source_path, within_locs)
             if check_node_mm(base_path + ": " + node['data'], base64_image, query, config=config):
                 retrieve_result[path] = node['data'] # Textual evidence
+                node_impacts[path] = node_impacts.get(path, 0) + 5
                 # Inject source_path into locations
                 for loc in within_locs:
                     loc['source_path'] = current_source_path
                 retrieve_bbox[path] = within_locs # Locational evidence
 
         if len(node['children']) == 0:
-            return retrieve_result, retrieve_bbox, selected_children
+            return retrieve_result, retrieve_bbox, selected_children, node_impacts
         
         # Forward search
         keys = filt_by_location(node, current_source_path, locations) # list(node['children'].keys())
@@ -229,23 +231,27 @@ def _process_single_node(path, node, query, log_file, source_path, locations, in
                     # Inject source_path for the next level if not present
                     if 'source_path' not in child_node:
                         child_node['source_path'] = current_source_path
-                    selected_children[path + "--" + key] = child_node # Record path
+                    
+                    child_path = path + "--" + key
+                    selected_children[child_path] = child_node # Record path
+                    node_impacts[child_path] = node_impacts.get(child_path, 0) + 1
 
     except Exception as e:
         logger.error(f"Retrieval on node {path} fails: {e}")
         # traceback.print_exc()
-        return []
+        return {}, {}, {}, {}
 
-    return retrieve_result, retrieve_bbox, selected_children
+    return retrieve_result, retrieve_bbox, selected_children, node_impacts
 
 
 def select_and_check_by_level(cur_level, query, log_file, source_path, locations, max_workers=4, inner_max_workers=4, config=None):
     retrieve_result = {}
     retrieve_bbox = {}
     selected_children = {}
+    node_impacts = {}
 
     if not cur_level:
-        return retrieve_result, retrieve_bbox
+        return retrieve_result, retrieve_bbox, node_impacts
     
     # Concurrent execution on current-level nodes
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -259,22 +265,32 @@ def select_and_check_by_level(cur_level, query, log_file, source_path, locations
 
         for fut in as_completed(futures):
             try:
-                rr, rb, sc = fut.result()
+                rr, rb, sc, ni = fut.result()
                 retrieve_result.update(rr)
                 retrieve_bbox.update(rb)
                 selected_children.update(sc)
+                
+                # Merge node_impacts
+                for k, v in ni.items():
+                    node_impacts[k] = node_impacts.get(k, 0) + v
+                    
             except Exception as e:
                 logger.error(f"Retrieval fails: {futures[fut]} -> {e}")
 
     # Go to the next level
-    sub_result, sub_bbox = select_and_check_by_level(
+    sub_result, sub_bbox, sub_impacts = select_and_check_by_level(
         selected_children, query, log_file, source_path, locations,
         max_workers=max_workers, inner_max_workers=inner_max_workers, config=config
     )
     retrieve_result.update(sub_result)
     retrieve_bbox.update(sub_bbox)
+    
+    # Merge sub_impacts
+    for k, v in sub_impacts.items():
+        node_impacts[k] = node_impacts.get(k, 0) + v
 
-    return retrieve_result, retrieve_bbox
+    return retrieve_result, retrieve_bbox, node_impacts
+
 
 '''
 def retrieve_by_location(tree, page_list, position_vector, pdf_path):
@@ -346,6 +362,6 @@ def retrieve_by_location(tree, page_list, position_vector, pdf_path):
 
 def retrieve(query, cctree, source_path, locations=None, log_file=None, config=None):
     # Retrive based on titles, metadata and data
-    retrieve_result = select_and_check_by_level({"root":cctree}, query, log_file, source_path, locations, config=config)
-    return retrieve_result
+    retrieve_result, retrieve_bbox, node_impacts = select_and_check_by_level({"root":cctree}, query, log_file, source_path, locations, config=config)
+    return retrieve_result, retrieve_bbox, node_impacts
 

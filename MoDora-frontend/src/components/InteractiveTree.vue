@@ -45,10 +45,10 @@
           <div
             class="px-3 py-2 shadow-sm rounded-xl border transition-all duration-200 cursor-pointer relative w-48 backdrop-blur-md"
             :class="[
-              getNodeStyle(data.type),
+              isHeatmapMode ? getHeatmapStyle(data.impact) : getNodeStyle(data.type),
               selected 
                 ? '!border-primary-500 ring-2 ring-primary-500/20 dark:ring-primary-500/40' 
-                : 'bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md'
+                : (isHeatmapMode ? '' : 'bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md')
             ]"
             @dblclick.stop="openEditModal({ id, label, ...data })"
           >
@@ -89,6 +89,18 @@
       <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 flex flex-col space-y-2">
          <button @click="focusRoot" class="flex items-center justify-center w-8 h-8 rounded hover:bg-primary-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition" title="回到根节点">
             <i class="fa-solid fa-crosshairs"></i>
+         </button>
+      </div>
+
+      <!-- 热力图开关 -->
+      <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-slate-100 dark:border-slate-700">
+         <button 
+            @click="isHeatmapMode = !isHeatmapMode" 
+            class="flex items-center justify-center w-8 h-8 rounded transition"
+            :class="isHeatmapMode ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/50 dark:text-orange-400 ring-2 ring-orange-200 dark:ring-orange-800' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'"
+            title="Toggle Heatmap"
+         >
+            <i class="fa-solid fa-fire"></i>
          </button>
       </div>
 
@@ -156,8 +168,18 @@ const elements = ref([]);
 const isLoading = ref(false);
 const error = ref(null);
 const isEditMode = ref(false); // 控制编辑模式
+const isHeatmapMode = ref(false); // 控制热力图模式
 const showEditModal = ref(false);
 const editingNodeData = ref({});
+
+// --- 热力图样式 ---
+const getHeatmapStyle = (impact) => {
+  if (!impact || impact <= 0) return 'bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 opacity-60 grayscale'; // 无影响节点变淡
+  if (impact <= 2) return 'bg-orange-50 dark:bg-orange-900/30 border-orange-300 dark:border-orange-700';
+  if (impact <= 5) return 'bg-orange-100 dark:bg-orange-900/50 border-orange-400 dark:border-orange-600 shadow-md shadow-orange-200/50';
+  if (impact <= 10) return 'bg-red-100 dark:bg-red-900/50 border-red-500 dark:border-red-500 shadow-md shadow-red-200/50 font-medium';
+  return 'bg-red-500 text-white border-red-600 shadow-lg shadow-red-500/50 font-bold';
+};
 
 // --- 编辑状态 ---
 const openEditModal = (nodeData) => {

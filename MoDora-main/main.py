@@ -93,6 +93,7 @@ class ChatResponse(BaseModel):
     # retrieved_image: Optional[str] = ""  # 移除
     # 废弃原来的分离字段，改用结构化列表
     retrieved_documents: List[RetrievalItem] = []
+    node_impacts: Dict[str, int] = {}
 
 class TreeRequest(BaseModel):
     file_name: str
@@ -210,6 +211,10 @@ def reconstruct_tree_from_elements(elements, original_tree, file_name):
                  node_data["location"] = orig.get("location", [])
             else:
                  node_data["location"] = frontend_data.get("location", [])
+            
+            # Preserve 'impact' if it exists in original node
+            if "impact" in orig:
+                node_data["impact"] = orig["impact"]
         else:
             # 新节点，使用前端提供的 location，或者空列表
             node_data["location"] = frontend_data.get("location", [])
@@ -667,7 +672,8 @@ def chat_endpoint(request: ChatRequest):
         return ChatResponse(
             answer=qa_result.get("answer", "No answer"),
             reasoning_log=log_content,
-            retrieved_documents=documents
+            retrieved_documents=documents,
+            node_impacts=qa_result.get("node_impacts", {})
         )
 
     except Exception as e:
@@ -740,7 +746,8 @@ def convert_tree_to_vueflow(cctree, root_label="Document Root"):
                 "type": node.get('type', 'unknown'),
                 "metadata": node.get('metadata', ''),
                 "id": current_id, # 方便前端回调
-                "path": current_path # 传递路径给前端
+                "path": current_path, # 传递路径给前端
+                "impact": node.get('impact', 0) # 传递热力值
             }
         }
         nodes.append(node_obj)
