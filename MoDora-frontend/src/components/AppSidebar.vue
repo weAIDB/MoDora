@@ -222,6 +222,15 @@
                     <i class="fa-solid fa-sitemap text-[10px]"></i>
                  </button>
               </div>
+
+              <!-- Remove Button (Top Right Badge) -->
+              <button 
+                @click.stop="store.removeDocFromSession(doc.id)" 
+                class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-red-500 hover:text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm z-10 border border-white dark:border-slate-800"
+                title="Remove from Session"
+              >
+                 <i class="fa-solid fa-xmark text-[8px]"></i>
+              </button>
             </li>
 
             <!-- 单文档统计面板 -->

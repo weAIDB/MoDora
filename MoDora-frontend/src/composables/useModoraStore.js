@@ -498,6 +498,29 @@ export function useModoraStore() {
         }
     };
 
+    // 动作：从当前会话移除文档
+    const removeDocFromSession = (docId) => {
+        const session = getActiveSession();
+        const docIndex = session.docs.findIndex(d => d.id === docId);
+        if (docIndex === -1) return;
+
+        const doc = session.docs[docIndex];
+        session.docs.splice(docIndex, 1);
+        
+        // 如果删除的是当前正在查看的文档，需要清除 viewingDocTree 等状态
+        if (state.viewingDocTree && state.viewingDocTree.id === docId) {
+            state.viewingDocTree = null;
+        }
+        // viewingPdf
+        if (state.viewingPdf && state.viewingPdf.name === doc.name) {
+             state.viewingPdf = null;
+        }
+        // docStats
+        if (state.docStats && state.docStats.file_name === doc.name) {
+             state.docStats = null;
+        }
+    };
+
     // 动作：从全局库中删除标签
     const deleteGlobalTag = async (tag) => {
         try {
@@ -574,6 +597,7 @@ export function useModoraStore() {
         fetchDocStats,
         fetchSessionStats,
         addDocFromKb,
+        removeDocFromSession,
         deleteGlobalTag
     };
 }
