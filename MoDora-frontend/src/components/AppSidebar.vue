@@ -147,8 +147,16 @@
                <i class="fa-solid fa-cloud-arrow-up text-sm mb-1"></i>
                <span class="text-[10px] font-bold uppercase tracking-tighter">Local</span>
             </div>
-            <div v-else class="text-primary-600 flex items-center text-xs font-bold px-4 w-full">
-               <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <div v-else class="w-full px-4 flex flex-col items-center justify-center">
+               <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                 <div 
+                   class="h-full bg-primary-500 transition-all duration-300 ease-out"
+                   :style="{ width: `${store.state.uploadProgress}%` }"
+                 ></div>
+               </div>
+               <span class="text-[9px] font-bold text-primary-500 mt-1">
+                 {{ Math.round(store.state.uploadProgress) }}%
+               </span>
             </div>
             <input ref="fileInputRef" type="file" class="hidden" @change="onFileChange" :disabled="store.state.isUploading" accept=".pdf,.txt,.md" />
           </div>
@@ -218,7 +226,7 @@
                  <button @click.stop="store.openPdf(doc.id, 1)" class="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Preview">
                     <i class="fa-regular fa-eye text-[10px]"></i>
                  </button>
-                 <button @click.stop="store.setViewingDoc(doc)" class="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Graph">
+                 <button @click.stop="store.setViewingDoc(doc)" class="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Tree">
                     <i class="fa-solid fa-sitemap text-[10px]"></i>
                  </button>
               </div>
@@ -276,7 +284,7 @@
     <!-- Knowledge Base Selection Modal -->
     <Teleport to="body">
       <div v-if="showingKbSelector" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-all duration-300">
-        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-4xl h-[85vh] overflow-hidden border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-300 flex flex-col">
           <div class="px-8 py-5 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
             <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center">
               <div class="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center mr-3">
@@ -311,6 +319,15 @@
                   ? 'bg-indigo-50/50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 ring-2 ring-indigo-500/20' 
                   : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md'"
               >
+                <!-- Delete Button -->
+                <button 
+                  @click.stop="confirmDeleteKbDoc(name)"
+                  class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white dark:bg-slate-700 hover:bg-red-500 hover:text-white text-slate-300 dark:text-slate-500 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-20 shadow-sm border border-slate-100 dark:border-slate-600"
+                  title="Permanently Delete"
+                >
+                  <i class="fa-solid fa-trash text-[10px]"></i>
+                </button>
+
                 <div class="flex items-center min-w-0 mr-4">
                   <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mr-3 shrink-0 text-slate-400 group-hover:text-indigo-500 transition-colors">
                     <i class="fa-solid fa-file-pdf text-lg"></i>
@@ -560,6 +577,9 @@ const addSelectedFromKb = () => {
   selectedKbDocs.value = [];
 };
 
+const confirmDeleteKbDoc = (name) => {
+    store.deleteKbDoc(name);
+};
 
 const startTagEditing = (doc) => {
   editingTagsDocId.value = doc.id;

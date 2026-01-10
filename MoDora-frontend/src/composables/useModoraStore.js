@@ -181,7 +181,7 @@ export function useModoraStore() {
             state.isThinking = false;
             session.messages.push({
                 role: "assistant",
-                content: "请先上传至少一个文档，然后我才能回答你的问题。",
+                content: "Please upload at least one document so I can answer your questions.",
                 isTyping: false
             });
             return;
@@ -216,12 +216,12 @@ export function useModoraStore() {
             }
 
             const data = await response.json();
-            answer = data.answer || "后端未返回有效答案";
+            answer = data.answer || "No valid answer returned from backend.";
 
             const retrievedDocs = data.retrieved_documents || [];
 
             citations = retrievedDocs.map((doc) => {
-                let snippetText = doc.content || "引用详情...";
+                let snippetText = doc.content || "Citation Details...";
                 if (snippetText.length > 60) snippetText = snippetText.substring(0, 60) + "...";
                 
                 // 尝试根据 file_name 找到对应的 fileId (用于 openPdf)
@@ -243,10 +243,10 @@ export function useModoraStore() {
             });
 
         } catch (error) {
-            console.error("API 请求失败:", error);
-            answer = `❌ 请求失败: ${error.message}`;
+            console.error("API Request Failed:", error);
+            answer = `❌ Request Failed: ${error.message}`;
             if (error.message.includes("404")) {
-                answer += "\n\n💡 提示: 请检查后端数据集路径及文件完整性。";
+                answer += "\n\n💡 Tip: Please check backend dataset path and file integrity.";
             }
             citations = [];
         } finally {
@@ -540,6 +540,43 @@ export function useModoraStore() {
             console.error("Failed to delete global tag:", e);
         }
     };
+
+    // 动作：从知识库彻底删除文档
+    const deleteKbDoc = async (fileName) => {
+        if (!confirm(`Are you sure you want to permanently delete "${fileName}"? This cannot be undone.`)) {
+            return;
+        }
+        try {
+            const res = await fetch(`/api/kb/delete/${encodeURIComponent(fileName)}`, {
+                method: 'DELETE'
+            });
+            // Treat 404 (Not Found) as success, assuming file is already deleted
+            if (res.ok || res.status === 404) {
+                // 从本地缓存移除
+                if (state.kbDocs[fileName]) {
+                    delete state.kbDocs[fileName];
+                }
+                // 从所有会话移除引用
+                state.sessions.forEach(sess => {
+                    const idx = sess.docs.findIndex(d => d.name === fileName);
+                    if (idx !== -1) {
+                         sess.docs.splice(idx, 1);
+                    }
+                });
+                
+                // 如果当前正在查看此文档，关闭它
+                if (state.viewingPdf && state.viewingPdf.name === fileName) closePdf();
+                if (state.viewingDocTree && state.viewingDocTree.name === fileName) closeSidePanel();
+            } else {
+                const err = await res.json().catch(() => ({}));
+                alert("Delete failed: " + (err.detail || `Status ${res.status}`));
+            }
+        } catch (e) {
+            console.error("Failed to delete kb doc:", e);
+            alert("Delete failed: " + e.message);
+        }
+    };
+
     // 动作：获取单文档统计
     const fetchDocStats = async (fileName) => {
         try {
@@ -598,6 +635,7 @@ export function useModoraStore() {
         fetchSessionStats,
         addDocFromKb,
         removeDocFromSession,
-        deleteGlobalTag
+        deleteGlobalTag,
+        deleteKbDoc
     };
 }

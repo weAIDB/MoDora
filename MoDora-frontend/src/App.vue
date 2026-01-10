@@ -29,7 +29,7 @@
           <h3 class="font-bold text-primary-900 dark:text-primary-100 flex items-center text-sm">
             <i class="fa-solid fa-sitemap mr-2 text-primary-600 dark:text-primary-400"></i>
             {{ store.state.viewingDocTree.name }}
-            <span class="ml-2 text-[10px] bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 px-2 py-0.5 rounded-full uppercase tracking-wide">Graph View</span>
+            <span class="ml-2 text-[10px] bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 px-2 py-0.5 rounded-full uppercase tracking-wide">Tree View</span>
           </h3>
           <button
             @click="store.closeSidePanel()"

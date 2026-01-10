@@ -133,9 +133,9 @@
           <button
             @click="handleSend"
             :disabled="!store.state.inputMessage || store.state.isThinking"
-            class="p-3 bg-gradient-to-br from-primary-600 to-primary-500 text-white rounded-xl hover:shadow-lg hover:shadow-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300 transform active:scale-95 flex items-center justify-center aspect-square"
+            class="w-11 h-11 shrink-0 bg-gradient-to-br from-primary-600 to-primary-500 text-white rounded-xl hover:shadow-lg hover:shadow-primary-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-300 transform active:scale-95 flex items-center justify-center"
           >
-            <i class="fa-solid fa-paper-plane"></i>
+            <i class="fa-solid fa-arrow-up text-lg font-bold" style="-webkit-text-stroke: 1px white;"></i>
           </button>
         </div>
         
