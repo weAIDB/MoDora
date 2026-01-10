@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import uvicorn
+import traceback
 from typing import Optional, List, Dict, Any, Union
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -18,7 +19,7 @@ from logger import logger, modora_logger
 
 # 引入你的后端核心模块
 from qa import qa
-from constants import BASE_DIR, CACHE_DIR, LOG_DIR
+from constants import BASE_DIR, CACHE_DIR, LOG_DIR, API_KEY, API_URL, MODEL
 
 app = FastAPI(title="MoDora Chat API")
 
@@ -456,17 +457,69 @@ def generate_auto_tags(file_path: str, cache_base: str):
         if variance > 0.5: tags.append("Complex Layout")
         if depth > 5: tags.append("Deep Hierarchy")
         
+        return tags
+
     except Exception as e:
         logger.error(f"Error generating auto tags: {e}")
         return []
 
+from api_utils import gpt_generate
+from prompt_template import metadata_generation_prompt
+
 def generate_semantic_tags(file_path: str, cache_base: str, config: Optional[Dict] = None):
     """
-    调用 LLM 生成语义标签 (预留接口)
+    调用 LLM 生成语义标签
     """
-    # 这里可以读取 cp.json 的前几个文本块，调用 LLM 总结
-    # 暂时返回一些通用占位符，模拟 LLM 行为
-    return ["Automated Analysis"]
+    try:
+        doc_name = os.path.splitext(os.path.basename(file_path))[0]
+        cp_path = os.path.join(cache_base, doc_name, "cp.json")
+        
+        if not os.path.exists(cp_path):
+            return ["No Content"]
+            
+        with open(cp_path, "r", encoding="utf-8") as f:
+            cp_data = json.load(f)
+            
+        # 收集前几个文本块的内容作为摘要输入
+        # cp.json 结构通常是 {"body": [...]} 或直接是 [...] (兼容旧格式)
+        blocks = cp_data.get("body", []) if isinstance(cp_data, dict) else cp_data
+        
+        text_content = []
+        for block in blocks[:10]:  # 只取前10个块，避免token过多
+            if block.get("type") == "text":
+                text_content.append(block.get("data", ""))
+                
+        if not text_content:
+            return ["No Text Content"]
+            
+        full_text = "\n".join(text_content)[:2000] # 截取前2000字符
+        
+        # 使用 prompt_template 中的 metadata_generation_prompt
+        # n0=5 生成5个关键词
+        prompt = metadata_generation_prompt.format(n0=3, data=full_text)
+        
+        # 调用 LLM
+        if config is None:
+            config = {}
+            
+        api_key = config.get("apiKey") or API_KEY
+        base_url = config.get("baseUrl") or API_URL
+        model = config.get("chatModel") or MODEL
+        
+        logger.info(f"Generating semantic tags for {doc_name} using model: {model}, url: {base_url}")
+        
+        response = gpt_generate(prompt, key=api_key, url=base_url, base_model=model)
+        
+        logger.info(f"Semantic tags response: {response}")
+        
+        # 处理返回结果，分割分号
+        tags = [tag.strip() for tag in response.split(";") if tag.strip()]
+        return tags[:5] # 确保不超过5个
+        
+    except Exception as e:
+        logger.error(f"Error generating semantic tags for {file_path}: {e}")
+        logger.error(traceback.format_exc())
+        return ["Analysis Failed"]
 
 def process_document_task(file_path: str, config: Optional[Dict] = None):
     """
@@ -475,6 +528,14 @@ def process_document_task(file_path: str, config: Optional[Dict] = None):
     filename = os.path.basename(file_path)
     try:
         task_status_store[filename] = "processing"
+        
+        # 强制使用本地模型，除非用户指定了其他模型
+        if config is None:
+            config = {}
+        if not config.get("chatModel"):
+            config["chatModel"] = "qwen-vl-local"
+        if not config.get("treeModel"):
+            config["treeModel"] = "qwen-vl-local"
         
         # 确保缓存目录存在
         cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
@@ -491,6 +552,8 @@ def process_document_task(file_path: str, config: Optional[Dict] = None):
         
         # 3. 自动生成标签并更新知识库
         auto_tags = generate_auto_tags(file_path, cache_base)
+        
+        logger.info(f"Using config for semantic tags: {config}")
         semantic_tags = generate_semantic_tags(file_path, cache_base, config)
         
         kb_manager.update_doc_info(filename, {
@@ -523,6 +586,7 @@ def get_task_status(filename: str):
     return {"status": status}
 
 from fastapi import UploadFile, File, BackgroundTasks, Form
+import traceback
 
 @app.post("/api/upload")
 async def upload_file(
@@ -588,6 +652,26 @@ def delete_kb_tag(tag: str):
     """从全局库中删除标签"""
     kb_manager.delete_tag_from_library(tag)
     return {"status": "success"}
+
+@app.delete("/api/kb/delete/{file_name}")
+def delete_kb_doc(file_name: str):
+    """从知识库和磁盘中彻底删除文件"""
+    # 1. 删除源文件
+    source_path = os.path.join(BASE_DIR, file_name)
+    if os.path.exists(source_path):
+        os.remove(source_path)
+    
+    # 2. 删除缓存目录
+    doc_name = os.path.splitext(file_name)[0]
+    cache_base = os.path.join(CACHE_DIR, os.path.basename(BASE_DIR))
+    cache_path = os.path.join(cache_base, doc_name)
+    if os.path.exists(cache_path):
+        shutil.rmtree(cache_path)
+        
+    # 3. 更新知识库元数据
+    kb_manager.delete_doc(file_name)
+    
+    return {"status": "success", "message": f"File {file_name} deleted successfully"}
 
 # --- 3. 核心问答接口 ---
 @app.post("/api/chat", response_model=ChatResponse)

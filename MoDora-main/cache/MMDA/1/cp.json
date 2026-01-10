@@ -418,9 +418,9 @@
         },
         {
             "type": "image",
-            "title": "Regulatory Status of Digital Currency Derivatives in Key Regions",
-            "metadata": "Digital currency derivatives; cryptocurrency regulation; global financial markets; UK; France; Japan; South Korea; USA; EU; financial regulation infographic",
-            "data": "The image is an infographic illustrating the regulatory status of digital currency derivatives in six major global regions/countries. It is structured into two horizontal rows, each presenting three distinct regulatory stances. Each regulatory point is represented by a colored circular pin icon (alternating blue and purple) displaying the country/region name, paired with a square text box below detailing the specific regulatory approach.\n\nIn the top row:\n1.  The United Kingdom (英国) clearly states that digital currency derivatives are under the supervision of the UK Financial Conduct Authority.\n2.  France (法国) explicitly places digital currency derivatives under the supervision of the French Financial Markets Authority.\n3.  Japan (日本) clarifies that digital currency derivatives fall under the supervision of the Japanese Financial Services Agency.\n\nIn the bottom row:\n1.  South Korea (韩国) has completely prohibited the issuance and trading of digital currency derivatives.\n2.  The United States (美国) requires multi-party authorization for comprehensive digital currency derivatives business and maintains an open attitude towards them.\n3.  The European Union (欧盟) has issued the \"Markets in Financial Instruments Regulation\" (MiFIR) and is currently deliberating whether digital currency derivatives fall within its regulatory scope.",
+            "title": "Digital Currency Regulation Approaches by Major Countries",
+            "metadata": "Digital currency, regulatory frameworks, UK, France, Japan, South Korea, USA, EU",
+            "data": "The image is an infographic displaying the regulatory approaches of seven major countries and regions regarding digital currencies. It is structured in a hexagonal layout with seven colored hexagons, each representing a country or region: UK (blue), France (purple), Japan (purple), South Korea (blue), USA (cyan), and EU (cyan). Each hexagon contains a brief description of the country's regulatory stance. The UK states that digital currency issuance is under the supervision of the UK's financial regulator. France similarly indicates that digital currency issuance falls under the supervision of its financial regulatory authority. Japan specifies that digital currency issuance is under the supervision of the Japan Financial Services Agency. South Korea states that it comprehensively prohibits the issuance and trading of digital currency assets. The USA indicates that complete issuance of digital currency assets requires multi-party authorization, and the financial sector's attitude toward digital currency is open. The EU notes that it has enacted the \"Financial Instruments Markets Regulation,\" and whether digital currency assets fall within the scope of its regulatory framework is still under consideration. The overall layout is clean and uses contrasting colors to distinguish each country's regulatory approach.",
             "location": [
                 {
                     "range": [
@@ -560,9 +560,9 @@
         },
         {
             "type": "image",
-            "title": "Digital Asset Trading Contract Mechanism",
-            "metadata": "Digital assets, trading contract, buyer, seller, profit, agreed price, agreed date, flowchart, BlockData",
-            "data": "The image displays a flowchart illustrating the mechanism of digital asset trading contracts. It features three main rectangular nodes and two smaller nodes representing parties. On the left, a blue rounded rectangle labeled \"买方\" (Buyer) points to a larger, light blue rounded rectangle. This upper blue box describes \"在约定日期以约定价格买入约定数量数字资产的合约\" (A contract to buy a specified quantity of digital assets at an agreed price on an agreed date). An arrow points downwards from this box to a central, purple rounded rectangle. This purple box states: \"在约定日期买卖双方均可通过交易合约获利\" (On the agreed date, both buyers and sellers can profit through the trading contract). An arrow from this central purple box points upwards to a lower, darker blue rounded rectangle. This bottom blue box describes \"在约定日期以约定价格卖出约定数量数字资产的合约\" (A contract to sell a specified quantity of digital assets at an agreed price on an agreed date). An arrow from this bottom blue box points rightwards to a smaller blue rounded rectangle labeled \"卖方\" (Seller). The overall diagram depicts how both buyers and sellers engage in contracts for digital assets at an agreed future date and price, with the potential for both parties to profit from the trading contract. A faint watermark \"链塔智库 BlockData\" is visible in the background.",
+            "title": "Digital Asset Futures Contract Flowchart",
+            "metadata": "Digital assets, futures contract, buyer, seller, settlement date, fixed price, profit mechanism",
+            "data": "The image is a flowchart illustrating the mechanics of a digital asset futures contract. It begins with a blue box labeled \"买方\" (Buyer) on the left, which points to a teal box describing \"在约定日期以约定价格买入约定数量数字资产的合约\" (A contract to buy a specified quantity of digital assets at a specified price on the agreed date). Below this, a purple box explains \"在约定日期买卖双方均可通过交易合约获利\" (On the agreed date, both parties can profit from the contract transaction). At the bottom, a dark blue box labeled \"在约定日期以约定价格卖出约定数量数字资产的合约\" (A contract to sell a specified quantity of digital assets at a specified price on the agreed date) is connected to a box labeled \"卖方\" (Seller) on the right. Arrows indicate the flow of the contract process from buyer to seller, with the central purple box showing the mutual profit potential. The diagram visually represents the symmetric nature of futures contracts in digital asset markets.",
             "location": [
                 {
                     "range": [
@@ -577,9 +577,9 @@
         },
         {
             "type": "image",
-            "title": "Options Contract: Buyer and Seller Rights and Obligations",
-            "metadata": "Options contract; buyer; seller; premium; right; obligation; financial diagram; flowchart; contract execution; financial derivatives",
-            "data": "The image is a flowchart illustrating the fundamental rights and obligations of the buyer and seller in an options contract. At the top, two blue rectangular boxes labeled \"买方\" (Buyer) and \"卖方\" (Seller) are positioned on the left and right, respectively. An arrow from the Buyer to the Seller indicates that the \"Buyer pays a certain premium to the seller\" (买方向卖方支付一定权利金). Conversely, an arrow from the Seller to the Buyer explains that the \"Buyer obtains the right to sell or buy a certain quantity of underlying assets at a certain price within a certain period\" (买方获得在一段时间内以一定价格出售或购买一定数量标的物的权利).\n\nBelow the \"Buyer\" box, a vertical arrow points downwards, with the accompanying text \"Buyer's right can be waived\" (买方权利可以放弃). This path leads to a purple rectangular box at the bottom left, stating \"Buyer can choose not to execute the contract content\" (买方可放弃执行合约内容).\n\nSimilarly, below the \"Seller\" box, a vertical arrow points downwards, with the text \"Seller's obligation cannot be waived\" (卖方义务无法放弃). This path leads to a purple rectangular box at the bottom right, stating \"Seller must execute the contract content\" (卖方必须执行合约内容).\n\nConnecting the bottom two purple boxes, an arrow originates from the \"Buyer can choose not to execute\" box and points towards the \"Seller must execute\" box, with text indicating the consequence of the buyer's decision: \"When the buyer waives execution of the contract, they lose the premium paid\" (买方放弃执行合约时损失其支付的权利金). The diagram clearly delineates the optionality for the buyer and the firm obligation for the seller, central to options trading.",
+            "title": "Option Contract Flowchart",
+            "metadata": "Option contract, buyer, seller, rights, obligations, payment, execution, abandonment",
+            "data": "The image is a flowchart illustrating the mechanics of an option contract between a buyer and a seller. At the top, the buyer (left) pays the seller (right) a fixed option premium, granting the buyer the right, but not the obligation, to purchase a specified quantity of the underlying asset at a predetermined price within a specified time period. The buyer's right is explicitly labeled as \"can be abandoned,\" while the seller's obligation is labeled as \"cannot be abandoned.\" Below this, a consequence is shown: if the buyer chooses to abandon the contract, they forfeit the paid option premium, while the seller is obligated to fulfill the contract terms if the buyer chooses to exercise it. The diagram uses arrows to indicate the flow of payments and obligations, with clear labels in Chinese explaining each step and condition.",
             "location": [
                 {
                     "range": [
@@ -595,8 +595,8 @@
         {
             "type": "table",
             "title": "Comparison of Digital Asset Futures and Traditional Futures",
-            "metadata": "Digital asset futures, traditional futures, comparison, spot market, risk, correlation, hedging, financial derivatives.",
-            "data": "The table presents a comparison between digital asset futures and traditional futures across four key aspects. For spot market price discovery value, digital asset futures are limited to BTC, while traditional futures show strong price discovery value. Regarding the ability to avoid spot market risk, digital asset futures cannot, but traditional futures can. In terms of correlation with the spot market, digital asset futures have a weak correlation, while traditional futures exhibit a strong correlation. Finally, for hedging capabilities, digital asset futures cannot be used for hedging, whereas traditional futures can.",
+            "metadata": "Digital Asset Futures, Traditional Futures, Market Value, Risk Management, Correlation, Hedging",
+            "data": "The table compares digital asset futures (specifically BTC) with traditional futures across four key attributes: (1) “现货市场发现价值” (Spot Market Discovery Value) — digital asset futures have only BTC with limited discovery value, while traditional futures have stronger discovery value; (2) “是否可规避现货市场风险” (Whether it can hedge spot market risks) — digital asset futures cannot hedge risks, whereas traditional futures can; (3) “与现货市场相关联性” (Correlation with spot market) — digital asset futures have weaker correlation, while traditional futures have stronger correlation; (4) “是否可以套期保值” (Whether it can be used for hedging) — digital asset futures cannot be used for hedging, but traditional futures can. This comparison highlights the structural and functional differences between the two types of futures markets.",
             "location": [
                 {
                     "range": [
@@ -612,8 +612,8 @@
         {
             "type": "table",
             "title": "Digital Asset Exchange Overview Table",
-            "metadata": "Digital asset exchanges, cryptocurrency, derivatives, spot trading, futures trading, options trading, launch dates, business scope.",
-            "data": "This table provides an overview of 15 digital asset exchanges, detailing four attributes for each. The first column lists the \"Exchange Name,\" such as BitMEX, OKEX, Huobi PRO, Bitfinex, and others. The second column, \"是否仅做数字资产衍生产品\" (Is it solely for digital asset derivatives?), indicates with '是' (Yes) or '否' (No) whether the exchange's business is exclusively in digital asset derivative products. For example, BitMEX, bitFlyer, Alt-options, BitStar, 比权网, LedgerX, and 分子未来 are solely focused on derivatives, while OKEX, Huobi PRO, Bitfinex, Exx, B网, Zaif, and DEW are not. The third column, \"主营业务\" (Main Business), describes the primary operations of each exchange, which can include \"数字资产现货交易\" (digital asset spot trading), \"数字资产期货交易\" (digital asset futures trading), \"数字资产期权交易\" (digital asset options trading), \"数字资产衍生品金融服务\" (digital asset derivatives financial services), \"数字资产清算\" (digital asset clearing), and \"数字资产掉期交易\" (digital asset swap trading). For instance, BitMEX engages in digital asset futures and swap trading, while OKEX offers both spot and futures trading. LedgerX's main business includes digital asset options trading, clearing, and swap trading. The final column, \"上线时间\" (Launch Time), indicates the year and month when the exchange was launched, ranging from early 2013 (e.g., OKEX, Huobi PRO, LedgerX) to late 2018 (e.g., DEW).",
+            "metadata": "Digital asset exchanges, business scope, product focus, launch time",
+            "data": "The table provides a comprehensive overview of various digital asset exchanges, listing their names, whether they exclusively focus on digital asset derivatives, their primary business activities, and their launch dates. It includes exchanges such as BitMEX, OKEX, Huobi PRO, Bitfinex, Exx, Binance, Zaif, bitFlyer, DEW, 中币交易所, Alt-options, BitStar, 比权网, LedgerX, and 分子未来. For instance, BitMEX and bitFlyer are noted as exclusively offering digital asset derivatives, while others like OKEX and Huobi PRO provide both spot and futures trading. Launch times range from 2013.1 to 2018.1, indicating the evolution of the digital asset exchange market. Some exchanges, such as 中币交易所, Alt-options, 比权网, LedgerX, and 分子未来, also offer financial services related to digital asset derivatives. The table serves as a reference for understanding the scope and timing of digital asset exchange offerings.",
             "location": [
                 {
                     "range": [
@@ -849,9 +849,9 @@
         },
         {
             "type": "table",
-            "title": "Comparison of BitMEX and OKEx Contract Features",
-            "metadata": "Cryptocurrency exchanges, BitMEX, OKEx, contract types, leverage ratios, margin rules, swap contracts, digital asset trading, platform comparison",
-            "data": "This table presents a detailed comparison between two cryptocurrency exchanges, BitMEX and OKEx, based on four key attributes. For \"Contract Type,\" both platforms support eight types of coins, but BitMEX offers over ten contract products, while OKEx provides twenty-four contract products. Regarding \"Leverage Ratio,\" BitMEX allows users to customize their leverage, with a maximum of 100 times, whereas OKEx offers only two fixed leverage options: 10 times and 20 times. The \"Margin Rules\" for BitMEX are calculated by dividing the number of contracts by the estimated transaction value of the purchased digital assets at the time of transaction. For OKEx, the margin rule is defined as the amount of digital assets equivalent to the contract value at the time of transaction, divided by the leverage multiple. Lastly, concerning \"Swap Contracts,\" BitMEX offers them, while OKEx does not.",
+            "title": "Comparison of BitMEX and OKEx Futures Platforms",
+            "metadata": "BitMEX, OKEx, futures trading, leverage, margin rules, perpetual contracts",
+            "data": "The table compares the key features of BitMEX and OKEx futures trading platforms across four categories: contract types, leverage ratios, margin rules, and perpetual contracts. BitMEX offers eight currencies and over ten contract products, allowing users to set custom leverage up to 100x, with margin calculated as the contract size divided by the estimated asset value at the time of trade. BitMEX also supports perpetual contracts. In contrast, OKEx provides eight currencies and twenty-four contract products, with fixed leverage options of 10x and 20x, and margin calculated as the value of the digital assets at the settlement time divided by the leverage ratio. OKEx does not support perpetual contracts. This comparison highlights differences in product variety, leverage flexibility, margin calculation methods, and contract type offerings between the two platforms.",
             "location": [
                 {
                     "range": [
@@ -1042,9 +1042,9 @@
         },
         {
             "type": "image",
-            "title": "Blue Letter D Icon",
-            "metadata": "Icon; logo; letter D; blue circle; white D; gradient; abstract; digital",
-            "data": "The image displays a small, circular icon featuring the capital letter 'D'. The 'D' is rendered in white and placed against a blue background. The blue background exhibits a subtle gradient, appearing slightly darker on the left side and gradually lightening towards the right, creating a sense of depth. The right vertical stroke of the letter 'D' is straight, and the blue portion to its right forms a distinct crescent or semi-circular shape, almost as if the 'D' is dividing the circle into two unequal parts. The overall design is clean and modern, suitable for a digital logo or application icon.",
+            "title": "Logo Icon",
+            "metadata": "circular design, blue gradient, minimalist, abstract",
+            "data": "The image displays a minimalist circular logo icon with a blue gradient. The circle is not solid; it features a white or light-colored vertical bar on the right side, creating an abstract shape that resembles the letter \"D\" or a stylized \"O\" with a cutout. The gradient transitions from a darker blue on the left to a lighter blue on the right, giving it a modern and sleek appearance. The overall design is clean, simple, and suitable for digital or branding purposes.",
             "location": [
                 {
                     "range": [
@@ -1059,9 +1059,9 @@
         },
         {
             "type": "image",
-            "title": "Qianke Finance Logo",
-            "metadata": "Logo; Qianke Finance; KG.COM; blue and white; Chinese characters; finance and economics",
-            "data": "The image displays a logo featuring a stylized design and text on a light background. On the left, there is an abstract geometric symbol resembling a capital \"K\", rendered in white against a solid blue square. To the right of this symbol, the Chinese characters \"千氪财经\" (Qianke Finance and Economics) are written in blue, appearing somewhat pixelated but legible. Below the Chinese characters, the website address \"WWW.KG.COM\" is displayed in smaller blue letters. The overall color scheme is blue and white, indicating a corporate or brand identity for an entity likely involved in finance and economics.",
+            "title": "千氪财经 Logo",
+            "metadata": "财经媒体, 千氪财经, 网站标识, 蓝色设计",
+            "data": "图像展示了一个蓝色的“K”形标志，旁边配有中文文字“千氪财经”，下方是其官方网站地址“WWW.KG.COM”。整体设计简洁现代，主要采用蓝色调，传达出专业和科技感，适用于财经媒体的品牌标识。",
             "location": [
                 {
                     "range": [
@@ -1076,9 +1076,9 @@
         },
         {
             "type": "image",
-            "title": "Walian.cn Logo",
-            "metadata": "Logo, Walian.cn, 挖链网, blue W, orange dot, Chinese website logo, brand identity",
-            "data": "The image displays the logo for \"walian.cn\" (挖链网) on a white background. The logo consists of three main elements arranged horizontally. On the left, there is a large, stylized, three-dimensional letter resembling a blue 'W' or 'M', rendered with a smooth, glossy effect. To the immediate right and slightly above this blue graphic, a small, vibrant orange-red circular or oval shape is present. Further to the right, in a darker gray or black sans-serif font, are the Chinese characters \"挖链网\" (Wā liàn wǎng). Directly below these Chinese characters, the English text \"walian.cn\" is written in a smaller, dark gray sans-serif font.",
+            "title": "挖链网 Logo",
+            "metadata": "挖链网, logo, 网站标识, walian.cn",
+            "data": "图像展示了一个网站的标志，左侧是一个由蓝色和橙色组成的抽象“W”形图案，右侧是黑色的中文文字“挖链网”，下方是较小的灰色文字“walian.cn”。整体设计简洁现代，色彩搭配鲜明，传达出科技感和专业性。",
             "location": [
                 {
                     "range": [
@@ -1094,8 +1094,8 @@
         {
             "type": "image",
             "title": "Blockchain Blue Sea Logo",
-            "metadata": "Logo; blockchain; blue sea; Chinese text; English text; wave icon; technology",
-            "data": "The image displays a logo on a white background, featuring a circular blue icon on the left and text on the right. The icon is a stylized abstract representation, possibly a wave or a sailboat in motion, rendered in shades of blue within a circular outline. To the right of the icon, the prominent text in Chinese characters reads \"区块链蓝海\" (Qūkuàiliàn Lánhǎi), which translates to \"Blockchain Blue Sea\". Below this Chinese text, in a smaller font, is the English translation \"BLUE SEA OF BLOCK CHAIN\". The overall color scheme is predominantly blue and white, conveying a sense of innovation and forward movement.",
+            "metadata": "Blockchain, Blue Sea, Logo, Technology, Brand",
+            "data": "The image displays a logo with a stylized blue sailboat icon on the left, symbolizing navigation and progress. To the right, the Chinese characters \"区块链蓝海\" (Blockchain Blue Sea) are prominently featured in bold blue and black fonts, conveying a sense of innovation and vast opportunity. Below the Chinese text, the English translation \"BLUE SEA OF BLOCKCHAIN\" is written in uppercase blue letters, reinforcing the global and technological theme. The overall design uses a clean, modern aesthetic with a blue color scheme, suggesting trust, technology, and forward-thinking in the blockchain industry.",
             "location": [
                 {
                     "range": [
@@ -1110,9 +1110,9 @@
         },
         {
             "type": "image",
-            "title": "Weilai Caijing (Future Finance) Logo",
-            "metadata": "Logo, Future Finance, Weilai Caijing, Chinese characters, blue geometric design, red dot, weilaicaijing.com",
-            "data": "The image shows a logo for \"未来财经\" (Weilai Caijing), which translates to \"Future Finance\" or \"Future Economics\". On the left, there is an abstract blue geometric emblem, characterized by interlocking lines forming a complex, stylized hexagonal or knot-like shape, with a small red circle at its center. To the right of this emblem, the Chinese characters \"未来财经\" are displayed in a prominent blue font. Below the Chinese characters, the website address \"weilaicaijing.com\" is written in a smaller, gray sans-serif font. The background of the logo is white.",
+            "title": "Future Finance Logo",
+            "metadata": "logo, financial media, Chinese text, website, blue and red design",
+            "data": "The image displays the logo for \"未来财经\" (Future Finance). The logo features a stylized hexagonal graphic on the left, composed of interconnected blue lines forming a geometric pattern with a red circular element at its center. To the right of the graphic, the Chinese characters \"未来财经\" are written in a bold, blue font. Below the Chinese text, the website address \"weilaicaijing.com\" is displayed in smaller, gray lowercase letters. The overall design conveys a modern and professional aesthetic, suitable for a financial media brand.",
             "location": [
                 {
                     "range": [
@@ -1127,9 +1127,9 @@
         },
         {
             "type": "image",
-            "title": "Golden Bull Finance Logo",
-            "metadata": "Logo; Golden bull; Chinese characters; Jiniu Caijing; Finance; Investment; Business; Financial news",
-            "data": "The image displays a logo for \"Golden Bull Finance\" (金牛财经). On the right side of the logo, there is a large, golden silhouette of a powerful bull in a dynamic, charging or leaping posture. The bull's tail is curled upwards, ending with a small, stylized star. To the left and slightly below the bull, the Chinese characters \"金牛财经\" (Jīnniú Cáijīng), meaning \"Golden Bull Finance\", are prominently featured in a bold, metallic-gold font. Above these Chinese characters, within a small horizontal black oval, are the white English letters \"JINNIU\", which is the pinyin for \"金牛\". The entire logo is set against a clean white background.",
+            "title": "金牛财经 Logo",
+            "metadata": "金牛财经, 财经, 金融, 牛, 黄色, 标志",
+            "data": "图像展示了一个名为“金牛财经”的标志。标志主体是一头黄色的公牛剪影，姿态充满力量与动感，象征着稳健与力量。公牛形象下方是黑色的“金牛财经”四个汉字，字体醒目且具有现代感。在公牛剪影的左上方，有一个黑色矩形框，内含白色文字“FINANCE”，进一步强调其财经属性。整体设计简洁、鲜明，传达出专业、活力的财经品牌形象。",
             "location": [
                 {
                     "range": [
@@ -1144,9 +1144,9 @@
         },
         {
             "type": "image",
-            "title": "He Cai Jing (核财经) Logo",
-            "metadata": "Logo, Chinese characters, Pinyin, Finance, Economics, Red arrow, Upward trend, HE CAI JING, 核财经",
-            "data": "The image displays a logo for \"He Cai Jing (核财经)\". The main text, \"核财经\", is written in dark blue Chinese characters, stylized with a modern, sans-serif font. Beneath these characters, the Pinyin transliteration \"HE CAI JING\" is written in a smaller, dark blue, capitalized, sans-serif font. Behind and slightly interwoven with the Chinese characters is a prominent red graphic element depicting an upward-trending line graph or arrow, symbolizing growth or positive financial performance. The overall design suggests a brand related to finance and economics, emphasizing growth and core financial information.",
+            "title": "He Cai Jing Logo",
+            "metadata": "Chinese characters, English text, upward arrow, financial, business, logo",
+            "data": "The image displays a logo with the Chinese characters \"核财经\" prominently featured in bold blue font. A red upward-trending arrow overlays the characters, symbolizing growth or positive movement. Below the Chinese text, the English transliteration \"HE CAI JING\" is written in uppercase blue letters. The design suggests a connection to finance or economic analysis, with the upward arrow reinforcing themes of progress or increasing value. The overall layout is clean and modern, suitable for a business or financial media brand.",
             "location": [
                 {
                     "range": [
@@ -1224,8 +1224,8 @@
         {
             "type": "image",
             "title": "QR Code with Logo",
-            "metadata": "QR code, barcode, scannable code, digital, purple logo, white symbol, rounded square, dark blue border",
-            "data": "The image displays a QR code, which is a two-dimensional barcode composed of black squares on a white background. The QR code is contained within a white rounded square frame, which is further outlined by a prominent dark blue border. At the very center of the QR code, there is a distinct logo. This logo is a purple square with rounded corners, and it features a white abstract symbol inside it, resembling two interconnected triangular shapes or stylized mountain peaks.",
+            "metadata": "QR code, logo, digital link, scanning, mobile access",
+            "data": "The image displays a standard QR code composed of black modules on a white background, enclosed within a rounded square border. At the center of the QR code is a purple square logo featuring a white stylized \"M\" or mountain-like symbol. The QR code is designed for scanning with a smartphone or device to access a digital link or content. The overall appearance is clean and modern, with the central logo serving as a brand identifier or thematic element.",
             "location": [
                 {
                     "range": [
@@ -1240,9 +1240,9 @@
         },
         {
             "type": "image",
-            "title": "QR Code with Stylized Logos",
-            "metadata": "QR code, black and white, white background, blue border, circular logo, purple blue gradient, stylized M, white triangles, green icon, white S symbol, social media link.",
-            "data": "The image displays a square QR code with slightly rounded corners, set against a white background and enclosed by a thin blue border. The QR code itself consists of a standard pattern of black modules on a white background. At its center, there is a prominent circular logo featuring a gradient background that transitions from purple to blue. Within this circle, a white stylized symbol resembling a double 'M' or two overlapping triangles is visible. In the bottom-right corner of the QR code, a small, circular green icon with a white stylized 'S' or infinity symbol is embedded, commonly associated with social media link aggregators.",
+            "title": "QR Code with Logo",
+            "metadata": "QR code, logo, payment, WeChat Pay, digital payment",
+            "data": "The image displays a square QR code with a blue border. At the center is a circular logo featuring a stylized white \"M\" on a blue background. Surrounding the central logo are concentric patterns of black dots and lines, characteristic of QR codes. In the bottom-right corner, there is a small green circular icon with a white \"S\" inside, likely indicating a payment function or service. The overall design suggests it is a payment QR code, possibly for WeChat Pay or a similar digital payment platform.",
             "location": [
                 {
                     "range": [
@@ -1257,9 +1257,9 @@
         },
         {
             "type": "image",
-            "title": "Globe Symbol Icon",
-            "metadata": "Globe icon, internet symbol, world wide web, global, circle, black and white, graphic",
-            "data": "The image displays a simple, monochromatic icon, primarily in black and white or grayscale. It features a stylized representation of a globe, enclosed within a bold circular border. The globe itself is depicted with intersecting horizontal and vertical lines, forming a grid pattern that commonly symbolizes longitudes and latitudes, representing the Earth or global connectivity. The lines of the globe and the surrounding circle are dark, contrasting with the white interior of the symbol. The image has a slightly pixelated or low-resolution appearance due to its small size.",
+            "title": "Globe Icon",
+            "metadata": "globe, earth, international, global, symbol",
+            "data": "The image displays a simple black-and-white icon of a globe enclosed within a circle. The globe is stylized with two curved lines representing the equator and a meridian, dividing the sphere into sections. The design is minimalistic and universally recognized as a symbol for global or international concepts.",
             "location": [
                 {
                     "range": [
@@ -1275,8 +1275,8 @@
         {
             "type": "image",
             "title": "WeChat Icon",
-            "metadata": "WeChat logo; chat icon; messaging app; social media; communication; speech bubbles; dialogue; app icon",
-            "data": "The image displays a stylized black and white icon, widely recognized as the logo for the WeChat messaging application. It consists of two overlapping speech bubbles, each containing two dots that resemble eyes, giving them a face-like appearance. The larger speech bubble is positioned behind and to the left, while a smaller one is in front and slightly to the right, partially obscuring the larger one. Both bubbles have a distinct black outline and a white fill, set against a plain background. The overall design suggests interaction and communication.",
+            "metadata": "WeChat, messaging app, communication, social media, logo",
+            "data": "The image displays the iconic logo of WeChat, featuring two overlapping speech bubbles. The larger bubble is positioned slightly behind and to the left, while the smaller one is in front and to the right, creating a sense of depth. Each bubble contains two small dots representing eyes, giving them a simple, cartoonish, and friendly appearance. The design is minimalist, using clean black outlines on a white background, symbolizing conversation and communication.",
             "location": [
                 {
                     "range": [
@@ -1291,9 +1291,9 @@
         },
         {
             "type": "image",
-            "title": "Tuoniao Blockchain Logo",
-            "metadata": "Tuoniao Blockchain; Ostrich Blockchain; Chinese logo; blockchain media; tuoniaoK.com; technology branding",
-            "data": "The image displays a digital logo or branding for \"Tuoniao Blockchain\". The main text consists of four Chinese characters \"鸵鸟区块链\" (Tuoniao Qukuailian, meaning Ostrich Blockchain) rendered in a prominent, stylized blue and light blue gradient font. The characters have a slight glow effect against a plain white background. Above the second half of the Chinese text, \"区块链\", a smaller, less prominent website address \"tuoniaoK.com\" is inscribed, also in a blue font. The overall design is clean, modern, and suggests a connection to digital technology or the blockchain industry.",
+            "title": "骆鸟区块链",
+            "metadata": "骆鸟区块链, logo, 网站域名, Tuoniboo.com",
+            "data": "图像展示了一个蓝色的“骆鸟区块链”文字标识，字体粗壮醒目，位于图像下方。在文字标识的上方，有一个较小的蓝色矩形框，内含白色文字“Tuoniboo.com”，作为网站域名。整体设计简洁，以蓝色为主色调，突出品牌名称和官方网站信息。",
             "location": [
                 {
                     "range": [
@@ -1352,9 +1352,9 @@
         },
         {
             "type": "image",
-            "title": "QR Code with Embedded Logo",
-            "metadata": "QR code, barcode, digital, scan, logo, purple border, white symbol, stylized M, blue purple gradient",
-            "data": "The image displays a standard black and white QR code, which is a two-dimensional barcode. The QR code features a dense pattern of black squares on a white background. Centrally embedded within the QR code pattern is a small, square-shaped logo. This logo consists of a white abstract symbol, which appears to be either a stylized letter \"M\" or two interlocking triangles, set against a background that transitions in color from purple to blue. The entire QR code image is framed by a solid, light purple border, giving it the appearance of a digital icon or a shareable element.",
+            "title": "QR Code with Logo",
+            "metadata": "QR code, logo, digital link, purple border",
+            "data": "The image displays a square QR code with a purple border. At the center of the QR code, there is a blue square logo containing a white stylized \"M\" or mountain-like symbol. The QR code is composed of black and white modules arranged in a grid pattern, typical for encoding digital information. The corners feature the standard finder patterns used by QR code scanners. The overall design suggests it may link to a website, app, or digital service associated with the logo.",
             "location": [
                 {
                     "range": [
@@ -1369,9 +1369,9 @@
         },
         {
             "type": "image",
-            "title": "QR Code with M and S Logos",
-            "metadata": "QR code; M logo; S logo; blue circle; green circle; scan code; digital link; purple frame",
-            "data": "The image shows a square QR code, composed of a black and white pixelated pattern. In the center of the QR code, there is a prominent blue circle with a white stylized letter 'M' or two mountain peaks logo. In the bottom right corner of the QR code, a smaller green circle contains a white stylized 'S' or infinity symbol. The entire QR code is enclosed within a purple border with rounded corners. The QR code is designed for scanning, likely to direct users to a specific website, application, or digital content associated with the represented brands or entities.",
+            "title": "QR Code with Logo",
+            "metadata": "QR code, logo, payment, WeChat Pay, digital payment",
+            "data": "The image displays a square QR code with a purple border. At the center is a circular logo featuring a stylized white \"M\" on a blue gradient background. Surrounding the central logo are black dots arranged in a radial pattern, resembling a sunburst or signal pattern. In the bottom-right corner, there is a small green circular icon with a white \"S\" inside, likely indicating a payment or service feature. The overall design suggests it is a digital payment or service QR code, possibly for WeChat Pay or a similar platform.",
             "location": [
                 {
                     "range": [

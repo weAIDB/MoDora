@@ -2,8 +2,7 @@ import os
 import json
 from logger import logger
 from typing import List, Dict, Any, Optional
-
-CACHE_DIR = "cache"
+from constants import CACHE_DIR
 
 class KnowledgeBaseManager:
     def __init__(self):
@@ -48,9 +47,9 @@ class KnowledgeBaseManager:
         
         # Update tag library
         all_tags = set(self.data["tag_library"])
-        if "tags" in info:
+        if "tags" in info and info["tags"]:
             all_tags.update(info["tags"])
-        if "semantic_tags" in info:
+        if "semantic_tags" in info and info["semantic_tags"]:
             all_tags.update(info["semantic_tags"])
         
         self.data["tag_library"] = sorted(list(all_tags))
@@ -76,6 +75,15 @@ class KnowledgeBaseManager:
                 if tag in doc.get("semantic_tags", []):
                     doc["semantic_tags"].remove(tag)
             self._save_kb()
+
+    def delete_doc(self, file_name: str):
+        logger.info(f"Attempting to delete doc from KB: {file_name}")
+        if file_name in self.data["docs"]:
+            del self.data["docs"][file_name]
+            self._save_kb()
+            logger.info(f"Successfully deleted {file_name} from knowledge_base.json")
+        else:
+            logger.warning(f"File {file_name} not found in KB docs. Available keys: {list(self.data['docs'].keys())}")
 
     def update_doc_tags(self, file_name: str, tags: List[str]):
         if file_name in self.data["docs"]:

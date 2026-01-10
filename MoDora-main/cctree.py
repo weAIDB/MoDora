@@ -69,7 +69,7 @@ def calculate_n_i(D_i, d_i, n_im1, k = 2):
     
     return math.ceil(n_i)
 
-def get_metadata(root, level = 1, n0 = 2, max_workers = 8, config=None):
+def get_metadata(root, level = 1, n0 = 2, max_workers = 16, config=None):
     # Concurrent metadata generation
     sem = threading.BoundedSemaphore(value=max_workers)
 
@@ -89,7 +89,7 @@ def get_metadata(root, level = 1, n0 = 2, max_workers = 8, config=None):
 
         children = list(node['children'].values())
 
-        # Recursive call
+        # 1. Submit children tasks (Parallel)
         results = []
         for child in children:
             if sem.acquire(blocking=False):
@@ -102,7 +102,14 @@ def get_metadata(root, level = 1, n0 = 2, max_workers = 8, config=None):
             else:
                 results.append(_compute(child, level + 1, executor))
 
-        # Summarize recursion results
+        # 2. Process self metadata (Parallel with children)
+        # Run in current thread to avoid deadlock and utilize waiting time
+        node_type = node.get('type')
+        if node_type == 'text':
+             # Generate self metadata immediately
+             node['metadata'] = generate_metadata(node['data'], n0, config=config)
+
+        # 3. Gather children results
         for item in results:
             if isinstance(item, Future):
                 n_child, d_child, D_child = item.result()
@@ -112,14 +119,10 @@ def get_metadata(root, level = 1, n0 = 2, max_workers = 8, config=None):
             D = max(D, D_child)
             n_children += n_child
 
-        # Current node Execution
-        node_type = node.get('type')
-        if node_type == "text" or node_type == "root": # 允许 root 节点生成/聚合 metadata
-            # Generate self metadata
-            if node_type == 'text':
-                node['metadata'] = generate_metadata(node['data'], n0, config=config)
+        # 4. Integration
+        if node_type == "text" or node_type == "root": 
+            # Note: node['metadata'] for text is already generated above
             
-            # For non-leaf text or root
             if n_children > 0:
                 n = calculate_n_i(D, d, n_children)
                 # 如果是 root，可能没有 data 字段作为基础，仅依赖 children 的 metadata
@@ -299,7 +302,8 @@ def build_tree(source_path, cache_dir, config=None):
             cctree = {}
         
         # Summarization
-        get_metadata(cctree, config=config)
+        if config is not None:
+            get_metadata(cctree, config=config)
         
     with open(tree_path, "w", encoding="utf-8") as f:
         json.dump(cctree, f, ensure_ascii=False, indent=4)

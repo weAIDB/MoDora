@@ -13,6 +13,8 @@ from qa import *
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+PROCESS_RANGE = 1, 200
+
 def pipeline(id, source_path, cache_dir, query="", log_dir = None, use_cache=False, config=None):
     # Prepare
     cache_path = os.path.join(cache_dir, os.path.splitext(os.path.basename(source_path))[0])
@@ -20,7 +22,19 @@ def pipeline(id, source_path, cache_dir, query="", log_dir = None, use_cache=Fal
     tree_path = os.path.join(cache_path,"tree.json")
     title_path = os.path.join(cache_path,"title.json")
     if log_dir != None:
-        log_file = os.path.join(log_dir, f"{id}_log.txt")
+        log_path = os.path.join(log_dir, f"{id}_log.txt")
+        # Create a simple logger object that qa() expects
+        class SimpleLogger:
+            def __init__(self, path):
+                self.path = path
+            def info(self, msg):
+                with open(self.path, "a", encoding="utf-8") as f:
+                    f.write(str(msg) + "\n")
+        
+        log_file = SimpleLogger(log_path)
+        # Clear log file
+        with open(log_path, "w", encoding="utf-8") as f:
+            pass
     else:
         log_file = None
     if not use_cache:
@@ -76,7 +90,12 @@ def run_on_dataset(source_dir, cache_dir, log_dir = None, output_dir = None, ena
     
     
     sorted_data = sorted(dataset, key=lambda x: x["questionId"])
-    sorted_data = sorted_data[0:5] # Few samples test
+    
+    # Filter for 1.pdf to 200.pdf
+    target_pdfs = {f"{i}.pdf" for i in range(PROCESS_RANGE[0], PROCESS_RANGE[1]+1)}
+    sorted_data = [item for item in sorted_data if item["pdf_id"] in target_pdfs]
+    
+    # sorted_data = sorted_data[:0] # Few samples test
 
     results = []
     processed_docs = {}

@@ -179,7 +179,13 @@ def _process_single_node(path, node, query, log_file, source_path, locations, in
         current_source_path = node.get('source_path', source_path)
 
         # Backward verification
-        curloc_res, within_locs = check_location(node, current_source_path, locations, True)
+        if not locations:
+            # If no location cues, consider all locations within the node as candidates
+            curloc_res = True
+            within_locs = node.get('location', [])
+        else:
+            curloc_res, within_locs = check_location(node, current_source_path, locations, True)
+
         if node['type'] != 'root' and node['type'] != 'MROOT' and curloc_res:
             base64_image = bbox_to_base64(current_source_path, within_locs)
             if check_node_mm(base_path + ": " + node['data'], base64_image, query, config=config):
