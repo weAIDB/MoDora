@@ -1,11 +1,11 @@
 <template>
   <!-- 
-    AppSidebar.vue 改造：
-    1. 去掉外层容器的 border 和 bg (由父级 glass-panel 接管)
-    2. 使用 bg-transparent 
+    AppSidebar.vue Refactoring:
+    1. Remove border and bg of outer container (handled by parent glass-panel)
+    2. Use bg-transparent 
   -->
   <aside class="flex flex-col h-full bg-transparent">
-    <!-- 头部 -->
+    <!-- Header -->
     <div class="h-16 px-6 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between shrink-0 rounded-t-3xl">
       <div class="flex items-center">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white mr-3 shadow-lg shadow-primary-500/30">
@@ -36,10 +36,10 @@
       </div>
     </div>
 
-    <!-- 列表区 -->
+    <!-- List Area -->
     <div class="flex-1 overflow-y-auto p-4 custom-scrollbar flex flex-col space-y-6">
       
-      <!-- 会话管理区 -->
+      <!-- Session Management Area -->
       <div>
         <div class="flex items-center justify-between mb-2 px-2">
            <h3 class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Sessions</h3>
@@ -94,7 +94,7 @@
 
       <div class="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent"></div>
 
-      <!-- 当前会话文档区 -->
+      <!-- Current Session Documents Area -->
       <div v-if="store.getActiveSession()">
          <div class="flex items-center justify-between mb-3 px-2">
             <h3 class="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
@@ -109,7 +109,7 @@
             </button>
          </div>
          
-         <!-- 统计面板 (Session) -->
+         <!-- Statistics Panel (Session) -->
          <div v-if="showingSessionStats" class="mb-4 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-xl border border-primary-100 dark:border-primary-800 relative animate-in fade-in slide-in-from-top-2">
             <button @click="showingSessionStats = false" class="absolute top-2 right-2 text-primary-400 hover:text-primary-600">
                <i class="fa-solid fa-xmark text-xs"></i>
@@ -136,9 +136,9 @@
             <div v-else class="text-[10px] text-primary-400 animate-pulse">Calculating...</div>
          </div>
          
-        <!-- 添加文档按钮区 -->
+        <!-- Add Document Button Area -->
         <div class="mb-3 flex gap-2">
-           <!-- 本地上传 -->
+           <!-- Local Upload -->
            <div 
             @click="triggerUpload"
             class="flex-1 group flex items-center justify-center h-12 border border-dashed border-primary-300/50 rounded-lg cursor-pointer hover:border-primary-500 hover:bg-white/50 transition-all relative overflow-hidden"
@@ -153,7 +153,7 @@
             <input ref="fileInputRef" type="file" class="hidden" @change="onFileChange" :disabled="store.state.isUploading" accept=".pdf,.txt,.md" />
           </div>
 
-          <!-- 知识库导入 -->
+          <!-- Knowledge Base Import -->
           <div 
             @click="openKbSelector"
             class="flex-1 group flex items-center justify-center h-12 border border-dashed border-indigo-300/50 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-white/50 transition-all"
@@ -176,9 +176,9 @@
                 <div class="flex flex-col min-w-0 flex-1">
                   <span class="text-xs text-slate-600 dark:text-slate-300 truncate font-medium" :title="doc.name">{{ doc.name }}</span>
                   
-                  <!-- 标签展示 -->
+                  <!-- Tag Display -->
                   <div class="flex flex-wrap gap-1 mt-0.5" v-if="store.state.kbDocs[doc.name]">
-                    <!-- 显示前3个标签 -->
+                    <!-- Show top 3 tags -->
                     <span 
                       v-for="tag in store.state.kbDocs[doc.name].tags.slice(0, 3)" 
                       :key="tag"
@@ -187,7 +187,7 @@
                     >
                       {{ tag }}
                     </span>
-                    <!-- 语义标签（不同颜色） -->
+                    <!-- Semantic tags (different color) -->
                     <span 
                       v-for="tag in store.state.kbDocs[doc.name].semantic_tags.slice(0, 1)" 
                       :key="tag"
@@ -196,7 +196,7 @@
                     >
                       {{ tag }}
                     </span>
-                    <!-- 更多折叠 -->
+                    <!-- More collapsed -->
                     <span 
                       v-if="store.state.kbDocs[doc.name].tags.length > 3"
                       class="px-1 py-0.5 bg-slate-50 dark:bg-slate-800 text-[8px] text-slate-400 rounded leading-none"
@@ -207,7 +207,7 @@
                 </div>
               </div>
               
-              <!-- 文档操作 -->
+              <!-- Document Operations -->
               <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-all text-xs">
                  <button @click.stop="startTagEditing(doc)" class="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" title="Manage Tags">
                     <i class="fa-solid fa-tags text-[10px]"></i>
@@ -233,7 +233,7 @@
               </button>
             </li>
 
-            <!-- 单文档统计面板 -->
+            <!-- Single Document Statistics Panel -->
             <div v-if="showingDocStatsId === doc.id" class="mt-1 mb-2 p-2.5 bg-orange-50/50 dark:bg-orange-900/10 rounded-lg border border-orange-100 dark:border-orange-900/30 animate-in zoom-in-95 duration-200">
                <div v-if="store.state.docStats" class="space-y-2">
                   <div class="flex justify-between items-center border-b border-orange-100 dark:border-orange-900/30 pb-1 mb-1">
@@ -273,7 +273,7 @@
       </div>
     </div>
 
-    <!-- 知识库选择弹窗 -->
+    <!-- Knowledge Base Selection Modal -->
     <Teleport to="body">
       <div v-if="showingKbSelector" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-all duration-300">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">

@@ -23,7 +23,7 @@
           </button>
         </div>
 
-        <a :href="source" download class="p-2 text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition" title="下载原文件">
+        <a :href="source" download class="p-2 text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition" title="Download Original File">
           <i class="fa-solid fa-download"></i>
         </a>
       </div>
@@ -65,12 +65,12 @@
       <div v-else class="absolute inset-0 flex items-center justify-center">
         <div class="flex flex-col items-center text-slate-400 dark:text-slate-500">
           <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i>
-          <span class="text-xs">正在渲染文档...</span>
+          <span class="text-xs">Rendering document...</span>
         </div>
       </div>
     </div>
 
-    <!-- 3. 底部翻页控制 -->
+    <!-- Pagination -->
     <div class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 p-2 flex justify-center space-x-4 z-10 shrink-0">
       <button
         @click="changePage(-1)"
@@ -78,16 +78,15 @@
         class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors border border-slate-200 dark:border-slate-600"
         :class="currentPage <= 1 ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed bg-slate-50 dark:bg-slate-800' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-primary-300 dark:hover:border-primary-500'"
       >
-        <i class="fa-solid fa-chevron-left mr-1"></i> 上一页
+        <i class="fa-solid fa-chevron-left mr-1"></i> Previous
       </button>
-
       <button
         @click="changePage(1)"
         :disabled="currentPage >= pageCount"
         class="px-3 py-1.5 rounded-md text-xs font-medium transition-colors border border-slate-200 dark:border-slate-600"
         :class="currentPage >= pageCount ? 'text-slate-300 dark:text-slate-600 cursor-not-allowed bg-slate-50 dark:bg-slate-800' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-primary-300 dark:hover:border-primary-500'"
       >
-        下一页 <i class="fa-solid fa-chevron-right ml-1"></i>
+        Next <i class="fa-solid fa-chevron-right ml-1"></i>
       </button>
     </div>
   </div>

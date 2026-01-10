@@ -1,28 +1,28 @@
 <template>
   <div class="h-full w-full bg-transparent relative group flex flex-col">
 
-    <!-- 1. 加载状态 -->
+    <!-- 1. Loading State -->
     <div v-if="isLoading" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm transition-all">
       <div class="flex items-center space-x-3 text-primary-600 dark:text-primary-400">
         <i class="fa-solid fa-circle-notch fa-spin text-3xl"></i>
-        <span class="font-medium animate-pulse text-lg">正在解析文档结构...</span>
+        <span class="font-medium animate-pulse text-lg">Analyzing document structure...</span>
       </div>
       <p class="text-slate-400 dark:text-slate-500 text-xs mt-2">Analyzing document topology...</p>
     </div>
 
-    <!-- 2. 错误状态 -->
+    <!-- 2. Error State -->
     <div v-else-if="error" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/95 dark:bg-slate-900/95">
       <div class="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
         <i class="fa-solid fa-triangle-exclamation text-3xl text-red-500"></i>
       </div>
-      <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-1">加载失败</h3>
+      <h3 class="text-lg font-bold text-slate-700 dark:text-slate-200 mb-1">Load Failed</h3>
       <p class="text-slate-500 dark:text-slate-400 mb-4 px-8 text-center">{{ error }}</p>
       <button @click="fetchTreeData" class="px-5 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition shadow-sm">
-        <i class="fa-solid fa-rotate-right mr-2"></i> 重试
+        <i class="fa-solid fa-rotate-right mr-2"></i> Retry
       </button>
     </div>
 
-    <!-- 3. Vue Flow 核心组件 -->
+    <!-- 3. Vue Flow Core Component -->
     <VueFlow
       v-else
       v-model="elements"
@@ -38,10 +38,10 @@
       <Background :pattern-color="isDark ? '#475569' : '#cbd5e1'" :gap="20" />
       <Controls position="bottom-left" class="!bg-white dark:!bg-slate-800 !border-slate-200 dark:!border-slate-700 !shadow-lg [&>button]:!bg-transparent [&>button]:!border-slate-100 dark:[&>button]:!border-slate-700 [&>button]:!text-slate-600 dark:[&>button]:!text-slate-300 hover:[&>button]:!bg-slate-50 dark:hover:[&>button]:!bg-slate-700" />
 
-      <!-- 4. 自定义节点模板 -->
+      <!-- 4. Custom Node Template -->
       <template #node-custom="{ id, label, data, selected }">
         <div class="relative group/node">
-          <!-- 节点卡片主体 -->
+          <!-- Node Card Body -->
           <div
             class="px-3 py-2 shadow-sm rounded-xl border transition-all duration-200 cursor-pointer relative w-48 backdrop-blur-md"
             :class="[
@@ -52,7 +52,7 @@
             ]"
             @dblclick.stop="openEditModal({ id, label, ...data })"
           >
-            <!-- 顶部元信息 -->
+            <!-- Top Meta Info -->
             <div class="flex items-center justify-between mb-1">
                <span class="text-[9px] uppercase font-bold tracking-wider opacity-80 bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-300">
                  {{ data.type || 'NODE' }}
@@ -62,17 +62,17 @@
                </div>
             </div>
 
-            <!-- 标题内容 -->
+            <!-- Title Content -->
             <div class="font-bold text-slate-700 dark:text-slate-200 text-xs leading-snug line-clamp-2" :title="label">
               {{ label }}
             </div>
           </div>
 
-          <!-- 悬浮摘要 Tooltip -->
+          <!-- Hover Summary Tooltip -->
           <div v-if="data.metadata" class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-3 bg-slate-800 dark:bg-slate-700 text-white text-xs rounded-lg shadow-xl opacity-0 group-hover/node:opacity-100 transition-all duration-200 pointer-events-none z-50 transform translate-y-2 group-hover/node:translate-y-0 border border-slate-700 dark:border-slate-600">
             <div class="font-semibold mb-1 border-b border-slate-600 dark:border-slate-500 pb-1 flex items-center">
               <i class="fa-solid fa-wand-magic-sparkles text-yellow-400 mr-2"></i>
-              AI 摘要
+              AI Summary
             </div>
             <div class="leading-relaxed text-slate-300">{{ data.metadata }}</div>
           </div>
@@ -83,16 +83,16 @@
       </template>
     </VueFlow>
     
-    <!-- 顶部操作工具栏 -->
+    <!-- Top Operation Toolbar -->
     <div class="absolute top-4 right-4 z-10 flex flex-col space-y-2">
-      <!-- 视图控制 -->
+      <!-- View Control -->
       <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 flex flex-col space-y-2">
-         <button @click="focusRoot" class="flex items-center justify-center w-8 h-8 rounded hover:bg-primary-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition" title="回到根节点">
+         <button @click="focusRoot" class="flex items-center justify-center w-8 h-8 rounded hover:bg-primary-50 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition" title="Reset to Root">
             <i class="fa-solid fa-crosshairs"></i>
          </button>
       </div>
 
-      <!-- 热力图开关 -->
+      <!-- Heatmap Toggle -->
       <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-slate-100 dark:border-slate-700">
          <button 
             @click="isHeatmapMode = !isHeatmapMode" 
@@ -104,28 +104,28 @@
          </button>
       </div>
 
-      <!-- 编辑模式开关 -->
+      <!-- Edit Mode Toggle -->
       <div class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-slate-100 dark:border-slate-700">
          <button 
             @click="isEditMode = !isEditMode" 
             class="flex items-center justify-center w-8 h-8 rounded transition"
             :class="isEditMode ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'"
-            title="切换编辑模式"
+            title="Toggle Edit Mode"
          >
             <i class="fa-solid fa-pen-to-square"></i>
          </button>
       </div>
 
-      <!-- 编辑操作 (仅在编辑模式下显示) -->
+      <!-- Edit Operations (Only in Edit Mode) -->
       <div v-if="isEditMode" class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-slate-100 dark:border-slate-700 flex flex-col space-y-2 items-center animate-fade-in-down">
-         <button @click="addFreeNode" class="flex items-center justify-center w-8 h-8 rounded hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 transition" title="添加新节点">
+         <button @click="addFreeNode" class="flex items-center justify-center w-8 h-8 rounded hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 transition" title="Add New Node">
             <i class="fa-solid fa-plus"></i>
          </button>
-         <button @click="deleteSelected" class="flex items-center justify-center w-8 h-8 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400 transition" title="删除选中元素">
+         <button @click="deleteSelected" class="flex items-center justify-center w-8 h-8 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400 transition" title="Delete Selected Elements">
             <i class="fa-solid fa-trash"></i>
          </button>
          <div class="h-px w-6 bg-slate-200 dark:bg-slate-600 my-1"></div>
-         <button @click="saveTree" class="flex items-center justify-center w-8 h-8 rounded bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-600 dark:hover:bg-primary-600 hover:text-white transition" title="保存树结构">
+         <button @click="saveTree" class="flex items-center justify-center w-8 h-8 rounded bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-600 dark:hover:bg-primary-600 hover:text-white transition" title="Save Tree Structure">
             <i class="fa-solid fa-save"></i>
          </button>
       </div>
@@ -236,37 +236,37 @@ const addFreeNode = () => {
 const deleteSelected = () => {
     const selected = getSelectedElements.value;
     if (selected.length === 0) return;
-    if (confirm(`确定要删除选中的 ${selected.length} 个元素吗？`)) {
-        removeNodes(selected.filter(e => e.type !== 'default' && e.source === undefined)); // 删除节点
-        // Vue Flow 会自动处理关联边的删除
-        // 但为了保险，我们也可以手动处理
-        // 注意：removeNodes 也可以接受 edges
-        // 这里直接用 elements.value 过滤比较麻烦，直接用 hook
-        // removeNodes 实际上是内部 hook，我们这里用传入的 removeNodes
+    if (confirm(`Are you sure you want to delete the selected ${selected.length} elements?`)) {
+        removeNodes(selected.filter(e => e.type !== 'default' && e.source === undefined)); // Delete nodes
+        // Vue Flow automatically handles related edge deletion
+        // But for safety, we can also handle it manually
+        // Note: removeNodes can also accept edges
+        // Filtering elements.value here is troublesome, so use hook directly
+        // removeNodes is actually an internal hook, we use the passed removeNodes here
         removeNodes(selected);
     }
 };
 
 const saveTree = async () => {
-    if (!confirm("确定要保存当前的树结构吗？后端将重新编译文档树。")) return;
+    if (!confirm("Are you sure you want to save the current tree structure? The backend will recompile the document tree.")) return;
     
     const fileName = store.state.viewingDocTree.name;
-    // 获取当前的 nodes 和 edges
-    // Vue Flow 的 elements 是 ref，包含了 nodes 和 edges
-    // 或者用 toObject()
+    // Get current nodes and edges
+    // Vue Flow's elements is a ref containing nodes and edges
+    // Or use toObject()
     
-    // 过滤掉不必要的信息，只保留核心结构
-    // 实际上直接传 elements 给后端，后端处理比较好
-    // 注意：elements.value 包含了 Vue Flow 的内部状态，最好深拷贝一下
+    // Filter out unnecessary info, keep core structure
+    // Actually passing elements to backend is better, backend handles it
+    // Note: elements.value contains Vue Flow internal state, better deep copy
     const currentElements = JSON.parse(JSON.stringify(elements.value));
     
     try {
         isLoading.value = true;
         await store.saveTreeStructure(fileName, currentElements);
-        alert("保存成功！");
-        await fetchTreeData(); // 重新加载以确保同步
+        alert("Saved successfully!");
+        await fetchTreeData(); // Reload to ensure sync
     } catch (e) {
-        alert(`保存失败: ${e.message}`);
+        alert(`Save failed: ${e.message}`);
         isLoading.value = false;
     }
 };
@@ -322,13 +322,13 @@ const fetchTreeData = async () => {
     }
   } catch (err) {
     console.error('Tree Fetch Error:', err);
-    error.value = err.message || '网络连接错误';
+    error.value = err.message || 'Network Connection Error';
   } finally {
     isLoading.value = false;
   }
 };
 
-const onNodeClick = (event) => console.log('点击节点:', event.node);
+const onNodeClick = (event) => console.log('Node Clicked:', event.node);
 const onPaneClick = () => {};
 
 onMounted(() => {

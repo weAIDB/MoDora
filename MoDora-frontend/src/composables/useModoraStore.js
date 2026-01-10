@@ -7,7 +7,7 @@ const generateId = () => 'sess_' + Math.random().toString(36).substr(2, 9);
 const createWelcomeMessage = () => [
     {
         role: "assistant",
-        content: "你好！请上传文档，我会为你分析并回答相关问题。",
+        content: "Hello! Please upload a document, and I will analyze it and answer your questions.",
         isTyping: false
     }
 ];
