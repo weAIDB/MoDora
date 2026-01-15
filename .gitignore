@@ -21,3 +21,5 @@ models/
 .DS_Store
 
 MoDora-backend/configs/*
+
+/home/yukai/project/MoDora/MoDora-backend/activate.sh
