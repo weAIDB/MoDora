@@ -1,0 +1,4877 @@
+[
+  {
+    "questionId": 15,
+    "benchmark": "MMDA",
+    "question": "How many steps are reduced in Tile Replacement for PBU Metal Panel Walls compared to Tile Replacement for PBU Drywalls?",
+    "answer": [
+      "1"
+    ],
+    "MoDora_prediction": {
+      "answer": "1",
+      "retrieved_documents": [],
+      "node_impacts": {}
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 39,
+    "benchmark": "MMDA",
+    "question": "Around what date did the outbreak of the epidemic occur in China?",
+    "answer": [
+      "2022-03-04"
+    ],
+    "MoDora_prediction": {
+      "answer": "March 2022.",
+      "retrieved_documents": [],
+      "node_impacts": {}
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 143,
+    "benchmark": "MMDA",
+    "question": "How many references are listed?",
+    "answer": [
+      "23"
+    ],
+    "MoDora_prediction": {
+      "answer": "23",
+      "retrieved_documents": [
+        {
+          "page": 5,
+          "content": "\n\n [1] Jefferies M, Rauff B, Rashid H, et al. Update on global epidemiology of viral hepatitis and preventive strateqies.WorldJClinCases.2018;6:589–599.\n\n [2] Coppola N, Alessio L, Onorato L, et al. Epidemiology and management of hepatitis C virus infections in immigrant populations. Infect Dis Poverty. 2019;8:17.[3] Triantos C, Aggeletopoulou I, Kalafateli M, et al.Prognostic significance of vitamin D receptor (VDR)gene polymorphisms in liver cirrhosis. Sci Rep.2018;8:14065.\n[4]  Shin SK, Choi DJ, Kim JH, et al. Characteristics of contrast-enhanced ultrasound in distinguishing small (≤3cm) hepatocellular carcinoma from intrahepatic cholangiocarcinoma. Medicine. 2018;97:e12781.[5] Irshad M,Gupta P, Irshad K. Molecular basis of hepatocellular carcinoma induced by hepatitis C virus infection.World J Hepatol. 2017;9:1305-1314.[6]  Umar M, Sastry KS,Chouchane AI. Role of vitamin D beyond the skeletal function: a review of the molecular and clinical studies. Int J Mol Sci. 2018;19:1618.[7] Basit S. Vitamin D in health and disease: a literature review,BrJBiomed Sci,2013:70:161-172.[8] Barooah P, Saikia S, Bharadwaj R, et al. Role of VDR,\nGC, and CYP2R1 polymorphisms in the development of hepatocellular carcinoma in hepatitis C virus-infected patients. Genet Test Mol Biomarkers.\n2019;23:325–331.\n[9]  Keane JT, Elangovan H, Stokes RA, et al. Vitamin D and the liver-correlation or cause?. Nutrients. 2018;16:10.[10] He Q, Huang Y, Zhang L, et al. Association between vitamin D receptor polymorphisms and hepatitis B virus infection susceptibility. Meta-analysis Study Genet. 2018;1:105-112.\n[11] Rai V,Abdo J, Agrawal S, et al. Vitamin D receptor polymorphism and cancer. Update Anticancer Res.\n2017;37:3991–4003.\n[12] Pugh RN, Murray-Lyon IM, Dawson JL, et al.\nTransection of the oesophagus for bleeding oesophageal varices. Br J Surg. 1973;60:646-649.[13] Botta F, Giannini E, Romagnoli P, et al. MELD scoring system is useful for predicting prognosis in patients with liver cirrhosis and is correlated with residual liver function. Eur Study Gut. 2003;52:134–139.\n\n [14] Kamath PS, Wiesner RH, Malinchoc M, et al. A model to predict survival in patients with end-stage liver disease. Hepatology. 2001;33:464–470.[15] Arafa M, Besheer T, El-Eraky AM, et al. Genetic variants of XRCC1 and risk of hepatocellular carcinoma in chronic hepatitis C patients. BrJ Biomed Sc.2019;76:64–69.\n[16]  El-Bendary M, Neamatallah M, Elalfy H, et al. Association of genetic polymorphisms of chemokines and their receptors with clearance or persistence of hepatitis C virus infection. BrJ Biomed Sci. 2019;76:11-16.[17] Hussein TD. Serological tumor markers of hepatocellular carcinoma: a meta-analysis. Int J Biol Markers.\n2015;30:e32–42.\n[18] Hung CH, Chiu YC, Hu TH, et al. Signifi cance of vitamin D receptor gene polymorphisms for risk of hepatocellular carcinoma in chronic hepatitis C. Transl Oncol.\n2014;7:503–507.\n[19] Mohammed MA, Omar NM, Mohammed SA, et al. The significance of vitamin D receptor gene polymorphisms for susceptibility to hepatocellular carcinoma in subjects infected with hepatitis C virus. Gastroenterol Hepatol Open Access. 2017;7:00246.[20] EI-Zayadi AR, Badran HM, Barakat EM, et al.\nHepatocellular carcinoma in Egypt: a single center study over a decade. World J Gastroenterol.\n2005;11:5193–5198.\n[21] Abdel-Wahab M, El-Ghawalby N, Mostafa M, et al.\nEpidemiology of hepatocellular carcinoma in lower Egypt,Mansoura Gastroenterology center.\nHepatogastroenterology. 2007;54:157-162.[22] Baur K, Mertens JC, Schmitt J, et al. Swiss hepatitis C cohort study group. Combined effect of 25-OH vitamin D plasma levels and genetic vitamin D receptor (NR 1l1) variants on fibrosis progression rate in HCV patients. Liver Int. 2012;32:635–643.\n[23] Falleti E, Bitetto D, Fabris C, et al. Vitamin D receptor gene polymorphisms and hepatocellular carcinoma in alcoholic cirrhosis.World 1Gastroenterol.\n2010;16:3016-3024.\n",
+          "bboxes": [
+            {
+              "range": [
+                610,
+                1474,
+                721,
+                1494
+              ],
+              "page": 5,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/72.pdf"
+            },
+            {
+              "range": [
+                629,
+                1514,
+                1069,
+                1578
+              ],
+              "page": 5,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/72.pdf"
+            },
+            {
+              "range": [
+                129,
+                103,
+                578,
+                981
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/72.pdf"
+            },
+            {
+              "range": [
+                621,
+                104,
+                1071,
+                980
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/72.pdf"
+            }
+          ],
+          "file_name": "72.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--References ": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 144,
+    "benchmark": "MMDA",
+    "question": "When are the dates of the relevant reports?",
+    "answer": [
+      "2023.2.27, 2023.2.14"
+    ],
+    "MoDora_prediction": {
+      "answer": "2023.2.27 and 2023.2.14.",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n 【山证证券Ⅱ】全面注册制加速落地，关注投行链条优势券商-行业周报（20230220-0224）2023.2.27\n\n 【山证证券Ⅲ】Q4保有规模走弱，券商持续蚕食市场份额-公募基金销售动态跟踪2023.2.14\n\n\n 分析师：\n\n 刘丽\n\n 执业登记编码：S0760511050001\n\n 电话：0351--8686985\n\n 邮箱：liuli2@sxzq.com \n\n 孙田田\n\n 执业登记编码：S0760518030001\n\n 电话：0351-8686900\n\n 邮箱：suntiantian@sxzq.com \n\n 证券研究报告\n\n 领先大市-A(维持)\n\n 行业研究/行业周报",
+          "bboxes": [
+            {
+              "range": [
+                62,
+                768,
+                146,
+                787
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                65,
+                806,
+                378,
+                896
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                62,
+                916,
+                378,
+                1006
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                63,
+                1065,
+                128,
+                1084
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                63,
+                1104,
+                102,
+                1122
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                63,
+                1142,
+                317,
+                1160
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                63,
+                1180,
+                232,
+                1197
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                63,
+                1219,
+                243,
+                1237
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                63,
+                1257,
+                120,
+                1275
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                63,
+                1295,
+                317,
+                1313
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                63,
+                1333,
+                226,
+                1351
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                63,
+                1372,
+                284,
+                1391
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                965,
+                145,
+                1113,
+                170
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                887,
+                188,
+                1134,
+                222
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            },
+            {
+              "range": [
+                938,
+                282,
+                1123,
+                305
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/73.pdf"
+            }
+          ],
+          "file_name": "73.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--相关报告：": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 151,
+    "benchmark": "MMDA",
+    "question": "How many hot events are introduced in the article for both domestic and foreign?",
+    "answer": [
+      "7 for domestic, 3 for foreign"
+    ],
+    "MoDora_prediction": {
+      "answer": "Domestic: 7; Foreign: 3",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n 1）国内；央企ESG主题指数密集发布，ESG主题基金整体表现较为稳健。5月4日，中证诚通央企ESG指数、中证央企ESG50指数正式发布；5月8日，中证国新央企ESG成长100指数正式发布。一系列央企ESG指数的发布，一方面是对央企在ESG方向取得成绩的认可，发挥其良好的示范带动作用，同时也有助于央企实现价值重估。\n\n\n 2）国外：航运纳入欧盟排放交易体系，欧盟贸易成本或将上升。欧盟理事会表示，航运纳入欧盟排放交易体系(EUETS)的法律程序现已完成，碳排放交易体系(EU ETS)已正式通过并成为法律。欧盟排放交易体系是一个基于能源密集型行业和发电行业排放配额限额与交易制度的碳市场。\n\n\n 政策动态：（1）山东出台碳金融发展行动方案，2025年底碳债券融资规模过百亿。山东省政府印发《山东省碳金融发展三年行动方案(2023-2025年)》，在碳金融基础设施建设、碳金融试点示范、碳交易推进、碳金融、社会资本投入等5个领域展开重点行动。\n",
+          "bboxes": [
+            {
+              "range": [
+                398,
+                427,
+                513,
+                446
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                418,
+                476,
+                1134,
+                599
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                417,
+                629,
+                1134,
+                726
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                397,
+                756,
+                1134,
+                853
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            }
+          ],
+          "file_name": "77.pdf"
+        },
+        {
+          "page": 6,
+          "content": "\n\n （1）航运纳入欧盟排放交易体系，欧盟贸易成本或将上升。欧盟理事会表示，航运纳入欧盟排放交易体系(EUETS)的法律程序现已完成，碳排放交易体系(EUETS)已正式通过并成为法律。欧盟排放交易体系是一个基于能源密集型行业和发电行业排放配额限额与交易制度的碳市场。涵盖航运的碳排放规则和其他四项法律构成了欧盟实现2030年气候目标的“Fitfor55”战略的一部分，首次纳入EUETS范围的航运排放配额，将分三个阶段为航运公司提供碳配额，分别是：2024年提供40%，2025年提供70%，2026年提供100%。\n\n （2）欧盟《生态设计指令》实施，将量化光伏组件碳足迹。欧盟委员会联合研究中心已经开发出一种计算光伏组件在制造和运输阶段的碳足迹的方法，包括生命周期评估热点分析，该分析将用于确定光伏组件生命周期中对环境影响最大的区域，涵盖在光伏组件的制造和使用寿命期间使用水和其他资源的情况。同时，研究人员还建议引入一般或特定参数的定量要求，为光伏组件的碳足迹建立最大允许阈值，它将要求光伏组件制造商在其能源标签或数据表上提供这些光伏组件的碳足迹信息。\n\n\n （3）亚行首推“亚太创新气变融资机制”，加速调动数十亿美元气变资金。5月2日，亚洲开发银行宣布推出“亚太创新气候变化融资机制”（IF-CAP)。目前，IF-CAP的初始合作伙伴包括丹麦、日本、韩国、瑞典、英国和美国，亚行正与这些合作伙伴磋商机制运行细节，包括如何为相关项目准备提供赠款和为亚行部分主权贷款资产组合提供担保等事宜。通过IF-CAP担保降低亚行资金风险敞口，使得亚行得以释放部分资金，加速为气变项目提供新资金，在“1比5”的杠杆模式下，最初30亿美元额度的担保目标将最高释放亚行150亿美元的贷款额度用于气变项目，从而缓解整个亚太地区急需的气变项目资金缺口。",
+          "bboxes": [
+            {
+              "range": [
+                344,
+                201,
+                441,
+                223
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                355,
+                258,
+                1121,
+                472
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                354,
+                506,
+                1122,
+                720
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                355,
+                754,
+                1121,
+                1000
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            }
+          ],
+          "file_name": "77.pdf"
+        },
+        {
+          "page": 4,
+          "content": "\n\n (1）央企ESG主题指数密集发布，ESG主题基金整体表现较为稳健。5月4日，中证诚通央企ESG指数、中证央企ESG50指数正式发布；5月8日，中证国新央企ESG成长100指数正式发布。一系列央企ESG指数的发布，一方面是对央企在ESG方向取得成绩的认可，发挥其良好的示范带动作用，同时也有助于央企实现价值重估。随着ESG理念融入央企日常经营，ESG实践趋于成熟，央企上市公司ESG绩效优势明显，从WindESG评级来看，截至2023年2月，央企上市公司中获得BBB以上评级的占56.12%，整体表现优于上市10年以上的A股公司。中国银行研究院研究员刘晨通过数据分析指出，ESG主题基金整体表现较为稳健，未来ESG投资标的有望进一步扩容。截至5月9日，市场上共有736只ESG投资基金，其中，有75只ESG投资基金成立以来回报超过100%，占比达10.2%；有110只基金成立以来回报超过50%，占比达14.9%，虽然去年受二级市场震荡影响，部分ESG投资基金回报不及预期，但是依然有40.3%的ESG投资基金跑赢业绩比较基准。\n\n\n (2）年内商业银行绿色金融债发行规模同比增超140%，中小银行积极参与。绿色金融债发行升温，截至5月7日，商业银行计划发行绿色金融债规模达1358亿元，较去年同期增长140.78%，同时，发行绿色金融债的17家商业银行中有10家为中小银行，越来越多中小银行加入发行行列。中小银行成为绿色金融债发行主体得益于三方面：1）政策大力引导和激励；2）绿色投融资需求持续高涨；3）银行类金融机构绿色发展理念不断深化。但是目前绿色金融债券发展存在信息披露质量问题，绿色金融债券需要在募集说明书上披露环境效益指标，但绿色项目的投向广泛，各类绿色投资之间缺乏明显可比的统一标准。因此，需要完善信息披露的精准度和频次，更好地实现绿色金融对绿色投资的传导，并助力“双碳”目标的中长期实现。\n\n\n （3）2022年绿色信贷规模两极分化，新品披露参差不齐。银行不断加大绿色信贷投放、创新产品，绿色信贷投放保持高速增长。截至2022年末，42家A 股上市银行绿色贷款余额达到16万亿元，约占我国绿色信贷总余额的72.63%，其中，有4家国有大行的绿色信贷余额超万亿元，另有14家上市银行超千亿元。虽然绿色金融整体规模增速较快，但仍存在着不可忽视的问题，有些银行对绿色投资、绿色租赁、绿色消费等多方面的绿色成果进行了充分展示，但部分中小银行仅披露了绿色贷款余额等数据，这不仅仅是由于披露未进行统一化、标准化的要求，更源于部分银行没有更多的相关业务和产品可供披露，各个银行在绿色金融发展方面存在巨大的不平衡与分化。\n\n\n 资料来源：银柿财经，德邦研究所\n\n 资料来源：银柿财经，德邦研究所\n\n 资料来源：银柿财经，德邦研究所\n\n （4）CCER重启渐进，注册登记系统及交易系统上线在即。北京绿色交易所公布全国温室自愿减排注册登记系统及交易系统安全测试服务项目成交结果，全国温室气体自愿减排注册登记系统安全测试和全国温室气体自愿减排交易系统安全测试分别以56000元和28000元成交。系统安全测试是保障系统上线的重要测试，具体内容是依据PTES渗透测试方法，对系统进行非破坏性质的攻击性测试，最大限度发现信息系统存在的安全漏洞，提供漏洞整改建议，并对修复成果进行复测，最终达到提升系统安全水平的目标。全国首个“零碳产业园区”标准实施，推动内蒙古工业绿色发展。4月28日，中国首个零碳产业园区建设规范地方标准《内蒙古自治区零碳产业园区建设规范》正式实施，填补了国内在零碳园区建设、绿色电力评价领域的标准空白。该标准给出了以零碳为最终目标的产业园区的建设原则、园区主要系统构成、建设中的重点工作、运维管理等内容。对于低碳/零碳能源系统，《规范》要求零碳产业园在保证安全、质量的前提下优先使用可再生能源，零碳园区可再生能源使用比例应不低于80%。\n\n （5）世行批准3.45亿美元贷款，助力中国绿色农业和农村发展。世界银行执行董事会已批准3.45亿美元贷款，这笔贷款将与政府资金形成合力，推动减少种植业和养殖业的温室气体排放，增加土壤碳汇，改善农业生态系统生物多样性保护与恢复状况，强化地方政府将环境和脱碳目标纳入政府乡村振兴规划和投资项目的机构能力建设，助力中国湖北省和湖南省绿色农业和农村发展。该笔贷款项目的目标包括以下几点：1）加强省、县、乡级政府机构能力建设；2）为农民和合作社成员提供培训和农业推广服务；3）创新财务激励机制，鼓励农民和食品加工企业采用气候智慧型农业技术和良好农业实践；4）改善农村污水和垃圾治理服务；5）建立农村基础设施和公共服务规划和监测评价体系；6）开发农业温室气体减排测量、报告和核验方法；7）构建绿色预算和支出跟踪系统。\n\n （6）首届中国出行碳大会成功召开，全国首个《零碳交通共识宣言》发布。5月10日，首届中国出行碳大会在北京召开，我国首个促进城市交通零碳转型的社会组织—中国城市公共交通协会碳分会的主要成员集体亮相。大会就零碳交通发展方向达成了共识，并由出行、物流、金融、汽车、能源、科研机构等领域代表共同发布了全国首个《零碳交通共识宣言》，为加快推进双碳目标下的零碳交通转型、生态圈跨圈融合提供重要指引。同时指出，为加速实现零碳交通美好愿景，应尽快建立涵盖城市结构、出行结构、能源结构、金融与科技赋能的“3+2”零碳交通发展体系。\n\n\n （7）世界首个淡水湿地修复碳汇项目落户湖南岳阳君山区，推动君山区生态价值转化。湖南岳阳市君山区湿地碳汇开发项目经国际核证减排计划（VCS）官方技术审核并公示，成为世界首个达到国际核证减排计划标准，挂牌公示的淡水湿地修复项目，预计项目2023年总静态收益约400万元。该项目通过采用卫星遥感、激光雷达测绘和生物物理化学建模等多项先进技术，对湿地修复碳汇成效进行高精度测量和全面评估。通过该项目的实施，能够进一步改善项目区生物多\n\n 样性水平、扩展国家重点保护动、植物生存领地，提高物种数量和种类。同时也能促进农业农村增收，改善居民生存环境、增强民众生态保护意识，有力推动君山区生态产品价值转换。\n",
+          "bboxes": [
+            {
+              "range": [
+                343,
+                202,
+                440,
+                225
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                345,
+                254,
+                1122,
+                588
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                345,
+                617,
+                1130,
+                873
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                345,
+                901,
+                1123,
+                1130
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                65,
+                1501,
+                292,
+                1517
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                607,
+                1501,
+                834,
+                1518
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                344,
+                474,
+                572,
+                490
+              ],
+              "page": 5,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                345,
+                525,
+                1122,
+                859
+              ],
+              "page": 5,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                345,
+                887,
+                1122,
+                1143
+              ],
+              "page": 5,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                345,
+                1171,
+                1121,
+                1375
+              ],
+              "page": 5,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                345,
+                1404,
+                1121,
+                1555
+              ],
+              "page": 5,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            },
+            {
+              "range": [
+                345,
+                96,
+                1120,
+                169
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/77.pdf"
+            }
+          ],
+          "file_name": "77.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--热点聚焦：": 6,
+        "root--1.热点聚焦": 1,
+        "root--1.热点聚焦--1.1.国内": 6,
+        "root--1.热点聚焦--1.2.国外": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 156,
+    "benchmark": "MMDA",
+    "question": "What is the stock code of the first company mentioned in the company's important information?",
+    "answer": [
+      "300498"
+    ],
+    "MoDora_prediction": {
+      "answer": "300498.SZ",
+      "retrieved_documents": [
+        {
+          "page": 7,
+          "content": "\n\n 公司预计2022年归母净利润盈利48亿元-53亿元，扣非归母净利润盈利45亿元-50亿元。公司2022年公司销售肉猪（含毛猪和鲜品）1,790.86万头，同比增长35.49%，毛猪销售均价19.05元/公斤，同比增长9.55%。公司销售肉鸡10.81亿只（含毛鸡、鲜品和熟食），同比下降1.83%，毛鸡销售均价同比上升17.20%。\n",
+          "bboxes": [
+            {
+              "range": [
+                235,
+                724,
+                672,
+                745
+              ],
+              "page": 7,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/79.pdf"
+            },
+            {
+              "range": [
+                272,
+                781,
+                1077,
+                929
+              ],
+              "page": 7,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/79.pdf"
+            }
+          ],
+          "file_name": "79.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--3.公司重要资讯": 1,
+        "root--3.公司重要资讯--温氏股份：2022年度业绩预告（2023/1/31)": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 158,
+    "benchmark": "MMDA",
+    "question": "What are three aspects of the problem restatement?",
+    "answer": [
+      "Expected objectives, annex contents, task requirements"
+    ],
+    "MoDora_prediction": {
+      "answer": "预期目标、附件内容、任务要求。",
+      "retrieved_documents": [
+        {
+          "page": 7,
+          "content": "\n\n 大难点：通过观察题目给出的附件数据与任务要求，本文分析得出任务一存在以下两以下两\n\n 案卷的完成时长是扫描、图像处理、自检全检三个工序的耗时之和，PDF处理无难点一：判断案卷已完成的标准。根据题目要求可知，虽然题目中注明每个个需计算耗时，但是在对完成案件进行计数时，需要确定每个案件在四道工序中均有结束时间。\n\n\n 难点二：每个案卷完成时长的计算方式。由于实际工作中工人会出现提前上岗或推迟下岗的情况，通过观察附件数据可知，如果仅仅以每个案卷的第三道工序结束时间减去第一道工序的开始时间作为每个案卷的完成时长，则会将非工作时间也会计入到完成时间中。因此，本文对附件数据中可能存在的所有情况进行总结，后续问题求解时对于一些特殊情况需要进行特殊处理，具体见表1。",
+          "bboxes": [
+            {
+              "range": [
+                175,
+                240,
+                318,
+                264
+              ],
+              "page": 7,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                174,
+                305,
+                1011,
+                376
+              ],
+              "page": 7,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                175,
+                398,
+                1021,
+                564
+              ],
+              "page": 7,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                174,
+                587,
+                1011,
+                798
+              ],
+              "page": 7,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            }
+          ],
+          "file_name": "80.pdf"
+        },
+        {
+          "page": 4,
+          "content": "\n\n 对加工流程数据进行统计分析，并作可视化展示，便于管理人员及时了解档案加工处理动态。具体目标如下：\n\n 1．统计档案数字化流程的耗时和进度情况。\n\n 2．统计操作人员的工作量和工作效率情况。",
+          "bboxes": [
+            {
+              "range": [
+                228,
+                717,
+                392,
+                740
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                174,
+                763,
+                1010,
+                833
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                217,
+                857,
+                677,
+                882
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                216,
+                904,
+                676,
+                928
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            }
+          ],
+          "file_name": "80.pdf"
+        },
+        {
+          "page": 6,
+          "content": "\n\n a)计算并绘制每天不同工序完成案卷数量的簇状柱形图：x轴表示时间，y轴表示完成案卷的数量，用不同颜色标记不同工序。\n\n 表示时间，y轴表示每天投入的工作量，用不同颜色标记不同工序。b)计算并绘制各工序每天投入工作量（单位：人·小时）的多重折线图：x轴折线图：x轴\n\n 轴表示时间，y轴表示百分比，用不同颜色标记不同工序。c)绘制每天各工序返工案卷数占当天返工案卷总数的百分比堆积面积图积面积图\n\n 卷总数的百分比，并按百分比进行排序，绘制饼图，其中排名第10位及以后的合并成一个扇区。\n",
+          "bboxes": [
+            {
+              "range": [
+                216,
+                153,
+                513,
+                177
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                175,
+                201,
+                1011,
+                270
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                175,
+                294,
+                1012,
+                363
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                175,
+                387,
+                987,
+                457
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            },
+            {
+              "range": [
+                174,
+                481,
+                1019,
+                598
+              ],
+              "page": 6,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/80.pdf"
+            }
+          ],
+          "file_name": "80.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--一、问题简介": 1,
+        "root--二、任务一：数据预处理与统计": 1,
+        "root--三、任务二：数据分析与可视化": 1,
+        "root--一、问题简介--1.2问题重述": 1,
+        "root--二、任务一：数据预处理与统计--2.1问题分析": 6,
+        "root--一、问题简介--1.2问题重述--（一）预期目标": 6,
+        "root--一、问题简介--1.2问题重述--（二）附件内容": 1,
+        "root--一、问题简介--1.2问题重述--（三）任务要求": 1,
+        "root--二、任务一：数据预处理与统计--2.1问题分析--表1工序情况归纳表": 1,
+        "root--一、问题简介--1.2问题重述--（三）任务要求--任务一：数据预处理与统计": 1,
+        "root--一、问题简介--1.2问题重述--（三）任务要求--任务二：数据分析与可视化": 6,
+        "root--一、问题简介--1.2问题重述--（三）任务要求--任务三：领取提交模式分析": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 172,
+    "benchmark": "MMDA",
+    "question": "According to experimental charts, in which solution does Mo alloy corrode the fastest?",
+    "answer": [
+      "3% NaCl+(CH3)COOH"
+    ],
+    "MoDora_prediction": {
+      "answer": "3% NaCl + CH3COOH (acidified saline)",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--Influence of alloying and heat treatment on  the corrosion properties of electrolytic alloys  on the basis of nickel \n": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 237,
+    "benchmark": "MMDA",
+    "question": "Data of which two months are shown in the interest rate comparison chart?",
+    "answer": [
+      "Dec-22, Mar-23"
+    ],
+    "MoDora_prediction": {
+      "answer": "March 2023 and December 2022.",
+      "retrieved_documents": [],
+      "node_impacts": {}
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 261,
+    "benchmark": "MMDA",
+    "question": "What does the solid line in Figure 3a represent?",
+    "answer": [
+      "No HTA or VCC"
+    ],
+    "MoDora_prediction": {
+      "answer": "The untreated device: no HTA and no VCC.",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--3. Results and discussions ": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 262,
+    "benchmark": "MMDA",
+    "question": "What are the authors of the article that is referred for the CSS method mentioned in experimental details?",
+    "answer": [
+      "C. Ferekides, J. Britt, Y. Ma, L. Killian"
+    ],
+    "MoDora_prediction": {
+      "answer": "C. Ferekides, J. Britt, Y. Ma, and L. Killian.",
+      "retrieved_documents": [],
+      "node_impacts": {}
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 288,
+    "benchmark": "MMDA",
+    "question": "What are the main sections in the document related to the artificial hand design?",
+    "answer": [
+      "I. Introduction, II. Basic Idea of the Mechatronic Design, III. Prototyping of the Hand, IV. Functional Characteristics of the Artificial Hand, V. Experimental Investigations of the Hand, Summary"
+    ],
+    "MoDora_prediction": {
+      "answer": "- I. INTRODUCTION\n- II. BASIC IDEA OF THE MECHATRONIC DESIGN\n- III. PROTOTYPING OF THE HAND\n- IV. FUNCTIONAL CHARACTERISTICS OF THE ARTIFICIAL HAND\n- V. EXPERIMENTAL INVESTIGATIONS OF THE HAND\n- SUMMARY\n- REFERENCES",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n Mianowski K.\nWarsaw University of Technology Warsaw, Poland e-mail: kmianowski@meil.pw.edu.pl,\n\n Abstract— The original design of multifingered gripper in the shape of human hand with flexible fingers dedicated for humanoid robot ROMAN is presented in the paper. The deesign work was concentated on ensuring that the hand can contact with a variety of different shape objects made of flexible materials of different properties as well as fragile objects requiring particular caution when manipulated. Additionally it was assumed that the gripper should ensure a satisfactory reliabilty level, required high functionality and easy maintenance. The project was based on the assumptions, that the final solution should characterized by high versatility, good adaptability and good robustness. Design methods and prototyping of a robotic hand is presented in the paper in details. In the real solution of the model, the plastic and composite materials were applied.Incontrol systems,PIC controllers and PC computers have been used.",
+          "bboxes": [
+            {
+              "range": [
+                107,
+                155,
+                1080,
+                251
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/145.pdf"
+            },
+            {
+              "range": [
+                165,
+                332,
+                460,
+                424
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/145.pdf"
+            },
+            {
+              "range": [
+                94,
+                487,
+                583,
+                808
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/145.pdf"
+            }
+          ],
+          "file_name": "145.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--The artificial hand with elastic fingers for humanoid  robot ROMAN ": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 292,
+    "benchmark": "MMDA",
+    "question": "What is the page number of the document that contains both a table and an airplane image?",
+    "answer": [
+      "Page 1, 2 and 4."
+    ],
+    "MoDora_prediction": {
+      "answer": "1, 2, and 4",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--JetBlue Aircraft in Flight": 1,
+        "root--Product Dimensions Table": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 308,
+    "benchmark": "MMDA",
+    "question": "What colors are used in the pencil chart?",
+    "answer": [
+      "Yellow, blue, red, black, and white."
+    ],
+    "MoDora_prediction": {
+      "answer": "Yellow, blue, red, white, and black.",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--Pencil chart/Bleistiftmuster ": 1,
+        "root--Pencil chart/Bleistiftmuster --Pixel Art Letter \"D\"": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 331,
+    "benchmark": "MMDA",
+    "question": "What is the source of the data for Figure 1?",
+    "answer": [
+      "Wind，中国政府网站，东吴证券研究所"
+    ],
+    "MoDora_prediction": {
+      "answer": "Wind; China government website; Dongwu (Soochow) Securities Research Institute",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--CPI同比转负后政策怎么走?": 1,
+        "root--CPI同比转负后政策怎么走?--那么这次CPI同比转负后政策可能会有哪些动作：": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 354,
+    "benchmark": "MMDA",
+    "question": "What are the main parts of a lesson in this module?",
+    "answer": [
+      "What’s In, What’s New, What is It, What’s More, What I Have Learned, What I Can Do, Assessment, Additional Activities, and Answer Key"
+    ],
+    "MoDora_prediction": {
+      "answer": "What’s In, What’s New, What Is It, What’s More, What I Have Learned, What I Can Do, Assessment, Additional Activities.",
+      "retrieved_documents": [
+        {
+          "page": 12,
+          "content": "\n\n What you have to do:\n\n 1.Fill your mouth with air. Press your cheeks with your fingers.\n\n 2.Answer the following questions:\n\n a. Did air occupy space in your mouth?\n\n b. Were you able to press your cheeks with your fingers? Why?\n\n\n C.When you pressed one of your cheeks, did you feel the air moving to the other side of your cheek? Explain what happened.",
+          "bboxes": [
+            {
+              "range": [
+                138,
+                1038,
+                219,
+                1057
+              ],
+              "page": 12,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                139,
+                1079,
+                369,
+                1100
+              ],
+              "page": 12,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                193,
+                1125,
+                902,
+                1147
+              ],
+              "page": 12,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                193,
+                1156,
+                578,
+                1176
+              ],
+              "page": 12,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                229,
+                1185,
+                664,
+                1208
+              ],
+              "page": 12,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                229,
+                1259,
+                1041,
+                1343
+              ],
+              "page": 12,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                229,
+                1365,
+                1041,
+                1478
+              ],
+              "page": 12,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            }
+          ],
+          "file_name": "178.pdf"
+        },
+        {
+          "page": 10,
+          "content": "\n\n A. In Grade 9 you have a better picture or view of how the particles are arranged in the three states of matter: solid, liquid, and gas. Study the models below,then identify the phase being described. Write your answers on a separate sheet of paper.\n\n\n 1. Particles are very close to each other and move in a fixed position.\n\n 2. Particles are far apart and move freely.\n\n 3. Particles are able to vibrate about their fixed position. Thus, attractions between them are very strong.\n\n\n 4. The random motion of the particles and their freedom to slide against each other result in weaker forces of attraction. It assumes the shape of the containers. However, the volume is definite.\n\n\n 5. Particles have very weak forces of attraction between them and account for their unique properties.\n\n\n B. Complete the table below using the following list of phrases provided below:\n\n Difficult to compress \nSame volume as container \nVery high density \nNo diffusion.\n\n\n\n Fixed volume Fixed shape Takes the shape of the Easily compressed \n\n Rapid diffusion Very low density \n\n When we talk about gases, they have no definite shape and size, while mass and volume are not directly measurable. The kinetic theory of gases is useful and can be applied in this case. Kinetic theory of gases explains the three macroscopic properties of a gas in terms of the microscopic nature of atoms and molecules making up the gas. Usually, physical properties of solids and liquids can be described by their, size, shape,mass, volume etc.\n\n\n In your previous lessons, you have taken into account three properties of gases, namely, pressure, volume and temperature. These properties along with the kinetic molecular theory of gases will play a significant role in helping you understand the physical properties of gases at the molecular level.",
+          "bboxes": [
+            {
+              "range": [
+                318,
+                574,
+                500,
+                603
+              ],
+              "page": 10,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                138,
+                687,
+                1024,
+                797
+              ],
+              "page": 10,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                139,
+                1100,
+                922,
+                1122
+              ],
+              "page": 10,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                138,
+                1154,
+                635,
+                1176
+              ],
+              "page": 10,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                142,
+                1208,
+                1043,
+                1259
+              ],
+              "page": 10,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                154,
+                1292,
+                1045,
+                1371
+              ],
+              "page": 10,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                140,
+                1404,
+                1045,
+                1456
+              ],
+              "page": 10,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                139,
+                142,
+                977,
+                166
+              ],
+              "page": 11,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                149,
+                187,
+                432,
+                294
+              ],
+              "page": 11,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                528,
+                187,
+                767,
+                295
+              ],
+              "page": 11,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                852,
+                186,
+                1026,
+                239
+              ],
+              "page": 11,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                137,
+                697,
+                1045,
+                867
+              ],
+              "page": 11,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                137,
+                899,
+                1044,
+                1010
+              ],
+              "page": 11,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            }
+          ],
+          "file_name": "178.pdf"
+        },
+        {
+          "page": 15,
+          "content": "\n\n Did you see the connection of kinetic molecular theory in the previous activity?What state of matter is involved in all of the three situations above? These situations involved gases. All of the properties and characteristics of gases can be described using the kinetic molecular theory.\n\n\n The Kinetic Molecular Theory (KMT) effectively explains the behavior of gases.As a product of numerous experiments and years of investigations by several scientists, the theory closely conforms to reality.\n\n\n The Kinetic Molecular Theory (KMT) consists of several postulates.\n\n A. A gas is composed of large number of particles, either atoms or molecules.They are so small compared to the distance separating them that their own size can be considered negligible. Compared to the total gas volume,the particles occupy negligible volume. A considerable empty space exists between particles.\n\n\n B.Gas particles move randomly in straight line motion and collide with each other and the container frequently. The force of collisions of the gas particles with the walls of the container causes pressure.\n\n C.Collisions of gas molecules are perfectly elastic. This means no energy is lost as friction when molecules collide.\n\n\n D.Gas particles exhibit almost negligible attractions and repulsions for each other. The molecules thus, move freely as far as space will allow.\n\n E.The average kinetic energy of gas molecules is directly proportional to the absolute temperature (Kelvin). At the same temperature, the molecules of all gases will have the same average kinetic energy.\n",
+          "bboxes": [
+            {
+              "range": [
+                318,
+                554,
+                507,
+                582
+              ],
+              "page": 15,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                137,
+                666,
+                1045,
+                777
+              ],
+              "page": 15,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                137,
+                809,
+                1045,
+                883
+              ],
+              "page": 15,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                209,
+                910,
+                915,
+                931
+              ],
+              "page": 15,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                210,
+                949,
+                1045,
+                1073
+              ],
+              "page": 15,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                211,
+                1090,
+                1045,
+                1163
+              ],
+              "page": 15,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                210,
+                1180,
+                1045,
+                1225
+              ],
+              "page": 15,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                210,
+                1244,
+                1045,
+                1290
+              ],
+              "page": 15,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                211,
+                1307,
+                1047,
+                1381
+              ],
+              "page": 15,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            }
+          ],
+          "file_name": "178.pdf"
+        },
+        {
+          "page": 17,
+          "content": "\n\n What you need:\n\n √separate sheet of paper \n\n üball pen \n\n What you have to do:\n\n 1. Identify the property of gases that is described by the following observations and write the part of kinetic molecular theory that explains the observation. Use a separate sheet of paper for your answers.\n\n\n 2. Below are the postulates of the KMT. Identify the KMT postulate that describes each characteristic of gas particles found in the Table. Write the letter of the correct answer on a separate sheet of paper.\n\n\n Postulates of the Kinetic Molecular Theory (KMT)\n\n a.A gas is composed of large number of particles, either atoms or molecules.They are so small compared to the distance separating them that their own size can be considered negligible. Compared to the total gas volume, the particles occupy negligible volume. A considerable empty space exists between particles.\n\n\n b.Gas particles move randomly in straight line motion and collide with each other and the container frequently. The force of collisions of the gas particles with the walls of the container causes pressure.\n\n C.Collisions of gas molecules are perfectly elastic. This means no energy is lost as friction when molecules collide.\n\n\n d.Gas particles exhibit almost negligible attractions and repulsions for each other. The molecules thus, move freely as far as space will allow.\n\n e.The average kinetic energy of gas molecules is directly proportional to the absolute temperature (Kelvin). At the same temperature, the molecules of all gases will have the same average kinetic energy.\n",
+          "bboxes": [
+            {
+              "range": [
+                138,
+                1115,
+                933,
+                1142
+              ],
+              "page": 17,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                139,
+                1168,
+                310,
+                1189
+              ],
+              "page": 17,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                175,
+                1214,
+                486,
+                1237
+              ],
+              "page": 17,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                176,
+                1246,
+                311,
+                1268
+              ],
+              "page": 17,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                139,
+                1279,
+                369,
+                1299
+              ],
+              "page": 17,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                139,
+                1324,
+                1045,
+                1406
+              ],
+              "page": 17,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                89,
+                681,
+                1044,
+                764
+              ],
+              "page": 18,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                193,
+                804,
+                724,
+                825
+              ],
+              "page": 18,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                199,
+                835,
+                1045,
+                973
+              ],
+              "page": 18,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                201,
+                982,
+                1046,
+                1063
+              ],
+              "page": 18,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                201,
+                1072,
+                1045,
+                1122
+              ],
+              "page": 18,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                201,
+                1130,
+                1045,
+                1181
+              ],
+              "page": 18,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                201,
+                1191,
+                1047,
+                1272
+              ],
+              "page": 18,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            }
+          ],
+          "file_name": "178.pdf"
+        },
+        {
+          "page": 21,
+          "content": "\n\n Great job! You are almost done with this module. Let's summarize what you have learned from the lesson and activities by choosing the correct word inside the parenthesis. Choose and write your answers on a separate sheet of paper.\n\n 1.(Pressure, Volume) is defined as the amount of space and object occupies.\n\n 2.(Gas, Solid) is viewed as collection of widely separated molecules in chaotic and constant motion.\n\n\n 3.(Gases, Solids) have a very high compressibility.\n\n 4.(Solids, Liquids) tend to have a high density.\n\n 5-6Gas particles have (big, little) attraction for one another. Therefore,attractive forces between gas molecules can be (ignored, noticed).\n\n 7-8The distance between the gas particles is (large, small) compared to their size. Therefore, the volume occupied by gas molecules is (big, small)compared to the volume of the gas container.\n\n\n 9.Gas particles move in (straight, zigzag) lines and collide with each other and the container frequently. The force of collisions of the gas particles with the walls of the container causes pressure.\n\n\n 10.The average (kinetic energy, potential energy) of gas molecules is directly proportional to the absolute temperature.\n\n\n 11-12 Collisions among molecules are perfectly (elastic, inelastic), that is,energy may transfer from molecule to molecule as the result of collision,but the total energy of all the molecules in the system (remains constant,varies).\n\n\n 13-15.The frequency of collision is affected by temperature because gas molecules move (faster, slower) at high temperature. On the other hand, they move slowly at (high, low) temperature. The faster the movement of the molecules, the more frequent the collision causing an increase in (pressure, volume).\n",
+          "bboxes": [
+            {
+              "range": [
+                318,
+                682,
+                715,
+                711
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                137,
+                796,
+                1043,
+                877
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                175,
+                925,
+                1046,
+                946
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                174,
+                963,
+                1037,
+                1010
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                174,
+                1027,
+                767,
+                1049
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                174,
+                1065,
+                730,
+                1086
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                175,
+                1103,
+                939,
+                1149
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                175,
+                1166,
+                1045,
+                1240
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                174,
+                1256,
+                1044,
+                1329
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                176,
+                1345,
+                1043,
+                1393
+              ],
+              "page": 21,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                177,
+                143,
+                1045,
+                240
+              ],
+              "page": 22,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            },
+            {
+              "range": [
+                177,
+                258,
+                1045,
+                383
+              ],
+              "page": 22,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/178.pdf"
+            }
+          ],
+          "file_name": "178.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--Science  Quarter 4 - Module 1.3: Kinetic Molecular Theory ": 1,
+        "root--What's In ": 6,
+        "root--What's New ": 1,
+        "root--What Can Gases Do?": 1,
+        "root--Part A.": 1,
+        "root--Part B.": 6,
+        "root--Part C ": 1,
+        "root--Part D ": 1,
+        "root--What is It ": 6,
+        "root--What's More ": 1,
+        "root--Activity 1. Getting to Know Gases ": 1,
+        "root--Activity 2. Better Insight on Kinetic Molecular Theory ": 6,
+        "root--Activity 3. Examining Kinetic Molecular Theory ": 1,
+        "root--What I Have Learned ": 6,
+        "root--What I Can Do ": 1,
+        "root--What's In --States of Matter Properties Table": 1,
+        "root--Activity 1. Getting to Know Gases --Five Illustrated Science and Technology Concepts": 1,
+        "root--Activity 2. Better Insight on Kinetic Molecular Theory --Kinetic Molecular Theory Puzzle Table": 1,
+        "root--Activity 2. Better Insight on Kinetic Molecular Theory --Characteristics of Gas Particles According to KMT": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 372,
+    "benchmark": "MMDA",
+    "question": "What is the number of followers of the accounts with the highest likes among the typical creators in the Douyin liquor industry?",
+    "answer": [
+      "577.6w"
+    ],
+    "MoDora_prediction": {
+      "answer": "577.6w",
+      "retrieved_documents": [
+        {
+          "page": 8,
+          "content": "\n\n 葡萄酒知识专家@醉鹅娘小酒馆\n\n 粉丝量\n\n 361.7w \n\n 获赞量\n\n 2312.9w \n\n 酒水品鉴师，细致、科学的解读红酒知识或文化，“让喝红酒更日常”是其努力的目标\n\n\n 酒水百科全书@安森的话事酒馆\n\n 粉丝量\n\n 577.6w \n\n 获赞量\n\n 7589.7w \n\n 从业20年，专业调酒师。上海国际花式调酒大赛冠军，传播酒的干货知识和家庭调酒秘籍\n\n 数据来源：巨量算数&算数电商研究院，2023年3月\n\n 品质酒水推荐@酒仙网拉飞哥\n\n 粉丝量\n\n 549.5w \n\n 获赞量\n\n 2468.5w \n\n 酒仙网联合创始人，为大家挑选好酒，分享酒文化，以此为基础做好直播带货\n\n\n 品酒故事介绍@徐博士\n\n\n 粉丝量\n\n 264.2w \n\n 获赞量\n\n 3992.0w \n\n 品酒师，爱酒懂酒，酒文化分享者，普及酒类知识和好酒推荐\n\n 花式调酒分享@调酒师--扬扬\n\n 粉丝量\n\n 626.9w \n\n 获赞量\n\n 5963.7w \n\n 花式调酒师，分享调酒的乐趣带粉丝领略酒的文化风情\n\n 酒水兴趣种草\n@老宋的微醺23点\n\n 粉丝量\n\n 609.7w \n\n 获赞量\n\n 4758.6w \n\n 有趣的介绍各类酒水，讲解搭配和制作方法，普及酒水知识",
+          "bboxes": [
+            {
+              "range": [
+                55,
+                745,
+                410,
+                768
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                101,
+                813,
+                228,
+                859
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                75,
+                893,
+                149,
+                911
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                182,
+                885,
+                249,
+                912
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                99,
+                938,
+                149,
+                956
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                177,
+                930,
+                254,
+                957
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                88,
+                989,
+                325,
+                1054
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                101,
+                1098,
+                244,
+                1143
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                78,
+                1177,
+                149,
+                1195
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                182,
+                1170,
+                249,
+                1197
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                100,
+                1222,
+                149,
+                1240
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                177,
+                1214,
+                254,
+                1241
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                87,
+                1273,
+                325,
+                1338
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                60,
+                1364,
+                318,
+                1378
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                407,
+                813,
+                530,
+                859
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                405,
+                893,
+                453,
+                910
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                488,
+                885,
+                553,
+                912
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                405,
+                938,
+                453,
+                956
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                476,
+                930,
+                553,
+                958
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                393,
+                989,
+                630,
+                1054
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                406,
+                1098,
+                515,
+                1143
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                405,
+                1177,
+                453,
+                1194
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                487,
+                1170,
+                553,
+                1197
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                405,
+                1222,
+                453,
+                1240
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                476,
+                1214,
+                553,
+                1241
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                393,
+                1273,
+                630,
+                1314
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                710,
+                813,
+                830,
+                859
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                710,
+                893,
+                758,
+                910
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                793,
+                885,
+                858,
+                912
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                710,
+                938,
+                757,
+                956
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                781,
+                930,
+                858,
+                958
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                698,
+                989,
+                923,
+                1030
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                710,
+                1098,
+                856,
+                1143
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                710,
+                1177,
+                758,
+                1194
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                792,
+                1171,
+                858,
+                1197
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                709,
+                1222,
+                758,
+                1240
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                780,
+                1214,
+                858,
+                1241
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            },
+            {
+              "range": [
+                697,
+                1273,
+                935,
+                1314
+              ],
+              "page": 8,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/187.pdf"
+            }
+          ],
+          "file_name": "187.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--抖音酒水行业典型创作者及内容示例": 6,
+        "root--抖音酒水行业典型创作者及内容示例--Smartphone Displaying a Bar Scene": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 380,
+    "benchmark": "MMDA",
+    "question": "What is the increase in the real estate sector this week mentioned in the document?",
+    "answer": [
+      "1.13%"
+    ],
+    "MoDora_prediction": {
+      "answer": "1.13%",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--新房销售仍待复苏二手房热度高于新房": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 405,
+    "benchmark": "MMDA",
+    "question": "In 2022/1-2024/1, which month has the fastest year-on-year growth in total sales of air conditioners",
+    "answer": [
+      "2024/01"
+    ],
+    "MoDora_prediction": {
+      "answer": "January 2024",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--2 行业重点数据跟踪": 1,
+        "root--2 行业重点数据跟踪--2.1市场及板块行情回顾": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 447,
+    "benchmark": "MMDA",
+    "question": "When was the document received?",
+    "answer": [
+      "October 29, 2001."
+    ],
+    "MoDora_prediction": {
+      "answer": "9 October 2001",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--2. Data and Methods ": 1,
+        "root--3. Results ": 1,
+        "root--4. Discussion ": 1,
+        "root--5. Conclusions ": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 455,
+    "benchmark": "MMDA",
+    "question": "What sections contain schematic diagrams in the document?",
+    "answer": [
+      "Pattern and Work picot bind off"
+    ],
+    "MoDora_prediction": {
+      "answer": "Work picot bind off (Charts A, B, and C).",
+      "retrieved_documents": [],
+      "node_impacts": {}
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 466,
+    "benchmark": "MMDA",
+    "question": "What are the main sections of the document according to their titles?",
+    "answer": [
+      "1.Attitudes Toward K12 Education; 2.Investment in K12 Education; 3.Preference for K12 Tutoring Programs; 4.Preference for K12 Apps; 5.K12 Education User Profile"
+    ],
+    "MoDora_prediction": {
+      "answer": "K12教育态度, K12教育投入, K12培训班偏好, K12教育app偏好, K12教育用户画像",
+      "retrieved_documents": [
+        {
+          "page": 3,
+          "content": "\n\n K12教育态度\n\n分数不再是王道，综合素质和心理健康最受关注\n权威型父母更看重综合素质和学习方法\nK12教育投入\n\n孩子越升学，父母参与得越少，报班也从兴趣转\n向学习辅导\n\nK12培训班偏好\n\n最主要诉求是能够提升学习方法，全面补强的教\n学类培训班最偏好的是一周1-2次，IGUNG 一次2小时左右，15人以\n下的中小规模线下培训班及光大数据\nK12教育app偏好\n\n最受欢迎的是作业答疑类app \n最主要诉求是实效性和趣味性兼具\n\nK12教育用户画像\n\n本科学历的权威型父母最多，且偏好银行理财",
+          "bboxes": [
+            {
+              "range": [
+                61,
+                83,
+                343,
+                159
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/234.pdf"
+            },
+            {
+              "range": [
+                93,
+                288,
+                1118,
+                1484
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/234.pdf"
+            }
+          ],
+          "file_name": "234.pdf"
+        },
+        {
+          "page": 4,
+          "content": "\n\n 1K12教育态度\n\n2K12教育投入\n\n3K12培训班偏好\n\nK12教育app偏好\n\n5K12教育用户画像\n",
+          "bboxes": [
+            {
+              "range": [
+                116,
+                131,
+                336,
+                244
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/234.pdf"
+            },
+            {
+              "range": [
+                115,
+                593,
+                1072,
+                1228
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/234.pdf"
+            }
+          ],
+          "file_name": "234.pdf"
+        },
+        {
+          "page": 5,
+          "content": "",
+          "bboxes": [
+            {
+              "range": [
+                378,
+                674,
+                814,
+                839
+              ],
+              "page": 5,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/234.pdf"
+            }
+          ],
+          "file_name": "234.pdf"
+        },
+        {
+          "page": 11,
+          "content": "",
+          "bboxes": [
+            {
+              "range": [
+                378,
+                674,
+                813,
+                839
+              ],
+              "page": 11,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/234.pdf"
+            }
+          ],
+          "file_name": "234.pdf"
+        },
+        {
+          "page": 16,
+          "content": "",
+          "bboxes": [
+            {
+              "range": [
+                266,
+                674,
+                926,
+                840
+              ],
+              "page": 16,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/234.pdf"
+            }
+          ],
+          "file_name": "234.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--班班想报何时了 K12教育用户群体研究报告": 1,
+        "root--K12教育用户定义": 1,
+        "root--幼儿园到高三基础教育阶段学生的父母": 1,
+        "root--关键发现": 6,
+        "root--目录": 6,
+        "root--CHAPTER 01 K12教育态度": 6,
+        "root--CHAPTER 02 K12教育投入": 6,
+        "root--CHAPTER 03 K12教育培训班偏好": 6,
+        "root--CHAPTER 04 K12教育app偏好": 6,
+        "root--CHAPTER 05 K12教育用户画像": 6,
+        "root--报告说明": 1,
+        "root--关于极光": 1,
+        "root--幼儿园到高三基础教育阶段学生的父母--男女样本量相当": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 518,
+    "benchmark": "MMDA",
+    "question": "For what purpose is establishing context indispensable?",
+    "answer": [
+      "To define norms, standards, or thresholds for sustainability performance and measure, manage, and report sustainability activities effectively."
+    ],
+    "MoDora_prediction": {
+      "answer": "Measuring, managing, and reporting sustainability performance.",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n In corporate sustainability management, context - or sustainability context, as the Global Reporting Initiative calls it - refers to the combination of circumstances that determines what the norms, standards or thresholds for sustainability performance should be when attempting to judge whether or not an organization's activities are sustainable.\n\n\n The factors involved in determining context include: (a) who an organization's stakeholders are,(b) what its impacts on related vital capitals are or ought to be, (c) what the carrying capacities of the capitals are, and (d) who else, if anyone, is responsible for maintaining the capital resources involved. All of this gives rise to normative impacts, or sustainability standards of performance,against which actual impacts can be measured, managed and reported. Proportionate allocations of available resources and/or duties to preserve, create and maintain them can then be assigned to individual organizations.\n\n\n The purpose of establishing context, then, is to make it possible to define norms, standards or thresholds for what an organization's impacts on vital capital resources must be in order for its activities to be sustainable. Actual impacts can then be measured against such benchmarks.Establishing context is therefore an indispensable requirement for measuring, managing and reporting sustainability performance!\n",
+          "bboxes": [
+            {
+              "range": [
+                374,
+                60,
+                1064,
+                204
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/260.pdf"
+            },
+            {
+              "range": [
+                80,
+                251,
+                1357,
+                399
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/260.pdf"
+            },
+            {
+              "range": [
+                81,
+                443,
+                1357,
+                707
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/260.pdf"
+            },
+            {
+              "range": [
+                81,
+                749,
+                1356,
+                937
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/260.pdf"
+            }
+          ],
+          "file_name": "260.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--SustainabilityContext  What is It?": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 541,
+    "benchmark": "MMDA",
+    "question": "What does the y-axis of the Pattern Schematic represent?",
+    "answer": [
+      "Number of rows."
+    ],
+    "MoDora_prediction": {
+      "answer": "Rows (row numbers).",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--Pattern ": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 594,
+    "benchmark": "MMDA",
+    "question": "What is depicted in Figure 3?",
+    "answer": [
+      "(a) TEM and (b) HRTEM images of the La2Ti2O7:Eu3+ (Eu:La = 0.05:0.95) nanoparticles calcined at 800°C for 3 h (The in-set in (a) is the corresponding selected area electron diffraction (SAED) pattern)."
+    ],
+    "MoDora_prediction": {
+      "answer": "TEM and HRTEM images of (La0.95Eu0.05)2Ti2O7 nanoparticles calcined at 800 °C for 3 h, with an inset SAED pattern.",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--3. Results and discussions ": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 616,
+    "benchmark": "MMDA",
+    "question": "What color is used for the section titles in the document?",
+    "answer": [
+      "Black"
+    ],
+    "MoDora_prediction": {
+      "answer": "Black",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n Clinical Study ",
+          "bboxes": [
+            {
+              "range": [
+                97,
+                267,
+                298,
+                301
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/312.pdf"
+            }
+          ],
+          "file_name": "312.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--Default Title": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 628,
+    "benchmark": "MMDA",
+    "question": "What are the emails of the authors of this article?",
+    "answer": [
+      "tanghaiqing@tfzq.com; wangyihong@tfzq.com"
+    ],
+    "MoDora_prediction": {
+      "answer": "tanghaiqing@tfzq.com; wangyihong@tfzq.com",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--亨通光电（600487）": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 663,
+    "benchmark": "MMDA",
+    "question": "What is the color of the title under figure 4?",
+    "answer": [
+      "Black"
+    ],
+    "MoDora_prediction": {
+      "answer": "Black",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--Physical Activity Recognition Utilizing the Built-In  Kinematic Sensors of a Smartphone ": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 704,
+    "benchmark": "MMDA",
+    "question": "What are the key points typically included in the “Risk Warning” section?",
+    "answer": [
+      "1. Livestock and Poultry Volatility Risk; 2. Impact of Extreme Weather Events; 3. Impact of Animal Diseases."
+    ],
+    "MoDora_prediction": {
+      "answer": "- Livestock and poultry price volatility\n- Extreme weather impacts\n- Animal disease outbreaks",
+      "retrieved_documents": [],
+      "node_impacts": {}
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 766,
+    "benchmark": "MMDA",
+    "question": "What is the purpose of the paper mentioned in the abstract?",
+    "answer": [
+      "The paper describes the application of a Takagi-Sugeno fuzzy fault-tolerant control scheme to a non-linear system."
+    ],
+    "MoDora_prediction": {
+      "answer": "To propose and demonstrate an LMI-based Takagi–Sugeno fuzzy fault‑tolerant control and FDI scheme for nonlinear systems, validated on an induction motor application.",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n C J Lopez-Toribio, R J Patton \n\n Control & Intelligent Systems Engineering Research Group School of Engineering,The University of Hull, Cottingham Road, Hull HU6 7RX, UK e-mail:{r.j.patton,c.j.lopez}@eng.hull.ac.uk \n\n Abstract: This paper describes the application of a new fault-tolerant control scheme for non-linear systems. The approach presented takes into account the stability and design of non-linear fuzzy inference systems based on Takagi-Sugeno (T-S) fuzzy models. The paper derives the necessary conditions for the assignability of eigenvalues to a region in the s-plane and the necessary conditions to guarantee the stability of adaptive fuzzy models for both diagnostic T-S fuzzy observers and T-S fuzzy controllers are derived. The problem is solved through using Linear Matrix Inequalities (LMI). Finally, the paper demonstrates the feasibility of this system architecture through an example, which is an application to a fault-tolerant design in detecting and isolating intermittent faults in a 3-phase induction system using digital signal processing in a hardware test-rig.\n\n\n Keywords: Fault-tolerant control, multiple-model approach, linear matrix inequalities, induction motor control, parameter estimation.\n",
+          "bboxes": [
+            {
+              "range": [
+                319,
+                231,
+                911,
+                295
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                488,
+                339,
+                742,
+                358
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                373,
+                384,
+                860,
+                473
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                168,
+                536,
+                592,
+                864
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                167,
+                886,
+                592,
+                944
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            }
+          ],
+          "file_name": "387.pdf"
+        },
+        {
+          "page": 4,
+          "content": "\n\n The performance of the proposed observer is assessed using Matlab/Simulink simulation. The FDI subsystem forms part of a fault-tolerant control system used to regulate the torque and flux in the induction motor.\n\n The sensor fault-tolerant control scheme is run in real time using measurements taken from a hardware test-ring. The test-rig consists of a three phase AC induction motor driving a DC motor as load. The 3-phase voltages are supplied from a 100 KHz PWM-inverter. The induction motor selected is a 0.2 KW 3 phase 4 pole machine \n\n The overall system, shown in Fig. 4, consists of a PWM inverter, which provides the necessary power to drive the machine. Since the torque and flux cannot be measured they are estimated using a bilinear observer and fed to a TS Fuzzy Controller. The following faults due to gain and bias changes, noise and interference pick up, signal processing effects and disconnections due to continuous and intermittent loss of measurement loss of can occur in the system. A FDI/Reconfiguration block, based on fuzzy observers, performs the detection and isolation of faults and takes the necessary action to maintain the controller performance. The T-S Fuzzy representation of the induction motor observer is a class of non-linear systems.The dynamics of the induction motor observer are described by T-S fuzzy rules in Eq. 4.1. The induction motor can be modelled by the following bilinear differential equation:\n\n \\begin{aligned}\\dot{x}&=A(\\omega)x+Bu=Ax+N\\omega x+Bu\\\\\\dot{y}&=Cx\\\\ where\\\\x&=[I_{ds}I_{qs}I_{dr}I_{qr}]^T;y=[I_{ds}I_{dr}]^T;\\\\u&=[V_{ds}V_{qs}V_{dr}V_{qr}]^T\\end{aligned}\n\n where I and V denote the current and voltage respectively.The speed ω in Eq. 4.1 is referred to as the bilinear input.\n\n (3.3)\n\n (3.4)\n\n (4.1)",
+          "bboxes": [
+            {
+              "range": [
+                628,
+                582,
+                1040,
+                625
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                619,
+                633,
+                1050,
+                713
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                619,
+                717,
+                1049,
+                838
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                618,
+                851,
+                1049,
+                1202
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                617,
+                1225,
+                893,
+                1343
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                620,
+                1368,
+                1049,
+                1408
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                532,
+                558,
+                567,
+                577
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                532,
+                681,
+                567,
+                699
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            },
+            {
+              "range": [
+                1009,
+                1232,
+                1044,
+                1251
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/387.pdf"
+            }
+          ],
+          "file_name": "387.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--Takagi-Sugeno fuzzy fault-tolerant control for  a non-linear system ": 6,
+        "root--1.Introduction ": 6,
+        "root--4. Fault tolerant control of the induction motor in a rail way traction system: application ": 6,
+        "root--4. Fault tolerant control of the induction motor in a rail way traction system: application --4.3 Results from test rig ": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 774,
+    "benchmark": "MMDA",
+    "question": "What is the heading at the top of page 3?",
+    "answer": [
+      "1.RMB Credit: Total Volume Grows Less Year-on-Year, Structure Still Awaiting Improvement"
+    ],
+    "MoDora_prediction": {
+      "answer": "1、人民币信贷：总量同比少增，结构仍待修复",
+      "retrieved_documents": [
+        {
+          "page": 3,
+          "content": "\n\n 11月信贷总量增加10900亿元，同比少增1200亿元，总量低于季节性。同2022年同期相比，居民小幅多增，企业同比少增，非银贷款少增，结构反映出当前内需仍偏弱的特征。\n\n\n 居民信贷小幅改善，居民信心有所修复，但地产仍偏弱。11月居民贷款同比多增298亿元，比近五年同期均值少增3253亿元，同比多增主要是基数原因。居民中长贷同比多增228亿元：居民短贷小幅改善，多增69亿元（10月为同比多减）。11月商品房销售面积增速较10月再度下探，房地产销售持续磨底，居民按揭贷款增长较2022年有所改善，但仍处于季节性低位。总体来看，地产销售数据仍弱，居民贷款出现边际小幅回暖，可能的原因在于基本面稳中向好，居民信心较2023年同期有所改善；同时或与金融机构平滑信贷波动有关。\n\n\n 企业信贷结构待修复，企业短贷+票据多增。企业贷款新增8221亿元，同比少增616亿元。企业中长贷同比少增2907亿元，在高基数下有所回落：企业短贷表现亮眼，同比多增1946亿元，显著高于季节性，或反映企业资金周转、短期借贷需求增加；表内票据融资同比多增543亿元。总体看，短贷和票据增加，中长贷下滑，企业融资结构仍有改善空间。11月制造业PMI改善放缓，增发国债基建项目还未形成实物工作量，中长期贷款需求改善偏慢。但11月企业短贷+票据融资占比显著提高，指向信贷逆周期调控力度提升，且企业短贷提升幅度更大，经营活跃度趋于回升。\n\n\n 11月人民币信贷结构体现了政策的平滑信贷意图。回顾历史数据，2023年信贷的月度波动更加严重，“开门红”力度较大而缺乏持续性。《2023年第三季度中国货币政策执行报告》提出“适度平滑信贷波动”，根据往常惯例，11、12月为信贷小月，金融机构会为来年开门红积攒部分项目。而央行对信贷新规律的调整或意味着11-12月的信贷投放将会维持一定力度。这或许是“逆周期指标”更强的原因，尽管总量并未显著反映，但结构上可以看出一定政策维稳的意图。但同时我们也看到，企业中长贷+居民贷款的顺周期指标也在回升过程中，与经济的稳步修复相呼应。\n\n 数据来源：Wind、开源证券研究所\n\n 数据来源：Wind、开源证券研究所\n\n 数据来源：Wind、开源证券研究所\n\n 数据来源：Wind、开源证券研究所",
+          "bboxes": [
+            {
+              "range": [
+                348,
+                163,
+                934,
+                190
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/391.pdf"
+            },
+            {
+              "range": [
+                347,
+                213,
+                1116,
+                296
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/391.pdf"
+            },
+            {
+              "range": [
+                347,
+                322,
+                1116,
+                532
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/391.pdf"
+            },
+            {
+              "range": [
+                347,
+                557,
+                1117,
+                797
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/391.pdf"
+            }
+          ],
+          "file_name": "391.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--1、人民币信贷：总量同比少增，结构仍待修复": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 800,
+    "benchmark": "MMDA",
+    "question": "What are the keywords listed in the article?",
+    "answer": [
+      "Rockburst, Lateral stress, Localized damage, Rotation, V-shaped"
+    ],
+    "MoDora_prediction": {
+      "answer": "Rockburst, Lateral stress, Localized damage, Rotation, V-shaped",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n Article history:Received 9 January 2020Received in revised form 1 April 2020Accepted 11 May 2020Available online 18 June 2020\n\n Keywords:\nRockburst \nLateral stress \nLocalized damage \nRotation \nV-shaped \n",
+          "bboxes": [
+            {
+              "range": [
+                80,
+                749,
+                274,
+                764
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/404.pdf"
+            },
+            {
+              "range": [
+                80,
+                790,
+                316,
+                871
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/404.pdf"
+            },
+            {
+              "range": [
+                80,
+                898,
+                192,
+                998
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/404.pdf"
+            }
+          ],
+          "file_name": "404.pdf"
+        },
+        {
+          "page": 4,
+          "content": "The chart consists of two parts: (a) a schematic diagram of biaxial compression showing a cube under stress with σv (vertical stress), σh (horizontal stress), and σ0 (initial stress) indicated, and arrows showing the direction of applied forces; (b) a loading path diagram plotting stress (in MPa) on the vertical axis against time (in seconds) on the horizontal axis. The loading path is divided into two stages: the \"Preset stress loading stage\" and the \"Vertical stress loading stage,\" with σv and σh marked as key stress points. The diagram illustrates how stress is applied over time during a biaxial compression test.",
+          "bboxes": [
+            {
+              "range": [
+                190,
+                138,
+                982,
+                554
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/404.pdf"
+            },
+            {
+              "range": [
+                222,
+                570,
+                940,
+                586
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/404.pdf"
+            }
+          ],
+          "file_name": "404.pdf"
+        },
+        {
+          "page": 3,
+          "content": "The image displays three panels (a, b, c) illustrating the experimental setup for a specimen. Panel (a) shows a gray cubic specimen with labeled dimensions: thickness (100mm), width (100mm), and height (100mm), along with a central rectangular cutout. Panel (b) presents a close-up of the specimen with AE sensors attached, marked as \"AE sensors,\" and an \"Expanded box\" indicating a specific area of interest. Panel (c) depicts the layout of strain gauges on the specimen surface, with red lines connecting various points, and labels such as \"Three-dimensional stress state,\" \"AE Transducers,\" and \"Strain gauges.\" The right side of panel (c) includes a schematic diagram with zones labeled I, II, III, and IV, indicating different measurement or analysis regions. The overall image is labeled as \"Fig. 1. Experimental specimen: (a) specimen size; (b) layout for AE transducers; (c) layout for strain gauges.\"",
+          "bboxes": [
+            {
+              "range": [
+                173,
+                132,
+                1028,
+                723
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/404.pdf"
+            },
+            {
+              "range": [
+                268,
+                741,
+                935,
+                757
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/404.pdf"
+            }
+          ],
+          "file_name": "404.pdf"
+        },
+        {
+          "page": 12,
+          "content": "The image is a schematic diagram labeled as \"Fig. 18,\" illustrating the process of rock fracture near a free surface, divided into four stages labeled (a) through (d). In (a), it shows crack initiation and propagation under applied stresses σθ (tangential) and σr (radial). In (b), it depicts crack coalescence. In (c), it illustrates the formation of a spalling failure. In (d), it shows the final stage with a \"chipped work\" and an \"enlarged\" crack. The diagram uses arrows to indicate stress directions and labels to denote different components and stages of the fracture process. The overall layout is horizontal, with each stage presented in a separate panel.",
+          "bboxes": [
+            {
+              "range": [
+                188,
+                135,
+                982,
+                408
+              ],
+              "page": 12,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/404.pdf"
+            },
+            {
+              "range": [
+                59,
+                425,
+                1103,
+                458
+              ],
+              "page": 12,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/404.pdf"
+            }
+          ],
+          "file_name": "404.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--Default Title": 1,
+        "root--Experimental investigation on rockburst process and failure  characteristics in trapezoidal tunnel under different lateral stresses ": 6,
+        "root--ARTICLEINFO ": 6,
+        "root--ABSTRACT ": 1,
+        "root--1.Introduction ": 6,
+        "root--2. Experimental apparatus and scheme ": 1,
+        "root--3. Experimental results and analysis ": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses ": 1,
+        "root--5. Conclusions ": 1,
+        "root--2. Experimental apparatus and scheme --2.1. Specimen description and preparation ": 1,
+        "root--2. Experimental apparatus and scheme --2.2. Experimental apparatus and procedure ": 1,
+        "root--3. Experimental results and analysis --3.1. Analysis of rockburst tendency of sandstone ": 1,
+        "root--3. Experimental results and analysis --3.2. Effect of lateral stress on structure model strength and AE evolution \n": 1,
+        "root--3. Experimental results and analysis --3.3. Strain distribution around the opening under different lateral stresses \n": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.1. Fracture modes under different lateral stresses ": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.2. Characteristics analysis during the rockburst process ": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.3. Failure characteristics of sidewall ": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.4. Discussion of engineering guidance ": 1,
+        "root--2. Experimental apparatus and scheme --2.2. Experimental apparatus and procedure --Fig. 1.Experimental specimen: (a) specimen size; (b) layout for AE transducers; (c) layout for strain gauges.": 6,
+        "root--2. Experimental apparatus and scheme --2.2. Experimental apparatus and procedure --Fig. 2. Experimental system containing loading apparatus, acoustic emission system, deformation acquisition equipment, and integrated observation system.": 6,
+        "root--2. Experimental apparatus and scheme --2.2. Experimental apparatus and procedure --Fig.3. Schematic illustrations of loading path: (a) schematic diagram of biaxial compression;(b) loading stress path.": 6,
+        "root--3. Experimental results and analysis --3.2. Effect of lateral stress on structure model strength and AE evolution \n--Fig. 4. Stress-time curves associated with AE energy and accumulated AE energy under different lateral stresses: (a)$\\sigma_{\\mathrm{h}}=0MPa;(\\mathrm{b})\\sigma_{\\mathrm{h}}=10MPa;(\\mathrm{c})\\sigma_{\\mathrm{h}}=20MPa$ ": 1,
+        "root--3. Experimental results and analysis --3.2. Effect of lateral stress on structure model strength and AE evolution \n--Fig. 5. Time history curyes of the cumulative AE energy under different lateral stresses.\n": 1,
+        "root--3. Experimental results and analysis --3.3. Strain distribution around the opening under different lateral stresses \n--Fig.6. Tangential strain response to biaxial compression in the locations of roof, sidewall and floor under different lateral stresses: (a $\\sigma_{\\mathrm{h}}=0~\\mathrm{M P a};~(\\mathrm{b})~\\sigma_{\\mathrm{h}}=10~\\mathrm{M P a};$ (c)$\\sigma_{\\mathrm{h}}=20~\\mathrm{M P a}$ 1\n": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.1. Fracture modes under different lateral stresses --Fig. 8. Principal strains and direction in two typical locations under different lateral stresses: (a)$\\sigma_{\\mathrm{h}}=0~\\mathrm{M P a};$ :(b)$\\sigma_{\\mathrm{h}}=10~\\mathrm{M P a}$ ;(c)$\\sigma_{\\mathrm{h}}=20~\\mathrm{M P a}$ .C10 and C11 denote the locations of the upper corner and lower corner, respectively.\n": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.2. Characteristics analysis during the rockburst process --Fig. 9. Compressive strains measured at the corners under different lateral stresses: (a)$\\sigma_{\\mathrm{h}}=0~\\mathrm{M P a};$ :(b)$\\sigma_{\\mathrm{h}}=10~\\mathrm{M P a};~(\\mathrm{c})~\\sigma_{\\mathrm{h}}=20~\\mathrm{M P a}$ ": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.3. Failure characteristics of sidewall --Fig. 11. Scatter plots of AF and RA under different lateral stresses: (a)$\\sigma_{\\mathrm{h}}=0~\\mathrm{M P a};$ (b)$\\sigma_{\\mathrm{h}}=10~\\mathrm{M P a};~(\\mathrm{c})~\\sigma_{\\mathrm{h}}=20~\\mathrm{M P a}$ ": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.3. Failure characteristics of sidewall --Fig.14.V-shaped failure bands after rockburst under different lateral stresses: (a)$\\sigma_{\\mathrm{h}}=0~\\mathrm{M P a};$ (b)$\\sigma_{\\mathrm{h}}=10~\\mathrm{M P a};$ ;($c)\\sigma_{\\mathrm{h}}=20$ Mpa; (d) rockburst in tunnel at a gold mine site [41].\n": 1,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.3. Failure characteristics of sidewall --Fig.1.Schmaticlluttionofrockacturear tefeuaceofopning:crackiiionand propaaion;()ackcoalecnce;)spllingfalure;d)ormtionof V-shaped notch.$\\sigma_{0}$ and $\\sigma_{\\mathrm{r}}$ are tangential stress and radial stress,respectively.\n": 6,
+        "root--4. Analysis of rockburst process under different lateral stresses --4.3. Failure characteristics of sidewall --Fig. 18. Spalling failure in the field tunnels and experiment: (a) and (b) thin slabs formed by spalling failure in the test tunnel of Jinping I hydropower station [46];(c)surface spalling failure at the interface between the stress-fractured and undisturbed rock mass [9]; (d) spalling failure in the experiment.": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 810,
+    "benchmark": "MMDA",
+    "question": "According to the document, what is the significance of adding gadolinium (Gd) in the ceramic matrix as described in the microcalorimetry results?",
+    "answer": [
+      "Gadolinium helps block the movement of grain boundaries, reducing the activation energy for coarsening and preventing grain growth beyond 50 nm, consistent with predictions."
+    ],
+    "MoDora_prediction": {
+      "answer": "It segregates to grain boundaries, reducing heat release during grain growth, raising activation energy, blocking boundary motion, and halting coarsening (growth stops at ~50 nm).",
+      "retrieved_documents": [],
+      "node_impacts": {}
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 841,
+    "benchmark": "MMDA",
+    "question": "What is the subject of the x-axis of Table 1",
+    "answer": [
+      "Time"
+    ],
+    "MoDora_prediction": {
+      "answer": "Time by month (Jan 2020 to Jan 2023)",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--强于大市（维持）行情走势图\n": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 878,
+    "benchmark": "MMDA",
+    "question": "What does Figure 2(a) depict?",
+    "answer": [
+      "Figure 2(a) depicts the upconversion spectra from a \\(\\mathrm{Yb}^{3+}/\\mathrm{Er}^{3+}\\) co-doped \\(\\mathrm{NaYF}_{4}\\) sample, showing strong green emissions at 540 nm and 525 nm, red emission at 650 nm, and weaker emissions at 407 nm and 800 nm under excitation by a 980 nm laser diode."
+    ],
+    "MoDora_prediction": {
+      "answer": "Room-temperature upconversion spectrum of Yb³⁺/Er³⁺ co-doped NaYF₄ nanorods under 980 nm excitation, showing strong green (∼525, 540 nm) and red (∼650 nm) emissions.",
+      "retrieved_documents": [
+        {
+          "page": 2,
+          "content": "\n\n Fig. 1a shows the typical TEM image of the $\\mathrm{{L n}^{3+}\\mathrm{{-}\\mathrm{{d o p e d}}}}$ NaYF4nanorods, revealing a morphology with a diameter of about 55 nm and length of about 300 nm. Fig, 1b shows the electron diffraction pattern (SAeD) of single nanorod demonstrating unambiguously the single-crystalline nature. Fig. 1c is the high-resolution TEM (HRTEM) image of a nanorod showing lattice fringes with the d-spacing of 3.05 and 2.82 Å. The SAED pattern and HRTEM image can be readily indexed to the hexagonal phase of $\\mathrm{N a Y F}_{4}.$ . The results are well consistent with the XRD results shown in Fig. 1d,in which the diffraction peaks are well indexed to $\\beta–NaYF_4$ :(JCPDS 16-0334). Further energy-dispersive X-ray analysis (EDS) confirms that the main elemental components are Na, Y, F and Yb (not shownhere),being consistent withtheir real elemental components.\n\n\n Our investigation chasing RGB emission and white light generation commences with the study of UC emission in binary dopant systems. Fig. 2a depicts the typical UC spectra acquired from the $\\mathrm{\\boldmath~\\overset{\\circ}{Y b}}^{3+}/\\mathrm{\\boldmath{E r}}^{3+}$ (25:0.2 mol%) co-doped sample under excitation by a 980 nm LD. The spectra show strong green emission centered at 540 nm and 525 nm and red UC one at 650 nm as well as weak violet and infrared emissions at 407 nm and 800 nm. They can be attributed tothe $^2\\mathrm{H}_{11/2}/^{4}\\mathrm{S}_{3/2}\\rightarrow{}^{4}\\mathrm{I}_{15/2},\\;^{4}\\mathrm{F}_{9/2}\\rightarrow{}^{4}\\mathrm{I}_{15/2},\\;^{2}\\mathrm{H}_{9/2}\\rightarrow{}^{4}\\mathrm{I}_{15/2}$ and $^4\\mathrm{I}_{9/2}\\rightarrow{}^{4}\\mathrm{I}_{15/2}$ transitions of $\\mathbb{E}\\mathrm{r}^{3\\overset{\\cdot}{+}}.$ ,respectively. Fig. 2b shows the typical UC spectra from the $\\mathrm{Y b^{3+}/H o^{3+}}(25:0.2\\mathrm{m o l}\\%)$ )co-doped sample under excitation by a 980 nm LD. Strong green and red UC \n\n emission bands centered at 540 nm and 650 nm are shown, together with weak blue and near-infrared emission around 485 nm and 750 nm. These bands can be respectively assigned to the ${}^{5}\\mathrm{F}_{5}\\rightarrow{}^{5}\\mathrm{I}_{8},~{}^{4}\\mathrm{S}_{2}/{}^{5}\\mathrm{F}_{4}\\rightarrow{}^{5}\\mathrm{I}_{8},~{}^{5}\\mathrm{F}_{3}\\rightarrow{}^{5}\\mathrm{I}_{8}$ and $^5\\mathrm{I}_{4}^{^*}\\rightarrow{}^{5}\\mathrm{I}_{8}$ transitions of $\\mathrm{H o}^{3+}$ ions. The populations of the $\\operatorname{\\mathsf{E r}}^{3+}\\operatorname{\\mathsf{o r}}\\operatorname{\\mathsf{H o}}^{3+}$ excited levels to emit the aforementioned UC bands can be readily achieved through successive ET processes from $\\mathsf{Y b}^{3+}$ to $\\mathtt{E r}^{3+}$ ions or $\\mathsf{H o}^{3+}\\left[1\\right]$ ,as demonstrated in Fig. 3. Fig. 2c shows the typical UC spectra of the $\\mathsf{Y}\\mathsf{b}^{3+}/$ $\\mathrm{T m}^{3+}$ (25:0.25 mol%) co-doped sample. The intense blue emission bands at 451 and 478 nm correspond to the ${}^{1}D_{2}\\rightarrow{}^{3}F_{4}$ and ${}^{1}G_{4}\\rightarrow{}^{3}H_{6}$ transitions of $\\mathrm{T m}^{3+}$ ions, respectively. The populations of the $^1D_{2}$ and $^1G_{4}$ levels are accomplished respectively by threestep sequential ETs from the excited $\\mathsf{Y b}^{3+}\\mathsf{t o}\\mathrm{T}\\dot{\\mathrm{m}}^{3+}$ and cross relaxation(CR) of $^3F_{2}+{}^{3}H_{4}\\rightarrow{}^{3}H_{6}+{}^{1}D_{2}$ between the $\\mathrm{T m}^{3+}$ ions (CR-I),which is a four-photon UC process [8]. Besides blue emissions,red emissions at 650 and 696 nm assigned to ${}^{3}F_{2}/{}^{3}F_{3}\\rightarrow{}^{3}H_{6}$ or ${}^{1}G_{4}\\rightarrow{}^{3}H_{4}/{}^{3}H_{5}$ ;transitions of $\\mathrm{T m}^{3+}$ ions which intensely depend on pump-power densities in the following, and intense near-infrared emission at 800 nm corresponding to ${}^{3}H_{4}\\rightarrow{}^{3}H_{6}$ transitions of $\\mathrm{T m}^{3+}$ ions are also recorded in this sample. It is worth mentioning that the RGB light color is readily visible to the naked eyes, even for pump-power as low as 10 mW. This is indicative of the high UC effi ciency of the co-doped $\\mathrm{N a Y F}_{4}$ nanorods.\n\n\n Based on the generation of RGB light color from the different codoped samples, it is possible to produce white emission by appropriate triple doping of $\\mathsf{Y b}^{3+},\\mathsf{T}\\bar{\\mathsf{m}}^{3+}$ ,and $\\mathrm{\\tt   Er}^{3+}\\mathrm{\\tt   or}~\\mathrm{\\tt   Ho}^{3+}$ of the NaYF4nanorods. Fig. 2d displays the UC spectra of YHT $(\\mathsf{Y}\\mathsf{b}^{3+}\\mathrm{{:}\\mathrm{{-}}}$ $\\mathrm{Ho^{3+}:Tm^{3+}=25:0.75:1}$ and YET $\\mathrm{(Yb^{3+}:Er^{3+}:Tm^{3+}=25:0.25:1)}$ triply-doped NaYF4 nanorods showing bright white emission (see the inset photographs) under excitation by a 980 nm LD. Compared to the spectra of the binary dopant systems, it is easy to assign the origin of all the emission bands in the triple-doped $\\mathtt{N a Y F}_{4}$ nanorods. The blue emission around 475 and 450 nm and the red emission at 696 nm can be assigned to the intra-4f electronic transitions of $\\mathrm{T m}^{3+}$ ions, and the green emission around 540 nm to the $\\mathrm{H o}^{3+}$ ions or $\\mathtt{E r}^{3+}$ ions, For the red emission at 650 nm, it should include the contributions from both $\\mathrm{T m}^{3+}$ and $\\mathrm{H o}^{3+}$ ions or $\\mathtt{E r}^{3+}$ according to the change of fine spectral shape in the red band.\n\n Fig. 4a shows the UC spectra and corresponding CIE chromaticity diagram of 1931 together with the calculated color coordinates of the YET-triply-doped $\\mathrm{N a Y F}_{4}$ nanorods under excitation by a 980 nm LD with various outputs. The calculated color coordinates range from (0.396, 0.395)to (0.264, 0.281), which correspond to the laser pump-power densities from 1.75$\\mathsf{W}/\\mathsf{c m}^{2}$ to 16.13 W/cm2. The arrow shown in the inset indicates the changing trends of the color coordinates with increasing pump-power densities.These color coordinates fall exactly within the white region of 1931 CIE diagram. In particular, the color coordinates at a pumppower density of 5.34$\\mathsf{W}/\\mathsf{c m}^{2}$ is very close to the standard color coordinates (0.33, 0.33), suggesting their potential use in standard white light sources. At high pump-power densities, the color coordinates shift towards the blue region due to the fact that the intensity of the blue emission increases faster than the green and red UC ones. These results indicate that the simulated white color output can be modulated by adjusting the pump-power densities of the LD. Fig. 4b shows the UC spectra and corresponding CIE chromaticity diagram of 1931 together with the calculated color coordinates of the YHT-triply-doped NaYF4 nanorods under excitation by a 980 nm LD with various outputs ranging from 1.78 W/cm2 to 16.54W/cm2. Similar dependence of the color coordinates on pump-power densities can be observed. However, compared to the results obtained from the YET-triply-doped system, there are two obvious differences. The first is that the range of the calculated color coordinates is much narrower than that in the former under the same pump-power densities. The second one is that the pumppower density at which the calculated color coordinates are very \n\n close to the standard color ones is 11.05 W/cm is higher than that in the YET-triply-doped system. The results imply that the response scope to the pump-power densities for white emission from the YHT-triply-doped system is much broader than that from \n\n the YET-triply-doped system and the simulated white color output can be tuned even precisely. Therefore, promising applications would be expected for the white emission of the YHT-triply-doped NaYF4 nanostructures. Furthermore, our results suggest a new \n\n strategy to fine-tune the UC emission, different from that by precisely controlling the combinations of $\\mathtt{L n}^{3+}$ doping kinds and concentration [14] or by changing the size of $\\mathrm{N a Y F}_{4}$ nanocrystals [31].\n\n To further clarify the UC mechanism and dependence of the calculated color coordinates on the pump-power densities, the power dependent UC behaviors of the fi ve visible emission bands are systematically investigated. Fig. 5a shows the log-log plot of the Uc emission intensity versus pump-power densities for the YHT-triply-doped $\\mathrm{N a Y F_{4}}$ nanorods. The slopes of the linear fits are 3.11,$2.14,$ ,1.53,1.48, and 1.34 for the five observed UC bands under low pump-power densities. The results indicate that two pump photons are necessary to produce the UC emission bands centered at 650,540 and 696 nm, while three and four photons are needed to produce the blue UC emission bands at 475 and 450 nm. They are consistent with previous reports concerning cubic $\\mathrm{N a Y F}_{4},\\mathrm{Y}_{2}\\mathrm{O}_{3}$ ！and $\\mathtt{B a Y F}_{5}$ nanocrystals [10,14,32]. Furthermore, the slopes of the blue and green UC bands as well as red emission band at 650 nm tend to decrease. This saturation effect can be attributed to the two factors [33-35]. The first one is saturation of $\\mathsf{^{\\prime}Y b}^{3+}$ absorption at high pump-power and the second may be related to the saturation of the excited states of $\\mathrm{T m}^{3+}(^{3}\\mathrm{F}_{4}),\\mathrm{H o}^{3+}(^{5}\\mathrm{I}_{6})$ ,and $\\mathrm{H o}^{3+}(^{5}\\mathrm{I}_{7})$ due to the efficient ET processes from $\\mathsf{Y b}^{3+}\\mathsf{t o}\\mathrm{T m}^{3+}$ or $\\mathrm{H o}^{3+}$ ions [33,34].However, the slope of the red emission band at 696 nm changes abnormally. For the abnormal change, we consider that it would originate from that at the low pump-power densities, it comes mainly from the ${}^{3}F_{3}\\rightarrow{}^{3}H_{6}$ transitions, which is a two-phonon process, but at high pump-power densities it does from the $^1G_{4}\\rightarrow{}^{3}H_{5}$ j transition of the $\\mathrm{T m}^{3+}$ ,which is a three-phonon process. Fig. 5b shows the log-log plot of the UC emission intensity versus the pump-power obtained from the YET-triply-doped $\\mathrm{N a Y F}_{4}$ nanorods.Compared with the results in the YHT-triply-doped $\\mathrm{N a Y F}_{4}$ nanorods, saturation-effect-induced decrease of slope yaluesfor blue and green emissions, and high pump-power-induced transition from $\\widetilde{^3F_{2}}\\rightarrow{^3H_{6}}\\mathrm{~\\sf{t o}~}^{1}\\widetilde{G_{4}}\\rightarrow{^3H_{5}}$ to emit 696 nm photon also exist.Here, we specifically focus on the photon number for blue emission at low pump-power densities. The slopes of 1.89 and 2.66 indicate that the two and three pump-photon processes are necessary to produce the UC emissions at 475 and 450 nm, which is inconsistent with the results in the YHT-triply-doped systems. The results imply that the pump condition for the excited states of $^3H_{4}$ being saturated can be realized more readily in the YET-triply-doped systems. Considering that the ratio of $\\mathsf{Y}\\widetilde{\\mathsf{b}}^{3+}$ and $\\mathrm{T m}^{3+}$ are same imply\n\n ing that the ET rate between $\\mathsf{Y b}^{3+}$ and $\\mathrm{T m}^{3+}$ would be equal in both systems, we suggest that the CR between $\\mathtt{E r}^{3+}$ and $\\mathrm{T m}^{3\\dot{+}}$ play a key role.\n\n\n There are many resonant CR processes for the $\\mathrm{T m}^{3+}$ and $\\mathtt{E r}^{3+}$ ions. Previously, Chen et al. [9] found that by controlling the CR processes between the $\\mathrm{T m}^{3+}$ and the $\\mathtt{E r}^{3+}$ ions, the red UC emission of $\\mathtt{E r}^{3+}$ could be enhanced while blue UC emission of $\\mathrm{T m}^{3+}$ from transparent glass ceramics embedded with YET triply-doped $\\mathtt{Y F}_{3}$ nanocrystals was reduced. It is believed that the nearly resonant CR process of $\\mathrm{T m}^{3+}{:}^{3}H_{6}+\\mathrm{E r}^{3+}{:}^{2}I_{9/2}\\rightarrow\\mathrm{T m}^{3+}{:}^{3}H_{4}+\\mathrm{E r}^{3+}{:}^{4}\\bar{I}_{15/2}$ (CR-II in Fig. 3) is responsible for the saturation-effect inducing decrease in the required photon number to emit blue emissions at 450 nm and $475$ nm since this CR process will increase the population of the $\\mathrm{T m}^{3+}~^{3}H_{4}$ excited states to make it saturated more easily. As a result, the intensity of blue emissions relative to the green and red UC ones from the YET-triply-doped systems increases rather faster than that from the YHT-triply-doped systems. It should be pointed out that the CR-II process increases the lifetime of the $\\mathrm{T m}^{3+}{:}^{3}\\mathrm{H}_{4}$ state in the YET-triply-doped system compared to the $\\mathsf{Y b}^{3+}-\\mathrm{T m}^{3+}$ co-doped system. It has been confirmed very recently in the YET-triply doped dielectric $\\mathrm{{\\tt{B a T i O}}}_{3}$ nanocrystals [15].\n\n Here, we also compare our results about UC white emission to the previously reported from other hosts such as glass ceramics containing $\\mathsf{P b}_{1}$ ${}_{x}\\mathsf{C d}_{x}\\mathsf{F}_{2}$ or YF3nanocrystals,$\\Upsilon_{2}\\ensuremath{\\boldsymbol{\\mathrm{O}}}_{3}$ nanocrystals, Lu3$\\mathsf{G a}_{5}\\mathsf{O}_{12}$ :nanocrystals,$\\mathrm{L u}_{2}\\mathrm{O}_{3}$ nanocrystals,cubic $\\mathrm{N a Y F}_{4}$ nanocrystals,and dielectric $\\mathrm{{\\tt{B a T i O}}}_{3}$ nanocrystals. In our experiments, we observe strong UC emission at 450 nm of $\\mathrm{T m}^{3+}$ ions and this has seldom been observed from these aforementioned hosts. Generally, the UC process to populate the upper excited $^1D_{2}$ .level of $\\mathrm{T m}^{3\\overset{\\circ}{+}}$ ions for the 450 nm emission occurs with a small probability because it involves a four-photon process, Therefore, it can be inferred that the UC effi ciency in hexagonal $\\mathrm{N a Y F}_{4}$ should be higher than that reported for these various hosts. Moreover, the range of the white color output should be broader due to the contribution of the blue emission at 450 nm from hexagonal $\\mathrm{N a Y F}_{4}$ nanorods.",
+          "bboxes": [
+            {
+              "range": [
+                80,
+                948,
+                282,
+                963
+              ],
+              "page": 2,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                79,
+                989,
+                586,
+                1278
+              ],
+              "page": 2,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                79,
+                1282,
+                586,
+                1510
+              ],
+              "page": 2,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                616,
+                131,
+                1124,
+                609
+              ],
+              "page": 2,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                616,
+                613,
+                1124,
+                923
+              ],
+              "page": 2,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                615,
+                925,
+                1124,
+                1510
+              ],
+              "page": 2,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                59,
+                1427,
+                567,
+                1510
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                596,
+                1428,
+                1104,
+                1509
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                78,
+                631,
+                586,
+                692
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                79,
+                694,
+                586,
+                1509
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                616,
+                630,
+                1123,
+                690
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                616,
+                694,
+                1124,
+                1069
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                616,
+                1072,
+                1123,
+                1362
+              ],
+              "page": 4,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            }
+          ],
+          "file_name": "443.pdf"
+        },
+        {
+          "page": 3,
+          "content": "The chart displays four subplots (a, b, c, d) showing room temperature upconversion (UC) spectra under excitation at 580 nm for different NaYF₄-based materials. Subplot (a) shows the UC spectra for Yb³⁺/Er³⁺ co-doped NaYF₄, with emission peaks at 520 nm (²H₁₁/₂ → ⁴I₁₅/₂) and 650 nm (⁴S₃/₂ → ⁴I₁₅/₂). Subplot (b) presents spectra for Yb³⁺/Ho³⁺ co-doped NaYF₄, showing emission peaks at 450 nm (⁵F₄ → ⁵I₈) and 650 nm (⁵F₅ → ⁵I₈). Subplot (c) illustrates spectra for Yb³⁺/Tm³⁺ co-doped NaYF₄, with emission peaks at 450 nm (³H₄ → ³F₄) and 650 nm (³H₄ → ³F₄). Subplot (d) includes the UC spectra for Yb³⁺/Tm³⁺ co-doped NaYF₄ along with corresponding digital photographs of the emission under excitation, showing blue and green emission. The horizontal axis represents wavelength (nm) and the vertical axis represents intensity (a.u.).",
+          "bboxes": [
+            {
+              "range": [
+                246,
+                779,
+                914,
+                1327
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            },
+            {
+              "range": [
+                58,
+                1344,
+                1099,
+                1378
+              ],
+              "page": 3,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/443.pdf"
+            }
+          ],
+          "file_name": "443.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--3. Results and discussion ": 6,
+        "root--3. Results and discussion --Fig. 2. Room temperature UC spectra under excitation by the 980 nm LD: (.$\\mathsf{a})\\mathsf{Y}\\mathsf{b}^{3+}/\\mathsf{E}\\mathsf{r}^{3+}$ co-doped $\\mathrm{N a Y F_{4},(b)Y b^{3+}/H o^{3+}}$ co-doped NaYF4,$(\\mathsf{c})\\;\\mathsf{Y}\\mathsf{b}^{3+}\\mathsf{:}\\mathsf{T}\\mathsf{m}^{3+}$ co-doped $\\mathsf{N a Y F}_{4}$ ,and (d)$\\mathrm{\\mathsf{Y b}^{3+}/\\mathsf{E r}^{3+}/\\mathrm{T m}^{3+}}$ and $\\mathrm{\\mathsf{Y b}^{3+}/\\mathrm{H\\dot{o^{3+}}/T m^{3+}}}$ triply-doped $\\mathsf{N a Y F}_{4}$ nanorods. The insets are the corresponding digital photographs.": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 923,
+    "benchmark": "MMDA",
+    "question": "What is the first subsection of Section 1?",
+    "answer": [
+      "1.1 Market Review of the Sector"
+    ],
+    "MoDora_prediction": {
+      "answer": "1.1板块行情回顾",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--1.上周行情：板块走势强劲，价值重估时机到来": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 925,
+    "benchmark": "MMDA",
+    "question": "What information is displayed at the bottom of the left side?",
+    "answer": [
+      "Date of birth, date of first issue, and validity period."
+    ],
+    "MoDora_prediction": {
+      "answer": "- Document: PRC Motor Vehicle Driving License\n- License No.: 510623198809125611\n- Name: 唐小龙\n- Gender: 男\n- Nationality: 中国/CHN\n- Address: 四川省德阳市中江县白果乡石莲村8组\n- Date of Birth: 1988-09-12\n- First Issue Date: 2008-07-24\n- Vehicle Classes: A2, D\n- Validity: 2024-07-24 至 长期\n- Issuing Authority: 四川省德阳市公安局交通警察支队",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n 中华人民共和国机动车驾驶证Driving License of the Peoples Republic of Chine 证号\n姓名唐小龙510623198809125611性别SeK 男国籍中国/CHN 焦址四川省德阳市中江县白果乡石莲村8组Nntnali \n\n 四川省德阳出生日期DBum 1988-09-12市公安局交Date of Fin 初次领证日期2008-07-24通警察支队准驾车型A2D 有效期限2024-07-24至长期",
+          "bboxes": [
+            {
+              "range": [
+                289,
+                511,
+                1106,
+                862
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/467.pdf"
+            }
+          ],
+          "file_name": "467.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--Default Title": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 936,
+    "benchmark": "MMDA",
+    "question": "What is written on the bottom of the first page?",
+    "answer": [
+      "July 2014 | Your monthly connection to First Presbyterian Church of San Antonio"
+    ],
+    "MoDora_prediction": {
+      "answer": "July 2014 I Your monthly connection to First Presbyterian Church of San Antonio",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "July 2014 I Your monthly connection to First Presbyterian Church of San Antonio ",
+          "bboxes": [
+            {
+              "range": [
+                219,
+                1471,
+                1009,
+                1497
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/473.pdf"
+            }
+          ],
+          "file_name": "473.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--Supplement": 1,
+        "root--Supplement--footer": 1,
+        "root--Supplement--footer--Footer of Page 1": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 973,
+    "benchmark": "MMDA",
+    "question": "How can subscribers benefit from The Washington Post app and where can they listen to its podcasts?",
+    "answer": [
+      "Subscribers enjoy unlimited access with features like reading the story as printed, saving to a reading list, and accessing 2 weeks of past issues. They can listen to podcasts at wpost.com/podcasts."
+    ],
+    "MoDora_prediction": {
+      "answer": "- App benefits: Read stories as printed, save articles, and access past issues.\n- Podcasts: Listen in The Washington Post app.",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "The image is a page from The Washington Post's Real Estate Guide, featuring multiple real estate advertisements for areas like Capital Hill, Cleveland Park, and Pennsylvanian Property, each with contact details and property descriptions. A prominent central ad promotes the Capital Weather Gang, asking “snow day or school day?” and encouraging readers to stay ahead of the weather. Below this, a large advertisement promotes downloading The Washington Post app, highlighting features like reading stories as printed, saving articles, and accessing past issues. The ad includes an image of a smartphone displaying the app interface. The bottom section promotes Washington Post podcasts with the tagline “Did you hear The Post today?” and lists categories like Politics, History, and Culture. The background of the app promotion section features a scenic view of the U.S. Capitol building.",
+          "bboxes": [
+            {
+              "range": [
+                31,
+                47,
+                1192,
+                1420
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/491.pdf"
+            }
+          ],
+          "file_name": "491.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--Washington Post Real Estate Guide and App Promotion": 6
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 977,
+    "benchmark": "MMDA",
+    "question": "How many sketches of fish appear on the page?",
+    "answer": [
+      "1 sketch"
+    ],
+    "MoDora_prediction": {
+      "answer": "1",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--THE TILE FISH.": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 983,
+    "benchmark": "MMDA",
+    "question": "What is the purpose of using a sustained-release formulation in the study described in section 576?",
+    "answer": [
+      "The purpose of using a sustained-release formulation in the study described in section 576 is to achieve prolonged duration of efficacy and significant improvement in histological scores of joint tissues with low systemic exposure and without prolonged inhibition of the HPA axis."
+    ],
+    "MoDora_prediction": {
+      "answer": "To prolong local triamcinolone delivery from a single intra‑articular dose, extending efficacy duration while minimizing systemic exposure.",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--SUSTAINEDEFFICACYOF INTRA-ARTICULARFXOO6INARATMODELOF  OSTEOARTHRITIS \n": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 1001,
+    "benchmark": "MMDA",
+    "question": "What is the title of the first chart?",
+    "answer": [
+      "Distribution of the source cities of foreign talents in Beijing and changes in salary."
+    ],
+    "MoDora_prediction": {
+      "answer": "Beijing's External Talent Source Cities Distribution and Salary Changes",
+      "retrieved_documents": [],
+      "node_impacts": {
+        "root--附件：抢人大战中11座热门城市个案展示及分析": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 1031,
+    "benchmark": "MMDA",
+    "question": "What book title is mentioned as being read on 08/26/06 in the document?",
+    "answer": [
+      "ENMITY BETWEEN THE SEEDS by Bill Cloud"
+    ],
+    "MoDora_prediction": {
+      "answer": "Enmity Between the Seeds",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n Remember the formerthings of old….Decl aring the end from the beginning.….Isaiah 46:9-10 (emphasis mine)\n\n And the Lord God said unto the serpent, Because thou has done this, thou are cursed above all cattle, and above every beast of the field; upon thy belly shalt thou go, and dust shalt thou eat all the days of thy life: 15) AndI will put enmity between thee and the woman, and between thy seed \n\n Yea ALL lsrael havetransgressed thy law, even by departing,that they might notobey thy voice;therefore THEcURSE (\"Alah\" in Hebrew: Strongs #0423)is poured uponUS, and the oaththat is written in the law ofMoses the servant ofGod, because we have sinned against him.Daniel9:11\n\n Wherefore remember, that ye being in time past Gentiles in theflesh.… That at that time ye were withoutChrist, being aliens from the commonwealth oflsrael, and strangers fromthe covenants of promise...But nowin Christ Jesus ye who sometimes were far off are made nigh by the blood of Christ. Ephesians 2:11-13 (emphasis mine)\n\n\n If you are tired of being deceived by fables and man's traditions concerning the modern prophetic teachings of our time: 'the time of the end\", then you must remember the things of old, andgo to the beginning bookofthe Bible,and study thebook ofGenesis for yourself,because the end is declared from thebeginning according to lsaiah 46:9-10!\n\n Afterreading the book:EMNMITYBETWEENTHESEEDSby BillCloud,I cameto understand the current conflicts between lsrael/Christianity and fundamental islam are actually hidden within the texts of the book ofGenesis. Specifically within the seed ofthe woman: The Torah in the Bible (Hebrew texts & KJV),and the seed of the serpent: thekoran (arabic & English). lt's not thatlagree with every word in Bill's book (I don't agree with some traditional teachings that crept in unawares), but the concept of the modern seeds(Holy Books) is astounding to say the least!\n\n\n The ENMITY (hatred) that exists between the followers of the people of the book: Jews and Christians following the teachings of their Holy Book:The Torah/Bible(KJV),and the followers ofthe muslim holy book: thekoran, is clearly evident todayand was placed therein thebeginningbyGod (Jehovah).\n\n\n The dayI finished reading this book(08/26/06),was the daytheHoly Spirit opened my eyes to the \"serpent's signature\"as the author of the muslim holy book:the koran. The serpents MARK is clearly seenin \"the name ofallah” in arabic.Go toGoogle andtypein the search bar: \"the name of allah in arabic\".After searching a little, you will clearly see a A \n\n Iam100%convinced this arabic symbol Revelation 13:17! His name in English is is\"the name of the beast\"mentioned in allah: the false god of islam.。\n\n I am also convinced this is \"the mark ofhisname\" inRev.14:11,and may very well be THE MARK OF THE BEAST in Rev.13:16-17\n\n As youread Daniel 9:11 above, and find out the Hebrew word forCURSE is alah, you can clearly understand who was behind the \"9/11\"attacks on the World Trade center.Nothing butthatole serpent called the Devil(Rev12:9),maskerading himself as allahthe god of islam! Do you think the Lord might have \"hid\" that information in verse 9:11 for our benefit?Notice this \"serpents signature\" orMARK is clearly worn on the headscarfs (forhead)of hamas and hizbullah and on ALL arabic literature,especially in thekoran!",
+          "bboxes": [
+            {
+              "range": [
+                109,
+                88,
+                1119,
+                156
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                182,
+                220,
+                1037,
+                282
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                117,
+                293,
+                1105,
+                370
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                114,
+                413,
+                1093,
+                488
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                113,
+                524,
+                1103,
+                623
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                113,
+                634,
+                1108,
+                739
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                112,
+                745,
+                1106,
+                933
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                112,
+                938,
+                1106,
+                1043
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                112,
+                1048,
+                1106,
+                1184
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                132,
+                1194,
+                544,
+                1295
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                717,
+                1195,
+                1090,
+                1294
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            },
+            {
+              "range": [
+                114,
+                1310,
+                1105,
+                1474
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/520.pdf"
+            }
+          ],
+          "file_name": "520.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--THE MODERNDAY SERPENT'S SEED INGENESIS 3:15,CANNOW  BE IDENTIFIEDBY THE SERPENT'SOWN UNIQUE SIGNATURE!": 6,
+        "root--THE MODERNDAY SERPENT'S SEED INGENESIS 3:15,CANNOW  BE IDENTIFIEDBY THE SERPENT'SOWN UNIQUE SIGNATURE!--Arabic Calligraphy Text": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 1048,
+    "benchmark": "MMDA",
+    "question": "How is the weather described in Scotland for September 1964?",
+    "answer": [
+      "​​Unsettled with frequent rain and dull weather, but brighter with showers at the end of the month.​"
+    ],
+    "MoDora_prediction": {
+      "answer": "Unsettled—often dull with rain at times.",
+      "retrieved_documents": [
+        {
+          "page": 1,
+          "content": "\n\n WARM AND SUNNY IN THE SOUTH, UNSETTLED IN SCOTLAND \n\n\n A large anticyclone to the east of the British Isles maintained south-easterly winds and dry sunny weather in nearly all districts during the first two days of the month. Winds became light and variable on the 3rd, but there was little change in the general weather until the sth apart from patches of fog in some coastal districts. Days were rather warm excet in foggy areas but night temperatures inland were below average.\n\n A trough of low pressure moving eastwards brought rain to western Scotland early on the 5th and to most other districts later in the day.Rainfall exceeded  inch locally in the north and west, but amounts were small in south-east England where in many areas it was the first rain for I7 days. The 6th was a day of showers in a north-westerly airstream, but rain was again widespread on the 7th as a depression skirted the north of Scotland.\n\n During the next few days a series of troughs and ridges moving eastwards from the Atlantic brought variable cloud and rain at times to Scotland, but much of England and Wales came under the influence of an anticyclone moving east over France and Germany.Central and southern districts (apart from the extreme west) were generally sunny and warm,afternoon temperatures over south-east England exceeding 26℃ locally on both the roth and rrth. The fine warm weather extended to the whole country on the Izth as another anticyclone moved east-south-east across the British Isles, but the spell was brought to an end by troughs from the Atlantic which gave widespread rain, heavy at times, on the I4th and for much of the rsth.\n\n\n A rather cool period with thundery showers followed. The showers were frequent and locally heavy on the 16th, but were rather scattered with good sunny periods, especially in the south, during the next four days.\n\n\n Another spell of fine sunny weather began over southern England on the 2ist and lasted with little break until the end of the month as an anticyclone moved slowly from the Bay of Biscay to the southern Baltic. On the 25th afternoon temperatures reached 25C in some eastern districts including the London area where it was the warmest September day for 15years. In the north, however, weather remained rather dull and unsettled with rain at times. A ridge of high pressure from the west brought brighter showery weather to Scotland on the 2gth, and the month ended fine and sunny with afternoon temperatures above average in most districts.\n\n\n R.E.B.\n\n 25 mm=lin.(approx.)",
+          "bboxes": [
+            {
+              "range": [
+                92,
+                145,
+                561,
+                170
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/529.pdf"
+            },
+            {
+              "range": [
+                90,
+                212,
+                548,
+                249
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/529.pdf"
+            },
+            {
+              "range": [
+                90,
+                296,
+                768,
+                375
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/529.pdf"
+            },
+            {
+              "range": [
+                90,
+                377,
+                768,
+                453
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/529.pdf"
+            },
+            {
+              "range": [
+                90,
+                456,
+                768,
+                595
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/529.pdf"
+            },
+            {
+              "range": [
+                90,
+                597,
+                768,
+                643
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/529.pdf"
+            },
+            {
+              "range": [
+                90,
+                645,
+                768,
+                770
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/529.pdf"
+            },
+            {
+              "range": [
+                744,
+                1048,
+                780,
+                1061
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/529.pdf"
+            },
+            {
+              "range": [
+                82,
+                1049,
+                234,
+                1064
+              ],
+              "page": 1,
+              "source_path": "/home/yukai/project/MoDora/datasets/MMDA/529.pdf"
+            }
+          ],
+          "file_name": "529.pdf"
+        }
+      ],
+      "node_impacts": {
+        "root--THE WEATHER OF SEPTEMBER 1964": 6,
+        "root--THE WEATHER OF SEPTEMBER 1964--Weather Data Table for UK Locations": 1
+      }
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 1064,
+    "benchmark": "MMDA",
+    "question": "Which papers discuss issues related to rock stability and their practical applications?",
+    "answer": [
+      "Rock Fracture and Failure Mechanisms, Support Measures in Tunnel Excavation, Rock Stresses in Engineering Projects, Shear Fracture Mechanism, Geological Approach for Predicting Instability, Tunnel Instability and Strain Softening"
+    ],
+    "MoDora_prediction": {
+      "answer": "- 795143 Mining and Tunnelling – Interaction and Crossfertilisation (Feder & Olsacher)\n- 795144 Support measures used in excavating the Arlberg Tunnel – adaptation to rock mass conditions (Judtmann)\n- 795145 Rock Stresses in Canada: Their Relevance to Engineering Projects (Franklin & Hungr)\n- 795146 Shear fracture mechanism of rock mass near deep tunnels: test results and analytical concepts (Feder)\n- 795147 Considerations about rock pressure and its effects on excavations in rock by blasting (Heltzen)\n- 795148 Geological approach for predicting unstable areas prior to mining (Ealy, Mazurak & Langrand)\n- 795149 Measurement of static and dynamic excess stresses in pillars of shallow underground quarries (Bonvallet, Dejean & Schwartzmann)\n- 795150 Fundamental study on instability of tunnel considering post‑peak strain‑softening behavior of rock (Akai & Hori)",
+      "retrieved_documents": [],
+      "node_impacts": {}
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  },
+  {
+    "questionId": 1065,
+    "benchmark": "MMDA",
+    "question": "What is being measured in the reports from Canada mentioned by Franklin and Bags?",
+    "answer": [
+      "Ground stress measurements in Canada."
+    ],
+    "MoDora_prediction": {
+      "answer": "Ground (rock) stresses in Canada.",
+      "retrieved_documents": [],
+      "node_impacts": {}
+    },
+    "other_models_results": {
+      "UDOP": {
+        "correct": false,
+        "present": true
+      },
+      "DocOwl2": {
+        "correct": false,
+        "present": true
+      },
+      "M3DocRAG": {
+        "correct": false,
+        "present": true
+      },
+      "TextRAG": {
+        "correct": false,
+        "present": true
+      },
+      "SV-RAG": {
+        "correct": false,
+        "present": true
+      },
+      "ZenDB": {
+        "correct": false,
+        "present": true
+      },
+      "GPT-5": {
+        "correct": false,
+        "present": true
+      },
+      "QUEST": {
+        "correct": false,
+        "present": true
+      }
+    }
+  }
+]

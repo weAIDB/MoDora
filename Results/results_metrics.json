@@ -1,0 +1,112 @@
+[
+  {
+    "file": "res_gpt_new.jsonl",
+    "stem": "res_gpt_new",
+    "rows": 960,
+    "AIC-Acc(%)": 61.66666666666667,
+    "ACNLS Score": 0.4781592423923841,
+    "judged_rows": 960,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 6
+  },
+  {
+    "file": "resdocowl.jsonl",
+    "stem": "resdocowl",
+    "rows": 1065,
+    "AIC-Acc(%)": 29.577464788732392,
+    "ACNLS Score": 0.2938106366642536,
+    "judged_rows": 1065,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 8
+  },
+  {
+    "file": "resgpt5.jsonl",
+    "stem": "resgpt5",
+    "rows": 1065,
+    "AIC-Acc(%)": 46.478873239436616,
+    "ACNLS Score": 0.41547333693260796,
+    "judged_rows": 1065,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 0
+  },
+  {
+    "file": "resm3rag.jsonl",
+    "stem": "resm3rag",
+    "rows": 1065,
+    "AIC-Acc(%)": 47.417840375586856,
+    "ACNLS Score": 0.41116728473289804,
+    "judged_rows": 1065,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 61
+  },
+  {
+    "file": "resmodora.jsonl",
+    "stem": "resmodora",
+    "rows": 1065,
+    "AIC-Acc(%)": 73.33333333333333,
+    "ACNLS Score": 0.5522754062254023,
+    "judged_rows": 1065,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 0
+  },
+  {
+    "file": "resquest.jsonl",
+    "stem": "resquest",
+    "rows": 1065,
+    "AIC-Acc(%)": 15.68075117370892,
+    "ACNLS Score": 0.12418940805401855,
+    "judged_rows": 1065,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 287
+  },
+  {
+    "file": "ressvrag.jsonl",
+    "stem": "ressvrag",
+    "rows": 1065,
+    "AIC-Acc(%)": 37.74647887323944,
+    "ACNLS Score": 0.3306080440649143,
+    "judged_rows": 1065,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 58
+  },
+  {
+    "file": "restxtrag.jsonl",
+    "stem": "restxtrag",
+    "rows": 1065,
+    "AIC-Acc(%)": 36.24413145539906,
+    "ACNLS Score": 0.29566730815865433,
+    "judged_rows": 1065,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 0
+  },
+  {
+    "file": "resudop.jsonl",
+    "stem": "resudop",
+    "rows": 1065,
+    "AIC-Acc(%)": 15.774647887323944,
+    "ACNLS Score": 0.15437513842580114,
+    "judged_rows": 1065,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 13
+  },
+  {
+    "file": "reszendb.jsonl",
+    "stem": "reszendb",
+    "rows": 1065,
+    "AIC-Acc(%)": 47.136150234741784,
+    "ACNLS Score": 0.3668380658589374,
+    "judged_rows": 1065,
+    "missing_judge": 0,
+    "missing_answer": 0,
+    "missing_prediction": 44
+  }
+]
