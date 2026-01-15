@@ -8,6 +8,8 @@ cache/
 log/
 output/
 evaluation/
+MoDora-backend/src/modora_backend.egg-info
+MoDora-backend/bin
 
 # Datasets & Large Files
 *.pdf
@@ -22,4 +24,7 @@ models/
 
 MoDora-backend/configs/*
 
-/home/yukai/project/MoDora/MoDora-backend/activate.sh
+MoDora-backend/activate.sh
+
+MoDora-backend/logs/*
+.trae
