@@ -19,3 +19,5 @@ models/
 
 # OS specific
 .DS_Store
+
+MoDora-backend/configs/*
