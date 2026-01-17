@@ -6,6 +6,9 @@ import logging
 from modora.core.logging_context import new_id, run_scope
 from modora.core.logging_setup import configure_logging
 from modora.core.settings import Settings
+from modora.lab.commands.health import register as register_health
+from modora.lab.commands.results import register as register_results
+
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="modora")
@@ -13,7 +16,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run-id", default=None)
 
     sub = parser.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("health")
+
+    register_health(sub)
+    register_results(sub)
 
     args = parser.parse_args(argv)
 
@@ -23,10 +28,12 @@ def main(argv: list[str] | None = None) -> int:
 
     run_id = args.run_id or new_id("run_", 8)
     with run_scope(run_id):
-        if args.cmd == "health":
-            logger.info("ok")
-            return 0
-    return 0
+        handler = getattr(args, "_handler", None)
+        if handler is None:
+            logger.error("no handler for command", extra={"cmd": args.cmd})
+            return 2
+        return int(handler(args, logger))
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
