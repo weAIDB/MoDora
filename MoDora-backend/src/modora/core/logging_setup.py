@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import sys
 from logging.handlers import RotatingFileHandler
 from typing import Any
 
@@ -85,13 +86,36 @@ def _extract_extras(record: logging.LogRecord) -> dict[str, Any]:
     return extras
 
 
+_REST = "\x1b[0m"
+_COLOR_BY_LEVEL = {
+    logging.DEBUG: "\x1b[34m",  # 蓝色
+    logging.INFO: "\x1b[32m",  # 绿色
+    logging.WARNING: "\x1b[33m",  # 黄色
+    logging.ERROR: "\x1b[31m",  # 红色
+    logging.CRITICAL: "\x1b[1;31m",  # 紫色
+}
+
+
 class _TextFormater(logging.Formatter):
+    def __init__(self, fmt: str, datefmt: str | None = None, color: bool = False):
+        super().__init__(fmt, datefmt)
+        self._color = color
+
     def format(self, record: logging.LogRecord) -> str:
         base = super().format(record)
         extras = _extract_extras(record)
         if extras:
-            return f"{base} extra={json.dumps(extras, ensure_ascii=False)}"
-        return base
+            base = f"{base} extra={json.dumps(extras, ensure_ascii=False)}"
+
+        if not self._color:
+            return base
+        if not (hasattr(sys.stderr, "isatty") and sys.stderr.isatty()):
+            return base
+
+        color = _COLOR_BY_LEVEL.get(record.levelno, _REST)
+        if not color:
+            return base
+        return f"{color}{base}{_REST}"
 
 
 class _JsonFormatter(logging.Formatter):
@@ -147,7 +171,7 @@ def configure_logging(settings: Settings) -> None:
     console = logging.StreamHandler()
     console.addFilter(context_filter)
     # 一直以text格式打印到控制台
-    console.setFormatter(_TextFormater(fmt_text, datefmt=datefmt))
+    console.setFormatter(_TextFormater(fmt_text, datefmt=datefmt, color=True))
     root.addHandler(console)
 
     if settings.log_to_file:

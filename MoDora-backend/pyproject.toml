@@ -11,6 +11,9 @@ dependencies = [
   "uvicorn",
 ]
 
+[project.scripts]
+modora = "modora.lab.cli:main"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
