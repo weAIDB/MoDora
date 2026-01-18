@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import base64
+from pathlib import Path
 from typing import Any
 
+import cv2
+import numpy as np
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -12,18 +15,64 @@ router = APIRouter(prefix="/ocr", tags=["ocr"])
 
 
 class OCRExtractRequest(BaseModel):
-    image_base64: str
+    image_base64: str | None = None
+    file_path: str | None = None
+
+    def load_image_bytes(self) -> bytes:
+        if self.image_base64 and self.file_path:
+            raise HTTPException(status_code=400, detail="only one of image_base64/file_path is allowed")
+
+        if self.image_base64:
+            s = _strip_data_url_prefix(self.image_base64)
+            try:
+                return base64.b64decode(s, validate=True)
+            except Exception:
+                raise HTTPException(status_code=400, detail="invalid base64 image")
+
+        if self.file_path:
+            p = Path(self.file_path)
+            if not p.is_file():
+                raise HTTPException(status_code=400, detail="file_path not found")
+            if p.suffix.lower() not in {".png", ".jpg", ".jpeg"}:
+                raise HTTPException(status_code=400, detail="file_path must be .png/.jpg/.jpeg")
+            return p.read_bytes()
+
+        raise HTTPException(status_code=400, detail="image_base64 or file_path required")
 
 
 class OCRBlock(BaseModel):
     id: int
+    page_id: int
     bbox: list[float]
     type: str
     text: str
 
 
 class OcrExtractResponse(BaseModel):
+    source: str
     blocks: list[OCRBlock]
+
+
+class OCRExtractPdfRequest(BaseModel):
+    file_path: str
+
+    def resolve_pdf_input(self) -> tuple[str, str]:
+        p = Path(self.file_path)
+        if not p.is_file():
+            raise HTTPException(status_code=400, detail="file_path not found")
+        if p.suffix.lower() != ".pdf":
+            raise HTTPException(status_code=400, detail="file_path must be .pdf")
+        return str(p), f"file:{p}"
+
+
+class OCRPdfPage(BaseModel):
+    page_id: int
+    blocks: list[OCRBlock]
+
+
+class OcrExtractPdfResponse(BaseModel):
+    source: str
+    pages: list[OCRPdfPage]
 
 
 def _strip_data_url_prefix(s: str) -> str:
@@ -32,27 +81,60 @@ def _strip_data_url_prefix(s: str) -> str:
     return s
 
 
+def _decode_image_bytes_to_rgb(raw: bytes):
+    buf = np.frombuffer(raw, dtype=np.uint8)
+    img_bgr = cv2.imdecode(buf, cv2.IMREAD_COLOR)
+    if img_bgr is None:
+        raise HTTPException(status_code=400, detail="invalid image")
+    return cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+
+
+def _blocks_from_parsing_res_list(regions: Any, *, page_id: int) -> list[OCRBlock]:
+    if not isinstance(regions, list):
+        return []
+
+    blocks: list[OCRBlock] = []
+    for i, region in enumerate(regions):
+        if not isinstance(region, dict):
+            continue
+
+        bbox = region.get("block_bbox")
+        if hasattr(bbox, "tolist"):
+            bbox = bbox.tolist()
+
+        if not isinstance(bbox, (list, tuple)) or len(bbox) != 4:
+            continue
+
+        block_id = region.get("block_id", i)
+        try:
+            bid = int(block_id)
+        except Exception:
+            bid = i
+
+        label = region.get("block_label")
+        text_val = region.get("block_content")
+
+        blocks.append(
+            OCRBlock(
+                id=bid,
+                page_id=int(page_id),
+                bbox=[float(x) for x in bbox],
+                type=str(label or "text").lower(),
+                text=str(text_val or ""),
+            )
+        )
+
+    return blocks
+
+
 @router.post("/extract", response_model=OcrExtractResponse)
 def ocr_extract(request: OCRExtractRequest) -> OcrExtractResponse:
     model = get_ocr_model()
     if model is None:
         raise HTTPException(status_code=503, detail="ocr model not loaded")
 
-    s = _strip_data_url_prefix(request.image_base64)
-    try:
-        raw = base64.b64decode(s, validate=True)
-    except Exception:
-        raise HTTPException(status_code=400, detail="invalid base64 image")
-
-    import cv2
-    import numpy as np
-
-    buf = np.frombuffer(raw, dtype=np.uint8)
-    img_bgr = cv2.imdecode(buf, cv2.IMREAD_COLOR)
-    if img_bgr is None:
-        raise HTTPException(status_code=400, detail="invalid image")
-
-    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+    raw = request.load_image_bytes()
+    img_rgb = _decode_image_bytes_to_rgb(raw)
 
     it = model.predict_iter(img_rgb)
     try:
@@ -60,84 +142,39 @@ def ocr_extract(request: OCRExtractRequest) -> OcrExtractResponse:
     except StopIteration:
         return OcrExtractResponse(blocks=[])
 
-    regions: Any = None
-    if isinstance(out, dict):
-        regions = out.get("parsing_res_list")
-        if regions is None:
-            regions = out.get("region_det_res")
-        if regions is None and isinstance(out.get("res"), dict):
-            res = out["res"]
-            regions = res.get("parsing_res_list") or res.get("region_det_res")
-    elif isinstance(out, tuple) and out:
-        regions = out[0]
+    if not isinstance(out, dict):
+        raise HTTPException(status_code=502, detail="unexpected ocr output")
 
-    if isinstance(regions, tuple) and regions:
-        regions = regions[0]
+    regions = out.get("parsing_res_list")
     if not isinstance(regions, list):
-        regions = []
+        return OcrExtractResponse(blocks=[])
 
-    blocks: list[OCRBlock] = []
-    for i, region in enumerate(regions):
-        if isinstance(region, dict):
-            bbox = region.get("block_bbox") or region.get("bbox")
-            label = (
-                region.get("block_label")
-                or region.get("type")
-                or region.get("label")
-                or region.get("layout_label")
-                or "text"
-            )
-            text_val = (
-                region.get("block_content")
-                or region.get("text")
-                or region.get("rec_text")
-                or region.get("content")
-                or ""
-            )
-            block_id = region.get("block_id", region.get("id", i))
+    source = "image_base64" if request.image_base64 else (f"file:{request.file_path}" if request.file_path else "-")
+    blocks = _blocks_from_parsing_res_list(regions, page_id=1)
+    return OcrExtractResponse(source=source, blocks=blocks)
+
+
+@router.post("/extract_pdf", response_model=OcrExtractPdfResponse)
+def ocr_extract_pdf(request: OCRExtractPdfRequest) -> OcrExtractPdfResponse:
+    model = get_ocr_model()
+    if model is None:
+        raise HTTPException(status_code=503, detail="ocr model not loaded")
+
+    pdf_input, source = request.resolve_pdf_input()
+
+    pages: list[OCRPdfPage] = []
+    for idx, out in enumerate(model.predict_iter(pdf_input)):
+        if not isinstance(out, dict):
+            raise HTTPException(status_code=502, detail="unexpected ocr output")
+
+        page_index = out.get("page_index")
+        if isinstance(page_index, int) and page_index >= 0:
+            page_id = page_index + 1
         else:
-            bbox = getattr(region, "bbox", None) or getattr(region, "layout_bbox", None)
-            label = (
-                getattr(region, "type", None)
-                or getattr(region, "label", None)
-                or getattr(region, "layout_label", None)
-                or "text"
-            )
-            text_val = (
-                getattr(region, "text", None)
-                or getattr(region, "rec_text", None)
-                or getattr(region, "content", None)
-            )
-            if not text_val:
-                res_val = getattr(region, "res", None)
-                rec_texts: list[str] = []
-                if res_val:
-                    for line in res_val:
-                        if isinstance(line, dict) and isinstance(line.get("text"), str):
-                            rec_texts.append(line["text"])
-                        elif isinstance(line, (tuple, list)) and line and isinstance(line[0], str):
-                            rec_texts.append(line[0])
-                text_val = "\n".join(rec_texts)
+            page_id = idx + 1
 
-            block_id = getattr(region, "block_id", None)
-            if block_id is None:
-                block_id = getattr(region, "id", i)
+        regions = out.get("parsing_res_list")
+        blocks = _blocks_from_parsing_res_list(regions, page_id=page_id)
+        pages.append(OCRPdfPage(page_id=page_id, blocks=blocks))
 
-        if not isinstance(bbox, (list, tuple)) or len(bbox) != 4:
-            continue
-
-        try:
-            bid = int(block_id)
-        except Exception:
-            bid = i
-
-        blocks.append(
-            OCRBlock(
-                id=bid,
-                bbox=[float(x) for x in bbox],
-                type=str(label).lower(),
-                text=str(text_val or ""),
-            )
-        )
-
-    return OcrExtractResponse(blocks=blocks)
+    return OcrExtractPdfResponse(source=source, pages=pages)

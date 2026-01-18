@@ -10,6 +10,7 @@ import cv2
 pp_structure = PPStructureV3(
     device="gpu:2",
     use_table_recognition=False,
+    use_doc_unwarping=False,
     lang='en',
     layout_unclip_ratio=0.5
 )

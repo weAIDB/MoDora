@@ -6,7 +6,10 @@ HOST="${HOST:-127.0.0.1}"
 PORT="${PORT:-8000}"
 STARTUP_TIMEOUT_S="${STARTUP_TIMEOUT_S:-180}"
 
-# OCR 测试：传一张 png/jpg 路径（可选）
+OUT_DIR="${OUT_DIR:-.smoke_out}"
+OCR_PRINT_N="${OCR_PRINT_N:-20}"
+PRINT_FULL_JSON="${PRINT_FULL_JSON:-0}"
+
 OCR_IMAGE_PATH="${OCR_IMAGE_PATH:-}"
 
 # LLM 测试：是否检查本地 lmdeploy（可选）
@@ -83,6 +86,9 @@ LOG_DIR="${ROOT_DIR}/.smoke_logs"
 mkdir -p "$LOG_DIR"
 LOG_FILE="${LOG_DIR}/uvicorn_${PORT}_$(date +%Y%m%d_%H%M%S).log"
 
+mkdir -p "$OUT_DIR"
+RUN_TS="$(date +%Y%m%d_%H%M%S)"
+
 cleanup() {
   if [ -n "${UVICORN_PID:-}" ] && kill -0 "$UVICORN_PID" >/dev/null 2>&1; then
     echo "[cleanup] stopping uvicorn pid=${UVICORN_PID}"
@@ -127,6 +133,9 @@ PY
 )"
   ocr_resp="$(curl -sS -X POST "$OCR_URL" -H "Content-Type: application/json" --data "$body")"
 
+  ocr_json_path="$OUT_DIR/ocr_${RUN_TS}.json"
+  printf "%s" "$ocr_resp" >"$ocr_json_path"
+
   echo "$ocr_resp" | json_assert '
 blocks=obj.get("blocks")
 assert isinstance(blocks, list), obj
@@ -140,12 +149,28 @@ for b in blocks:
   assert isinstance(b.get("type"), str), b
   assert isinstance(b.get("text"), str), b
 '
-  echo "      ocr ok, blocks_count=$(python - <<PY
-import json,sys
+
+  echo "      ocr result saved: $ocr_json_path"
+  echo "      ocr preview (first $OCR_PRINT_N blocks):"
+  echo "$ocr_resp" | python - "$OCR_PRINT_N" <<'PY'
+import json, sys
+n=int(sys.argv[1])
 obj=json.load(sys.stdin)
-print(len(obj.get("blocks") or []))
+blocks=obj.get("blocks") or []
+for i,b in enumerate(blocks[:n]):
+  bbox=b.get("bbox")
+  t=str(b.get("type",""))
+  text=str(b.get("text","")).replace("\n"," ").strip()
+  if len(text)>200:
+    text=text[:200]+"..."
+  print(f"  #{i} id={b.get('id')} type={t} bbox={bbox} text={text}")
+print(f"  total_blocks={len(blocks)}")
 PY
-<<<"$ocr_resp")"
+
+  if [ "$PRINT_FULL_JSON" = "1" ]; then
+    echo "      ocr full json:"
+    echo "$ocr_resp" | python -m json.tool
+  fi
 else
   echo "      skipped (set OCR_IMAGE_PATH=/path/to/img.png to enable)"
 fi
@@ -182,12 +207,30 @@ print(json.dumps({
 PY
 )"
   chat_resp="$(curl -sS -X POST "${LLM_BASE_URL}/chat/completions" -H "Content-Type: application/json" --data "$chat_body")"
+
+  llm_json_path="$OUT_DIR/llm_${RUN_TS}.json"
+  printf "%s" "$chat_resp" >"$llm_json_path"
+
   echo "$chat_resp" | json_assert '
 assert "choices" in obj and isinstance(obj["choices"], list) and obj["choices"], obj
 msg=obj["choices"][0].get("message") or {}
 assert isinstance(msg.get("content",""), str), obj
 '
-  echo "      llm ok (model=${model_id})"
+
+  echo "      llm result saved: $llm_json_path"
+  echo "      llm preview (model=${model_id}):"
+  echo "$chat_resp" | python - <<'PY'
+import json,sys
+obj=json.load(sys.stdin)
+msg=obj["choices"][0].get("message") or {}
+content=str(msg.get("content",""))
+print(content)
+PY
+
+  if [ "$PRINT_FULL_JSON" = "1" ]; then
+    echo "      llm full json:"
+    echo "$chat_resp" | python -m json.tool
+  fi
 else
   echo "      skipped (set ENABLE_LLM_TEST=1 to enable)"
 fi
