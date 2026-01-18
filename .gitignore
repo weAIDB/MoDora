@@ -27,4 +27,5 @@ MoDora-backend/configs/*
 MoDora-backend/activate.sh
 
 MoDora-backend/logs/*
+MoDora-backend/tests/*
 .trae
