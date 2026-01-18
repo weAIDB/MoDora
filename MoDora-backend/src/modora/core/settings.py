@@ -81,6 +81,17 @@ class Settings:
     api_base: str | None = None
     api_key: str | None = None
 
+    llm_local_model: str | None = None
+    llm_local_port: int = 9001
+    llm_local_cuda_visible_devices: str | None = None
+    llm_local_startup_timeout_s: float = 600.0
+
+    ocr_device: str = "gpu:6"
+    ocr_lang: str = "en"
+    ocr_layout_unclip_ratio: float = 0.5
+    ocr_use_table_recognition: bool = True
+    ocr_use_doc_unwarping: bool = False
+
     @staticmethod
     def load(config_path: str | None = None) -> "Settings":
         cfg_path = (config_path or os.getenv("MODORA_CONFIG") or "").strip()
@@ -109,6 +120,25 @@ class Settings:
         api_base = _clean_str(pick("api_base", None))
         api_key = _clean_str(pick("api_key", None))
 
+        llm_local_model = _clean_str(pick("llm_local_model", None))
+        llm_local_port = int(pick("llm_local_port", 9001))
+        llm_local_cuda_visible_devices = _clean_str(
+            pick("llm_local_cuda_visible_devices", None)
+        )
+        llm_local_startup_timeout_s = float(
+            pick("llm_local_startup_timeout_s", 600.0)
+        )
+
+        ocr_device = _clean_str(pick("ocr_device", "gpu:6")) or "gpu:6"
+        ocr_lang = _clean_str(pick("ocr_lang", "en"))
+        ocr_layout_unclip_ratio = float(pick("ocr_layout_unclip_ratio", 0.5))
+        ocr_use_table_recognition = _coerce_bool(
+            pick("ocr_use_table_recognition", True), default=True
+        )
+        ocr_use_doc_unwarping = _coerce_bool(
+            pick("ocr_use_doc_unwarping", False), default=False
+        )
+
         return Settings(
             env=env,
             service_name=service_name,
@@ -118,6 +148,15 @@ class Settings:
             log_dir=log_dir,
             api_base=api_base,
             api_key=api_key,
+            llm_local_model=llm_local_model,
+            llm_local_port=llm_local_port,
+            llm_local_cuda_visible_devices=llm_local_cuda_visible_devices,
+            llm_local_startup_timeout_s=llm_local_startup_timeout_s,
+            ocr_device=ocr_device,
+            ocr_lang=ocr_lang,
+            ocr_layout_unclip_ratio=ocr_layout_unclip_ratio,
+            ocr_use_table_recognition=ocr_use_table_recognition,
+            ocr_use_doc_unwarping=ocr_use_doc_unwarping,
         )
 
 
