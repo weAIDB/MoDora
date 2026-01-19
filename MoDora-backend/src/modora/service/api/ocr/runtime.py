@@ -16,6 +16,7 @@ def ensure_ocr_model_loaded(settings: Settings, logger) -> None:
     device = (settings.ocr_device or "").strip() or "gpu:6"
     _ocr_model = PPStructureV3(
         device=device,
+        # enable_hpi=True, 缺少高性能的必要依赖
         use_table_recognition=bool(settings.ocr_use_table_recognition),
         use_doc_unwarping=bool(settings.ocr_use_doc_unwarping),
         lang=settings.ocr_lang or "en",
