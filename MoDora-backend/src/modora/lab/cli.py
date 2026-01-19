@@ -8,6 +8,7 @@ from modora.core.logging_setup import configure_logging
 from modora.core.settings import Settings
 from modora.lab.commands.health import register as register_health
 from modora.lab.commands.results import register as register_results
+from modora.lab.commands.config import register as register_config
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -19,6 +20,7 @@ def main(argv: list[str] | None = None) -> int:
 
     register_health(sub)
     register_results(sub)
+    register_config(sub)
 
     args = parser.parse_args(argv)
 
