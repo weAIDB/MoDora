@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import base64
-import fitz
 import io
 import json
 from pathlib import Path
+
+import fitz
 from PIL import Image
 
 from modora.core.domain.component import Component
-
+from modora.core.interfaces.media import ImageProvider
 
 # 如果裁剪失败（PDF打不开/页号越界/bbox非法等），返回 1x1 空白 PNG 的 base64。
 _BLANK_1X1_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMBAFh4kXcAAAAASUVORK5CYII="
@@ -142,3 +143,23 @@ def render_ocr_json_to_pdf(
         return out_pdf_path
     finally:
         doc.close()
+
+
+class PDFCropper(ImageProvider):
+    """
+    PDF 图片裁剪适配器。
+    实现了 ImageProvider 接口，使用 PyMuPDF (fitz) 从 PDF 中裁剪指定区域。
+    """
+
+    def crop_image(self, source: str, component: Component) -> str:
+        """
+        从 PDF 文件中裁剪组件区域并转换为 Base64 图片。
+
+        Args:
+            source: PDF 文件路径 (支持 "file:" 前缀)
+            component: 包含位置信息的组件
+
+        Returns:
+            str: Base64 编码的 PNG 图片
+        """
+        return co_to_base64(source, component)

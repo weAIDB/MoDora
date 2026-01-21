@@ -7,7 +7,7 @@ import sys
 from logging.handlers import RotatingFileHandler
 from typing import Any
 
-from modora.core.logging_context import get_request_id, get_run_id
+from modora.core.infra.logging.context import get_request_id, get_run_id
 from modora.core.settings import Settings
 
 """
@@ -22,7 +22,7 @@ from modora.core.settings import Settings
 
 使用方式：
     from modora.core.settings import Settings
-    from modora.core.logging_config import configure_logging
+    from modora.core.infra.logging.setup import configure_logging
     
     settings = Settings()  # 加载配置
     configure_logging(settings)  # 配置日志系统

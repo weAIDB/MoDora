@@ -3,8 +3,8 @@ from __future__ import annotations
 import argparse
 import logging
 
-from modora.core.logging_context import new_id, run_scope
-from modora.core.logging_setup import configure_logging
+from modora.core.infra.logging.context import new_id, run_scope
+from modora.core.infra.logging.setup import configure_logging
 from modora.core.settings import Settings
 from modora.lab.commands.health import register as register_health
 from modora.lab.commands.results import register as register_results

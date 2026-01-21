@@ -5,7 +5,6 @@ import concurrent.futures as futures
 from dataclasses import dataclass
 import json
 import logging
-import multiprocessing as mp
 import os
 from pathlib import Path
 import re
@@ -16,12 +15,13 @@ from tqdm import tqdm
 
 from modora.core.preprocess import get_components
 from modora.core.settings import Settings
+from modora.core.domain.ocr import OcrExtractResponse
 from modora.service.api.ocr.router import (
     OCRExtractPdfRequest,
-    OcrExtractResponse,
     ocr_extract_pdf,
 )
 from modora.service.api.ocr.runtime import ensure_ocr_model_loaded
+from modora.core.infra.logging.setup import configure_logging
 
 
 @dataclass(frozen=True)
@@ -49,17 +49,6 @@ def _parse_ocr_response(obj: Any) -> OcrExtractResponse:
     if callable(parse_obj):
         return parse_obj(obj)
     return OcrExtractResponse(**obj)
-
-
-def _ocr_worker_init(config_path: str | None) -> None:
-    cfg = (config_path or "").strip() or None
-    if cfg:
-        os.environ["MODORA_CONFIG"] = cfg
-    settings = Settings.load(cfg)
-    from modora.core.logging_setup import configure_logging
-
-    configure_logging(settings)
-    ensure_ocr_model_loaded(settings, logging.getLogger("modora.lab.ocr_worker"))
 
 
 def _ocr_worker_run(pdf_path: str) -> tuple[dict[str, Any], int, float]:
@@ -93,12 +82,6 @@ def register(sub: argparse._SubParsersAction) -> None:
         "--cache-dir",
         default="cache",
         help="Cache directory (writes <num>/res.json and <num>/co.json)",
-    )
-    p.add_argument(
-        "--ocr-workers",
-        type=int,
-        default=2,
-        help="Number of OCR workers (processes when >1)",
     )
     p.add_argument(
         "--component-workers",
@@ -154,18 +137,17 @@ def _handle_preprocess_ocr_pipeline(
     args: argparse.Namespace, logger: logging.Logger
 ) -> int:
     """
-    预处理流水线入口：PDF -> OCR -> Components。
+    预处理流水线入口：PDF -> OCR (Single Thread) -> Components (Multi Thread)。
 
     流程：
     1. 扫描 dataset 目录下的 PDF 文件。
     2. 检查 cache 目录，支持断点续传（resume）。
-    3. 第一阶段：OCR (多进程)
-       - 如果开启多进程 (ocr_workers > 1)，使用 ProcessPoolExecutor 并行处理 OCR。
+    3. 第一阶段：OCR (单线程/主线程)
+       - 依次处理每个 PDF，调用 _ocr_worker_run。
        - OCR 结果保存为 res.json。
     4. 第二阶段：Component Extraction (多线程)
-       - 使用 ThreadPoolExecutor 并行处理组件提取（get_components）。
+       - OCR 完成后，立即异步提交 component 任务到 ThreadPoolExecutor。
        - 结果保存为 co.json。
-    5. 支持一边 OCR 一边提取组件（run_co_after_ocr 逻辑）。
     """
     config_path = (getattr(args, "config", None) or "").strip() or None
     if config_path:
@@ -179,7 +161,6 @@ def _handle_preprocess_ocr_pipeline(
 
     os.makedirs(cache_dir, exist_ok=True)
 
-    ocr_workers = int(getattr(args, "ocr_workers", 1) or 1)
     component_workers = int(getattr(args, "component_workers", 8) or 1)
     resume = bool(getattr(args, "resume", False)) and not bool(
         getattr(args, "overwrite", False)
@@ -201,79 +182,53 @@ def _handle_preprocess_ocr_pipeline(
         )
 
     total = len(jobs)
-    done = 0
-    failed = 0
-    skipped = 0
+    done_count = 0
+    failed_count = 0
+    skipped_count = 0
 
     pbar = tqdm(total=total, unit="pdf", dynamic_ncols=True)
-    pbar.set_postfix(failed=failed, skipped=skipped, refresh=False)
+    pbar.set_postfix(failed=failed_count, skipped=skipped_count, refresh=False)
 
-    def _tick() -> None:
+    def _tick(is_fail=False, is_skip=False) -> None:
+        nonlocal done_count, failed_count, skipped_count
+        done_count += 1
+        if is_fail:
+            failed_count += 1
+        if is_skip:
+            skipped_count += 1
         pbar.update(1)
-        pbar.set_postfix(failed=failed, skipped=skipped, refresh=False)
+        pbar.set_postfix(failed=failed_count, skipped=skipped_count, refresh=False)
 
-    needs_ocr = False
-    for job in jobs:
-        res_exists = os.path.isfile(job.res_path)
-        co_exists = os.path.isfile(job.co_path)
-        if resume and res_exists and co_exists:
-            continue
-        if (not res_exists) or (not resume):
-            needs_ocr = True
-            break
-
-    ocr_exec: futures.Executor | None = None
-    if needs_ocr and ocr_workers > 1:
-        ocr_exec = futures.ProcessPoolExecutor(
-            max_workers=ocr_workers,
-            mp_context=mp.get_context("spawn"),
-            initializer=_ocr_worker_init,
-            initargs=(config_path,),
-        )
-    elif needs_ocr and ocr_workers <= 1:
-        settings = Settings.load(config_path)
-        ensure_ocr_model_loaded(settings, logger)
+    # Load OCR model once (single thread)
+    settings = Settings.load(config_path)
+    configure_logging(settings)
+    ensure_ocr_model_loaded(settings, logger)
 
     co_exec = futures.ThreadPoolExecutor(max_workers=component_workers)
-
-    ocr_futs: dict[
-        futures.Future[tuple[dict[str, Any], int, float]], tuple[_Job, bool]
-    ] = {}
     co_futs: dict[futures.Future[tuple[int, int, float]], _Job] = {}
 
-    def _drain_components(*, block: bool) -> None:
-        nonlocal done, failed
-        while co_futs:
-            timeout = None if block else 0
-            done_set, _ = futures.wait(
-                list(co_futs.keys()),
-                timeout=timeout,
-                return_when=futures.FIRST_COMPLETED,
+    def _handle_future_done(f: futures.Future) -> None:
+        if f not in co_futs:
+            return
+        job = co_futs.pop(f)
+        try:
+            f.result()
+            logger.info(
+                "pdf done",
+                extra={
+                    "taskName": "get_component",
+                    "pdf": job.pdf_path,
+                    "res": job.res_path,
+                    "co": job.co_path,
+                },
             )
-            if not done_set:
-                break
-            for f in done_set:
-                job = co_futs.pop(f)
-                try:
-                    blocks_n, body_n, co_s = f.result()
-                    done += 1
-                    logger.info(
-                        "pdf done",
-                        extra={
-                            "taskName": "get_component",
-                            "pdf": job.pdf_path,
-                            "res": job.res_path,
-                            "co": job.co_path,
-                        },
-                    )
-                except Exception as e:
-                    failed += 1
-                    done += 1
-                    logger.exception(
-                        "get_component failed",
-                        extra={"taskName": "get_component", "pdf": job.pdf_path, "error": str(e)},
-                    )
-                _tick()
+            _tick()
+        except Exception as e:
+            logger.exception(
+                "get_component failed",
+                extra={"taskName": "get_component", "pdf": job.pdf_path, "error": str(e)},
+            )
+            _tick(is_fail=True)
 
     try:
         for job in jobs:
@@ -282,8 +237,6 @@ def _handle_preprocess_ocr_pipeline(
             co_exists = os.path.isfile(job.co_path)
 
             if resume and res_exists and co_exists:
-                skipped += 1
-                done += 1
                 logger.info(
                     "pdf done (skipped)",
                     extra={
@@ -293,147 +246,58 @@ def _handle_preprocess_ocr_pipeline(
                         "co": job.co_path,
                     },
                 )
-                _tick()
+                _tick(is_skip=True)
                 continue
 
             need_res = not res_exists or not resume
-            need_co = not co_exists or not resume
-
-            if not need_res and need_co:
-                co_futs[
-                    co_exec.submit(
-                        _run_get_components, job.res_path, job.co_path, logger
-                    )
-                ] = job
-                _drain_components(block=False)
-                continue
-
-            run_co_after_ocr = need_co and (need_res or res_exists)
-
-            if ocr_exec is None:
+            
+            # Step 1: OCR (Synchronous)
+            if need_res:
                 try:
                     payload, n_blocks, ocr_s = _ocr_worker_run(job.pdf_path)
                     Path(job.res_path).write_text(
                         json.dumps(payload, ensure_ascii=False, indent=2),
                         encoding="utf-8",
                     )
-                    if run_co_after_ocr:
-                        co_futs[
-                            co_exec.submit(
-                                _run_get_components, job.res_path, job.co_path, logger
-                            )
-                        ] = job
-                        _drain_components(block=False)
-                    else:
-                        done += 1
-                        logger.info(
-                            "pdf done (ocr only)",
-                            extra={
-                                "taskName": "ocr",
-                                "pdf": job.pdf_path,
-                                "res": job.res_path,
-                            },
-                        )
-                        _tick()
-                        _drain_components(block=False)
                 except Exception as e:
-                    failed += 1
-                    done += 1
                     logger.exception(
                         "ocr failed",
                         extra={"taskName": "ocr", "pdf": job.pdf_path, "error": str(e)},
                     )
-                    _tick()
-                    _drain_components(block=False)
-                continue
+                    _tick(is_fail=True)
+                    continue
 
-            ocr_futs[ocr_exec.submit(_ocr_worker_run, job.pdf_path)] = (
-                job,
-                run_co_after_ocr,
-            )
+            # Step 2: Components (Asynchronous)
+            fut = co_exec.submit(_run_get_components, job.res_path, job.co_path, logger)
+            co_futs[fut] = job
 
-        if ocr_exec is None:
-            _drain_components(block=True)
-        else:
-            pending: set[futures.Future[Any]] = set(ocr_futs.keys()) | set(
-                co_futs.keys()
-            )
-            while pending:
-                done_set, pending = futures.wait(
-                    pending, return_when=futures.FIRST_COMPLETED
+            # Check completed futures (non-blocking)
+            if co_futs:
+                done_set, _ = futures.wait(
+                    list(co_futs.keys()),
+                    timeout=0,
+                    return_when=futures.FIRST_COMPLETED,
                 )
                 for f in done_set:
-                    if f in ocr_futs:
-                        job, run_co_after_ocr = ocr_futs.pop(f)
-                        try:
-                            payload, n_blocks, ocr_s = f.result()
-                            Path(job.res_path).write_text(
-                                json.dumps(payload, ensure_ascii=False, indent=2),
-                                encoding="utf-8",
-                            )
-                            if run_co_after_ocr:
-                                cf = co_exec.submit(
-                                    _run_get_components,
-                                    job.res_path,
-                                    job.co_path,
-                                    logger,
-                                )
-                                co_futs[cf] = job
-                                pending.add(cf)
-                            else:
-                                done += 1
-                                logger.info(
-                                    "pdf done (ocr only)",
-                                    extra={
-                                        "taskName": "ocr",
-                                        "pdf": job.pdf_path,
-                                        "res": job.res_path,
-                                    },
-                                )
-                        except Exception as e:
-                            failed += 1
-                            done += 1
-                            logger.exception(
-                                "ocr failed",
-                                extra={
-                                    "taskName": "ocr",
-                                    "pdf": job.pdf_path,
-                                    "error": str(e),
-                                },
-                            )
-                        _tick()
-                        continue
+                    _handle_future_done(f)
 
-                    job = co_futs.pop(f)
-                    try:
-                        done += 1
-                        logger.info(
-                            "pdf done",
-                            extra={
-                                "taskName": "get_component",
-                                "pdf": job.pdf_path,
-                                "res": job.res_path,
-                                "co": job.co_path,
-                            },
-                        )
-                    except Exception as e:
-                        failed += 1
-                        done += 1
-                        logger.exception(
-                            "get_component failed",
-                            extra={"taskName": "get_component", "pdf": job.pdf_path, "error": str(e)},
-                        )
-                    _tick()
+        # Wait for remaining tasks
+        while co_futs:
+            done_set, _ = futures.wait(
+                list(co_futs.keys()),
+                return_when=futures.FIRST_COMPLETED,
+            )
+            for f in done_set:
+                _handle_future_done(f)
+
     finally:
-        if ocr_exec is not None:
-            ocr_exec.shutdown(wait=True, cancel_futures=False)
         co_exec.shutdown(wait=True, cancel_futures=False)
         pbar.close()
 
-    if failed:
+    if failed_count:
         logger.error(
             "preprocess ocr pipeline finished with failures",
-            extra={"taskName": "preprocess", "total": total, "failed": failed, "cache_dir": cache_dir},
+            extra={"taskName": "preprocess", "total": total, "failed": failed_count, "cache_dir": cache_dir},
         )
         return 2
 

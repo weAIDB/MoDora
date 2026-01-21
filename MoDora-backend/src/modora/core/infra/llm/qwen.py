@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import re
 import threading
+from typing import Tuple
 
 from openai import OpenAI
 
+from modora.core.interfaces.llm import LLMClient
 from modora.core.prompts.enrichment import (
     chart_enrichment_prompt,
     image_enrichment_prompt,
@@ -117,3 +119,25 @@ def qwen_annotation(
             break
 
     return title, metadata, content
+
+
+class QwenLLMClient(LLMClient):
+    """
+    Qwen LLM 客户端适配器。
+    实现了 LLMClient 接口，底层调用本地部署的 Qwen-VL 模型。
+    """
+
+    def generate_annotation(
+        self, base64_image: str, cp_type: str
+    ) -> Tuple[str, str, str]:
+        """
+        调用 Qwen 模型生成图片标注。
+
+        Args:
+            base64_image: Base64 编码的图片
+            cp_type: 组件类型
+
+        Returns:
+            Tuple[str, str, str]: (标题, 元数据, 内容)
+        """
+        return qwen_annotation(base64_image, cp_type)
