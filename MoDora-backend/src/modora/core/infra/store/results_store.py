@@ -24,7 +24,6 @@ from modora.core.domain.results import (
 """
 
 
-
 def _iter_jsonl_objects(path: str) -> Iterable[tuple[int, dict[str, Any]]]:
     """逐行读取 JSONL 并 yield (line_no, obj)。
 

@@ -12,6 +12,7 @@ from typing import Any
 - 允许对历史数据做最小兼容（例如 prediction 允许为 null），并通过显式约束保证一致性。
 """
 
+
 @dataclass(frozen=True)
 class ResultItem:
     """单条结果记录（对应 JSONL 中的一行）。

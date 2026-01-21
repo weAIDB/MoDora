@@ -9,6 +9,7 @@ from modora.core.settings import Settings
 from modora.lab.commands.health import register as register_health
 from modora.lab.commands.results import register as register_results
 from modora.lab.commands.config import register as register_config
+from modora.lab.commands.preprocess import register as register_preprocess
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -21,6 +22,7 @@ def main(argv: list[str] | None = None) -> int:
     register_health(sub)
     register_results(sub)
     register_config(sub)
+    register_preprocess(sub)
 
     args = parser.parse_args(argv)
 

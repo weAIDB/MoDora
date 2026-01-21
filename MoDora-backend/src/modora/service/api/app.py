@@ -17,6 +17,7 @@ settings = Settings.load()
 configure_logging(settings)
 logger = logging.getLogger("modora.service")
 
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     ensure_llm_local_loaded(settings, logger)
@@ -26,8 +27,10 @@ async def lifespan(_app: FastAPI):
     finally:
         shutdown_llm_local()
 
+
 app = FastAPI(title=settings.service_name, lifespan=lifespan)
 app.include_router(ocr_router)
+
 
 @app.middleware("http")
 async def request_id_middleware(request: Request, call_next):

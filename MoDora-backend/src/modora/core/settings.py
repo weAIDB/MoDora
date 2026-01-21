@@ -53,6 +53,80 @@ def _clean_str(val: Any) -> str | None:
     return s if s else None
 
 
+def _coerce_json(val: Any) -> Any:
+    if val is None:
+        return None
+    if isinstance(val, (dict, list)):
+        return val
+    if isinstance(val, str):
+        s = val.strip()
+        if not s:
+            return None
+        if (s.startswith("{") and s.endswith("}")) or (
+            s.startswith("[") and s.endswith("]")
+        ):
+            try:
+                return json.loads(s)
+            except Exception:
+                return None
+    return None
+
+
+def _coerce_float_or_pair(
+    val: Any, default: float | tuple[float, float] | None
+) -> float | tuple[float, float] | None:
+    if val is None:
+        return default
+
+    if isinstance(val, (int, float)):
+        return float(val)
+
+    if isinstance(val, (list, tuple)) and len(val) == 2:
+        try:
+            return (float(val[0]), float(val[1]))
+        except Exception:
+            return default
+
+    s = str(val).strip()
+    if not s:
+        return default
+
+    if s.lower() in {"none", "null"}:
+        return None
+
+    if s.startswith("[") and s.endswith("]"):
+        try:
+            parsed = json.loads(s)
+        except Exception:
+            parsed = None
+        if isinstance(parsed, list) and len(parsed) == 2:
+            try:
+                return (float(parsed[0]), float(parsed[1]))
+            except Exception:
+                return default
+
+    if "," in s:
+        parts = [p.strip() for p in s.split(",")]
+        parts = [p for p in parts if p]
+        if len(parts) == 2:
+            try:
+                return (float(parts[0]), float(parts[1]))
+            except Exception:
+                return default
+
+    try:
+        return float(s)
+    except Exception:
+        return default
+
+
+@dataclass(frozen=True)
+class LlmLocalInstance:
+    host: str = "127.0.0.1"
+    port: int = 9001
+    cuda_visible_devices: str | None = None
+
+
 @dataclass(frozen=True)
 class Settings:
     """应用程序配置类
@@ -85,10 +159,11 @@ class Settings:
     llm_local_port: int = 9001
     llm_local_cuda_visible_devices: str | None = None
     llm_local_startup_timeout_s: float = 600.0
+    llm_local_instances: tuple[LlmLocalInstance, ...] = ()
 
     ocr_device: str = "gpu:6"
     ocr_lang: str = "en"
-    ocr_layout_unclip_ratio: float = 0.5
+    ocr_layout_unclip_ratio: float | tuple[float, float] | None = 1.1
     ocr_use_table_recognition: bool = True
     ocr_use_doc_unwarping: bool = False
 
@@ -125,13 +200,45 @@ class Settings:
         llm_local_cuda_visible_devices = _clean_str(
             pick("llm_local_cuda_visible_devices", None)
         )
-        llm_local_startup_timeout_s = float(
-            pick("llm_local_startup_timeout_s", 600.0)
-        )
+        llm_local_startup_timeout_s = float(pick("llm_local_startup_timeout_s", 600.0))
+
+        llm_local_instances_raw = _coerce_json(pick("llm_local_instances", None))
+        llm_local_instances: tuple[LlmLocalInstance, ...] = ()
+        if isinstance(llm_local_instances_raw, list):
+            inst_list: list[LlmLocalInstance] = []
+            for it in llm_local_instances_raw:
+                if not isinstance(it, dict):
+                    continue
+                port_raw = it.get("port", None)
+                if port_raw is None:
+                    continue
+                try:
+                    port = int(port_raw)
+                except Exception:
+                    continue
+                host = _clean_str(it.get("host", None)) or "127.0.0.1"
+                cuda_visible_devices = _clean_str(it.get("cuda_visible_devices", None))
+                inst_list.append(
+                    LlmLocalInstance(
+                        host=host, port=port, cuda_visible_devices=cuda_visible_devices
+                    )
+                )
+            llm_local_instances = tuple(inst_list)
+
+        if not llm_local_instances and llm_local_model:
+            llm_local_instances = (
+                LlmLocalInstance(
+                    host="127.0.0.1",
+                    port=llm_local_port,
+                    cuda_visible_devices=llm_local_cuda_visible_devices,
+                ),
+            )
 
         ocr_device = _clean_str(pick("ocr_device", "gpu:6")) or "gpu:6"
         ocr_lang = _clean_str(pick("ocr_lang", "en"))
-        ocr_layout_unclip_ratio = float(pick("ocr_layout_unclip_ratio", 0.5))
+        ocr_layout_unclip_ratio = _coerce_float_or_pair(
+            pick("ocr_layout_unclip_ratio", 0.5), default=0.5
+        )
         ocr_use_table_recognition = _coerce_bool(
             pick("ocr_use_table_recognition", True), default=True
         )
@@ -152,6 +259,7 @@ class Settings:
             llm_local_port=llm_local_port,
             llm_local_cuda_visible_devices=llm_local_cuda_visible_devices,
             llm_local_startup_timeout_s=llm_local_startup_timeout_s,
+            llm_local_instances=llm_local_instances,
             ocr_device=ocr_device,
             ocr_lang=ocr_lang,
             ocr_layout_unclip_ratio=ocr_layout_unclip_ratio,
