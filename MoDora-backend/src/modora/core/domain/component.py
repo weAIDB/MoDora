@@ -34,6 +34,7 @@ class Component:
 
     type: str
     title: str = TITLE
+    title_level: int = 1
     metadata: Any | None = None
     data: str = ""
     location: list[Location] = field(default_factory=list)
@@ -42,6 +43,7 @@ class Component:
         return {
             "type": self.type,
             "title": self.title,
+            "title_level": self.title_level,
             "metadata": self.metadata,
             "data": self.data,
             "location": [loc.to_dict() for loc in self.location],
@@ -58,6 +60,7 @@ class Component:
         return Component(
             type=str(obj.get("type") or ""),
             title=str(obj.get("title") or TITLE),
+            title_level=obj.get("title_level" or 1),
             metadata=obj.get("metadata"),
             data=str(obj.get("data") or ""),
             location=locs,

@@ -156,7 +156,9 @@ def _handle_preprocess_ocr_pipeline(
     cache_dir = str(getattr(args, "cache_dir", "cache"))
     pdf_paths = _iter_pdf_paths(str(args.dataset))
     if not pdf_paths:
-        logger.error("no pdf files found", extra={"taskName": "ocr", "dataset": args.dataset})
+        logger.error(
+            "no pdf files found", extra={"taskName": "ocr", "dataset": args.dataset}
+        )
         return 2
 
     os.makedirs(cache_dir, exist_ok=True)
@@ -226,7 +228,11 @@ def _handle_preprocess_ocr_pipeline(
         except Exception as e:
             logger.exception(
                 "get_component failed",
-                extra={"taskName": "get_component", "pdf": job.pdf_path, "error": str(e)},
+                extra={
+                    "taskName": "get_component",
+                    "pdf": job.pdf_path,
+                    "error": str(e),
+                },
             )
             _tick(is_fail=True)
 
@@ -250,7 +256,7 @@ def _handle_preprocess_ocr_pipeline(
                 continue
 
             need_res = not res_exists or not resume
-            
+
             # Step 1: OCR (Synchronous)
             if need_res:
                 try:
@@ -297,12 +303,22 @@ def _handle_preprocess_ocr_pipeline(
     if failed_count:
         logger.error(
             "preprocess ocr pipeline finished with failures",
-            extra={"taskName": "preprocess", "total": total, "failed": failed_count, "cache_dir": cache_dir},
+            extra={
+                "taskName": "preprocess",
+                "total": total,
+                "failed": failed_count,
+                "cache_dir": cache_dir,
+            },
         )
         return 2
 
     logger.info(
         "preprocess ocr pipeline finished",
-        extra={"taskName": "preprocess", "total": total, "failed": 0, "cache_dir": cache_dir},
+        extra={
+            "taskName": "preprocess",
+            "total": total,
+            "failed": 0,
+            "cache_dir": cache_dir,
+        },
     )
     return 0

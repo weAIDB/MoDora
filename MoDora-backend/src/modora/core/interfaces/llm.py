@@ -21,3 +21,16 @@ class LLMClient(Protocol):
             Tuple[str, str, str]: 包含 (标题, 元数据, 内容) 的元组
         """
         ...
+
+    def generate_levels(self, title_list: list[str], base64_image: str) -> str:
+        """
+        为标题列表生成标题层次结构。
+
+        Args:
+            title_list: 标题列表
+            base64_image: Base64 编码的图片
+
+        Returns:
+            str: 标题层次结构
+        """
+        ...

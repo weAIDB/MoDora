@@ -10,8 +10,6 @@ from modora.core.infra.logging.setup import configure_logging
 from modora.core.settings import Settings
 from modora.service.api.llm_local import ensure_llm_local_loaded, shutdown_llm_local
 from modora.service.api.ocr.router import router as ocr_router
-from modora.service.api.ocr.runtime import ensure_ocr_model_loaded
-
 
 settings = Settings.load()
 configure_logging(settings)
@@ -21,7 +19,7 @@ logger = logging.getLogger("modora.service")
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     ensure_llm_local_loaded(settings, logger)
-    ensure_ocr_model_loaded(settings, logger)
+    # ensure_ocr_model_loaded(settings, logger)
     try:
         yield
     finally:

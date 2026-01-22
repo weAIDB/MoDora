@@ -49,7 +49,6 @@ class OCRExtractRequest(BaseModel):
         )
 
 
-
 class OCRExtractPdfRequest(BaseModel):
     file_path: str
 

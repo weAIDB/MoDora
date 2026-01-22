@@ -15,7 +15,7 @@ def get_components(
 ) -> ComponentPack:
     """
     将 OCR 提取的扁平 Block 列表重组为结构化的 ComponentPack。
-    
+
     此函数现在充当应用服务编排器 (Orchestrator)：
     1. 调用 StructureAnalyzer 进行结构分析。
     2. 调用 EnrichmentService 进行信息增强。
@@ -29,8 +29,8 @@ def get_components(
     llm = QwenLLMClient()
     cropper = PDFCropper()
     enricher = EnrichmentService(llm, cropper)
-    
+
     # 执行增强
     co_pack = enricher.enrich(co_pack, extracted_data.source)
-    
+
     return co_pack

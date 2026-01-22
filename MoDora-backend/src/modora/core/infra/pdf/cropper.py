@@ -8,7 +8,7 @@ from pathlib import Path
 import fitz
 from PIL import Image
 
-from modora.core.domain.component import Component
+from modora.core.domain.component import Component, Location
 from modora.core.interfaces.media import ImageProvider
 
 # 如果裁剪失败（PDF打不开/页号越界/bbox非法等），返回 1x1 空白 PNG 的 base64。
@@ -23,46 +23,48 @@ def _normalize_pdf_path(pdf_path: str) -> str:
     return p
 
 
-def co_to_base64(pdf_path: str, co: Component) -> str:
-    """将 Component 的所有 location 对应区域裁剪出来并拼接为一张 PNG，然后返回 base64。"""
+def bbox_to_base64(pdf_path: str, bbox_list: list[Location]) -> str:
+    """
+    将 PDF 中多个 bbox 区域裁剪出来并拼接为一张 PNG，然后返回 base64。
+
+    Args:
+        pdf_path: PDF 文件路径 (支持 "file:" 前缀)
+        bbox_list: 包含多个 Location 的列表，每个 Location 表示一个要裁剪的区域
+
+    Returns:
+        str: Base64 编码的 PNG 图片
+    """
     pdf_path = _normalize_pdf_path(pdf_path)
-    try:
-        pdf_document = fitz.open(pdf_path)
-    except Exception:
-        return _BLANK_1X1_PNG_BASE64
+    pdf_document = fitz.open(pdf_path)
 
     images: list[Image] = []
-    try:
-        for loc in co.location:
-            # OCR 的 page_id 从 1 开始，这里转换成 fitz 的 0-based page index。
-            page_idx = loc.page - 1
-            crop_range = loc.bbox
-            page = pdf_document[page_idx]
+    for loc in bbox_list:
+        # OCR 的 page_id 从 1 开始，这里转换成 fitz 的 0-based page index。
+        page_idx = loc.page - 1
+        crop_range = loc.bbox
+        page = pdf_document[page_idx]
 
-            pix = page.get_pixmap(clip=crop_range)
-            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-            images.append(img)
+        pix = page.get_pixmap(clip=crop_range)
+        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+        images.append(img)
 
-        if not images:
-            raise ValueError("No specified regions")
+    if not images:
+        raise ValueError("No specific image!!!")
 
-        total_width = max(int(img.width) for img in images)
-        total_height = sum(int(img.height) for img in images)
-        merged_image = Image.new("RGB", (total_width, total_height))
+    total_width = max(int(img.width) for img in images)
+    total_height = sum(int(img.height) for img in images)
+    merged_image = Image.new("RGB", (total_width, total_height))
 
-        y_offset = 0
-        for img in images:
-            merged_image.paste(img, (0, y_offset))
-            y_offset += int(img.height)
+    y_offset = 0
+    for img in images:
+        merged_image.paste(img, (0, y_offset))
+        y_offset += int(img.height)
 
-        buffered = io.BytesIO()
-        merged_image.save(buffered, format="PNG")
-        buffered.seek(0)
-        return base64.b64encode(buffered.read()).decode("utf-8")
-    except Exception:
-        return _BLANK_1X1_PNG_BASE64
-    finally:
-        pdf_document.close()
+    buffered = io.BytesIO()
+    merged_image.save(buffered, format="PNG")
+    buffered.seek(0)
+    pdf_document.close()
+    return base64.b64encode(buffered.read()).decode("utf-8")
 
 
 def render_ocr_json_to_pdf(
@@ -151,7 +153,7 @@ class PDFCropper(ImageProvider):
     实现了 ImageProvider 接口，使用 PyMuPDF (fitz) 从 PDF 中裁剪指定区域。
     """
 
-    def crop_image(self, source: str, component: Component) -> str:
+    def crop_image(self, source: str, locs: Component | list[Location]) -> str:
         """
         从 PDF 文件中裁剪组件区域并转换为 Base64 图片。
 
@@ -162,4 +164,6 @@ class PDFCropper(ImageProvider):
         Returns:
             str: Base64 编码的 PNG 图片
         """
-        return co_to_base64(source, component)
+        if isinstance(locs, Component):
+            locs = locs.location
+        return bbox_to_base64(source, locs)

@@ -9,7 +9,9 @@ from modora.core.domain.ocr import OcrExtractResponse
 class StructureAnalyzer:
     """负责将 OCR 扁平结果分析为结构化的 ComponentPack。"""
 
-    def analyze(self, extracted_data: OcrExtractResponse, logger: logging.Logger) -> ComponentPack:
+    def analyze(
+        self, extracted_data: OcrExtractResponse, logger: logging.Logger
+    ) -> ComponentPack:
         # Initial sequence
         co_pack = ComponentPack()
         header = co_pack.supplement.header

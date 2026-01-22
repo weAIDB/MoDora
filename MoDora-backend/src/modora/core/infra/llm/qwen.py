@@ -12,6 +12,7 @@ from modora.core.prompts.enrichment import (
     image_enrichment_prompt,
     table_enrichment_prompt,
 )
+from modora.core.prompts.hierarchy import level_title_prompt
 from modora.core.settings import Settings
 
 _rr_lock = threading.Lock()
@@ -141,3 +142,18 @@ class QwenLLMClient(LLMClient):
             Tuple[str, str, str]: (标题, 元数据, 内容)
         """
         return qwen_annotation(base64_image, cp_type)
+
+    def generate_levels(self, title_list: list[str], base64_image: str) -> str:
+        """
+        调用 Qwen 模型生成标题层次结构。
+
+        Args:
+            title_list: 标题列表
+            base64_image: Base64 编码的图片
+
+        Returns:
+            str: 标题层次结构
+        """
+        prompt = level_title_prompt.format(raw_list=title_list)
+        leveled_title = call_qwen_vl(prompt, base64_image) or ""
+        return leveled_title
