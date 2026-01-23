@@ -68,11 +68,12 @@ class LevelGenerator:
 
         return cp
 
+
 class AsyncLevelGenerator:
     def __init__(self, llm_client: AsyncQwenLLMClient, image_provider: ImageProvider):
         self.llm = llm_client
         self.media = image_provider
-    
+
     def _get_title_level(self, title: str) -> int:
         level = 0
         for char in title.lstrip():
@@ -81,7 +82,7 @@ class AsyncLevelGenerator:
             else:
                 break
         return level if level > 0 else 1
-    
+
     async def generate_level(
         self,
         source_path: str,

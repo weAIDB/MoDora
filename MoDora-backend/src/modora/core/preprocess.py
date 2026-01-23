@@ -10,6 +10,7 @@ from modora.core.infra.llm.qwen import AsyncQwenLLMClient, QwenLLMClient
 from modora.core.infra.pdf.cropper import PDFCropper
 from modora.core.services.constructor import TreeConstructor
 from modora.core.services.hierarchy import AsyncLevelGenerator, LevelGenerator
+from modora.core.services.generator import AsyncMetadataGenerator
 from modora.core.settings import Settings
 
 
@@ -57,9 +58,15 @@ async def build_tree_async(
     settings = Settings.load()
     llm = AsyncQwenLLMClient()
     cropper = PDFCropper()
+    generator = AsyncMetadataGenerator(
+        n0=2, growth_rate=2.0, logger=logger, llm_client=llm
+    )
+    constructor = TreeConstructor(settings, logger)
+
     if source_path:
         cp = await AsyncLevelGenerator(llm, cropper).generate_level(
             source_path=source_path, cp=cp, config=settings, logger=logger
         )
-    constructor = TreeConstructor(settings, logger)
-    return constructor.construct_tree(cp)
+    cctree = constructor.construct_tree(cp)
+    await generator.get_metadata(cctree)
+    return cctree

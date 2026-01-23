@@ -63,17 +63,20 @@ class TreeConstructor:
             )
 
         header_children = {
-            f"Header of Page {p}": _supp_node(co) for p, co in cp.supplement.header.items()
+            f"Header of Page {p}": _supp_node(co)
+            for p, co in cp.supplement.header.items()
         }
         footer_children = {
-            f"Footer of Page {p}": _supp_node(co) for p, co in cp.supplement.footer.items()
+            f"Footer of Page {p}": _supp_node(co)
+            for p, co in cp.supplement.footer.items()
         }
         number_children = {
             f"Original number of Page {p}": _supp_node(co)
             for p, co in cp.supplement.number.items()
         }
         aside_children = {
-            f"Aside text of Page {p}": _supp_node(co) for p, co in cp.supplement.aside.items()
+            f"Aside text of Page {p}": _supp_node(co)
+            for p, co in cp.supplement.aside.items()
         }
 
         header_root = CCTreeNode(

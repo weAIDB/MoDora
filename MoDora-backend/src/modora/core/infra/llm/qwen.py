@@ -13,6 +13,10 @@ from modora.core.prompts.enrichment import (
     table_enrichment_prompt,
 )
 from modora.core.prompts.hierarchy import level_title_prompt
+from modora.core.prompts.metadata import (
+    metadata_generation_prompt,
+    metadata_integration_prompt,
+)
 from modora.core.settings import Settings
 
 _rr_lock = threading.Lock()
@@ -52,25 +56,30 @@ def _next_rr(n: int) -> int:
         _rr_idx += 1
         return idx
 
-def _create_messages(prompt: str, base64_image: str) -> list:
+
+def _create_messages(prompt: str, base64_image: str | None = None) -> list:
     messages = [
         {
             "role": "user",
             "content": [
                 {"type": "text", "text": prompt},
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/jpeg;base64,{base64_image}"  # 使用Base64数据
-                    },
-                },
             ],
         }
     ]
+    if base64_image is not None:
+        messages[0]["content"].append(
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{base64_image}"  # 使用Base64数据
+                },
+            }
+        )
     return messages
 
+
 def call_qwen_vl(
-    prompt: str, base64_image: str, settings: Settings | None = None
+    prompt: str, base64_image: str | None = None, settings: Settings | None = None
 ) -> str:
     """通过 OpenAI 兼容接口调用本地 Qwen-VL（lmdeploy api_server）。"""
     settings = settings or Settings.load()
@@ -79,7 +88,7 @@ def call_qwen_vl(
 
     base_urls = _list_base_urls(settings)
     start = _next_rr(len(base_urls))
-    messages =  _create_messages(prompt, base64_image)
+    messages = _create_messages(prompt, base64_image)
 
     last_exc: Exception | None = None
     for i in range(len(base_urls)):
@@ -100,13 +109,14 @@ def call_qwen_vl(
         raise last_exc
     raise RuntimeError("no llm endpoints configured")
 
+
 async def call_qwen_vl_async(
-    prompt: str, base64_image: str, settings: Settings | None = None
+    prompt: str, base64_image: str | None = None, settings: Settings | None = None
 ) -> str:
     settings = settings or Settings.load()
     if not settings.llm_local_model:
         raise RuntimeError("llm_local_model is not configured")
-    
+
     base_urls = _list_base_urls(settings)
     start = _next_rr(len(base_urls))
     messages = _create_messages(prompt, base64_image)
@@ -125,7 +135,7 @@ async def call_qwen_vl_async(
         except Exception as e:
             last_exc = e
             continue
-    
+
     if last_exc is not None:
         raise last_exc
     raise RuntimeError("no llm endpoints configured")
@@ -191,8 +201,21 @@ class QwenLLMClient(LLMClient):
         leveled_title = call_qwen_vl(prompt, base64_image) or ""
         return leveled_title
 
+
 class AsyncQwenLLMClient:
     async def generate_levels(self, title_list: list[str], base64_image: str) -> str:
         prompt = level_title_prompt.format(raw_list=title_list)
         response = await call_qwen_vl_async(prompt, base64_image)
         return response or ""
+
+    async def generate_metadata(self, data: str, num: int) -> str:
+        prompt = metadata_generation_prompt.format(data=data, num=num)
+        raw_response = await call_qwen_vl_async(prompt)
+        response = ";".join(raw_response.split(";")[:num])
+        return response
+
+    async def integrate_metadata(self, data: str, num: int) -> str:
+        prompt = metadata_integration_prompt.format(data=data, num=num)
+        raw_response = await call_qwen_vl_async(prompt)
+        response = ";".join(raw_response.split(";")[:num])
+        return response
