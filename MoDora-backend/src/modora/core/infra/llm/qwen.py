@@ -4,7 +4,7 @@ import re
 import threading
 from typing import Tuple
 
-from openai import OpenAI
+from openai import AsyncOpenAI, OpenAI
 
 from modora.core.interfaces.llm import LLMClient
 from modora.core.prompts.enrichment import (
@@ -52,17 +52,7 @@ def _next_rr(n: int) -> int:
         _rr_idx += 1
         return idx
 
-
-def call_qwen_vl(
-    prompt: str, base64_image: str, settings: Settings | None = None
-) -> str:
-    """通过 OpenAI 兼容接口调用本地 Qwen-VL（lmdeploy api_server）。"""
-    settings = settings or Settings.load()
-    if not settings.llm_local_model:
-        raise RuntimeError("llm_local_model is not configured")
-
-    base_urls = _list_base_urls(settings)
-    start = _next_rr(len(base_urls))
+def _create_messages(prompt: str, base64_image: str) -> list:
     messages = [
         {
             "role": "user",
@@ -77,6 +67,19 @@ def call_qwen_vl(
             ],
         }
     ]
+    return messages
+
+def call_qwen_vl(
+    prompt: str, base64_image: str, settings: Settings | None = None
+) -> str:
+    """通过 OpenAI 兼容接口调用本地 Qwen-VL（lmdeploy api_server）。"""
+    settings = settings or Settings.load()
+    if not settings.llm_local_model:
+        raise RuntimeError("llm_local_model is not configured")
+
+    base_urls = _list_base_urls(settings)
+    start = _next_rr(len(base_urls))
+    messages =  _create_messages(prompt, base64_image)
 
     last_exc: Exception | None = None
     for i in range(len(base_urls)):
@@ -93,6 +96,36 @@ def call_qwen_vl(
             last_exc = e
             continue
 
+    if last_exc is not None:
+        raise last_exc
+    raise RuntimeError("no llm endpoints configured")
+
+async def call_qwen_vl_async(
+    prompt: str, base64_image: str, settings: Settings | None = None
+) -> str:
+    settings = settings or Settings.load()
+    if not settings.llm_local_model:
+        raise RuntimeError("llm_local_model is not configured")
+    
+    base_urls = _list_base_urls(settings)
+    start = _next_rr(len(base_urls))
+    messages = _create_messages(prompt, base64_image)
+
+    last_exc: Exception | None = None
+    for i in range(len(base_urls)):
+        base_url = base_urls[(start + i) % len(base_urls)]
+        try:
+            client = AsyncOpenAI(base_url=base_url, api_key="local")
+            response = await client.chat.completions.create(
+                model=settings.llm_local_model,
+                messages=messages,
+                max_completion_tokens=2048,
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            last_exc = e
+            continue
+    
     if last_exc is not None:
         raise last_exc
     raise RuntimeError("no llm endpoints configured")
@@ -157,3 +190,9 @@ class QwenLLMClient(LLMClient):
         prompt = level_title_prompt.format(raw_list=title_list)
         leveled_title = call_qwen_vl(prompt, base64_image) or ""
         return leveled_title
+
+class AsyncQwenLLMClient:
+    async def generate_levels(self, title_list: list[str], base64_image: str) -> str:
+        prompt = level_title_prompt.format(raw_list=title_list)
+        response = await call_qwen_vl_async(prompt, base64_image)
+        return response or ""

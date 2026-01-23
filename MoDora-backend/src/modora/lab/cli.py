@@ -6,6 +6,7 @@ import logging
 from modora.core.infra.logging.context import new_id, run_scope
 from modora.core.infra.logging.setup import configure_logging
 from modora.core.settings import Settings
+from modora.lab.commands.build_tree import register as register_build_tree
 from modora.lab.commands.health import register as register_health
 from modora.lab.commands.results import register as register_results
 from modora.lab.commands.config import register as register_config
@@ -18,6 +19,7 @@ def main(argv: list[str] | None = None) -> int:
 
     sub = parser.add_subparsers(dest="cmd", required=True)
 
+    register_build_tree(sub)
     register_health(sub)
     register_results(sub)
     register_config(sub)

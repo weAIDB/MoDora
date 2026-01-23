@@ -6,8 +6,11 @@ from modora.core.domain.component import ComponentPack
 from modora.core.domain.ocr import OcrExtractResponse
 from modora.core.services.structure import StructureAnalyzer
 from modora.core.services.enrichment import EnrichmentService
-from modora.core.infra.llm.qwen import QwenLLMClient
+from modora.core.infra.llm.qwen import AsyncQwenLLMClient, QwenLLMClient
 from modora.core.infra.pdf.cropper import PDFCropper
+from modora.core.services.constructor import TreeConstructor
+from modora.core.services.hierarchy import AsyncLevelGenerator, LevelGenerator
+from modora.core.settings import Settings
 
 
 def get_components(
@@ -34,3 +37,29 @@ def get_components(
     co_pack = enricher.enrich(co_pack, extracted_data.source)
 
     return co_pack
+
+
+def build_tree(cp: ComponentPack, logger: logging.Logger, source_path: str = ""):
+    settings = Settings.load()
+    llm = QwenLLMClient()
+    cropper = PDFCropper()
+    if source_path:
+        cp = LevelGenerator(llm, cropper).generate_level(
+            source_path=source_path, cp=cp, config=settings, logger=logger
+        )
+    constructor = TreeConstructor(settings, logger)
+    return constructor.construct_tree(cp)
+
+
+async def build_tree_async(
+    cp: ComponentPack, logger: logging.Logger, source_path: str = ""
+):
+    settings = Settings.load()
+    llm = AsyncQwenLLMClient()
+    cropper = PDFCropper()
+    if source_path:
+        cp = await AsyncLevelGenerator(llm, cropper).generate_level(
+            source_path=source_path, cp=cp, config=settings, logger=logger
+        )
+    constructor = TreeConstructor(settings, logger)
+    return constructor.construct_tree(cp)
