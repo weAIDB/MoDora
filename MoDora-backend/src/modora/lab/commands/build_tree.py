@@ -27,13 +27,13 @@ def register(sub: argparse._SubParsersAction) -> None:
     )
     p.add_argument(
         "--cache-dir",
-        default="/home/yukai/project/MoDora/MoDora-backend/cache",
+        default="/home/yukai/project/MoDora/MoDora-backend/cache_v4",
         help="Cache directory containing <num>/co.json",
     )
     p.add_argument(
         "--concurrency",
         type=int,
-        default=0,
+        default=16,
         help="Max concurrent PDFs (0=auto)",
     )
     p.set_defaults(_handler=_handle_build_tree)

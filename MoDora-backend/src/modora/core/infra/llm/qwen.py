@@ -17,6 +17,15 @@ from modora.core.prompts.metadata import (
     metadata_generation_prompt,
     metadata_integration_prompt,
 )
+from modora.core.prompts.retrieval import (
+    question_parsing_prompt,
+    select_children_prompt,
+    check_node_prompt1,
+    check_node_prompt2,
+    check_answer_prompt,
+    retrieved_reasoning_prompt,
+    whole_reasoning_prompt,
+)
 from modora.core.settings import Settings
 
 _rr_lock = threading.Lock()
@@ -202,6 +211,13 @@ class QwenLLMClient(LLMClient):
         return leveled_title
 
 
+def _bool_string(s: str) -> bool:
+    s = s.lower()
+    if "t" in s or "yes" in s or "true" in s:
+        return True
+    return False
+
+
 class AsyncQwenLLMClient:
     async def generate_levels(self, title_list: list[str], base64_image: str) -> str:
         prompt = level_title_prompt.format(raw_list=title_list)
@@ -219,3 +235,73 @@ class AsyncQwenLLMClient:
         raw_response = await call_qwen_vl_async(prompt)
         response = ";".join(raw_response.split(";")[:num])
         return response
+
+    async def parse_question(self, query: str) -> str:
+        prompt = question_parsing_prompt.replace("__QUESTION_PLACEHOLDER__", query)
+        return await call_qwen_vl_async(prompt)
+
+    async def select_children(
+        self, keys: list[str], query: str, path: str, metadata_map: str
+    ) -> str:
+        prompt = select_children_prompt.format(
+            list=keys, query=query, path=path, metadata_map=metadata_map
+        )
+        return await call_qwen_vl_async(prompt)
+
+    async def check_node(self, data: str, query: str) -> bool:
+        prompt = check_node_prompt1.format(data=data, query=query)
+        res = await call_qwen_vl_async(prompt)
+        return _bool_string(res)
+
+    async def check_node_mm(self, data: str, base64_image: str, query: str) -> bool:
+        prompt = check_node_prompt2.format(data=data, query=query)
+        res = await call_qwen_vl_async(prompt, base64_image)
+        return _bool_string(res)
+
+    async def check_answer(self, query: str, answer: str) -> bool:
+        prompt = check_answer_prompt.format(query=query, answer=answer)
+        res = await call_qwen_vl_async(prompt)
+        return _bool_string(res)
+
+    async def reason_retrieved(self, query: str, schema: str, evidence: str) -> str:
+        prompt = retrieved_reasoning_prompt.format(
+            query=query, schema=schema, evidence=evidence
+        )
+        return await call_qwen_vl_async(prompt)
+
+    async def reason_whole(self, query: str, data: str) -> str:
+        prompt = whole_reasoning_prompt.format(query=query, data=data)
+        return await call_qwen_vl_async(prompt)
+
+    async def generate_annotation_async(
+        self, base64_image: str, cp_type: str, settings: Settings | None = None
+    ) -> Tuple[str, str, str]:
+        """
+        异步调用 Qwen 模型生成图片标注。
+        """
+        prompt = _prompt_for_type(cp_type)
+        pattern = re.compile(r"\[T\](.*?)\[M\](.*?)\[C\](.*)", re.DOTALL)
+
+        title = "Default Title"
+        metadata = "Default Metadata"
+        content = "Default Content"
+
+        settings = settings or Settings.load()
+        # Retry logic handled by caller or simple retry here
+        for _ in range(3):
+            text = await call_qwen_vl_async(prompt, base64_image, settings=settings) or ""
+            m = pattern.search(text)
+            if m:
+                title = m.group(1).strip() or title
+                metadata = m.group(2).strip() or metadata
+                content = m.group(3).strip() or content
+                break
+        
+        return title, metadata, content
+
+    async def generate_text(self, prompt: str) -> str:
+        """
+        异步调用 Qwen 模型生成文本。
+        """
+        return await call_qwen_vl_async(prompt) or ""
+

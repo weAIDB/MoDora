@@ -23,33 +23,41 @@ def _normalize_pdf_path(pdf_path: str) -> str:
     return p
 
 
-def bbox_to_base64(pdf_path: str, bbox_list: list[Location]) -> str:
+def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
     """
-    将 PDF 中多个 bbox 区域裁剪出来并拼接为一张 PNG，然后返回 base64。
-
+    Independent task function for cropping images from PDF.
+    This function is designed to be picklable and run in a separate process.
+    
     Args:
-        pdf_path: PDF 文件路径 (支持 "file:" 前缀)
-        bbox_list: 包含多个 Location 的列表，每个 Location 表示一个要裁剪的区域
-
+        pdf_path: Path to the PDF file.
+        bbox_data: List of dicts, each containing 'page' (1-based) and 'bbox' [x0, y0, x1, y1].
+    
     Returns:
-        str: Base64 编码的 PNG 图片
+        Base64 encoded string of the merged image.
     """
     pdf_path = _normalize_pdf_path(pdf_path)
-    pdf_document = fitz.open(pdf_path)
+    try:
+        pdf_document = fitz.open(pdf_path)
+    except Exception:
+        return _BLANK_1X1_PNG_BASE64
 
-    images: list[Image] = []
-    for loc in bbox_list:
-        # OCR 的 page_id 从 1 开始，这里转换成 fitz 的 0-based page index。
-        page_idx = loc.page - 1
-        crop_range = loc.bbox
-        page = pdf_document[page_idx]
-
-        pix = page.get_pixmap(clip=crop_range)
-        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-        images.append(img)
+    images: list[Image.Image] = []
+    try:
+        for data in bbox_data:
+            page_idx = data["page"] - 1
+            crop_range = data["bbox"]
+            if page_idx < 0 or page_idx >= len(pdf_document):
+                continue
+            
+            page = pdf_document[page_idx]
+            pix = page.get_pixmap(clip=crop_range)
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            images.append(img)
+    finally:
+        pdf_document.close()
 
     if not images:
-        raise ValueError("No specific image!!!")
+        return _BLANK_1X1_PNG_BASE64
 
     total_width = max(int(img.width) for img in images)
     total_height = sum(int(img.height) for img in images)
@@ -60,11 +68,26 @@ def bbox_to_base64(pdf_path: str, bbox_list: list[Location]) -> str:
         merged_image.paste(img, (0, y_offset))
         y_offset += int(img.height)
 
+    # Resize if too large (e.g. > 1024x1024)
+    # 限制最大尺寸以减少 token 消耗
+    MAX_SIZE = 1024
+    if merged_image.width > MAX_SIZE or merged_image.height > MAX_SIZE:
+        merged_image.thumbnail((MAX_SIZE, MAX_SIZE), Image.Resampling.LANCZOS)
+
     buffered = io.BytesIO()
     merged_image.save(buffered, format="PNG")
     buffered.seek(0)
-    pdf_document.close()
     return base64.b64encode(buffered.read()).decode("utf-8")
+
+
+def bbox_to_base64(pdf_path: str, bbox_list: list[Location]) -> str:
+    """
+    Wrapper for backward compatibility. 
+    NOTE: Calling this directly runs in the current process/thread, which may be unsafe for fitz.
+    Prefer using ProcessPoolExecutor with crop_pdf_image_task for concurrency.
+    """
+    bbox_data = [{"page": loc.page, "bbox": loc.bbox} for loc in bbox_list]
+    return crop_pdf_image_task(pdf_path, bbox_data)
 
 
 def render_ocr_json_to_pdf(

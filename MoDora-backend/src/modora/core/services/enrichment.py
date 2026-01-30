@@ -1,3 +1,4 @@
+import asyncio
 import concurrent.futures
 
 from modora.core.domain.component import TITLE, ComponentPack
@@ -26,19 +27,10 @@ class EnrichmentService:
         self.media = image_provider
         self.max_workers = max_workers
 
-    def enrich(self, co_pack: ComponentPack, source: str) -> ComponentPack:
+    async def enrich_async(self, co_pack: ComponentPack, source: str) -> ComponentPack:
         """
-        执行增强流程。
-        遍历组件包，对支持的类型调用 LLM 生成描述信息。
-
-        Args:
-            co_pack: 待处理的组件包
-            source: 源文件路径（用于截图）
-
-        Returns:
-            ComponentPack: 增强后的组件包
+        异步执行增强流程。
         """
-        # 筛选需要增强的组件
         tasks = []
         for co in co_pack.body:
             if co.type in ["image", "chart", "table"]:
@@ -47,32 +39,42 @@ class EnrichmentService:
         if not tasks:
             return co_pack
 
-        def _process_one(co):
+        async def _process_one(co):
             try:
-                # 获取组件截图
-                base64_img = self.media.crop_image(source, co)
-                # 调用 LLM 生成标注
-                title, metadata, data = self.llm.generate_annotation(
-                    base64_img, co.type
+                # 获取组件截图（IO 操作，跑在线程池）
+                loop = asyncio.get_running_loop()
+                base64_img = await loop.run_in_executor(
+                    None, self.media.crop_image, source, co
                 )
+                # 调用 LLM 生成标注（异步）
+                if hasattr(self.llm, "generate_annotation_async"):
+                    title, metadata, data = await self.llm.generate_annotation_async(
+                        base64_img, co.type
+                    )
+                else:
+                    # 兼容同步客户端
+                    title, metadata, data = await loop.run_in_executor(
+                        None, self.llm.generate_annotation, base64_img, co.type
+                    )
                 return co, title, metadata, data
             except Exception:
-                # 记录错误但不中断整体流程，返回 None
                 return None
 
-        # 使用线程池并发处理
-        with concurrent.futures.ThreadPoolExecutor(
-            max_workers=self.max_workers
-        ) as executor:
-            futures = [executor.submit(_process_one, co) for co in tasks]
+        # 使用 asyncio.gather 并发处理
+        # 限制并发数
+        sem = asyncio.Semaphore(self.max_workers)
 
-            for future in concurrent.futures.as_completed(futures):
-                result = future.result()
-                if result:
-                    co, title, metadata, data = result
-                    # 更新组件信息 (保留原有非默认标题)
-                    co.title = title if co.title == TITLE else co.title
-                    co.metadata = metadata
-                    co.data = data if co.data == "" else co.data
+        async def _sem_process(co):
+            async with sem:
+                return await _process_one(co)
+
+        results = await asyncio.gather(*[_sem_process(co) for co in tasks])
+
+        for result in results:
+            if result:
+                co, title, metadata, data = result
+                co.title = title if co.title == TITLE else co.title
+                co.metadata = metadata
+                co.data = data if co.data == "" else co.data
 
         return co_pack

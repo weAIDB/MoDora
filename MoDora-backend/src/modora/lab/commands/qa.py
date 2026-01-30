@@ -1,0 +1,81 @@
+from __future__ import annotations
+
+import argparse
+import asyncio
+import json
+import logging
+
+from modora.core.domain.cctree import CCTree, CCTreeNode
+from modora.core.domain.component import Location
+from modora.core.services.qa import QAService
+from modora.core.settings import Settings
+from modora.service.api.llm_local import ensure_llm_local_loaded, shutdown_llm_local
+
+
+def register(sub: argparse._SubParsersAction) -> None:
+    parser = sub.add_parser("qa", help="Run QA on a single document")
+    parser.add_argument("source_path", help="Path to the original PDF file")
+    parser.add_argument("tree_path", help="Path to the tree.json file")
+    parser.add_argument("query", help="The question to ask")
+    parser.set_defaults(_handler=_handle_qa)
+
+
+def _handle_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
+    settings = Settings.load()
+    ensure_llm_local_loaded(settings, logger)
+    try:
+        asyncio.run(run_qa(args.source_path, args.tree_path, args.query, logger))
+        return 0
+    except Exception as e:
+        logger.error(f"QA failed: {e}")
+        return 1
+    finally:
+        shutdown_llm_local()
+
+
+async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.Logger):
+    settings = Settings.load()
+    qa_service = QAService(settings, logger)
+
+    # Load Tree
+    logger.info(f"Loading tree from {tree_path}...")
+    try:
+        with open(tree_path, "r", encoding="utf-8") as f:
+            tree_data = json.load(f)
+
+        def dict_to_node(data):
+            node = CCTreeNode(
+                type=data.get("type", "unknown"),
+                metadata=data.get("metadata"),
+                data=data.get("data", ""),
+                location=[Location.from_dict(l) for l in data.get("location", [])],
+                children={},
+            )
+            for k, v in data.get("children", {}).items():
+                node.children[k] = dict_to_node(v)
+            return node
+
+        if "root" in tree_data:  # If wrapped in {root: ...}
+            root_node = dict_to_node(tree_data["root"])
+        else:  # If raw root node
+            root_node = dict_to_node(tree_data)
+
+        cctree = CCTree(root=root_node)
+
+    except Exception as e:
+        logger.error(f"Failed to load tree: {e}")
+        return
+
+    # Run QA
+    logger.info(f"Answering query: {query}")
+    result = await qa_service.answer_question(query, cctree, source_path)
+
+    print("\n" + "=" * 50)
+    print(f"QUESTION: {query}")
+    print("-" * 50)
+    print(f"ANSWER: {result['answer']}")
+    print("-" * 50)
+    print(f"EVIDENCE (Top {len(result['retrieved_documents'])} pages):")
+    for doc in result["retrieved_documents"]:
+        print(f"Page {doc['page']}: {doc['content'][:100]}...")
+    print("=" * 50 + "\n")

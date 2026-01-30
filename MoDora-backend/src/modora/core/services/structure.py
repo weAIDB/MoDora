@@ -35,6 +35,10 @@ class StructureAnalyzer:
                 # 按照当前标题初始化一个新的文本组件
                 non_text_cache.clear()
                 cur_text_co = Component(type="text", title=cur_text_title)
+                # 必须把标题本身的 bbox 也加入到新组件的 location 中
+                cur_text_co.location.append(location)
+                # 同时把标题内容也加到 data 中，确保 check_node 文本包含标题
+                cur_text_co.data = cur_text_title
 
             elif block.is_figure():
                 cur_figure_co = Component(

@@ -10,6 +10,10 @@ from modora.lab.commands.build_tree import register as register_build_tree
 from modora.lab.commands.health import register as register_health
 from modora.lab.commands.results import register as register_results
 from modora.lab.commands.config import register as register_config
+from modora.lab.commands.qa import register as register_qa
+from modora.lab.commands.batch_qa import register as register_batch_qa
+from modora.lab.commands.evaluate import register as register_evaluate
+from modora.lab.commands.preprocess import register as register_preprocess
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -23,6 +27,10 @@ def main(argv: list[str] | None = None) -> int:
     register_health(sub)
     register_results(sub)
     register_config(sub)
+    register_qa(sub)
+    register_batch_qa(sub)
+    register_evaluate(sub)
+    register_preprocess(sub)
 
     args = parser.parse_args(argv)
 
