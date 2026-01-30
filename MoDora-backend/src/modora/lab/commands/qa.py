@@ -73,6 +73,29 @@ async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.L
     print("\n" + "=" * 50)
     print(f"QUESTION: {query}")
     print("-" * 50)
+    
+    print("RETRIEVAL TRACE:")
+    trace = result.get("retrieval_trace", [])
+    for event in trace:
+        step = event.get("step")
+        if step == "parse_question":
+            print(f"  [Parse] Content: {event.get('content_query')}, Locations: {event.get('locations')}")
+        elif step == "check_location":
+            path = event.get("path", "")
+            res = "PASS" if event.get("result") else "FAIL"
+            count = event.get("locations_count")
+            print(f"  [CheckLoc] {path} -> {res} ({count} locs)")
+        elif step == "check_relevance":
+            path = event.get("path", "")
+            method = event.get("method")
+            res = "RELEVANT" if event.get("is_relevant") else "IRRELEVANT"
+            print(f"  [CheckRel] {path} ({method}) -> {res}")
+        elif step == "select_children":
+            path = event.get("path", "")
+            selected = event.get("selected_keys", [])
+            print(f"  [SelectChild] {path} -> Selected {len(selected)}: {selected}")
+    
+    print("-" * 50)
     print(f"ANSWER: {result['answer']}")
     print("-" * 50)
     print(f"EVIDENCE (Top {len(result['retrieved_documents'])} pages):")

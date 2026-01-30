@@ -35,16 +35,26 @@ class AsyncRetriever:
 
     async def retrieve(
         self, query: str, cctree: CCTree, source_path: str, question_id: str | int = "N/A"
-    ) -> tuple[dict[str, str], dict[str, list[dict]]]:
+    ) -> tuple[dict[str, str], dict[str, list[dict]], list[dict]]:
         """
         执行异步检索。
 
         Returns:
             retrieve_result: {path: text_evidence}
             retrieve_bbox: {path: [location_dicts]}
+            trace: [trace_events]
         """
+        trace = []
+        
         # 1. Parse Question
         locations, content_query = await self._parse_question(query, question_id)
+        
+        trace.append({
+            "step": "parse_question",
+            "content_query": content_query,
+            "locations": locations
+        })
+        
         self.logger.info(
             f"Parsed query: content='{content_query}', locations={locations}",
             extra={"question_id": question_id},
@@ -52,11 +62,15 @@ class AsyncRetriever:
 
         # 2. Start Recursive Search
         if not cctree.root:
-            return {}, {}
+            return {}, {}, trace
 
-        return await self._select_and_check_by_level(
+        rr, rb, sub_trace = await self._select_and_check_by_level(
             {"root": cctree.root}, content_query, source_path, locations, question_id
         )
+        
+        trace.extend(sub_trace)
+        
+        return rr, rb, trace
 
     async def _parse_question(
         self, query: str, question_id: str | int = "N/A"
@@ -96,13 +110,14 @@ class AsyncRetriever:
         source_path: str,
         locations: list[dict],
         question_id: str | int = "N/A",
-    ) -> tuple[dict, dict]:
+    ) -> tuple[dict, dict, list]:
         retrieve_result = {}
         retrieve_bbox = {}
         selected_children = {}
+        level_trace = []
 
         if not cur_level:
-            return retrieve_result, retrieve_bbox
+            return retrieve_result, retrieve_bbox, level_trace
 
         # 并发处理当前层的所有节点
         tasks = []
@@ -122,20 +137,23 @@ class AsyncRetriever:
                 )
                 continue
 
-            rr, rb, sc = res
+            rr, rb, sc, nt = res
             retrieve_result.update(rr)
             retrieve_bbox.update(rb)
             selected_children.update(sc)
+            if nt:
+                level_trace.extend(nt)
 
         # 递归处理下一层
         if selected_children:
-            sub_rr, sub_rb = await self._select_and_check_by_level(
+            sub_rr, sub_rb, sub_trace = await self._select_and_check_by_level(
                 selected_children, query, source_path, locations, question_id
             )
             retrieve_result.update(sub_rr)
             retrieve_bbox.update(sub_rb)
+            level_trace.extend(sub_trace)
 
-        return retrieve_result, retrieve_bbox
+        return retrieve_result, retrieve_bbox, level_trace
 
     async def _process_single_node(
         self,
@@ -145,7 +163,7 @@ class AsyncRetriever:
         source_path: str,
         locations: list[dict],
         question_id: str | int = "N/A",
-    ) -> tuple[dict, dict, dict]:
+    ) -> tuple[dict, dict, dict, list]:
         async with self.sem:
             self.logger.info(
                 f"Processing node: {path}", extra={"question_id": question_id}
@@ -153,6 +171,7 @@ class AsyncRetriever:
             retrieve_result = {}
             retrieve_bbox = {}
             selected_children = {}
+            node_trace = []
 
             base_path = path.split("--")[-1] if "--" in path else path
 
@@ -166,12 +185,21 @@ class AsyncRetriever:
                 curloc_res, within_locs = await asyncio.to_thread(
                     self._check_location, node, source_path, locations, True
                 )
+            
+            node_trace.append({
+                "step": "check_location",
+                "path": path,
+                "result": curloc_res,
+                "locations_count": len(within_locs)
+            })
 
             # 如果位置符合且不是 root/MROOT，则检查内容
             if node.type not in ["root", "MROOT"] and curloc_res:
                 is_relevant = False
+                check_method = "text"
                 try:
                     if within_locs:
+                        check_method = "multimodal"
                         # Prepare picklable data for process pool
                         bbox_data = [
                             {"page": loc.page, "bbox": loc.bbox} for loc in within_locs
@@ -192,6 +220,7 @@ class AsyncRetriever:
                             text_data, base64_image, query
                         )
                     else:
+                        check_method = "text_only"
                         self.logger.info(
                             f"Check node input: text='{node.data}', query='{query}'",
                             extra={"question_id": question_id},
@@ -203,6 +232,13 @@ class AsyncRetriever:
                         extra={"question_id": question_id},
                     )
                     is_relevant = False
+                
+                node_trace.append({
+                    "step": "check_relevance",
+                    "path": path,
+                    "method": check_method,
+                    "is_relevant": is_relevant
+                })
 
                 if is_relevant:
                     self.logger.info(
@@ -221,7 +257,7 @@ class AsyncRetriever:
 
             # 2. Forward Search (Select Children)
             if not node.children:
-                return retrieve_result, retrieve_bbox, selected_children
+                return retrieve_result, retrieve_bbox, selected_children, node_trace
 
             # 先按位置过滤子节点
             children_keys = list(node.children.keys())
@@ -235,10 +271,10 @@ class AsyncRetriever:
                 )
 
             if not children_keys:
-                return retrieve_result, retrieve_bbox, selected_children
+                return retrieve_result, retrieve_bbox, selected_children, node_trace
 
             # LLM 选择子节点
-            metadata_map = {k: str(node.children[k].metadata) for k in children_keys}
+            metadata_map = {k: f"{k}: {node.children[k].metadata}" for k in children_keys}
 
             try:
                 select_res = await self.llm.select_children(
@@ -252,6 +288,13 @@ class AsyncRetriever:
                     f"Select children failed: {e}", extra={"question_id": question_id}
                 )
                 selected_keys = []
+            
+            node_trace.append({
+                "step": "select_children",
+                "path": path,
+                "children_candidates": children_keys,
+                "selected_keys": selected_keys
+            })
 
             # 收集选中的子节点
             for key in selected_keys:
@@ -263,7 +306,7 @@ class AsyncRetriever:
                     child_path = f"{path}--{key}"
                     selected_children[child_path] = node.children[key]
 
-            return retrieve_result, retrieve_bbox, selected_children
+            return retrieve_result, retrieve_bbox, selected_children, node_trace
 
     def _check_location(
         self,

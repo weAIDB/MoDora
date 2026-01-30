@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from modora.core.domain.results import ResultItem
 from modora.core.infra.llm.qwen import AsyncQwenLLMClient
+from modora.core.infra.llm.remote import AsyncRemoteLLMClient
 from modora.core.settings import Settings
 from modora.service.api.llm_local import ensure_llm_local_loaded, shutdown_llm_local
 
@@ -49,10 +50,13 @@ You only need to output T or F, without any other content.
 
 
 class Evaluator:
-    def __init__(self, settings: Settings, logger: logging.Logger):
+    def __init__(self, settings: Settings, logger: logging.Logger, use_remote: bool = False):
         self.settings = settings
         self.logger = logger
-        self.llm = AsyncQwenLLMClient()
+        if use_remote:
+            self.llm = AsyncRemoteLLMClient(settings)
+        else:
+            self.llm = AsyncQwenLLMClient()
 
     async def _bool_string(self, s: str) -> bool:
         s = s.lower()
@@ -130,6 +134,11 @@ def register(sub: argparse._SubParsersAction) -> None:
         default=16,
         help="Max concurrent evaluation tasks",
     )
+    parser.add_argument(
+        "--remote",
+        action="store_true",
+        help="Use remote LLM defined in local.json for evaluation",
+    )
     parser.set_defaults(_handler=_handle_evaluate)
 
 
@@ -191,10 +200,10 @@ async def _process_single_item(
 
 
 async def _run_evaluation(
-    input_path: Path, result_path: Path, output_path: Path, concurrency: int, logger: logging.Logger
+    input_path: Path, result_path: Path, output_path: Path, concurrency: int, logger: logging.Logger, use_remote: bool = False
 ):
     settings = Settings.load()
-    evaluator = Evaluator(settings, logger)
+    evaluator = Evaluator(settings, logger, use_remote=use_remote)
     
     # Load Data
     with open(input_path, "r", encoding="utf-8") as f:
@@ -232,17 +241,6 @@ async def _run_evaluation(
     anls_score = 0.0
     for item in evaluated_items:
         if item.judge == "T":
-            # If judged T by AI or containment, ANLS is likely high, but let's compute strictly
-            # However, for consistency with old script:
-            # If contain -> 1.0
-            # If unanswerable & T -> 1.0
-            # Else -> calc ANLS
-            
-            # Re-check logic to match legacy exactly?
-            # Legacy logic: 
-            # if contain: score+=1
-            # elif unanswerable and T: score+=1
-            # else: calc anls
             
             contain = False
             if item.prediction:
@@ -270,18 +268,22 @@ async def _run_evaluation(
 
 
 def _handle_evaluate(args: argparse.Namespace, logger: logging.Logger) -> int:
-    ensure_llm_local_loaded(Settings.load(), logger)
+    # Only ensure local LLM loaded if NOT using remote
+    if not args.remote:
+        ensure_llm_local_loaded(Settings.load(), logger)
     try:
         asyncio.run(_run_evaluation(
             Path(args.input), 
             Path(args.result), 
             Path(args.output), 
             args.concurrency, 
-            logger
+            logger,
+            use_remote=args.remote
         ))
         return 0
     except Exception as e:
         logger.error(f"Evaluation failed: {e}")
         return 1
     finally:
-        shutdown_llm_local()
+        if not args.remote:
+            shutdown_llm_local()

@@ -31,7 +31,7 @@ class QAService:
         self.logger.info(
             f"Retrieving evidence for query: {query}", extra={"question_id": question_id}
         )
-        retrieved_text, retrieved_bbox = await self.retriever.retrieve(
+        retrieved_text, retrieved_bbox, trace = await self.retriever.retrieve(
             query, cctree, source_path, question_id
         )
 
@@ -66,14 +66,14 @@ class QAService:
         try:
             if not await self.llm.check_answer(query, answer):
                 # 兜底逻辑：全文档推理（简化版，只传结构）
-                self.logger.warning(
-                    "Answer check failed, falling back to whole document reasoning.",
-                    extra={"question_id": question_id},
-                )
                 simplified_tree = (
                     self._simplify_tree(cctree.root) if cctree.root else {}
                 )
                 tree_str = json.dumps(simplified_tree, ensure_ascii=False)[:30000]
+                self.logger.warning(
+                    "Answer check failed, falling back to whole document reasoning.",
+                    extra={"question_id": question_id, "len": len(tree_str)},
+                )
                 answer = await self.llm.reason_whole(query, tree_str)
         except Exception as e:
             self.logger.error(
@@ -101,6 +101,7 @@ class QAService:
         return {
             "answer": answer,
             "retrieved_documents": display_documents[:5],  # Top 5 distinct pages
+            "retrieval_trace": trace,
         }
 
     def _get_tree_schema(self, children: dict) -> dict:
@@ -119,7 +120,7 @@ class QAService:
         """递归简化树结构用于兜底推理"""
         simple = {
             "type": getattr(node, "type", "unknown"),
-            "data": getattr(node, "data", "")[:50] + "...", # Truncate data
+            "data": getattr(node, "data", "")
         }
         if node.children:
             simple["children"] = {

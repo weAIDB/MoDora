@@ -34,3 +34,49 @@ class LLMClient(Protocol):
             str: 标题层次结构
         """
         ...
+
+
+class AsyncLLMClient(Protocol):
+    """
+    异步 LLM 客户端接口协议。
+    """
+
+    async def generate_text(self, prompt: str) -> str:
+        ...
+
+    async def generate_levels(self, title_list: list[str], base64_image: str) -> str:
+        ...
+
+    async def generate_metadata(self, data: str, num: int) -> str:
+        ...
+
+    async def integrate_metadata(self, data: str, num: int) -> str:
+        ...
+
+    async def parse_question(self, query: str) -> str:
+        ...
+
+    async def select_children(
+        self, keys: list[str], query: str, path: str, metadata_map: str
+    ) -> str:
+        ...
+
+    async def check_node(self, data: str, query: str) -> bool:
+        ...
+
+    async def check_node_mm(self, data: str, base64_image: str, query: str) -> bool:
+        ...
+
+    async def check_answer(self, query: str, answer: str) -> bool:
+        ...
+
+    async def reason_retrieved(self, query: str, schema: str, evidence: str) -> str:
+        ...
+
+    async def reason_whole(self, query: str, data: str) -> str:
+        ...
+
+    async def generate_annotation_async(
+        self, base64_image: str, cp_type: str, settings: object | None = None
+    ) -> Tuple[str, str, str]:
+        ...
