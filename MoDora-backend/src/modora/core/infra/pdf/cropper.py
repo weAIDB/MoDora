@@ -190,3 +190,25 @@ class PDFCropper(ImageProvider):
         if isinstance(locs, Component):
             locs = locs.location
         return bbox_to_base64(source, locs)
+
+    def pdf_to_base64(self, source: str) -> str:
+        """
+        Convert the entire PDF (all pages) to a single vertically stacked base64 image.
+        """
+        source = _normalize_pdf_path(source)
+        try:
+            doc = fitz.open(source)
+        except Exception:
+            return _BLANK_1X1_PNG_BASE64
+        
+        # Create bbox for full page of each page
+        bbox_data = []
+        for i, page in enumerate(doc):
+            rect = page.rect
+            bbox_data.append({
+                "page": i + 1,
+                "bbox": [rect.x0, rect.y0, rect.x1, rect.y1]
+            })
+        doc.close()
+        
+        return crop_pdf_image_task(source, bbox_data)

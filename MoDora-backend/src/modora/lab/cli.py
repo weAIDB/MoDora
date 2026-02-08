@@ -14,6 +14,7 @@ from modora.lab.commands.qa import register as register_qa
 from modora.lab.commands.batch_qa import register as register_batch_qa
 from modora.lab.commands.evaluate import register as register_evaluate
 from modora.lab.commands.preprocess import register as register_preprocess
+from modora.lab.commands.rerun import register as register_rerun
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -31,6 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     register_batch_qa(sub)
     register_evaluate(sub)
     register_preprocess(sub)
+    register_rerun(sub)
 
     args = parser.parse_args(argv)
 

@@ -7,9 +7,9 @@ import logging
 
 from modora.core.domain.cctree import CCTree, CCTreeNode
 from modora.core.domain.component import Location
-from modora.core.services.qa import QAService
+from modora.core.services.qa_service import QAService
 from modora.core.settings import Settings
-from modora.service.api.llm_local import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
 
 
 def register(sub: argparse._SubParsersAction) -> None:
@@ -35,7 +35,7 @@ def _handle_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
 
 async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.Logger):
     settings = Settings.load()
-    qa_service = QAService(settings, logger)
+    qa_service = QAService(settings)
 
     # Load Tree
     logger.info(f"Loading tree from {tree_path}...")
@@ -68,7 +68,7 @@ async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.L
 
     # Run QA
     logger.info(f"Answering query: {query}")
-    result = await qa_service.answer_question(query, cctree, source_path)
+    result = await qa_service.qa(cctree, query, source_path)
 
     print("\n" + "=" * 50)
     print(f"QUESTION: {query}")
@@ -78,27 +78,19 @@ async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.L
     trace = result.get("retrieval_trace", [])
     for event in trace:
         step = event.get("step")
-        if step == "parse_question":
-            print(f"  [Parse] Content: {event.get('content_query')}, Locations: {event.get('locations')}")
-        elif step == "check_location":
-            path = event.get("path", "")
-            res = "PASS" if event.get("result") else "FAIL"
-            count = event.get("locations_count")
-            print(f"  [CheckLoc] {path} -> {res} ({count} locs)")
-        elif step == "check_relevance":
-            path = event.get("path", "")
-            method = event.get("method")
-            res = "RELEVANT" if event.get("is_relevant") else "IRRELEVANT"
-            print(f"  [CheckRel] {path} ({method}) -> {res}")
-        elif step == "select_children":
-            path = event.get("path", "")
-            selected = event.get("selected_keys", [])
-            print(f"  [SelectChild] {path} -> Selected {len(selected)}: {selected}")
+        if step == "extract_location":
+            print(f"  [ExtractLoc] Pages: {event.get('page_list')}, Pos: {event.get('position_vector')}")
+        elif step == "retrieve":
+            print(f"  [Retrieve] Found {event.get('locations_count')} locations")
+        elif step == "verification":
+            print(f"  [Verify] {event.get('status')}")
+        elif step == "fallback":
+            print(f"  [Fallback] Reason: {event.get('reason')}")
     
     print("-" * 50)
     print(f"ANSWER: {result['answer']}")
     print("-" * 50)
-    print(f"EVIDENCE (Top {len(result['retrieved_documents'])} pages):")
+    print(f"EVIDENCE (Top {len(result['retrieved_documents'])} snippets):")
     for doc in result["retrieved_documents"]:
         print(f"Page {doc['page']}: {doc['content'][:100]}...")
     print("=" * 50 + "\n")

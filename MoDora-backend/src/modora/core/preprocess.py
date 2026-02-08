@@ -68,19 +68,25 @@ def build_tree(cp: ComponentPack, logger: logging.Logger, source_path: str = "")
     return constructor.construct_tree(cp)
 
 
+from modora.core.infra.llm.factory import AsyncLLMFactory
+
 async def build_tree_async(
     cp: ComponentPack, logger: logging.Logger, source_path: str = ""
 ):
     settings = Settings.load()
-    llm = AsyncQwenLLMClient()
+    # Use remote LLM for title hierarchy generation
+    llm_remote = AsyncLLMFactory.create(settings, mode="remote")
+    # Use local LLM for metadata generation (summarization)
+    llm_local = AsyncLLMFactory.create(settings, mode="local")
+    
     cropper = PDFCropper()
     generator = AsyncMetadataGenerator(
-        n0=2, growth_rate=2.0, logger=logger, llm_client=llm
+        n0=2, growth_rate=2.0, logger=logger, llm_client=llm_local
     )
     constructor = TreeConstructor(settings, logger)
 
     if source_path:
-        cp = await AsyncLevelGenerator(llm, cropper).generate_level(
+        cp = await AsyncLevelGenerator(llm_remote, cropper).generate_level(
             source_path=source_path, cp=cp, config=settings, logger=logger
         )
     cctree = constructor.construct_tree(cp)

@@ -122,6 +122,23 @@ Here is a query and a reply to it. Please return T or F according to the followi
 You only need to output T or F, without any other content.
 """
 
+image_reasoning_prompt = """
+### Instruction
+Now we have a query and a document. Given the document schema, the textual evidence pieces retrieved from it and the visual image of their corresponding areas, please return a short and concise answer to the query.
+
+### Query
+{query}
+
+### Schema
+{schema}
+
+### Evidence
+{evidence}
+
+### Note
+You only need to output a short and concise answer. Do not add any explanations or repeat the query content in the output answer.
+"""
+
 retrieved_reasoning_prompt = """
 ### Instruction
 Now we have a query and a document. Given the document schema, the textual evidence pieces retrieved from it and the visual image of their corresponding areas, please return a short and concise answer to the query.
@@ -151,4 +168,47 @@ Now we have a query, please answer it based on the given visual pages and tree f
 
 ### Note
 You only need to output a short and concise answer. Do not add any explanations or repeat the query content in the output answer.
+"""
+
+location_extraction_prompt = """
+### Instruction
+Now I have a query, please determine whether there are cues about the location of elements in the document, including:
+1. **Page number**: Extract the page numbers needed by the query as a list. For example:
+   - "the first page" ---> [1]
+   - "page 6" ---> [6]
+   - "the first three pages" ---> [1, 2, 3]
+   If no page number is mentioned, return [-1].
+
+2. **Position on the page**: Divide the page into a 3x3 grid (9 blocks) and extract the position as a two-element vector [row, column]:
+   - The first element (row) represents vertical position:
+     - "top" ---> 1
+     - "middle" ---> 2
+     - "bottom" ---> 3
+     - If vertical position is not mentioned, return -1.
+   - The second element (column) represents horizontal position:
+     - "left" ---> 1
+     - "center" ---> 2
+     - "right" ---> 3
+     - If horizontal position is not mentioned, return -1.
+   If both vertical and horizontal positions are missing, return [-1, -1].
+
+### Output Format
+Page: [page_numbers]; Position: [row, column]
+
+### Few-Shot Example
+"What is written on the top right corner of the first page?" ---> Page: [1]; Position: [1, 3]
+
+"What is written on page 6 at the bottom center?" ---> Page: [6]; Position: [3, 2]
+
+"How many images are in the first three pages?" ---> Page: [1, 2, 3]; Position: [-1, -1]
+
+"What is the title of the document?" ---> Page: [-1]; Position: [-1, -1]
+
+"When will the meeting in Room 404 be held?" ---> Page: [-1]; Position: [-1, -1]
+
+### Query
+{query}
+
+### Note
+You only need to output the location cues found in the query with the specified format. Do not add any extra explanations.
 """

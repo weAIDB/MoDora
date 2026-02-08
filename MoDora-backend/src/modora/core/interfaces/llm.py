@@ -73,7 +73,7 @@ class AsyncLLMClient(Protocol):
     async def reason_retrieved(self, query: str, schema: str, evidence: str) -> str:
         ...
 
-    async def reason_whole(self, query: str, data: str) -> str:
+    async def reason_whole(self, query: str, data: str, image: str | None = None) -> str:
         ...
 
     async def generate_annotation_async(

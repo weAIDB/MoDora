@@ -15,7 +15,7 @@ from tqdm import tqdm
 from modora.core.domain.component import ComponentPack
 from modora.core.preprocess import build_tree_async
 from modora.core.settings import Settings
-from modora.service.api.llm_local import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
 
 
 def register(sub: argparse._SubParsersAction) -> None:
@@ -27,7 +27,7 @@ def register(sub: argparse._SubParsersAction) -> None:
     )
     p.add_argument(
         "--cache-dir",
-        default="/home/yukai/project/MoDora/MoDora-backend/cache_v4",
+        default="/home/yukai/project/MoDora/MoDora-backend/cache_v5",
         help="Cache directory containing <num>/co.json",
     )
     p.add_argument(
@@ -35,6 +35,10 @@ def register(sub: argparse._SubParsersAction) -> None:
         type=int,
         default=16,
         help="Max concurrent PDFs (0=auto)",
+    )
+    p.add_argument(
+        "--filter-list",
+        help="Path to a file containing a list of PDF filenames to process (one per line)",
     )
     p.set_defaults(_handler=_handle_build_tree)
 
@@ -178,6 +182,23 @@ def _handle_build_tree(args: argparse.Namespace, logger: logging.Logger) -> int:
         cache_dir = Path(str(getattr(args, "cache_dir", "") or "").strip()).resolve()
 
         pdf_paths = _iter_pdf_paths(dataset_dir)
+
+        filter_list_path = (getattr(args, "filter_list", None) or "").strip()
+        if filter_list_path:
+            filter_path = Path(filter_list_path).resolve()
+            if filter_path.is_file():
+                whitelist = {
+                    line.strip() for line in filter_path.read_text("utf-8").splitlines()
+                    if line.strip()
+                }
+                pdf_paths = [
+                    p for p in pdf_paths
+                    if p.name in whitelist or p.stem in whitelist
+                ]
+                logger.info(f"Filtered to {len(pdf_paths)} PDFs from whitelist")
+            else:
+                logger.warning(f"Filter list file not found: {filter_path}")
+
         total = len(pdf_paths)
         ok = 0
         failed = 0

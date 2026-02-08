@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request
 from modora.core.infra.logging.context import new_id, request_scope
 from modora.core.infra.logging.setup import configure_logging
 from modora.core.settings import Settings
-from modora.service.api.llm_local import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
 from modora.service.api.ocr.router import router as ocr_router
 
 settings = Settings.load()

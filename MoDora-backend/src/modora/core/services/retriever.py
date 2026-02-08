@@ -10,15 +10,59 @@ import fitz
 
 from modora.core.domain.cctree import CCTree, CCTreeNode
 from modora.core.domain.component import Location
-from modora.core.infra.llm.qwen import AsyncQwenLLMClient
+from modora.core.interfaces.llm import AsyncLLMClient
 import concurrent.futures
 from modora.core.infra.pdf.cropper import PDFCropper, crop_pdf_image_task
+
+
+def _parse_list_string(raw_str: str) -> list | None:
+    """
+    Robustly parse a string representation of a list.
+    Supports JSON, Python literal, and regex extraction.
+    """
+    clean_res = raw_str.strip()
+    if "```" in clean_res:
+        clean_res = re.sub(r"```(?:json|python)?", "", clean_res).strip()
+    
+    # Strategy 1: JSON
+    try:
+        res = json.loads(clean_res)
+        if isinstance(res, list):
+            return res
+    except json.JSONDecodeError:
+        pass
+    
+    # Strategy 2: AST Literal Eval
+    try:
+        res = ast.literal_eval(clean_res)
+        if isinstance(res, list):
+            return res
+    except (ValueError, SyntaxError):
+        pass
+
+    # Strategy 3: Regex Extraction
+    match = re.search(r"\[(.*?)\]", clean_res, re.DOTALL)
+    if match:
+        list_str = match.group(0)
+        try:
+            res = json.loads(list_str)
+            if isinstance(res, list):
+                return res
+        except:
+            try:
+                res = ast.literal_eval(list_str)
+                if isinstance(res, list):
+                    return res
+            except:
+                pass
+    
+    return None
 
 
 class AsyncRetriever:
     def __init__(
         self,
-        llm_client: AsyncQwenLLMClient,
+        llm_client: AsyncLLMClient,
         cropper: PDFCropper,
         logger: logging.Logger,
         max_workers: int = 16,
@@ -35,13 +79,14 @@ class AsyncRetriever:
 
     async def retrieve(
         self, query: str, cctree: CCTree, source_path: str, question_id: str | int = "N/A"
-    ) -> tuple[dict[str, str], dict[str, list[dict]], list[dict]]:
+    ) -> tuple[dict[str, str], dict[str, list[dict]], dict[str, str], list[dict]]:
         """
         执行异步检索。
 
         Returns:
             retrieve_result: {path: text_evidence}
             retrieve_bbox: {path: [location_dicts]}
+            retrieve_images: {path: base64_image_str}
             trace: [trace_events]
         """
         trace = []
@@ -62,15 +107,15 @@ class AsyncRetriever:
 
         # 2. Start Recursive Search
         if not cctree.root:
-            return {}, {}, trace
+            return {}, {}, {}, trace
 
-        rr, rb, sub_trace = await self._select_and_check_by_level(
+        rr, rb, ri, sub_trace = await self._select_and_check_by_level(
             {"root": cctree.root}, content_query, source_path, locations, question_id
         )
         
         trace.extend(sub_trace)
         
-        return rr, rb, trace
+        return rr, rb, ri, trace
 
     async def _parse_question(
         self, query: str, question_id: str | int = "N/A"
@@ -110,14 +155,15 @@ class AsyncRetriever:
         source_path: str,
         locations: list[dict],
         question_id: str | int = "N/A",
-    ) -> tuple[dict, dict, list]:
+    ) -> tuple[dict, dict, dict, list]:
         retrieve_result = {}
         retrieve_bbox = {}
+        retrieve_images = {}
         selected_children = {}
         level_trace = []
 
         if not cur_level:
-            return retrieve_result, retrieve_bbox, level_trace
+            return retrieve_result, retrieve_bbox, retrieve_images, level_trace
 
         # 并发处理当前层的所有节点
         tasks = []
@@ -137,23 +183,149 @@ class AsyncRetriever:
                 )
                 continue
 
-            rr, rb, sc, nt = res
+            rr, rb, ri, sc, nt = res
             retrieve_result.update(rr)
             retrieve_bbox.update(rb)
+            retrieve_images.update(ri)
             selected_children.update(sc)
             if nt:
                 level_trace.extend(nt)
 
         # 递归处理下一层
         if selected_children:
-            sub_rr, sub_rb, sub_trace = await self._select_and_check_by_level(
+            sub_rr, sub_rb, sub_ri, sub_trace = await self._select_and_check_by_level(
                 selected_children, query, source_path, locations, question_id
             )
             retrieve_result.update(sub_rr)
             retrieve_bbox.update(sub_rb)
+            retrieve_images.update(sub_ri)
             level_trace.extend(sub_trace)
 
-        return retrieve_result, retrieve_bbox, level_trace
+        return retrieve_result, retrieve_bbox, retrieve_images, level_trace
+
+    async def _select_children_with_retry(
+        self,
+        children_keys: list[str],
+        query: str,
+        path: str,
+        metadata_map: dict,
+        question_id: str | int,
+        max_retries: int = 3
+    ) -> list[str]:
+        """
+        Attempt to select children with LLM, including retries and robust parsing.
+        """
+        for attempt in range(max_retries):
+            try:
+                select_res = await self.llm.select_children(
+                    children_keys, query, path, str(metadata_map)
+                )
+                
+                selected_keys = _parse_list_string(select_res)
+
+                if selected_keys is not None:
+                    return selected_keys
+                
+                self.logger.warning(
+                    f"Attempt {attempt + 1}/{max_retries} failed to parse selection: {select_res}",
+                    extra={"question_id": question_id}
+                )
+                
+            except Exception as e:
+                self.logger.warning(
+                    f"Attempt {attempt + 1}/{max_retries} LLM call failed: {e}",
+                    extra={"question_id": question_id}
+                )
+        
+        self.logger.error(
+            "All retries failed for selecting children.",
+            extra={"question_id": question_id}
+        )
+        return []
+
+    async def _check_node_relevance(
+        self,
+        node: CCTreeNode,
+        base_path: str,
+        query: str,
+        within_locs: list[Location],
+        source_path: str,
+        question_id: str | int,
+    ) -> tuple[bool, str]:
+        """Checks if the node is relevant using LLM (Multimodal or Text-only)."""
+        check_method = "text"
+        is_relevant = False
+        try:
+            if within_locs:
+                check_method = "multimodal"
+                bbox_data = [
+                    {"page": loc.page, "bbox": loc.bbox} for loc in within_locs
+                ]
+                loop = asyncio.get_running_loop()
+                base64_image = await loop.run_in_executor(
+                    self.proc_pool,
+                    crop_pdf_image_task,
+                    source_path,
+                    bbox_data,
+                )
+                text_data = f"{base_path}: {node.data}"
+                self.logger.info(
+                    f"Check node MM input: text='{text_data[:20]}', query='{query}', image_len={len(base64_image)}",
+                    extra={"question_id": question_id},
+                )
+                is_relevant = await self.llm.check_node_mm(
+                    text_data, base64_image, query
+                )
+            else:
+                check_method = "text_only"
+                self.logger.info(
+                    f"Check node input: text='{node.data}', query='{query}'",
+                    extra={"question_id": question_id},
+                )
+                is_relevant = await self.llm.check_node(node.data, query)
+        except Exception as e:
+            self.logger.warning(
+                f"Check node failed for {base_path}: {e}",
+                extra={"question_id": question_id},
+            )
+            is_relevant = False
+        
+        return is_relevant, check_method
+
+    async def _filter_and_select_children(
+        self,
+        node: CCTreeNode,
+        query: str,
+        path: str,
+        source_path: str,
+        locations: list[dict],
+        question_id: str | int,
+    ) -> tuple[list[str], list[str], list[str]]:
+        """Filters children by location and then selects using LLM."""
+        if not node.children:
+            return [], [], []
+
+        # 1. Location Filtering
+        children_keys = list(node.children.keys())
+        if locations:
+            children_keys = await asyncio.to_thread(
+                self._filt_by_location, node, source_path, locations
+            )
+            self.logger.info(
+                f"Filtered children by location: {len(children_keys)}/{len(node.children)}",
+                extra={"question_id": question_id},
+            )
+
+        if not children_keys:
+            return [], [], []
+
+        # 2. LLM Selection
+        metadata_map = {k: f"{k}: {node.children[k].metadata}" for k in children_keys}
+        selected_keys = await self._select_children_with_retry(
+            children_keys, query, path, metadata_map, question_id
+        )
+
+        return children_keys, selected_keys, []
 
     async def _process_single_node(
         self,
@@ -163,13 +335,14 @@ class AsyncRetriever:
         source_path: str,
         locations: list[dict],
         question_id: str | int = "N/A",
-    ) -> tuple[dict, dict, dict, list]:
+    ) -> tuple[dict, dict, dict, dict, list]:
         async with self.sem:
             self.logger.info(
                 f"Processing node: {path}", extra={"question_id": question_id}
             )
             retrieve_result = {}
             retrieve_bbox = {}
+            retrieve_images = {}
             selected_children = {}
             node_trace = []
 
@@ -193,45 +366,11 @@ class AsyncRetriever:
                 "locations_count": len(within_locs)
             })
 
-            # 如果位置符合且不是 root/MROOT，则检查内容
+            # If location matches and not root, check content relevance
             if node.type not in ["root", "MROOT"] and curloc_res:
-                is_relevant = False
-                check_method = "text"
-                try:
-                    if within_locs:
-                        check_method = "multimodal"
-                        # Prepare picklable data for process pool
-                        bbox_data = [
-                            {"page": loc.page, "bbox": loc.bbox} for loc in within_locs
-                        ]
-                        loop = asyncio.get_running_loop()
-                        base64_image = await loop.run_in_executor(
-                            self.proc_pool,
-                            crop_pdf_image_task,
-                            source_path,
-                            bbox_data,
-                        )
-                        text_data = f"{base_path}: {node.data}"
-                        self.logger.info(
-                            f"Check node MM input: text='{text_data}', query='{query}', image_len={len(base64_image)}",
-                            extra={"question_id": question_id},
-                        )
-                        is_relevant = await self.llm.check_node_mm(
-                            text_data, base64_image, query
-                        )
-                    else:
-                        check_method = "text_only"
-                        self.logger.info(
-                            f"Check node input: text='{node.data}', query='{query}'",
-                            extra={"question_id": question_id},
-                        )
-                        is_relevant = await self.llm.check_node(node.data, query)
-                except Exception as e:
-                    self.logger.warning(
-                        f"Check node failed for {path}: {e}",
-                        extra={"question_id": question_id},
-                    )
-                    is_relevant = False
+                is_relevant, check_method = await self._check_node_relevance(
+                    node, base_path, query, within_locs, source_path, question_id
+                )
                 
                 node_trace.append({
                     "step": "check_relevance",
@@ -245,58 +384,51 @@ class AsyncRetriever:
                         f"Node relevant: {path}", extra={"question_id": question_id}
                     )
                     retrieve_result[path] = node.data
-                    # 统一转为 dict 输出
                     bbox_dicts = [loc.to_dict() for loc in within_locs]
                     for d in bbox_dicts:
                         d["source_path"] = source_path
                     retrieve_bbox[path] = bbox_dicts
+
+                    # Capture image content for Image nodes
+                    if node.type and node.type.strip().lower() == "image":
+                        try:
+                            bbox_data = [
+                                {"page": loc.page, "bbox": loc.bbox} for loc in within_locs
+                            ]
+                            loop = asyncio.get_running_loop()
+                            base64_image = await loop.run_in_executor(
+                                self.proc_pool,
+                                crop_pdf_image_task,
+                                source_path,
+                                bbox_data,
+                            )
+                            retrieve_images[path] = base64_image
+                            self.logger.info(f"Captured image for node: {path}", extra={"question_id": question_id})
+                        except Exception as e:
+                            self.logger.warning(
+                                f"Failed to crop image for {path}: {e}",
+                                extra={"question_id": question_id}
+                            )
+
                 else:
                     self.logger.info(
                         f"Node NOT relevant: {path}", extra={"question_id": question_id}
                     )
 
             # 2. Forward Search (Select Children)
-            if not node.children:
-                return retrieve_result, retrieve_bbox, selected_children, node_trace
-
-            # 先按位置过滤子节点
-            children_keys = list(node.children.keys())
-            if locations:
-                children_keys = await asyncio.to_thread(
-                    self._filt_by_location, node, source_path, locations
-                )
-                self.logger.info(
-                    f"Filtered children by location: {len(children_keys)}/{len(node.children)}",
-                    extra={"question_id": question_id},
-                )
-
-            if not children_keys:
-                return retrieve_result, retrieve_bbox, selected_children, node_trace
-
-            # LLM 选择子节点
-            metadata_map = {k: f"{k}: {node.children[k].metadata}" for k in children_keys}
-
-            try:
-                select_res = await self.llm.select_children(
-                    children_keys, query, path, str(metadata_map)
-                )
-                selected_keys = ast.literal_eval(select_res)
-                if not isinstance(selected_keys, list):
-                    selected_keys = []
-            except Exception as e:
-                self.logger.warning(
-                    f"Select children failed: {e}", extra={"question_id": question_id}
-                )
-                selected_keys = []
+            candidates, selected_keys, _ = await self._filter_and_select_children(
+                node, query, path, source_path, locations, question_id
+            )
             
-            node_trace.append({
-                "step": "select_children",
-                "path": path,
-                "children_candidates": children_keys,
-                "selected_keys": selected_keys
-            })
+            if candidates: # Only add trace if there were candidates
+                 node_trace.append({
+                    "step": "select_children",
+                    "path": path,
+                    "children_candidates": candidates,
+                    "selected_keys": selected_keys
+                })
 
-            # 收集选中的子节点
+            # Collect selected children
             for key in selected_keys:
                 if key in node.children:
                     self.logger.info(
@@ -306,26 +438,12 @@ class AsyncRetriever:
                     child_path = f"{path}--{key}"
                     selected_children[child_path] = node.children[key]
 
-            return retrieve_result, retrieve_bbox, selected_children, node_trace
+            return retrieve_result, retrieve_bbox, retrieve_images, selected_children, node_trace
 
-    def _check_location(
-        self,
-        node: CCTreeNode,
-        source_path: str,
-        target_locations: list[dict],
-        only_self: bool = False,
-    ) -> tuple[bool, list[Location]]:
-        """检查节点位置是否在目标区域内。"""
-        if not target_locations:
-            return True, []
-
-        try:
-            doc = fitz.open(source_path)
-            page_count = doc.page_count
-        except Exception:
-            return False, []
-
-        # 预处理 targets
+    def _preprocess_target_locations(
+        self, target_locations: list[dict], page_count: int
+    ) -> list[dict]:
+        """Preprocess target locations into a standard format."""
         processed_targets = []
         for loc in target_locations:
             p = loc.get("page", 0)
@@ -350,13 +468,19 @@ class AsyncRetriever:
                     processed_targets.append({"page": np, "grids": parsed_grids})
             else:
                 processed_targets.append({"page": p, "grids": parsed_grids})
+        return processed_targets
 
+    def _check_node_overlap(
+        self,
+        node: CCTreeNode,
+        doc: fitz.Document,
+        processed_targets: list[dict],
+    ) -> tuple[bool, list[Location]]:
+        """Check if the node overlaps with any target location."""
         flag = False
         within_locs: list[Location] = []
 
-        # Check current node
         for loc in node.location:
-            # Check page index
             try:
                 page = doc[loc.page - 1]
                 page_w, page_h = page.rect.width, page.rect.height
@@ -390,16 +514,40 @@ class AsyncRetriever:
                             flag = True
                             within_locs.append(loc)
                             break
-                # Do not break here to collect all locations across pages
-                # if flag and loc in within_locs:
-                #    break
+
+        return flag, within_locs
+
+    def _check_location(
+        self,
+        node: CCTreeNode,
+        source_path: str,
+        target_locations: list[dict],
+        only_self: bool = False,
+    ) -> tuple[bool, list[Location]]:
+        """检查节点位置是否在目标区域内。"""
+        if not target_locations:
+            return True, []
+
+        try:
+            doc = fitz.open(source_path)
+            page_count = doc.page_count
+        except Exception:
+            return False, []
+
+        # 1. Preprocess targets
+        processed_targets = self._preprocess_target_locations(
+            target_locations, page_count
+        )
+
+        # 2. Check overlap for current node
+        flag, within_locs = self._check_node_overlap(node, doc, processed_targets)
 
         doc.close()
 
         if flag:
             return True, within_locs
 
-        # Recursively check children
+        # 3. Recursively check children
         if not only_self and node.children:
             for child in node.children.values():
                 res, _ = self._check_location(

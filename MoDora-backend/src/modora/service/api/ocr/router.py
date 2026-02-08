@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from modora.core.domain.ocr import OCRBlock, OcrExtractResponse
-from modora.service.api.ocr.runtime import get_ocr_model
+from modora.core.infra.ocr.manager import get_ocr_model
 
 router = APIRouter(prefix="/ocr", tags=["ocr"])
 
@@ -76,23 +76,6 @@ def _decode_image_bytes_to_rgb(raw: bytes):
     return cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
 
-def _blocks_from_parsing_res_list(res_list: Any, *, page_id: int) -> list[OCRBlock]:
-    """将 PPStructureV3 的 parsing_res_list 归一化为 OCRBlock 列表。"""
-    blocks: list[OCRBlock] = []
-    for res in res_list:
-        blocks.append(
-            OCRBlock(
-                page_id=int(page_id),
-                block_id=res.index,
-                # 这里做一次 0.5 缩放，用于将模型坐标对齐到 PDF 坐标系。
-                bbox=[0.5 * x for x in res.bbox],
-                label=res.label,
-                content=res.content,
-            )
-        )
-    return blocks
-
-
 @router.post("/extract", response_model=OcrExtractResponse)
 def ocr_extract(request: OCRExtractRequest) -> OcrExtractResponse:
     """
@@ -114,12 +97,10 @@ def ocr_extract(request: OCRExtractRequest) -> OcrExtractResponse:
 
     it = model.predict_iter(img_rgb)
     try:
-        out = next(it)
+        blocks = next(it)
     except StopIteration:
         return OcrExtractResponse(source=source, blocks=[])
 
-    regions = out.get("parsing_res_list")
-    blocks = _blocks_from_parsing_res_list(regions, page_id=1)
     return OcrExtractResponse(source=source, blocks=blocks)
 
 
@@ -136,9 +117,7 @@ def ocr_extract_pdf(request: OCRExtractPdfRequest) -> OcrExtractResponse:
     pdf_input, source = request.resolve_pdf_input()
 
     pdf_blocks: list[OCRBlock] = []
-    for idx, out in enumerate(model.predict_iter(pdf_input)):
-        res_list = out.get("parsing_res_list")
-        page_blocks = _blocks_from_parsing_res_list(res_list, page_id=idx + 1)
+    for page_blocks in model.predict_iter(pdf_input):
         pdf_blocks.extend(page_blocks)
 
     return OcrExtractResponse(source=source, blocks=pdf_blocks)

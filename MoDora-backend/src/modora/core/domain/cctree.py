@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Tuple
 
 from modora.core.domain.component import Location, Component
 
@@ -60,6 +60,38 @@ class CCTreeNode:
             "depth": self.depth,
             "keyword_cnt": self.keyword_cnt,
         }
+    
+    def has_content(self) -> bool:
+        return self.data or self.location
+    
+    def get_metadata_map(self) -> dict[str, str]:
+        return {k: v.metadata for k, v in self.children.items()}
+
+    def get_structure(self) -> dict[str, Any]:
+        """
+        仅获取树的结构（递归），不包含 data/metadata/location 等详细信息。
+        用于快速浏览树的形态。
+        """
+        children_structure = {}
+        for k, v in self.children.items():
+            if k != "Supplement": # Exclude Supplement by default as it's usually auxiliary
+                children_structure[k] = v.get_structure()
+        return children_structure
+
+    def get_clean_structure(self) -> dict[str, Any]:
+        """
+        获取包含 data 的树结构，但去除 metadata/location/type 等无关信息。
+        用于整树推理上下文。
+        """
+        res = {}
+        if self.data:
+            res["data"] = self.data
+            
+        for k, v in self.children.items():
+            if k != "Supplement":
+                res[k] = v.get_clean_structure()
+        
+        return res
 
 
 @dataclass(slots=True)
@@ -89,3 +121,29 @@ class CCTree:
         p = Path(path)
         obj = json.loads(p.read_text(encoding="utf-8"))
         return CCTree.from_dict(obj)
+
+    def get_structure(self) -> dict[str, Any]:
+        """Delegate to root node."""
+        return self.root.get_structure()
+
+    def get_clean_structure(self) -> dict[str, Any]:
+        """Delegate to root node."""
+        return self.root.get_clean_structure()
+
+
+@dataclass(slots=True)
+class RetrievalResult:
+    """
+    检索结果集合。
+    直接提供业务所需的两种数据格式：
+    1. text_map: 路径到文本内容的映射，用于 LLM 推理。
+    2. locations: 所有命中位置的扁平列表，用于截图。
+    """
+    text_map: Dict[str, str] = field(default_factory=dict)
+    locations: List[Location] = field(default_factory=list)
+
+    def update(self, other: "RetrievalResult") -> None:
+        """合并另一个检索结果。"""
+        self.text_map.update(other.text_map)
+        self.locations.extend(other.locations)
+

@@ -24,6 +24,7 @@ from modora.core.prompts.retrieval import (
     check_answer_prompt,
     retrieved_reasoning_prompt,
     whole_reasoning_prompt,
+    image_reasoning_prompt,
 )
 
 
@@ -54,7 +55,9 @@ class BaseAsyncLLMClient(ABC):
         self.settings = settings or Settings.load()
 
     @abstractmethod
-    async def _call_llm(self, prompt: str, base64_image: str | None = None) -> str:
+    async def _call_llm(
+        self, prompt: str, base64_image: str | list[str] | None = None
+    ) -> str:
         """
         Abstract method to call the underlying LLM provider.
         Must be implemented by subclasses.
@@ -108,15 +111,19 @@ class BaseAsyncLLMClient(ABC):
         res = await self._call_llm(prompt)
         return _bool_string(res)
 
-    async def reason_retrieved(self, query: str, schema: str, evidence: str) -> str:
-        prompt = retrieved_reasoning_prompt.format(
+    async def reason_retrieved(
+        self, query: str, schema: str, evidence: str, images: list[str] | None = None
+    ) -> str:
+        prompt = image_reasoning_prompt.format(
             query=query, schema=schema, evidence=evidence
         )
-        return await self._call_llm(prompt)
+        return await self._call_llm(prompt, base64_image=images)
 
-    async def reason_whole(self, query: str, data: str) -> str:
+    async def reason_whole(
+        self, query: str, data: str, image: str | None = None
+    ) -> str:
         prompt = whole_reasoning_prompt.format(query=query, data=data)
-        return await self._call_llm(prompt)
+        return await self._call_llm(prompt, base64_image=image)
 
     async def generate_annotation_async(
         self, base64_image: str, cp_type: str, settings: Settings | None = None

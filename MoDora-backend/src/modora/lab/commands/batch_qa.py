@@ -11,9 +11,9 @@ from tqdm import tqdm
 
 from modora.core.domain.cctree import CCTree, CCTreeNode
 from modora.core.domain.component import Location
-from modora.core.services.qa import QAService
+from modora.core.services.qa_service import QAService
 from modora.core.settings import Settings
-from modora.service.api.llm_local import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
 
 
 def register(sub: argparse._SubParsersAction) -> None:
@@ -24,12 +24,12 @@ def register(sub: argparse._SubParsersAction) -> None:
         help="Path to the dataset JSON file (e.g., test.json)",
     )
     parser.add_argument(
-        "--cache-dir",
-        default="/home/yukai/project/MoDora/MoDora-backend/cache_v4",
+        "--cache",
+        default="/home/yukai/project/MoDora/MoDora-backend/cache_v5",
         help="Path to the cache directory containing trees",
     )
     parser.add_argument(
-        "--output-dir",
+        "--output",
         default="/home/yukai/project/MoDora/MoDora-backend/tmp",
         help="Directory to save intermediate and final results",
     )
@@ -45,6 +45,22 @@ def register(sub: argparse._SubParsersAction) -> None:
         default=0,
         help="Limit the number of QA tasks to run (0 for all)",
     )
+    parser.add_argument(
+        "--tag",
+        type=str,
+        default=None,
+        help="Filter questions by tag (comma-separated, e.g. 1-2,2-2)",
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug mode (save prompts and images)",
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume from existing result.json in output directory",
+    )
     parser.set_defaults(_handler=_handle_batch_qa)
 
 
@@ -58,7 +74,7 @@ class QAJob:
     output_path: Path
 
 
-def _resolve_paths(
+def resolve_paths(
     item: dict[str, Any], dataset_json_path: Path, cache_dir: Path, output_dir: Path
 ) -> QAJob | None:
     try:
@@ -95,8 +111,14 @@ def _resolve_paths(
         return None
 
 
-async def _run_single_qa(
-    job: QAJob, qa_service: QAService, sem: asyncio.Semaphore, logger: logging.Logger
+import base64
+
+async def run_single_qa(
+    job: QAJob,
+    qa_service: QAService,
+    sem: asyncio.Semaphore,
+    logger: logging.Logger,
+    debug: bool = False,
 ) -> dict[str, Any] | None:
     async with sem:
         try:
@@ -124,8 +146,8 @@ async def _run_single_qa(
             cctree = CCTree(root=root_node)
 
             # Run QA
-            result = await qa_service.answer_question(
-                job.question, cctree, str(job.pdf_path), job.question_id
+            result = await qa_service.qa(
+                cctree, job.question, str(job.pdf_path)
             )
             
             output = {
@@ -141,6 +163,35 @@ async def _run_single_qa(
             with open(job.output_path, "w", encoding="utf-8") as f:
                 json.dump(output, f, ensure_ascii=False, indent=2)
                 
+            if debug:
+                try:
+                    debug_dir = job.output_path.parent / "debug" / str(job.question_id)
+                    debug_dir.mkdir(parents=True, exist_ok=True)
+                    
+                    debug_prompts = result.get("debug_prompts", {})
+                    
+                    # Save reasoning context
+                    with open(debug_dir / "prompt.txt", "w", encoding="utf-8") as f:
+                        f.write(debug_prompts.get("reasoning_context", ""))
+                        
+                    # Save fallback context
+                    if debug_prompts.get("fallback_context"):
+                        with open(debug_dir / "fallback_prompt.txt", "w", encoding="utf-8") as f:
+                            f.write(debug_prompts.get("fallback_context", ""))
+                            
+                    # Save images
+                    images = debug_prompts.get("images", [])
+                    for i, img_b64 in enumerate(images):
+                        try:
+                            img_data = base64.b64decode(img_b64)
+                            with open(debug_dir / f"image_{i}.jpg", "wb") as f:
+                                f.write(img_data)
+                        except Exception as e:
+                            logger.error(f"Failed to save debug image {i}: {e}")
+                            
+                except Exception as e:
+                    logger.error(f"Failed to save debug info for Question {job.question_id}: {e}")
+
             return output
 
         except Exception as e:
@@ -152,15 +203,15 @@ async def _run_single_qa(
             }
 
 
-async def _run_batch_qa(
-    jobs: List[QAJob], concurrency: int, logger: logging.Logger
+async def run_batch_qa(
+    jobs: List[QAJob], concurrency: int, logger: logging.Logger, debug: bool = False
 ) -> List[dict[str, Any]]:
     settings = Settings.load()
-    qa_service = QAService(settings, logger)
+    qa_service = QAService(settings)
     sem = asyncio.Semaphore(concurrency)
     
     tasks = [
-        _run_single_qa(job, qa_service, sem, logger) for job in jobs
+        run_single_qa(job, qa_service, sem, logger, debug) for job in jobs
     ]
     
     results = []
@@ -178,16 +229,22 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
     
     try:
         dataset_path = Path(args.dataset).resolve()
-        cache_dir = Path(args.cache_dir).resolve()
-        output_dir = Path(args.output_dir).resolve()
+        cache_dir = Path(args.cache).resolve()
+        output_dir = Path(args.output).resolve()
         output_dir.mkdir(parents=True, exist_ok=True)
 
         with open(dataset_path, "r", encoding="utf-8") as f:
             dataset = json.load(f)
 
+        # Apply tag filter if specified
+        if args.tag:
+            target_tags = set(t.strip() for t in args.tag.split(","))
+            logger.info(f"Filtering by tags: {target_tags}")
+            dataset = [item for item in dataset if item.get("tag") in target_tags]
+
         jobs = []
         for item in dataset:
-            job = _resolve_paths(item, dataset_path, cache_dir, output_dir)
+            job = resolve_paths(item, dataset_path, cache_dir, output_dir)
             if job:
                 jobs.append(job)
         
@@ -196,16 +253,44 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
             logger.info(f"Limiting to first {args.limit} tasks")
             jobs = jobs[:args.limit]
             
-        logger.info(f"Found {len(jobs)} QA jobs")
-        
-        results = asyncio.run(_run_batch_qa(jobs, args.concurrency, logger))
-        
-        # Save final summary
+        # Resume logic
+        existing_results = []
         final_output_path = output_dir / "result.json"
+        if args.resume and final_output_path.exists():
+            try:
+                with open(final_output_path, "r", encoding="utf-8") as f:
+                    existing_results = json.load(f)
+                
+                if not isinstance(existing_results, list):
+                    logger.warning(f"Existing results in {final_output_path} is not a list, ignoring for resume")
+                    existing_results = []
+                
+                processed_ids = {res["questionId"] for res in existing_results if isinstance(res, dict) and res.get("status") == "success"}
+                logger.info(f"Resuming: found {len(processed_ids)} already processed tasks in {final_output_path}")
+                
+                original_count = len(jobs)
+                jobs = [j for j in jobs if j.question_id not in processed_ids]
+                logger.info(f"Filtered tasks: {original_count} -> {len(jobs)}")
+            except Exception as e:
+                logger.error(f"Failed to load existing results for resume: {e}")
+
+        logger.info(f"Found {len(jobs)} QA jobs to run")
+        
+        new_results = []
+        if jobs:
+            new_results = asyncio.run(run_batch_qa(jobs, args.concurrency, logger, args.debug))
+        
+        # Merge and save final summary
+        all_results = existing_results + new_results
+        
+        # Deduplicate by questionId, keeping the latest result
+        results_map = {res["questionId"]: res for res in all_results if "questionId" in res}
+        final_results = sorted(results_map.values(), key=lambda x: x["questionId"])
+
         with open(final_output_path, "w", encoding="utf-8") as f:
-            json.dump(results, f, ensure_ascii=False, indent=2)
+            json.dump(final_results, f, ensure_ascii=False, indent=2)
             
-        logger.info(f"Batch QA finished. Results saved to {final_output_path}")
+        logger.info(f"Batch QA finished. Total {len(final_results)} results saved to {final_output_path}")
         return 0
         
     except Exception as e:

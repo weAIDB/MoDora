@@ -66,7 +66,7 @@ def _next_rr(n: int) -> int:
         return idx
 
 
-def _create_messages(prompt: str, base64_image: str | None = None) -> list:
+def _create_messages(prompt: str, base64_image: str | list[str] | None = None) -> list:
     messages = [
         {
             "role": "user",
@@ -76,19 +76,23 @@ def _create_messages(prompt: str, base64_image: str | None = None) -> list:
         }
     ]
     if base64_image is not None:
-        messages[0]["content"].append(
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{base64_image}"  # 使用Base64数据
-                },
-            }
-        )
+        if isinstance(base64_image, str):
+            base64_image = [base64_image]
+            
+        for img in base64_image:
+            messages[0]["content"].append(
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{img}"
+                    },
+                }
+            )
     return messages
 
 
 def call_qwen_vl(
-    prompt: str, base64_image: str | None = None, settings: Settings | None = None
+    prompt: str, base64_image: str | list[str] | None = None, settings: Settings | None = None
 ) -> str:
     """通过 OpenAI 兼容接口调用本地 Qwen-VL（lmdeploy api_server）。"""
     settings = settings or Settings.load()
@@ -103,11 +107,11 @@ def call_qwen_vl(
     for i in range(len(base_urls)):
         base_url = base_urls[(start + i) % len(base_urls)]
         try:
-            client = OpenAI(base_url=base_url, api_key="local")
+            client = OpenAI(base_url=base_url, api_key=settings.llm_local_api_key)
             response = client.chat.completions.create(
                 model=settings.llm_local_model,
                 messages=messages,
-                max_completion_tokens=2048,
+                max_completion_tokens=16384,
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -120,7 +124,7 @@ def call_qwen_vl(
 
 
 async def call_qwen_vl_async(
-    prompt: str, base64_image: str | None = None, settings: Settings | None = None
+    prompt: str, base64_image: str | list[str] | None = None, settings: Settings | None = None
 ) -> str:
     settings = settings or Settings.load()
     if not settings.llm_local_model:
@@ -134,11 +138,11 @@ async def call_qwen_vl_async(
     for i in range(len(base_urls)):
         base_url = base_urls[(start + i) % len(base_urls)]
         try:
-            client = AsyncOpenAI(base_url=base_url, api_key="local")
+            client = AsyncOpenAI(base_url=base_url, api_key=settings.llm_local_api_key)
             response = await client.chat.completions.create(
                 model=settings.llm_local_model,
                 messages=messages,
-                max_completion_tokens=2048,
+                max_completion_tokens=16384,
             )
             return response.choices[0].message.content
         except Exception as e:
@@ -225,6 +229,8 @@ class AsyncQwenLLMClient(BaseAsyncLLMClient):
     Async Qwen LLM Client inheriting from BaseAsyncLLMClient.
     Uses call_qwen_vl_async for the underlying LLM call.
     """
-    async def _call_llm(self, prompt: str, base64_image: str | None = None) -> str:
+    async def _call_llm(
+        self, prompt: str, base64_image: str | list[str] | None = None
+    ) -> str:
         return await call_qwen_vl_async(prompt, base64_image, settings=self.settings)
 

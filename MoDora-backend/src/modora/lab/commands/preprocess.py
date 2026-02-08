@@ -21,7 +21,7 @@ from modora.service.api.ocr.router import (
     OCRExtractPdfRequest,
     ocr_extract_pdf,
 )
-from modora.service.api.ocr.runtime import ensure_ocr_model_loaded
+from modora.core.infra.ocr.manager import ensure_ocr_model_loaded
 from modora.core.infra.logging.setup import configure_logging
 
 
@@ -161,7 +161,7 @@ def _iter_pdf_paths(dataset_path: str) -> list[str]:
     return out
 
 
-from modora.service.api.llm_local import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
 
 
 def _handle_preprocess_ocr_pipeline(

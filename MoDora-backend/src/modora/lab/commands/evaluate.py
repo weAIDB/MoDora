@@ -14,7 +14,7 @@ from modora.core.domain.results import ResultItem
 from modora.core.infra.llm.qwen import AsyncQwenLLMClient
 from modora.core.infra.llm.remote import AsyncRemoteLLMClient
 from modora.core.settings import Settings
-from modora.service.api.llm_local import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
 
 # --- Prompts ---
 EVALUATION_PROMPT = """
