@@ -16,7 +16,7 @@ class AsyncRemoteLLMClient(BaseAsyncLLMClient):
     def _init_client(self):
         self.api_key = getattr(self.settings, "api_key", None)
         self.base_url = getattr(self.settings, "api_base", None)
-        self.model = "gemini-2.5-flash" 
+        self.model = getattr(self.settings, "api_model", None) or "gpt-4o-mini"
         
         # If not in settings, try manual load (fallback)
         if not self.api_key or not self.base_url:

@@ -7,7 +7,7 @@ import logging
 from modora.core.domain.component import ComponentPack
 from modora.core.settings import Settings
 from modora.core.interfaces.llm import LLMClient
-from modora.core.infra.llm.qwen import AsyncQwenLLMClient
+from modora.core.infra.llm.base import BaseAsyncLLMClient
 from modora.core.interfaces.media import ImageProvider
 
 
@@ -70,7 +70,7 @@ class LevelGenerator:
 
 
 class AsyncLevelGenerator:
-    def __init__(self, llm_client: AsyncQwenLLMClient, image_provider: ImageProvider):
+    def __init__(self, llm_client: BaseAsyncLLMClient, image_provider: ImageProvider):
         self.llm = llm_client
         self.media = image_provider
 

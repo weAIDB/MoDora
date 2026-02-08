@@ -7,7 +7,9 @@ from modora.core.domain.component import ComponentPack
 from modora.core.domain.ocr import OcrExtractResponse
 from modora.core.services.structure import StructureAnalyzer
 from modora.core.services.enrichment import EnrichmentService
-from modora.core.infra.llm.qwen import AsyncQwenLLMClient, QwenLLMClient
+from modora.core.infra.llm.qwen import QwenLLMClient
+from modora.core.infra.llm.factory import AsyncLLMFactory
+from modora.core.infra.llm.base import BaseAsyncLLMClient
 from modora.core.infra.pdf.cropper import PDFCropper
 from modora.core.services.constructor import TreeConstructor
 from modora.core.services.hierarchy import AsyncLevelGenerator, LevelGenerator
@@ -16,7 +18,9 @@ from modora.core.settings import Settings
 
 
 async def get_components_async(
-    extracted_data: OcrExtractResponse, logger: logging.Logger
+    extracted_data: OcrExtractResponse,
+    logger: logging.Logger,
+    llm_client: BaseAsyncLLMClient | None = None,
 ) -> ComponentPack:
     """
     异步将 OCR 提取的扁平 Block 列表重组为结构化的 ComponentPack。
@@ -29,7 +33,7 @@ async def get_components_async(
 
     # 2. Enrichment
     # 使用异步 LLM 客户端
-    llm = AsyncQwenLLMClient()
+    llm = llm_client or AsyncLLMFactory.create()
     cropper = PDFCropper()
     enricher = EnrichmentService(llm, cropper)
 
@@ -69,10 +73,13 @@ def build_tree(cp: ComponentPack, logger: logging.Logger, source_path: str = "")
 
 
 async def build_tree_async(
-    cp: ComponentPack, logger: logging.Logger, source_path: str = ""
+    cp: ComponentPack,
+    logger: logging.Logger,
+    source_path: str = "",
+    llm_client: BaseAsyncLLMClient | None = None,
 ):
     settings = Settings.load()
-    llm = AsyncQwenLLMClient()
+    llm = llm_client or AsyncLLMFactory.create()
     cropper = PDFCropper()
     generator = AsyncMetadataGenerator(
         n0=2, growth_rate=2.0, logger=logger, llm_client=llm
