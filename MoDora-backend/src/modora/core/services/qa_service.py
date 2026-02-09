@@ -3,10 +3,10 @@ import logging
 from typing import Tuple, List
 
 from modora.core.settings import Settings
-from modora.core.domain.cctree import CCTree, RetrievalResult
-from modora.core.infra.llm.factory import AsyncLLMFactory
-from modora.core.infra.pdf.cropper import PDFCropper
-from modora.core.prompts.retrieval import location_extraction_prompt
+from modora.core.domain import CCTree, RetrievalResult
+from modora.core.infra.llm import AsyncLLMFactory
+from modora.core.infra.pdf import PDFCropper
+from modora.core.prompts import location_extraction_prompt
 from modora.core.services.retrieve import LocationRetriever, SemanticRetriever
 
 logger = logging.getLogger(__name__)
@@ -63,7 +63,11 @@ class QAService:
         schema = cctree.get_structure()
         answer = "None"
         trace = [
-            {"step": "extract_location", "page_list": page_list, "position_vector": position_vector},
+            {
+                "step": "extract_location",
+                "page_list": page_list,
+                "position_vector": position_vector,
+            },
             {"step": "retrieve", "locations_count": len(result.locations)},
         ]
 
@@ -107,20 +111,22 @@ class QAService:
                 if p not in pages_map:
                     pages_map[p] = []
                 pages_map[p].append(loc.to_dict())
-            
+
             # 这里的 content 只是展示用，由于 RetrievalResult 目前没有按页存储文本，
             # 我们简单合并所有文本作为展示，或者留空。
             all_text = "\n".join(result.text_map.values())
-            
+
             for p, bboxes in pages_map.items():
-                retrieved_docs.append({
-                    "page": p,
-                    "content": all_text[:1000], # 限制长度
-                    "bboxes": bboxes
-                })
+                retrieved_docs.append(
+                    {
+                        "page": p,
+                        "content": all_text[:1000],  # 限制长度
+                        "bboxes": bboxes,
+                    }
+                )
 
         return {
             "answer": answer,
             "retrieved_documents": retrieved_docs,
-            "retrieval_trace": trace
+            "retrieval_trace": trace,
         }

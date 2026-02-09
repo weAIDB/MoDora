@@ -2,101 +2,69 @@ import argparse
 import asyncio
 import json
 import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import asdict
 from pathlib import Path
-from typing import Any, List
+from typing import List
 
 import Levenshtein
 from tqdm import tqdm
 
-from modora.core.domain.results import ResultItem
-from modora.core.infra.llm.qwen import AsyncQwenLLMClient
-from modora.core.infra.llm.remote import AsyncRemoteLLMClient
+from modora.core.domain.results import ResultItem, write_results_file
+from modora.core.infra.llm import (
+    AsyncLocalLLMClient,
+    AsyncRemoteLLMClient,
+    ensure_llm_local_loaded,
+    shutdown_llm_local,
+)
 from modora.core.settings import Settings
-from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
-
-# --- Prompts ---
-EVALUATION_PROMPT = """
-### Instruction
-Now there are the Reference answer and the generated answer to a query. Please judge whether the generated answer is correct according to the reference, output T if correct, otherwise output F.
-Please mainly focuses on whether the semantics of the answers to the key parts of the query are consistent, and allows differences in the degree of detail, the sentence pattern, and the format of answers.
-
-### Reference Answer
-{a}
-
-### Generated Answer
-{b}
-
-### Note
-You only need to output T or F, without any other content.
-"""
-
-CHECK_ANSWER_PROMPT = """
-### Instruction
-Here is a query and a reply to it. Please return T or F according to the following rules:
-(1) If the reply refuses to give a valid answer by meanings like "no relevant information", "insufficient evidence", "unable to answer", "None", "N/A", output F.
-(2) Otherwise output T.
-
-### Query
-{query}
-
-### Reply
-{answer}
-
-### Note
-You only need to output T or F, without any other content.
-"""
 
 
 class Evaluator:
-    def __init__(self, settings: Settings, logger: logging.Logger, use_remote: bool = False):
+    """评估器类，用于判断生成的答案是否正确"""
+
+    def __init__(
+        self, settings: Settings, logger: logging.Logger, use_remote: bool = False
+    ):
         self.settings = settings
         self.logger = logger
         if use_remote:
             self.llm = AsyncRemoteLLMClient(settings)
         else:
-            self.llm = AsyncQwenLLMClient()
-
-    async def _bool_string(self, s: str) -> bool:
-        s = s.lower()
-        if "true" in s or "t" in s or "yes" in s or "y" in s or "1" in s or "on" in s:
-            return True
-        return False
+            self.llm = AsyncLocalLLMClient()
 
     async def check_answer(self, query: str, answer: str) -> bool:
-        prompt = CHECK_ANSWER_PROMPT.format(query=query, answer=answer)
+        """检查回答是否有效"""
         try:
-            res = await self.llm.generate_text(prompt)
-            return await self._bool_string(res)
+            return await self.llm.check_answer(query, answer)
         except Exception as e:
             self.logger.error(f"Error in check_answer: {e}")
             return False
 
     async def is_equal(self, query: str, references: List[str], prediction: str) -> str:
+        """判断预测答案是否与参考答案等价"""
         if not prediction:
             return "F"
-        
+
         for reference in references:
-            # Containment Check
+            # 包含性检查：如果参考答案包含在预测中，则认为正确
             if reference.lower() in prediction.lower():
                 return "T"
 
-            # AI Check
-            prompt = EVALUATION_PROMPT.format(query=query, a=reference, b=prediction)
+            # AI 辅助检查：使用 LLM 判断语义是否一致
             try:
-                res = await self.llm.generate_text(prompt)
-                if "T" in res:
+                if await self.llm.evaluate(query, reference, prediction):
                     return "T"
             except Exception as e:
                 self.logger.error(f"Error in is_equal AI check: {e}")
-                
+
         return "F"
 
-    def anls_single_sample(self, prediction: str, references: List[str], threshold: float = 0.5) -> float:
+    def anls_single_sample(
+        self, prediction: str, references: List[str], threshold: float = 0.5
+    ) -> float:
+        """计算单个样本的 ANLS (Average Normalized Levenshtein Similarity) 分数"""
         max_nls = 0.0
         pred_str = prediction if prediction is not None else ""
-        
+
         for reference in references:
             distance = Levenshtein.distance(pred_str, reference)
             max_len = max(len(pred_str), len(reference))
@@ -104,7 +72,7 @@ class Evaluator:
                 nls = 1.0
             else:
                 nls = 1.0 - float(distance) / max_len
-            
+
             if nls > max_nls:
                 max_nls = nls
 
@@ -112,20 +80,21 @@ class Evaluator:
 
 
 def register(sub: argparse._SubParsersAction) -> None:
+    """注册 evaluate 子命令"""
     parser = sub.add_parser("evaluate", help="Evaluate QA results")
     parser.add_argument(
         "--input",
-        default = "/home/yukai/project/MoDora/datasets/MMDA/test.json",
+        default="/home/yukai/project/MoDora/datasets/MMDA/test.json",
         help="Path to the input JSON file (original dataset)",
     )
     parser.add_argument(
         "--result",
-        default = "/home/yukai/project/MoDora/MoDora-backend/tmp/result.json",
+        default="/home/yukai/project/MoDora/MoDora-backend/tmp/result.json",
         help="Path to the result JSON file (generated by batch-qa)",
     )
     parser.add_argument(
         "--output",
-        default = "/home/yukai/project/MoDora/MoDora-backend/tmp/evaluation.jsonl",
+        default="/home/yukai/project/MoDora/MoDora-backend/tmp/evaluation.jsonl",
         help="Path to save the evaluation report (JSONL)",
     )
     parser.add_argument(
@@ -143,38 +112,40 @@ def register(sub: argparse._SubParsersAction) -> None:
 
 
 async def _process_single_item(
-    item: dict, 
-    prediction_map: dict, 
-    evaluator: Evaluator, 
-    sem: asyncio.Semaphore
+    item: dict, prediction_map: dict, evaluator: Evaluator, sem: asyncio.Semaphore
 ) -> ResultItem | None:
+    """处理单个评估项"""
     async with sem:
         try:
             qid = item.get("questionId")
             if qid not in prediction_map:
-                # Missing prediction
+                # 缺少预测结果
                 return None
 
             pred_item = prediction_map[qid]
             prediction = pred_item.get("prediction")
-            
-            # Prepare answer list
+
+            # 准备参考答案列表
             answer = item.get("answer", [])
             if isinstance(answer, str):
                 answer = [answer]
             elif not isinstance(answer, list):
-                # Fallback for complex datasets like DUDE
+                # 针对复杂数据集（如 DUDE）的回退逻辑
                 if "answers" in item:
-                     answer = [", ".join(item["answers"])] + item.get("answers_variants", [])
+                    answer = [", ".join(item["answers"])] + item.get(
+                        "answers_variants", []
+                    )
                 else:
                     answer = []
-            
-            # AI Judgment
+
+            # AI 判定
             judge = "F"
-            
-            # Special logic for unanswerable
+
+            # 针对不可回答问题的特殊逻辑
             if item.get("answer_type") == "not-answerable":
-                is_valid_ans = await evaluator.check_answer(item["question"], prediction)
+                is_valid_ans = await evaluator.check_answer(
+                    item["question"], prediction
+                )
                 if not is_valid_ans:
                     judge = "T"
                 else:
@@ -182,85 +153,93 @@ async def _process_single_item(
             else:
                 judge = await evaluator.is_equal(item["question"], answer, prediction)
 
-            # Construct ResultItem
+            # 构造 ResultItem
             result_item = ResultItem(
                 questionId=qid,
-                pdf_id=item.get("pdf_id", "") or str(item.get("image_id", "")), # Fallback for image_id
+                pdf_id=item.get("pdf_id", "")
+                or str(item.get("image_id", "")),  # 回退到 image_id
                 question=item["question"],
                 answer=answer,
                 tag=item.get("tag"),
                 prediction=prediction,
-                judge=judge
+                judge=judge,
             )
             return result_item
 
         except Exception as e:
-            evaluator.logger.error(f"Error processing item {item.get('questionId')}: {e}")
+            evaluator.logger.error(
+                f"Error processing item {item.get('questionId')}: {e}"
+            )
             return None
 
 
 async def _run_evaluation(
-    input_path: Path, result_path: Path, output_path: Path, concurrency: int, logger: logging.Logger, use_remote: bool = False
+    input_path: Path,
+    result_path: Path,
+    output_path: Path,
+    concurrency: int,
+    logger: logging.Logger,
+    use_remote: bool = False,
 ):
+    """运行批量评估流程"""
     settings = Settings.load()
     evaluator = Evaluator(settings, logger, use_remote=use_remote)
-    
-    # Load Data
+
+    # 加载数据集和预测结果
     with open(input_path, "r", encoding="utf-8") as f:
         dataset = json.load(f)
-    
+
     with open(result_path, "r", encoding="utf-8") as f:
         results = json.load(f)
-    
-    # Map predictions by ID for fast lookup
+
+    # 将预测结果按 ID 映射，以便快速查找
     prediction_map = {r["questionId"]: r for r in results}
-    
+
     sem = asyncio.Semaphore(concurrency)
     tasks = [
-        _process_single_item(item, prediction_map, evaluator, sem)
-        for item in dataset
+        _process_single_item(item, prediction_map, evaluator, sem) for item in dataset
     ]
-    
+
     evaluated_items = []
     for f in tqdm(asyncio.as_completed(tasks), total=len(tasks), desc="Evaluating"):
         res = await f
         if res:
             evaluated_items.append(res)
 
-    # Save Results
+    # 保存评估结果
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
-        for item in evaluated_items:
-            f.write(json.dumps(item.to_dict(), ensure_ascii=False) + "\n")
+    write_results_file(str(output_path), evaluated_items)
 
-    # Calculate Metrics
+    # 计算各项指标
     total = len(evaluated_items)
     correct = sum(1 for item in evaluated_items if item.judge == "T")
     accuracy = correct / total if total > 0 else 0.0
-    
+
     anls_score = 0.0
     for item in evaluated_items:
         if item.judge == "T":
-            
+
             contain = False
             if item.prediction:
                 for ans in item.answer:
                     if ans and ans.lower() in item.prediction.lower():
                         contain = True
                         break
-            
+
             if contain:
                 anls_score += 1.0
-            elif item.answer == [] or (item.prediction is None and item.judge == "T"): # Unanswerable logic approximation
-                 anls_score += 1.0
+            elif item.answer == [] or (
+                item.prediction is None and item.judge == "T"
+            ):  # 针对不可回答问题的近似处理
+                anls_score += 1.0
             else:
-                 anls_score += evaluator.anls_single_sample(item.prediction, item.answer)
+                anls_score += evaluator.anls_single_sample(item.prediction, item.answer)
         else:
-             anls_score += evaluator.anls_single_sample(item.prediction, item.answer)
+            anls_score += evaluator.anls_single_sample(item.prediction, item.answer)
 
     anls = anls_score / total if total > 0 else 0.0
 
-    print(f"\nEvaluation Complete.")
+    print("\nEvaluation Complete.")
     print(f"Total: {total}")
     print(f"Accuracy: {accuracy:.4f}")
     print(f"ANLS: {anls:.4f}")
@@ -268,18 +247,21 @@ async def _run_evaluation(
 
 
 def _handle_evaluate(args: argparse.Namespace, logger: logging.Logger) -> int:
-    # Only ensure local LLM loaded if NOT using remote
+    """evaluate 命令的处理器"""
+    # 只有在不使用远程 LLM 时才确保本地 LLM 已加载
     if not args.remote:
         ensure_llm_local_loaded(Settings.load(), logger)
     try:
-        asyncio.run(_run_evaluation(
-            Path(args.input), 
-            Path(args.result), 
-            Path(args.output), 
-            args.concurrency, 
-            logger,
-            use_remote=args.remote
-        ))
+        asyncio.run(
+            _run_evaluation(
+                Path(args.input),
+                Path(args.result),
+                Path(args.output),
+                args.concurrency,
+                logger,
+                use_remote=args.remote,
+            )
+        )
         return 0
     except Exception as e:
         logger.error(f"Evaluation failed: {e}")

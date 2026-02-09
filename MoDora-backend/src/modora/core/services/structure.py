@@ -2,8 +2,13 @@ from __future__ import annotations
 
 import logging
 
-from modora.core.domain.component import TITLE, Component, Location, ComponentPack
-from modora.core.domain.ocr import OcrExtractResponse
+from modora.core.domain import (
+    TITLE,
+    Component,
+    Location,
+    ComponentPack,
+    OcrExtractResponse,
+)
 
 
 class StructureAnalyzer:

@@ -8,17 +8,18 @@ import os
 from pathlib import Path
 import re
 from typing import Any
-from dataclasses import dataclass
-
 from tqdm import tqdm
 
 from modora.core.domain.component import ComponentPack
 from modora.core.preprocess import build_tree_async
+from modora.core.domain.jobs import BuildTreeJob
 from modora.core.settings import Settings
-from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.infra.llm import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.utils import iter_pdf_paths
 
 
 def register(sub: argparse._SubParsersAction) -> None:
+    """注册 build-tree 子命令"""
     p = sub.add_parser("build-tree", help="Build title.json and tree.json for dataset")
     p.add_argument(
         "--dataset",
@@ -43,17 +44,8 @@ def register(sub: argparse._SubParsersAction) -> None:
     p.set_defaults(_handler=_handle_build_tree)
 
 
-@dataclass(frozen=True)
-class _BuildTreeJob:
-    num: int
-    pdf_path: Path
-    co_path: Path
-    out_dir: Path
-    title_path: Path
-    tree_path: Path
-
-
 def _resolve_concurrency(args: argparse.Namespace, settings: Settings) -> int:
+    """解析并发数，如果未指定则根据本地 LLM 实例数量确定"""
     concurrency = int(getattr(args, "concurrency", 0) or 0)
     if concurrency <= 0:
         inst = list(getattr(settings, "llm_local_instances", ()) or ())
@@ -61,16 +53,11 @@ def _resolve_concurrency(args: argparse.Namespace, settings: Settings) -> int:
     return concurrency
 
 
-def _iter_pdf_paths(dataset_dir: Path) -> list[Path]:
-    if dataset_dir.is_file():
-        return [dataset_dir] if dataset_dir.suffix.lower() == ".pdf" else []
-    return sorted(dataset_dir.glob("*.pdf"))
-
-
 def _build_jobs(
     pdf_paths: list[Path], cache_dir: Path, logger: logging.Logger, pbar: Any
-) -> tuple[list[_BuildTreeJob], int]:
-    jobs: list[_BuildTreeJob] = []
+) -> tuple[list[BuildTreeJob], int]:
+    """根据 PDF 路径构建任务列表，并验证 co.json 是否存在"""
+    jobs: list[BuildTreeJob] = []
     failed = 0
     for pdf_path in pdf_paths:
         m = re.fullmatch(r"(\d+)", pdf_path.stem)
@@ -94,7 +81,7 @@ def _build_jobs(
             continue
 
         jobs.append(
-            _BuildTreeJob(
+            BuildTreeJob(
                 num=num,
                 pdf_path=pdf_path,
                 co_path=co_path,
@@ -107,14 +94,16 @@ def _build_jobs(
 
 
 async def _run_one_job(
-    job: _BuildTreeJob, sem: asyncio.Semaphore, logger: logging.Logger
+    job: BuildTreeJob, sem: asyncio.Semaphore, logger: logging.Logger
 ) -> bool:
+    """执行单个构建树任务：加载 co.json，构建树，提取标题，并保存结果"""
     async with sem:
         try:
             cp = await asyncio.to_thread(ComponentPack.load_json, str(job.co_path))
             source = f"file:{str(job.pdf_path)}"
             tree = await build_tree_async(cp, logger, source)
 
+            # 提取并格式化标题信息
             titles: list[dict[str, Any]] = []
             for co in cp.body:
                 if co.type != "text":
@@ -130,12 +119,15 @@ async def _run_one_job(
                 )
 
             payload = {"source": source, "titles": titles}
+            # 确保输出目录存在
             await asyncio.to_thread(os.makedirs, job.out_dir, exist_ok=True)
+            # 保存标题信息
             await asyncio.to_thread(
                 job.title_path.write_text,
                 json.dumps(payload, ensure_ascii=False, indent=2, default=str),
                 "utf-8",
             )
+            # 保存树结构
             await asyncio.to_thread(tree.save_json, str(job.tree_path))
             return True
         except Exception as e:
@@ -154,8 +146,9 @@ async def _run_one_job(
 
 
 async def _run_jobs(
-    jobs: list[_BuildTreeJob], concurrency: int, logger: logging.Logger, pbar: Any
+    jobs: list[BuildTreeJob], concurrency: int, logger: logging.Logger, pbar: Any
 ) -> tuple[int, int]:
+    """批量运行构建任务"""
     sem = asyncio.Semaphore(concurrency)
     tasks = [asyncio.create_task(_run_one_job(job, sem, logger)) for job in jobs]
     ok = 0
@@ -170,6 +163,7 @@ async def _run_jobs(
 
 
 def _handle_build_tree(args: argparse.Namespace, logger: logging.Logger) -> int:
+    """build-tree 命令的处理器"""
     config_path = (getattr(args, "config", None) or "").strip() or None
     if config_path:
         os.environ["MODORA_CONFIG"] = config_path
@@ -181,19 +175,20 @@ def _handle_build_tree(args: argparse.Namespace, logger: logging.Logger) -> int:
         dataset_dir = Path(str(getattr(args, "dataset", "") or "").strip()).resolve()
         cache_dir = Path(str(getattr(args, "cache_dir", "") or "").strip()).resolve()
 
-        pdf_paths = _iter_pdf_paths(dataset_dir)
+        pdf_paths = list(iter_pdf_paths(dataset_dir))
 
+        # 应用白名单过滤
         filter_list_path = (getattr(args, "filter_list", None) or "").strip()
         if filter_list_path:
             filter_path = Path(filter_list_path).resolve()
             if filter_path.is_file():
                 whitelist = {
-                    line.strip() for line in filter_path.read_text("utf-8").splitlines()
+                    line.strip()
+                    for line in filter_path.read_text("utf-8").splitlines()
                     if line.strip()
                 }
                 pdf_paths = [
-                    p for p in pdf_paths
-                    if p.name in whitelist or p.stem in whitelist
+                    p for p in pdf_paths if p.name in whitelist or p.stem in whitelist
                 ]
                 logger.info(f"Filtered to {len(pdf_paths)} PDFs from whitelist")
             else:

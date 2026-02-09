@@ -6,16 +6,15 @@ import logging
 from modora.core.infra.logging.context import new_id, run_scope
 from modora.core.infra.logging.setup import configure_logging
 from modora.core.settings import Settings
-from modora.lab.commands.build_tree import register as register_build_tree
-from modora.lab.commands.health import register as register_health
-from modora.lab.commands.results import register as register_results
-from modora.lab.commands.config import register as register_config
-from modora.lab.commands.qa import register as register_qa
-from modora.lab.commands.batch_qa import register as register_batch_qa
-from modora.lab.commands.evaluate import register as register_evaluate
-from modora.lab.commands.preprocess import register as register_preprocess
-from modora.lab.commands.rerun import register as register_rerun
-
+from modora.lab.commands import (
+    register_build_tree,
+    register_batch_qa,
+    register_config,
+    register_evaluate,
+    register_health,
+    register_preprocess,
+    register_qa
+)
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="modora")
@@ -26,13 +25,11 @@ def main(argv: list[str] | None = None) -> int:
 
     register_build_tree(sub)
     register_health(sub)
-    register_results(sub)
     register_config(sub)
     register_qa(sub)
     register_batch_qa(sub)
     register_evaluate(sub)
     register_preprocess(sub)
-    register_rerun(sub)
 
     args = parser.parse_args(argv)
 

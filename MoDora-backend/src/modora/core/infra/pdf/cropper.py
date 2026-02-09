@@ -25,15 +25,15 @@ def _normalize_pdf_path(pdf_path: str) -> str:
 
 def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
     """
-    Independent task function for cropping images from PDF.
-    This function is designed to be picklable and run in a separate process.
-    
-    Args:
-        pdf_path: Path to the PDF file.
-        bbox_data: List of dicts, each containing 'page' (1-based) and 'bbox' [x0, y0, x1, y1].
-    
-    Returns:
-        Base64 encoded string of the merged image.
+    从 PDF 中裁剪图像的独立任务函数。
+    该函数设计为可序列化的（picklable），可以在独立进程中运行。
+
+    参数:
+        pdf_path: PDF 文件路径。
+        bbox_data: 包含 'page' (从1开始) 和 'bbox' [x0, y0, x1, y1] 的字典列表。
+
+    返回:
+        合并后图像的 Base64 编码字符串。
     """
     pdf_path = _normalize_pdf_path(pdf_path)
     try:
@@ -48,7 +48,7 @@ def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
             crop_range = data["bbox"]
             if page_idx < 0 or page_idx >= len(pdf_document):
                 continue
-            
+
             page = pdf_document[page_idx]
             pix = page.get_pixmap(clip=crop_range)
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
@@ -68,7 +68,7 @@ def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
         merged_image.paste(img, (0, y_offset))
         y_offset += int(img.height)
 
-    # Resize if too large (e.g. > 1024x1024)
+    # 如果图像太大（例如 > 1024x1024），进行缩放
     # 限制最大尺寸以减少 token 消耗
     MAX_SIZE = 1024
     if merged_image.width > MAX_SIZE or merged_image.height > MAX_SIZE:
@@ -82,9 +82,9 @@ def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
 
 def bbox_to_base64(pdf_path: str, bbox_list: list[Location]) -> str:
     """
-    Wrapper for backward compatibility. 
-    NOTE: Calling this directly runs in the current process/thread, which may be unsafe for fitz.
-    Prefer using ProcessPoolExecutor with crop_pdf_image_task for concurrency.
+    为了向后兼容的包装函数。
+    注意：直接调用此函数会在当前进程/线程中运行，这对于 fitz 来说可能不安全。
+    建议在并发场景下配合 ProcessPoolExecutor 使用 crop_pdf_image_task。
     """
     bbox_data = [{"page": loc.page, "bbox": loc.bbox} for loc in bbox_list]
     return crop_pdf_image_task(pdf_path, bbox_data)
@@ -93,16 +93,18 @@ def bbox_to_base64(pdf_path: str, bbox_list: list[Location]) -> str:
 def render_ocr_json_to_pdf(
     ocr_json_path: str, out_pdf_path: str | None = None, pdf_path: str | None = None
 ) -> str:
-    """把 OCR 输出 JSON 中的 bbox/label 渲染回 PDF 页面，输出标注后的 PDF。"""
+    """
+    把 OCR 输出 JSON 中的 bbox/label 渲染回 PDF 页面，输出标注后的 PDF。
+    """
     ocr_p = Path(ocr_json_path)
     obj = json.loads(ocr_p.read_text(encoding="utf-8"))
     if not isinstance(obj, dict):
-        raise TypeError("ocr json must be an object")
+        raise TypeError("OCR JSON 必须是一个对象")
 
     if pdf_path is None:
         src = obj.get("source")
         if not isinstance(src, str) or not src.startswith("file:"):
-            raise ValueError("pdf_path not provided and source is not file:<path>")
+            raise ValueError("未提供 pdf_path 且 source 不是 file:<path> 格式")
         pdf_path = src[len("file:") :]
 
     if out_pdf_path is None:
@@ -110,16 +112,17 @@ def render_ocr_json_to_pdf(
 
     blocks = obj.get("blocks")
     if not isinstance(blocks, list):
-        raise TypeError("blocks must be a list")
+        raise TypeError("blocks 必须是一个列表")
 
     def color_for(label: str) -> tuple[float, float, float]:
+        """为不同的标签生成固定的颜色。"""
         palette = [
-            (1.0, 0.0, 0.0),
-            (0.0, 0.6, 0.0),
-            (0.0, 0.3, 1.0),
-            (1.0, 0.5, 0.0),
-            (0.6, 0.0, 0.8),
-            (0.0, 0.7, 0.7),
+            (1.0, 0.0, 0.0),  # 红色
+            (0.0, 0.6, 0.0),  # 绿色
+            (0.0, 0.3, 1.0),  # 蓝色
+            (1.0, 0.5, 0.0),  # 橙色
+            (0.6, 0.0, 0.8),  # 紫色
+            (0.0, 0.7, 0.7),  # 青色
         ]
         idx = abs(hash(label)) % len(palette)
         return palette[idx]
@@ -193,22 +196,21 @@ class PDFCropper(ImageProvider):
 
     def pdf_to_base64(self, source: str) -> str:
         """
-        Convert the entire PDF (all pages) to a single vertically stacked base64 image.
+        将整个 PDF（所有页面）转换为单个垂直堆叠的 Base64 图像。
         """
         source = _normalize_pdf_path(source)
         try:
             doc = fitz.open(source)
         except Exception:
             return _BLANK_1X1_PNG_BASE64
-        
-        # Create bbox for full page of each page
+
+        # 为每一页创建全页 bbox
         bbox_data = []
         for i, page in enumerate(doc):
             rect = page.rect
-            bbox_data.append({
-                "page": i + 1,
-                "bbox": [rect.x0, rect.y0, rect.x1, rect.y1]
-            })
+            bbox_data.append(
+                {"page": i + 1, "bbox": [rect.x0, rect.y0, rect.x1, rect.y1]}
+            )
         doc.close()
-        
+
         return crop_pdf_image_task(source, bbox_data)

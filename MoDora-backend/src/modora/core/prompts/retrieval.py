@@ -106,22 +106,6 @@ If yes, output T, otherwise output F.
 You only need to output T or F, without any other content.
 """
 
-check_answer_prompt = """
-### Instruction
-Here is a query and a reply to it. Please return T or F according to the following rules:
-(1) If the reply refuses to give a valid answer by meanings like "no relevant information", "insufficient evidence", "unable to answer", "None", "N/A", output F.
-(2) Otherwise output T.
-
-### Query
-{query}
-
-### Reply
-{answer}
-
-### Note
-You only need to output T or F, without any other content.
-"""
-
 image_reasoning_prompt = """
 ### Instruction
 Now we have a query and a document. Given the document schema, the textual evidence pieces retrieved from it and the visual image of their corresponding areas, please return a short and concise answer to the query.

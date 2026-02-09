@@ -4,10 +4,12 @@ from pydantic import BaseModel
 
 
 class OCRBlock(BaseModel):
-    """结构化 OCR 的单个 block。
+    """
+    结构化 OCR 的单个 block。
 
-    - page_id: 从 1 开始的页号
-    - bbox: [x0, y0, x1, y1]，与 PDF 坐标系对齐（用于后续裁剪/渲染）
+    Attributes:
+        page_id: 从 1 开始的页号
+        bbox: [x0, y0, x1, y1]，与 PDF 坐标系对齐（用于后续裁剪/渲染）
     """
 
     page_id: int
@@ -42,7 +44,12 @@ class OCRBlock(BaseModel):
 
 
 class OcrExtractResponse(BaseModel):
-    """OCR 输出：source 用于追踪输入来源，blocks 为扁平化 block 列表。"""
+    """
+    OCR 输出.
+    Attributes:
+        source: 输入的 pdf 路径.
+        blocks: 结构化 OCR 结果，每个 block 包含页号、边界框、标签和内容。
+    """
 
     source: str
     blocks: list[OCRBlock]

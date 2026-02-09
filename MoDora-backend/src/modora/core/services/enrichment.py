@@ -1,8 +1,7 @@
 import asyncio
-import concurrent.futures
 
-from modora.core.domain.component import TITLE, ComponentPack
-from modora.core.interfaces.llm import LLMClient
+from modora.core.domain import TITLE, ComponentPack
+from modora.core.interfaces.llm import AsyncLLMClient
 from modora.core.interfaces.media import ImageProvider
 
 
@@ -13,7 +12,10 @@ class EnrichmentService:
     """
 
     def __init__(
-        self, llm_client: LLMClient, image_provider: ImageProvider, max_workers: int = 4
+        self,
+        llm_client: AsyncLLMClient,
+        image_provider: ImageProvider,
+        max_workers: int = 4,
     ):
         """
         初始化信息增强服务。
@@ -47,21 +49,14 @@ class EnrichmentService:
                     None, self.media.crop_image, source, co
                 )
                 # 调用 LLM 生成标注（异步）
-                if hasattr(self.llm, "generate_annotation_async"):
-                    title, metadata, data = await self.llm.generate_annotation_async(
-                        base64_img, co.type
-                    )
-                else:
-                    # 兼容同步客户端
-                    title, metadata, data = await loop.run_in_executor(
-                        None, self.llm.generate_annotation, base64_img, co.type
-                    )
+                title, metadata, data = await self.llm.generate_annotation_async(
+                    base64_img, co.type
+                )
                 return co, title, metadata, data
             except Exception:
                 return None
 
         # 使用 asyncio.gather 并发处理
-        # 限制并发数
         sem = asyncio.Semaphore(self.max_workers)
 
         async def _sem_process(co):

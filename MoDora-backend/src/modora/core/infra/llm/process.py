@@ -123,12 +123,7 @@ def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
                 settings.llm_local_model,
                 "--server-port",
                 str(port),
-                "--session-len",
-                str(settings.llm_local_session_len),
-                "--cache-max-entry-count",
-                str(settings.llm_local_cache_max_entry_count),
             ]
-        print(f"DEBUG: Starting {settings.llm_local_backend} with cmd: {' '.join(cmd)}")
         logger.info(
             f"starting local llm server ({settings.llm_local_backend})",
             extra={
@@ -136,8 +131,6 @@ def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
                 "cuda_visible": cuda_visible_devices,
                 "host": host,
                 "port": port,
-                "session_len": settings.llm_local_session_len,
-                "cache_max_entry_count": settings.llm_local_cache_max_entry_count,
             },
         )
         _llm_local_procs[key] = subprocess.Popen(cmd, env=env)

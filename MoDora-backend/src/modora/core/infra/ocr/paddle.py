@@ -6,9 +6,16 @@ from modora.core.domain.ocr import OCRBlock
 
 logger = logging.getLogger(__name__)
 
+
 class PPStructureClient(OCRClient):
+    """
+    基于 PPStructureV3 的 OCR 客户端。
+    支持版面分析、表格识别和文档去畸变。
+    """
+
     def __init__(self, settings: Settings):
         from paddleocr import PPStructureV3
+
         device = (settings.ocr_device or "").strip() or "gpu:6"
         kwargs: dict[str, Any] = {
             "device": device,
@@ -22,7 +29,7 @@ class PPStructureClient(OCRClient):
         self.lang = kwargs.get("lang")
 
     def _parse_response(self, res: Any, page_id: int) -> list[OCRBlock]:
-        """Parse PPStructureV3 response into OCRBlocks."""
+        """将 PPStructureV3 的响应结果解析为 OCRBlock 列表。"""
         res_list = res["parsing_res_list"]
 
         blocks: list[OCRBlock] = []
@@ -40,12 +47,20 @@ class PPStructureClient(OCRClient):
         return blocks
 
     def predict_iter(self, images_or_path: Any) -> Iterator[list[OCRBlock]]:
+        """迭代预测图像或路径中的 OCR 结果。"""
         for i, res in enumerate(self._model.predict_iter(images_or_path)):
             yield self._parse_response(res, page_id=i + 1)
 
+
 class PaddleOCRVLClient(OCRClient):
+    """
+    基于 PaddleOCRVL-1.5 模型的 OCR 客户端。
+    这个模型更加准确，但是目前速度很慢
+    """
+
     def __init__(self, settings: Settings, model_class_name: str = "PaddleOCRVL"):
         from paddleocr import PaddleOCRVL
+
         device = (settings.ocr_device or "").strip() or "gpu:6"
         kwargs: dict[str, Any] = {
             "device": device,
@@ -58,8 +73,7 @@ class PaddleOCRVLClient(OCRClient):
 
     def _parse_response(self, res: Any, page_id: int) -> list[OCRBlock]:
         """
-        Parse PaddleOCRVL response into OCRBlocks.
-        TODO: Implement specific parsing logic for PaddleOCRVL.
+        将 PaddleOCRVL 的响应结果解析为 OCRBlock 列表。
         """
         res_list = res["parsing_res_list"]
 
@@ -76,9 +90,8 @@ class PaddleOCRVLClient(OCRClient):
                 )
             )
         return blocks
-            
-        
-    
+
     def predict_iter(self, images_or_path: Any) -> Iterator[list[OCRBlock]]:
+        """迭代预测图像或路径中的 OCR 结果。"""
         for i, res in enumerate(self._model.predict_iter(images_or_path)):
             yield self._parse_response(res, page_id=i + 1)
