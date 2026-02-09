@@ -29,4 +29,8 @@ MoDora-backend/activate.sh
 MoDora-backend/logs/*
 MoDora-backend/tests/*
 MoDora-backend/tmp/*
+MoDora-backend/cache*
+MoDora-backend/exp_*
+*.log
+*.egg
 .trae
