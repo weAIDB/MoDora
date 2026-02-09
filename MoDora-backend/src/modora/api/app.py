@@ -11,14 +11,20 @@ from modora.core.infra.logging.context import new_id, request_scope
 from modora.core.infra.logging.setup import configure_logging
 from modora.core.settings import Settings
 from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
-from modora.service.api.ocr.router import router as ocr_router
-from modora.service.api.ocr.runtime import ensure_ocr_model_loaded
-from modora.service.api.modora.router import router as modora_router
-from modora.service.api.modora.paths import resolve_paths
+from modora.core.infra.ocr.manager import ensure_ocr_model_loaded
+from modora.core.utils.paths import resolve_paths
+
+# Import new v1 routers
+from modora.api.v1.chat import router as chat_router
+from modora.api.v1.documents import router as doc_router
+from modora.api.v1.kb import router as kb_router
+from modora.api.v1.tree import router as tree_router
+from modora.api.v1.stats import router as stats_router
+from modora.api.ocr.router import router as ocr_router
 
 settings = Settings.load()
 configure_logging(settings)
-logger = logging.getLogger("modora.service")
+logger = logging.getLogger("modora.api")
 
 
 @asynccontextmanager
@@ -36,7 +42,11 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title=settings.service_name, lifespan=lifespan)
 paths = resolve_paths(settings)
-app.mount("/api/files", StaticFiles(directory=str(paths.docs_dir)), name="files")
+
+# Mount docs directory for static access if needed
+if paths.docs_dir.exists():
+    app.mount("/api/files", StaticFiles(directory=str(paths.docs_dir)), name="files")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,8 +54,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(ocr_router)
-app.include_router(modora_router)
+
+# Include routers
+app.include_router(chat_router, prefix="/api")
+app.include_router(doc_router, prefix="/api")
+app.include_router(kb_router, prefix="/api")
+app.include_router(tree_router, prefix="/api")
+app.include_router(stats_router, prefix="/api")
+app.include_router(ocr_router, prefix="/api")
 
 
 @app.middleware("http")

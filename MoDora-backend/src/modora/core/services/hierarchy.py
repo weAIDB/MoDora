@@ -6,25 +6,16 @@ import logging
 
 from modora.core.domain.component import ComponentPack
 from modora.core.settings import Settings
-<<<<<<< HEAD
 from modora.core.infra.llm.local import AsyncLocalLLMClient
-=======
-from modora.core.interfaces.llm import LLMClient
-from modora.core.infra.llm.base import BaseAsyncLLMClient
->>>>>>> api
 from modora.core.interfaces.media import ImageProvider
 
 
 class AsyncLevelGenerator:
-<<<<<<< HEAD
     """
     异步层级生成器，负责利用 LLM 纠正或生成标题的层级结构（Markdown 风格）。
     """
 
     def __init__(self, llm_client: AsyncLocalLLMClient, image_provider: ImageProvider):
-=======
-    def __init__(self, llm_client: BaseAsyncLLMClient, image_provider: ImageProvider):
->>>>>>> api
         self.llm = llm_client
         self.media = image_provider
 
