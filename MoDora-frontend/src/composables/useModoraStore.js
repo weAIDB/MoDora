@@ -50,7 +50,7 @@ const state = reactive({
     // 全局设置
     settings: JSON.parse(localStorage.getItem('modora_settings')) || {
         apiKey: '',
-        baseUrl: 'https://api.aiaiapi.com/v1',
+        baseUrl: '',
         layoutModel: 'paddle',
         treeModel: 'qwen-vl-local',
         qaModel: 'qwen-vl-local'

@@ -3,8 +3,8 @@ from __future__ import annotations
 import logging
 import math
 
-from modora.core.domain.cctree import CCTree, CCTreeNode
-from modora.core.infra.llm.local import AsyncLocalLLMClient
+from modora.core.domain import CCTree, CCTreeNode
+from modora.core.infra.llm import BaseAsyncLLMClient
 
 
 class AsyncMetadataGenerator:
@@ -16,7 +16,7 @@ class AsyncMetadataGenerator:
         self,
         n0: int,
         growth_rate: float,
-        llm_client: AsyncLocalLLMClient,
+        llm_client: BaseAsyncLLMClient,
         logger: logging.Logger,
     ):
         self.llm = llm_client
