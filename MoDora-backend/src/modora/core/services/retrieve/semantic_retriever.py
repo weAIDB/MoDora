@@ -22,15 +22,18 @@ class SemanticRetriever:
         self.cropper = PDFCropper()
 
     async def retrieve(
-        self, tree: CCTree, query: str, source_path: str
+        self,
+        tree: CCTree,
+        query: str,
+        source_path: str | dict[str, str],
     ) -> RetrievalResult:
         """
         递归地从 CCTree 中检索相关节点。
 
         参数:
-            tree: CCTree 实例。
+            tree: CCTree 实例（可能是合并后的多文档树）。
             query: 用户查询字符串。
-            source_path: PDF 文件路径。
+            source_path: PDF 文件路径，如果是多文档树，则为文件名到路径的映射。
 
         返回:
             RetrievalResult: 检索结果。
@@ -40,7 +43,10 @@ class SemanticRetriever:
         return await self._retrieve_recursive(nodes, query, source_path)
 
     async def _retrieve_recursive(
-        self, nodes: dict[str, CCTreeNode], query: str, source_path: str
+        self,
+        nodes: dict[str, CCTreeNode],
+        query: str,
+        source_path: str | dict[str, str],
     ) -> RetrievalResult:
         """
         内部递归方法，逐层处理节点。
@@ -66,7 +72,10 @@ class SemanticRetriever:
         return result
 
     async def _process_level(
-        self, nodes: dict[str, CCTreeNode], query: str, source_path: str
+        self,
+        nodes: dict[str, CCTreeNode],
+        query: str,
+        source_path: str | dict[str, str],
     ):
         """
         并发处理一批节点。
@@ -74,10 +83,23 @@ class SemanticRetriever:
         result = RetrievalResult()
         selected_children_next_level = {}
 
-        tasks = [
-            self._process_single_node(path, node, query, source_path)
-            for path, node in nodes.items()
-        ]
+        tasks = []
+        for path, node in nodes.items():
+            # 为当前节点确定正确的 source_path
+            current_source = source_path
+            if isinstance(source_path, dict):
+                # 路径格式通常为 root--filename--...
+                parts = path.split("--")
+                if len(parts) > 1:
+                    file_name = parts[1]
+                    current_source = source_path.get(file_name, "")
+                    # 确保 node.location 中的 file_name 已设置（以防万一）
+                    if node.location:
+                        for loc in node.location:
+                            if not loc.file_name:
+                                loc.file_name = file_name
+
+            tasks.append(self._process_single_node(path, node, query, current_source))
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 

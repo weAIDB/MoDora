@@ -45,7 +45,55 @@ class QAService:
             position_vector = [-1.0, -1.0]
         return page_list, position_vector
 
-    async def qa(self, cctree: CCTree, query: str, source_path: str) -> dict:
+    def _format_retrieved_docs(
+        self, result: RetrievalResult, file_names: list[str] | None = None
+    ) -> list[dict]:
+        """
+        整理检索到的证据文档。
+        将同一个文件同一页的 bbox 合并到一个列表中，并关联对应的文本内容。
+        """
+        if not result.locations:
+            return []
+
+        # (file_name, page) -> {bboxes, content}
+        grouped_data: dict[tuple[str | None, int], dict] = {}
+
+        for loc in result.locations:
+            fn = loc.file_name
+            if not fn and file_names:
+                fn = file_names[0]
+
+            key = (fn, loc.page)
+            if key not in grouped_data:
+                # 查找该节点对应的文本
+                content = ""
+                for path, text in result.text_map.items():
+                    # 如果 path 中包含文件名或 path 本身就是我们要找的内容
+                    if fn and fn in path:
+                        content = text
+                        break
+                    elif not fn:
+                        content = text
+                        break
+
+                grouped_data[key] = {
+                    "file_name": fn,
+                    "page": loc.page,
+                    "content": content,
+                    "bboxes": [],
+                }
+
+            if loc.bbox not in grouped_data[key]["bboxes"]:
+                grouped_data[key]["bboxes"].append(loc.bbox)
+
+        return list(grouped_data.values())
+
+    async def qa(
+        self,
+        tree: CCTree,
+        query: str,
+        source_path: str | dict[str, str],
+    ) -> dict:
         """
         执行完整的 QA 流程：提取位置 -> 检索 -> 推理 -> 验证/回退。
         """
@@ -55,14 +103,20 @@ class QAService:
 
         # 1. 检索
         if -1 in page_list and position_vector == [-1.0, -1.0]:
-            result = await self.semantic_retriever.retrieve(cctree, query, source_path)
+            result = await self.semantic_retriever.retrieve(tree, query, source_path)
         else:
+            # 位置检索目前仅支持单文档，后续可扩展
+            actual_source = (
+                list(source_path.values())[0]
+                if isinstance(source_path, dict)
+                else source_path
+            )
             result = self.location_retriever.retrieve(
-                cctree, page_list, position_vector, source_path
+                tree, page_list, position_vector, actual_source
             )
 
         # 2. 处理结果并推理
-        schema = cctree.get_structure()
+        schema = tree.get_structure()
         answer = "None"
         trace = [
             {
@@ -73,12 +127,15 @@ class QAService:
             {"step": "retrieve", "locations_count": len(result.locations)},
         ]
 
+        file_names = list(source_path.keys()) if isinstance(source_path, dict) else None
+
         try:
             if result.locations or result.text_map:
                 # 根据精确位置裁剪图像
-                # TODO: 按照页来分组裁剪
-                images = self.cropper.crop_image(source_path, result.locations)
-                
+                images = self.cropper.crop_image(
+                    source_path, result.locations, file_names=file_names
+                )
+
                 logger.info(
                     f"Reasoning with {len(result.text_map)} text segments and {len(images)} images",
                     extra={
@@ -104,37 +161,20 @@ class QAService:
         # 3. 验证与回退
         if not await self.remote_llm.check_answer(query, answer):
             trace.append({"step": "fallback", "reason": "verification_failed"})
-            # 回退到整页推理
-            whole_doc = self.cropper.pdf_to_base64(source_path)
-            clean_tree_data = cctree.get_clean_structure()
-            answer = await self.remote_llm.reason_whole(
-                query=query, data=str(clean_tree_data), image=whole_doc
-            )
+            # 回退到整页推理 (多文档模式下暂不支持全页回退，或者只对第一文档做)
+            if isinstance(source_path, str):
+                whole_doc = self.cropper.pdf_to_base64(source_path)
+                clean_tree_data = tree.get_clean_structure()
+                answer = await self.remote_llm.reason_whole(
+                    query=query, data=str(clean_tree_data), image=whole_doc
+                )
+            else:
+                logger.warning("Multi-doc mode does not support whole-page fallback yet")
         else:
             trace.append({"step": "verification", "status": "passed"})
 
-        # 整理返回的证据文档，按页分组
-        retrieved_docs = []
-        if result.locations:
-            pages_map = {}
-            for loc in result.locations:
-                p = loc.page
-                if p not in pages_map:
-                    pages_map[p] = []
-                # 只保留 bbox 坐标，不再嵌套 page 信息，因为外层已经按 page 分组了
-                pages_map[p].append(loc.bbox)
-
-            # 这里的 content 暂时合并所有文本作为展示
-            all_text = "\n".join(result.text_map.values())
-
-            for p, bboxes in pages_map.items():
-                retrieved_docs.append(
-                    {
-                        "page": p,
-                        "content": all_text,  # 这里的文本可以后续优化为只包含该页的文本
-                        "bboxes": bboxes,
-                    }
-                )
+        # 整理返回的证据文档
+        retrieved_docs = self._format_retrieved_docs(result, file_names=file_names)
 
         return {
             "answer": answer,

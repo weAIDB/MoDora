@@ -16,24 +16,30 @@ class Location:
     Attributes:
         bbox: 边界框坐标 [x0, y0, x1, y1]。
         page: 页码，从 1 开始计数。
+        file_name: 文件名，用于多文档问答。
     """
 
     bbox: list[float]
     page: int
+    file_name: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """将定位信息序列化为字典。"""
-        return {"bbox": list(self.bbox), "page": int(self.page)}
+        d = {"bbox": list(self.bbox), "page": int(self.page)}
+        if self.file_name:
+            d["file_name"] = self.file_name
+        return d
 
     @staticmethod
     def from_dict(obj: dict[str, Any]) -> "Location":
         """从字典反序列化为 Location 对象。"""
         bbox = obj.get("bbox")
         page = obj.get("page")
+        file_name = obj.get("file_name")
         if not isinstance(bbox, list) or len(bbox) != 4:
             bbox = [0.0, 0.0, 0.0, 0.0]
         bbox_f = [float(x) for x in bbox[:4]]
-        return Location(bbox=bbox_f, page=int(page or 0))
+        return Location(bbox=bbox_f, page=int(page or 0), file_name=file_name)
 
 
 @dataclass(slots=True)

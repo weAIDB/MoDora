@@ -130,6 +130,53 @@ class CCTree:
         """从字典反序列化整棵树。"""
         return CCTree(root=CCTreeNode.from_dict(obj))
 
+    @staticmethod
+    def merge_multi_trees(trees: dict[str, CCTree]) -> "CCTree":
+        """
+        将多个文档的 CCTree 合并为一个多文档树。
+        原来的文档树根节点将以其文件名作为 key，挂载到一个新的 'multi_doc_root' 节点下。
+
+        Args:
+            trees: 文件名到 CCTree 的映射。
+
+        Returns:
+            合并后的 CCTree。
+        """
+        multi_root = CCTreeNode(
+            type="multi_doc_root",
+            metadata="Combined tree for multi-document session",
+            data="",
+            location=[],
+            children={},
+            height=0,
+            depth=0,
+            keyword_cnt=0,
+        )
+
+        max_height = 0
+        for file_name, tree in trees.items():
+            # 遍历树，为所有 Location 注入 file_name
+            CCTree._inject_file_name(tree.root, file_name)
+
+            # 将文档树作为子节点挂载，以文件名作为标题
+            multi_root.children[file_name] = tree.root
+            max_height = max(max_height, tree.root.height)
+
+        # 更新根节点高度
+        multi_root.height = max_height + 1
+        return CCTree(root=multi_root)
+
+    @staticmethod
+    def _inject_file_name(node: CCTreeNode, file_name: str) -> None:
+        """递归为节点及其子节点的所有 Location 注入文件名。"""
+        if node.location:
+            for loc in node.location:
+                loc.file_name = file_name
+
+        if node.children:
+            for child in node.children.values():
+                CCTree._inject_file_name(child, file_name)
+
     def save_json(self, path: str) -> None:
         """将树保存为 JSON 文件。"""
         p = Path(path)

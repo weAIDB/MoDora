@@ -179,20 +179,58 @@ class PDFCropper(ImageProvider):
     实现了 ImageProvider 接口，使用 PyMuPDF (fitz) 从 PDF 中裁剪指定区域。
     """
 
-    def crop_image(self, source: str, locs: Component | list[Location]) -> str:
+    def crop_image(
+        self,
+        source_path: str | dict[str, str],
+        locations: list[Location],
+        file_names: list[str] | None = None,
+    ) -> list[str]:
         """
-        从 PDF 文件中裁剪组件区域并转换为 Base64 图片。
+        根据位置信息裁剪图像。
+        支持单文档或多文档。如果是多文档，locations 中应包含正确的 file_name。
 
         Args:
-            source: PDF 文件路径 (支持 "file:" 前缀)
-            component: 包含位置信息的组件
+            source_path: PDF 路径或文件名到路径的映射。
+            locations: 待裁剪的位置列表。
+            file_names: 可选的文件名列表，如果提供且 locations 中 file_name 为空，则默认使用第一个。
 
         Returns:
-            str: Base64 编码的 PNG 图片
+            裁剪后的 Base64 图像列表。
         """
-        if isinstance(locs, Component):
-            locs = locs.location
-        return bbox_to_base64(source, locs)
+        if not locations:
+            return []
+
+        # 简单的实现：按文件分组裁剪，然后返回 base64 列表
+        # 在实际的多文档 RAG 中，通常我们会返回一个大的拼接图或多张图
+        # 这里为了兼容现有 reason_retrieved 接口，我们返回多张裁剪图
+        results = []
+
+        # 分组
+        grouped: dict[str, list[Location]] = {}
+        for loc in locations:
+            fn = loc.file_name
+            if not fn and file_names:
+                fn = file_names[0]
+            if not fn and isinstance(source_path, str):
+                fn = "default"
+
+            if fn not in grouped:
+                grouped[fn] = []
+            grouped[fn].append(loc)
+
+        for fn, locs in grouped.items():
+            path = source_path
+            if isinstance(source_path, dict):
+                path = source_path.get(fn, "")
+            if not path or not Path(str(path)).exists():
+                continue
+
+            # 使用现有的 bbox_to_base64 (同步版本，QAService 目前是同步调用它的)
+            # 注意：后期可以考虑优化为异步
+            img_b64 = bbox_to_base64(str(path), locs)
+            results.append(img_b64)
+
+        return results
 
     def pdf_to_base64(self, source: str) -> str:
         """

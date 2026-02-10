@@ -14,10 +14,12 @@ class AppPaths:
 
     @property
     def cache_base(self) -> Path:
-        return self.cache_dir / self.docs_dir.name
+        # trees 存储在 cache/trees 下
+        return self.cache_dir / "trees"
 
     def doc_cache_dir(self, file_name: str) -> Path:
         stem = Path(file_name).stem
+        # 直接在 trees 目录下寻找对应文件的文件夹
         return self.cache_base / stem
 
 
