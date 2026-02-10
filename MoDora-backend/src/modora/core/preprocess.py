@@ -19,7 +19,6 @@ from modora.core.settings import Settings
 async def get_components_async(
     extracted_data: OcrExtractResponse,
     logger: logging.Logger,
-    llm_client: BaseAsyncLLMClient | None = None,
 ) -> ComponentPack:
     """
     异步将 OCR 提取的扁平 Block 列表重组并增强为结构化的 ComponentPack。
@@ -56,7 +55,6 @@ async def build_tree_async(
     cp: ComponentPack,
     logger: logging.Logger,
     source_path: str = "",
-    llm_client: BaseAsyncLLMClient | None = None,
 ):
     """
     异步构建 CCTree 文档树。
