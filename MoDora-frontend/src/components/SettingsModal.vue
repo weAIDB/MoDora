@@ -135,8 +135,8 @@ const form = ref({
   apiKey: '',
   baseUrl: '',
   layoutModel: 'paddle',
-  treeModel: 'gemini-2.5-flash',
-  qaModel: 'gemini-2.5-flash'
+  treeModel: 'qwen-vl-local',
+  qaModel: 'qwen-vl-local'
 });
 
 // 初始化表单数据

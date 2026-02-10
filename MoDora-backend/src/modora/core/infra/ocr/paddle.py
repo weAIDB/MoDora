@@ -24,7 +24,15 @@ class PPStructureClient(OCRClient):
             "use_doc_unwarping": bool(settings.ocr_use_doc_unwarping),
             "layout_unclip_ratio": settings.ocr_layout_unclip_ratio,
         }
-        self._model = PPStructureV3(**kwargs)
+        try:
+            self._model = PPStructureV3(**kwargs)
+        except Exception as e:
+            # Some paddleocr versions don't accept 'lang' for PPStructureV3.
+            if "lang" in kwargs and "lang" in str(e).lower():
+                kwargs.pop("lang", None)
+                self._model = PPStructureV3(**kwargs)
+            else:
+                raise e
         self.device = device
         self.lang = kwargs.get("lang")
 

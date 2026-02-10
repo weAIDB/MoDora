@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 from dataclasses import dataclass
 from typing import Any
 
@@ -152,6 +153,10 @@ class Settings:
     log_to_file: bool = False
     log_dir: str | None = None
 
+    # Data paths
+    docs_dir: str | None = None
+    cache_dir: str | None = None
+
     api_base: str | None = None
     api_key: str | None = None
     api_model: str | None = None
@@ -185,6 +190,9 @@ class Settings:
             env_key = f"MODORA_{key.upper()}"
             if env_key in os.environ:
                 return os.environ[env_key]
+            # Backwards/compat: allow standard OpenAI env var for api_key
+            if key == "api_key" and "OPENAI_API_KEY" in os.environ:
+                return os.environ["OPENAI_API_KEY"]
             if key in cfg:
                 return cfg[key]
             return default
@@ -202,6 +210,9 @@ class Settings:
         api_base = _clean_str(pick("api_base", None))
         api_key = _clean_str(pick("api_key", None))
         api_model = _clean_str(pick("api_model", None))
+        if api_key and not api_base:
+            # Default to OpenAI-compatible endpoint when only key is provided.
+            api_base = "https://api.openai.com/v1"
 
         llm_local_backend = _clean_str(pick("llm_local_backend", "lmdeploy"))
         llm_local_model = _clean_str(pick("llm_local_model", None))
@@ -262,6 +273,12 @@ class Settings:
             pick("ocr_use_doc_unwarping", False), default=False
         )
 
+        repo_root = Path(__file__).resolve().parents[4]
+        default_docs = str(repo_root / "datasets" / "MMDA")
+        default_cache = str(repo_root / "MoDora-backend" / "cache")
+        docs_dir = _clean_str(pick("docs_dir", default_docs)) or default_docs
+        cache_dir = _clean_str(pick("cache_dir", default_cache)) or default_cache
+
         return Settings(
             env=env,
             service_name=service_name,
@@ -269,6 +286,8 @@ class Settings:
             log_format=log_format,
             log_to_file=log_to_file,
             log_dir=log_dir,
+            docs_dir=docs_dir,
+            cache_dir=cache_dir,
             api_base=api_base,
             api_key=api_key,
             api_model=api_model,
