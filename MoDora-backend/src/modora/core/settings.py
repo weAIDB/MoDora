@@ -161,14 +161,11 @@ class Settings:
     api_key: str | None = None
     api_model: str | None = None
 
-    llm_local_backend: str = "lmdeploy"  # lmdeploy/sglang
     llm_local_model: str | None = None
     llm_local_base_url: str | None = None
     llm_local_api_key: str = "local"
     llm_local_port: int = 9001
     llm_local_cuda_visible_devices: str | None = None
-    llm_local_session_len: int = 8192
-    llm_local_cache_max_entry_count: float = 0.7
     llm_local_startup_timeout_s: float = 600.0
     llm_local_instances: tuple[LlmLocalInstance, ...] = ()
 
@@ -211,17 +208,12 @@ class Settings:
         api_key = _clean_str(pick("api_key", None))
         api_model = _clean_str(pick("api_model", None))
 
-        llm_local_backend = _clean_str(pick("llm_local_backend", "lmdeploy"))
         llm_local_model = _clean_str(pick("llm_local_model", None))
         llm_local_base_url = _clean_str(pick("llm_local_base_url", None))
         llm_local_api_key = _clean_str(pick("llm_local_api_key", "local"))
         llm_local_port = int(pick("llm_local_port", 9001))
         llm_local_cuda_visible_devices = _clean_str(
             pick("llm_local_cuda_visible_devices", None)
-        )
-        llm_local_session_len = int(pick("llm_local_session_len", 8192))
-        llm_local_cache_max_entry_count = float(
-            pick("llm_local_cache_max_entry_count", 0.7)
         )
         llm_local_startup_timeout_s = float(pick("llm_local_startup_timeout_s", 600.0))
 
@@ -288,14 +280,11 @@ class Settings:
             api_base=api_base,
             api_key=api_key,
             api_model=api_model,
-            llm_local_backend=llm_local_backend,
             llm_local_model=llm_local_model,
             llm_local_base_url=llm_local_base_url,
             llm_local_api_key=llm_local_api_key,
             llm_local_port=llm_local_port,
             llm_local_cuda_visible_devices=llm_local_cuda_visible_devices,
-            llm_local_session_len=llm_local_session_len,
-            llm_local_cache_max_entry_count=llm_local_cache_max_entry_count,
             llm_local_startup_timeout_s=llm_local_startup_timeout_s,
             llm_local_instances=llm_local_instances,
             ocr_model=ocr_model,

@@ -91,41 +91,16 @@ def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
         if cuda_visible_devices:
             env["CUDA_VISIBLE_DEVICES"] = str(cuda_visible_devices)
 
-        if settings.llm_local_backend == "sglang":
-            tp_size = 1
-            if cuda_visible_devices:
-                tp_size = len(cuda_visible_devices.split(","))
-
-            cmd = [
-                "python",
-                "-m",
-                "sglang.launch_server",
-                "--model-path",
-                settings.llm_local_model,
-                "--port",
-                str(port),
-                "--host",
-                host,
-                "--context-length",
-                str(settings.llm_local_session_len),
-                "--mem-fraction-static",
-                str(settings.llm_local_cache_max_entry_count),
-                "--tp",
-                str(tp_size),
-                "--log-level",
-                "error",
-            ]
-        else:
-            cmd = [
-                "lmdeploy",
-                "serve",
-                "api_server",
-                settings.llm_local_model,
-                "--server-port",
-                str(port),
-            ]
+        cmd = [
+            "lmdeploy",
+            "serve",
+            "api_server",
+            settings.llm_local_model,
+            "--server-port",
+            str(port),
+        ]
         logger.info(
-            f"starting local llm server ({settings.llm_local_backend})",
+            "starting local llm server (lmdeploy)",
             extra={
                 "cmd": " ".join(cmd),
                 "cuda_visible": cuda_visible_devices,
