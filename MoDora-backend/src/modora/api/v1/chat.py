@@ -85,6 +85,15 @@ async def chat_endpoint(request: ChatRequest):
     try:
         # Use the correct method name 'qa' from core QAService
         qa_result = await qa_service.qa(cctree, request.query, source_arg)
+        
+        # 保存更新后的 impact 值到各文档的 tree.json
+        for fn, tree in trees.items():
+            t_path = paths.doc_cache_dir(fn) / "tree.json"
+            try:
+                tree.save_json(str(t_path))
+            except Exception as e:
+                logger.warning(f"Failed to save updated tree for {fn}: {e}")
+                
     except Exception as e:
         logger.error(f"QA process failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"QA process failed: {e}")

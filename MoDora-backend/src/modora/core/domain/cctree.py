@@ -33,6 +33,7 @@ class CCTreeNode:
     height: int = 1
     depth: int = 1
     keyword_cnt: int = 0
+    impact: int = 0
 
     @staticmethod
     def from_component(component: Component) -> "CCTreeNode":
@@ -46,6 +47,7 @@ class CCTreeNode:
             height=1,
             depth=1,
             keyword_cnt=0,
+            impact=0,
         )
 
     @staticmethod
@@ -60,6 +62,7 @@ class CCTreeNode:
             height=obj["height"],
             depth=obj["depth"],
             keyword_cnt=obj["keyword_cnt"],
+            impact=obj.get("impact", 0),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -73,6 +76,7 @@ class CCTreeNode:
             "height": self.height,
             "depth": self.depth,
             "keyword_cnt": self.keyword_cnt,
+            "impact": self.impact,
         }
 
     def has_content(self) -> bool:
@@ -197,8 +201,68 @@ class CCTree:
         return self.root.get_structure()
 
     def get_clean_structure(self) -> dict[str, Any]:
-        """获取整棵树的精简内容结构。"""
+        """获取整棵树的精简结构。"""
         return self.root.get_clean_structure()
+
+    def find_node_by_path(self, path: str) -> CCTreeNode | None:
+        """
+        根据路径字符串查找节点。
+        路径格式如: "Root--Child1--GrandChild1"
+        """
+        parts = path.split("--")
+        if not parts:
+            return None
+
+        current = self.root
+        # 兼容性处理：如果 path 只有一部分且匹配 root，直接返回
+        if len(parts) == 1:
+            return current
+
+        # 尝试逐层查找
+        for part in parts[1:]:
+            if part in current.children:
+                current = current.children[part]
+            else:
+                return None
+        return current
+
+    def update_impact(self, path: str) -> dict[str, int]:
+        """
+        更新路径上节点的热度值。
+        - 路径上的中间节点: impact + 1
+        - 目标叶子节点: impact + 2
+        
+        返回更新后的 {path: impact} 映射。
+        """
+        parts = path.split("--")
+        if not parts:
+            return {}
+
+        impact_updates = {}
+        current = self.root
+        current_path = parts[0]
+        
+        # 根节点处理 (+1)
+        current.impact += 1
+        impact_updates[current_path] = current.impact
+
+        # 逐层向下更新
+        for i, part in enumerate(parts[1:]):
+            if part in current.children:
+                current = current.children[part]
+                current_path += f"--{part}"
+                
+                # 判断是否是最后一个节点（目标节点）
+                if i == len(parts) - 2:
+                    current.impact += 2
+                else:
+                    current.impact += 1
+                
+                impact_updates[current_path] = current.impact
+            else:
+                break
+                
+        return impact_updates
 
 
 @dataclass(slots=True)

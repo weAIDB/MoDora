@@ -45,11 +45,12 @@
           <div
             class="px-3 py-2 shadow-sm rounded-xl border transition-all duration-200 cursor-pointer relative w-48 backdrop-blur-md"
             :class="[
-              isHeatmapMode ? getHeatmapStyle(data.impact) : getNodeStyle(data.type),
+              !isHeatmapMode ? getNodeStyle(data.type) : '',
               selected 
                 ? '!border-primary-500 ring-2 ring-primary-500/20 dark:ring-primary-500/40' 
-                : (isHeatmapMode ? '' : 'bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md')
+                : (!isHeatmapMode ? 'bg-white/80 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-600 hover:shadow-md' : '')
             ]"
+            :style="isHeatmapMode ? getHeatmapDynamicStyle(data.impact) : {}"
             @dblclick.stop="openEditModal({ id, label, ...data })"
           >
             <!-- Top Meta Info -->
@@ -141,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch } from 'vue';
+import { ref, onMounted, nextTick, watch, computed } from 'vue';
 import { VueFlow, useVueFlow, Handle, Position } from '@vue-flow/core';
 import { Background } from '@vue-flow/background';
 import { Controls } from '@vue-flow/controls';
@@ -182,7 +183,8 @@ const layout = (els) => {
   dagreGraph.setDefaultEdgeLabel(() => ({}));
   
   // 设定方向: TB (Top to Bottom), LR (Left to Right)
-  dagreGraph.setGraph({ rankdir: 'TB', nodesep: 100, ranksep: 200 });
+  // nodesep: 同层节点之间的间距; ranksep: 不同层级之间的间距
+  dagreGraph.setGraph({ rankdir: 'TB', nodesep: 50, ranksep: 60 });
 
   els.forEach((el) => {
     if (el.position) {
@@ -212,12 +214,48 @@ const layout = (els) => {
 };
 
 // --- 热力图样式 ---
+const maxImpact = computed(() => {
+  const impacts = elements.value
+    .filter(el => el.data && el.data.impact)
+    .map(el => el.data.impact);
+  return impacts.length > 0 ? Math.max(...impacts) : 1;
+});
+
+const getHeatmapDynamicStyle = (impact) => {
+  if (!impact || impact <= 0) {
+    return {
+      backgroundColor: isDark.value ? 'rgba(30, 41, 59, 0.5)' : 'rgba(248, 250, 252, 0.5)',
+      borderColor: isDark.value ? '#334155' : '#e2e8f0',
+      opacity: 0.6,
+      filter: 'grayscale(1)'
+    };
+  }
+
+  // 归一化 impact (0 到 1 之间)
+  const normalized = Math.min(impact / maxImpact.value, 1);
+  
+  // 颜色插值逻辑: 浅黄 -> 橙色 -> 深红
+  // HSL: 60 (黄) -> 30 (橙) -> 0 (红)
+  const hue = 60 - (normalized * 60); 
+  // Lightness: 95% (浅) -> 50% (深)
+  const lightness = 95 - (normalized * 45);
+  // Saturation: 80% (亮) -> 100% (鲜艳)
+  const saturation = 80 + (normalized * 20);
+
+  return {
+    backgroundColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.9)`,
+    borderColor: `hsla(${hue}, ${saturation}%, ${lightness - 10}%, 1)`,
+    color: lightness < 60 ? '#ffffff' : 'inherit',
+    boxShadow: normalized > 0.5 ? `0 4px 12px hsla(${hue}, ${saturation}%, 50%, 0.3)` : 'none',
+    fontWeight: normalized > 0.7 ? 'bold' : 'normal',
+    transition: 'all 0.3s ease'
+  };
+};
+
 const getHeatmapStyle = (impact) => {
-  if (!impact || impact <= 0) return 'bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 opacity-60 grayscale'; // 无影响节点变淡
-  if (impact <= 2) return 'bg-orange-50 dark:bg-orange-900/30 border-orange-300 dark:border-orange-700';
-  if (impact <= 5) return 'bg-orange-100 dark:bg-orange-900/50 border-orange-400 dark:border-orange-600 shadow-md shadow-orange-200/50';
-  if (impact <= 10) return 'bg-red-100 dark:bg-red-900/50 border-red-500 dark:border-red-500 shadow-md shadow-red-200/50 font-medium';
-  return 'bg-red-500 text-white border-red-600 shadow-lg shadow-red-500/50 font-bold';
+  // 旧方法保留用于兼容，但主要使用上面的动态样式
+  if (!impact || impact <= 0) return 'bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 opacity-60 grayscale';
+  return ''; 
 };
 
 // --- 编辑状态 ---
@@ -355,9 +393,10 @@ const fetchTreeData = async () => {
 
     if (data.elements) {
       elements.value = layout(data.elements);
+      // 自动聚焦到根节点
       setTimeout(() => {
-          fitView({ padding: 50 });
-      }, 100);
+          focusRoot();
+      }, 200);
     }
   } catch (err) {
     console.error('Tree Fetch Error:', err);

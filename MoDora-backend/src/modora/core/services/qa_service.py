@@ -176,9 +176,15 @@ class QAService:
         # 整理返回的证据文档
         retrieved_docs = self._format_retrieved_docs(result, file_names=file_names)
 
+        # 更新树节点的 impact 值
+        all_impact_updates = {}
+        for path in result.text_map.keys():
+            updates = tree.update_impact(path)
+            all_impact_updates.update(updates)
+
         return {
             "answer": answer,
             "retrieved_documents": retrieved_docs,
-            "node_impacts": {path: 1 for path in result.text_map.keys()},
+            "node_impacts": all_impact_updates,
             "retrieval_trace": trace,
         }
