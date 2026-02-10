@@ -87,12 +87,15 @@ def _extract_extras(record: logging.LogRecord) -> dict[str, Any]:
 
 
 _REST = "\x1b[0m"
+_COLOR_TIME = "\x1b[90m"     # 灰色
+_COLOR_NAME = "\x1b[35m"     # 紫色
+_COLOR_CONTEXT = "\x1b[90m"  # 灰色
 _COLOR_BY_LEVEL = {
     logging.DEBUG: "\x1b[34m",  # 蓝色
     logging.INFO: "\x1b[32m",  # 绿色
     logging.WARNING: "\x1b[33m",  # 黄色
     logging.ERROR: "\x1b[31m",  # 红色
-    logging.CRITICAL: "\x1b[1;31m",  # 紫色
+    logging.CRITICAL: "\x1b[1;31m",  # 粗体红
 }
 
 
@@ -102,20 +105,50 @@ class _TextFormater(logging.Formatter):
         self._color = color
 
     def format(self, record: logging.LogRecord) -> str:
-        base = super().format(record)
+        if not self._color or not (hasattr(sys.stderr, "isatty") and sys.stderr.isatty()):
+            base = super().format(record)
+            extras = _extract_extras(record)
+            if extras:
+                base = f"{base} extra={json.dumps(extras, ensure_ascii=False)}"
+            return base
+
+        # 带有颜色的格式化
+        asctime = self.formatTime(record, self.datefmt)
+        levelname = record.levelname
+        name = record.name
+        request_id = getattr(record, "request_id", "-")
+        run_id = getattr(record, "run_id", "-")
+        message = record.getMessage()
+
+        level_color = _COLOR_BY_LEVEL.get(record.levelno, _REST)
+
+        # 构建彩色字符串
+        # 格式: %(asctime)s %(levelname)s %(name)s [req=%(request_id)s run=%(run_id)s] %(message)s
+        formatted = (
+            f"{_COLOR_TIME}{asctime}{_REST} "
+            f"{level_color}{levelname:<8}{_REST} "
+            f"{_COLOR_NAME}{name}{_REST} "
+            f"{_COLOR_CONTEXT}[req={request_id} run={run_id}]{_REST} "
+            f"{message}"
+        )
+
+        if record.exc_info:
+            if not record.exc_text:
+                record.exc_text = self.formatException(record.exc_info)
+        if record.exc_text:
+            if formatted[-1:] != "\n":
+                formatted = formatted + "\n"
+            formatted = formatted + record.exc_text
+        if record.stack_info:
+            if formatted[-1:] != "\n":
+                formatted = formatted + "\n"
+            formatted = formatted + self.formatStack(record.stack_info)
+
         extras = _extract_extras(record)
         if extras:
-            base = f"{base} extra={json.dumps(extras, ensure_ascii=False)}"
+            formatted = f"{formatted} {_COLOR_CONTEXT}extra={json.dumps(extras, ensure_ascii=False)}{_REST}"
 
-        if not self._color:
-            return base
-        if not (hasattr(sys.stderr, "isatty") and sys.stderr.isatty()):
-            return base
-
-        color = _COLOR_BY_LEVEL.get(record.levelno, _REST)
-        if not color:
-            return base
-        return f"{color}{base}{_REST}"
+        return formatted
 
 
 class _JsonFormatter(logging.Formatter):

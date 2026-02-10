@@ -178,6 +178,15 @@ class Settings:
 
     @staticmethod
     def load(config_path: str | None = None) -> "Settings":
+        """从多个来源加载配置
+        
+        设置环境变量以优化运行环境：
+        1. TOKENIZERS_PARALLELISM: 设置为 false 以避免多进程警告和死锁。
+        2. PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK: 设置为 True 以跳过 PaddlePDX 的模型源连接检查。
+        """
+        os.environ["TOKENIZERS_PARALLELISM"] = "false"
+        os.environ["PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK"] = "True"
+
         cfg_path = (config_path or os.getenv("MODORA_CONFIG") or "").strip()
         cfg: dict[str, Any] = {}
         if cfg_path and os.path.exists(cfg_path):

@@ -89,7 +89,7 @@ def register(sub: argparse._SubParsersAction) -> None:
     p.add_argument(
         "--component-workers",
         type=int,
-        default=8,
+        default=64,
         help="Number of get_component workers (threads)",
     )
     p.add_argument(
