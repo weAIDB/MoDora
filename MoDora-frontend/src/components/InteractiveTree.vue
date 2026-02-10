@@ -145,6 +145,7 @@ import { ref, onMounted, nextTick, watch } from 'vue';
 import { VueFlow, useVueFlow, Handle, Position } from '@vue-flow/core';
 import { Background } from '@vue-flow/background';
 import { Controls } from '@vue-flow/controls';
+import dagre from '@dagrejs/dagre';
 import { useModoraStore } from '../composables/useModoraStore';
 import { useDarkTheme } from '../composables/useDarkTheme';
 import NodeEditModal from './NodeEditModal.vue';
@@ -161,7 +162,8 @@ const {
   setCenter, getNodes, getEdges,
   onNodesChange, onEdgesChange,
   getSelectedElements,
-  project, dimensions, viewport
+  project, dimensions, viewport,
+  fitView
 } = useVueFlow();
 
 const elements = ref([]);
@@ -171,6 +173,43 @@ const isEditMode = ref(false); // 控制编辑模式
 const isHeatmapMode = ref(false); // 控制热力图模式
 const showEditModal = ref(false);
 const editingNodeData = ref({});
+
+/**
+ * 使用 dagre 进行自动布局
+ */
+const layout = (els) => {
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+  
+  // 设定方向: TB (Top to Bottom), LR (Left to Right)
+  dagreGraph.setGraph({ rankdir: 'TB', nodesep: 100, ranksep: 200 });
+
+  els.forEach((el) => {
+    if (el.position) {
+      // 节点
+      dagreGraph.setNode(el.id, { width: 200, height: 100 });
+    } else {
+      // 连线
+      dagreGraph.setEdge(el.source, el.target);
+    }
+  });
+
+  dagre.layout(dagreGraph);
+
+  return els.map((el) => {
+    if (el.position) {
+      const nodeWithPosition = dagreGraph.node(el.id);
+      return {
+        ...el,
+        position: {
+          x: nodeWithPosition.x - 100, // 减去宽度的一半使中心对齐
+          y: nodeWithPosition.y - 50,  // 减去高度的一半
+        },
+      };
+    }
+    return el;
+  });
+};
 
 // --- 热力图样式 ---
 const getHeatmapStyle = (impact) => {
@@ -315,9 +354,9 @@ const fetchTreeData = async () => {
     const data = await response.json();
 
     if (data.elements) {
-      elements.value = data.elements;
+      elements.value = layout(data.elements);
       setTimeout(() => {
-          focusRoot();
+          fitView({ padding: 50 });
       }, 100);
     }
   } catch (err) {

@@ -43,6 +43,11 @@
           :page="currentPage"
           :width="pdfWidth"
           @loaded="handleLoaded"
+          c-map-url="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/"
+          c-map-packed
+          standard-font-data-url="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/standard_fonts/"
+          text-layer
+          annotation-layer
         />
 
         <!-- 模式 B: 原文溯源图片模式 (高精度) -->
@@ -95,6 +100,14 @@
 <script setup>
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import VuePdfEmbed from 'vue-pdf-embed';
+import * as pdfjs from 'pdfjs-dist';
+
+// 设置 PDF.js Worker
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+// 导入必要样式，确保 text-layer 和 annotation-layer 正常显示
+import 'vue-pdf-embed/dist/styles/textLayer.css';
+import 'vue-pdf-embed/dist/styles/annotationLayer.css';
 
 const props = defineProps({
   source: { type: String, required: true },
@@ -118,9 +131,8 @@ const imageNaturalHeight = ref(0);
 
 // --- 模式切换逻辑 ---
 const useImageMode = computed(() => {
-    // 修改：强制关闭图片模式，始终使用 PDF 渲染
-    // return props.highlightBboxes && props.highlightBboxes.length > 0;
-    return false;
+    // 只有当有高亮框时才使用图片模式（用于原文溯源）
+    return props.highlightBboxes && props.highlightBboxes.length > 0;
 });
 
 const imageUrl = computed(() => {
@@ -188,10 +200,8 @@ const highlights = computed(() => {
             // 绝对坐标 (PDF Point 或 Image Pixel)
             let scaleX, scaleY;
 
-            // 修正：后端 LayoutDetection 输出的 bbox 是基于 2x 缩放图片的
-            // 而前端 PDF 渲染器基于 1x PDF Point 尺寸
-            // 所以需要先将坐标除以 2，还原到 1x 尺度
-            const coordScale = 0.5;
+            // 坐标修正：直接使用后端返回的坐标，不再进行倍率变换
+            const coordScale = 1.0;
 
             // 优先使用 PDF 原始尺寸 (1x) 来计算缩放比
             if (originalPageViewport.value) {

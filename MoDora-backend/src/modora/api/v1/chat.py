@@ -16,29 +16,23 @@ from modora.api.v1.models import ChatRequest, ChatResponse, RetrievalItem
 router = APIRouter(tags=["chat"])
 logger = logging.getLogger("modora.api")
 
-def _settings_from_payload(payload: dict[str, Any] | None, *, api_model: str | None = None) -> Settings:
+def _settings_from_payload(payload: dict[str, Any] | None) -> tuple[Settings, str | None]:
     settings = Settings.load()
-    overrides: dict[str, Any] = {}
+    mode = None
     if payload:
+        mode = payload.get("selectedMode")
+        
+        # 即使只传 mode，我们也允许覆盖 apiKey 和 baseUrl，以便用户在前端临时修改
+        overrides: dict[str, Any] = {}
         if payload.get("apiKey"):
             overrides["api_key"] = payload.get("apiKey")
         if payload.get("baseUrl"):
             overrides["api_base"] = payload.get("baseUrl")
-        if payload.get("qaModel") and not api_model:
-            api_model = payload.get("qaModel")
-    if api_model:
-        overrides["api_model"] = api_model
-    return replace(settings, **overrides) if overrides else settings
-
-def _llm_mode_from_payload(payload: dict[str, Any] | None, key: str) -> str | None:
-    if not payload:
-        return None
-    val = str(payload.get(key) or "").lower()
-    if "local" in val:
-        return "local"
-    if val:
-        return "remote"
-    return None
+        
+        if overrides:
+            settings = replace(settings, **overrides)
+            
+    return settings, mode
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
@@ -47,7 +41,7 @@ async def chat_endpoint(request: ChatRequest):
     if not file_names:
         raise HTTPException(status_code=400, detail="File name(s) required")
 
-    app_settings = _settings_from_payload(settings_payload, api_model=settings_payload.get("qaModel"))
+    app_settings, mode = _settings_from_payload(settings_payload)
     paths = resolve_paths(app_settings)
 
     # Use first file for now; multi-file support can be expanded later.
@@ -63,10 +57,8 @@ async def chat_endpoint(request: ChatRequest):
     tree_dict = json.loads(tree_path.read_text(encoding="utf-8"))
     cctree = CCTree.from_dict(tree_dict)
 
-    llm_mode = _llm_mode_from_payload(settings_payload, "qaModel")
-    
-    # Use the core QAService
-    qa_service = QAService(app_settings)
+    # Use the core QAService with the overrides from payload
+    qa_service = QAService(app_settings, mode=mode)
 
     try:
         # Use the correct method name 'qa' from core QAService
@@ -83,6 +75,7 @@ async def chat_endpoint(request: ChatRequest):
                 content=doc.get("content", ""),
                 bboxes=doc.get("bboxes", []),
                 file_name=primary,
+                score=doc.get("score", 0.0),
             )
         )
 

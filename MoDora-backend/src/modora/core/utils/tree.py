@@ -97,22 +97,38 @@ def validate_tree_structure(tree: dict[str, Any]) -> None:
 
 
 def convert_tree_to_vueflow(cctree: dict[str, Any], root_label: str = "Document Root") -> list[dict[str, Any]]:
+    """
+    将 CCTree 字典结构转换为 Vue Flow 元素列表。
+    不再在后端计算坐标，由前端使用 dagre 自动布局。
+    """
     elements = []
+    
+    def get_node_id(name: str, depth: int, index: int) -> str:
+        import hashlib
+        content = f"{name}-{depth}-{index}"
+        return f"node-{hashlib.md5(content.encode()).hexdigest()[:8]}"
 
-    def traverse(node_name: str, node_data: dict[str, Any], parent_id: str | None = None):
-        node_id = f"node-{node_name}-{node_data.get('type', 'none')}"
-        if parent_id is None:
-            node_id = "root"
+    def traverse(node_name: str, node_data: dict[str, Any], parent_id: str | None = None, depth: int = 0, index: int = 0):
+        node_id = "root" if parent_id is None else get_node_id(node_name, depth, index)
+        
+        title = node_name
+        metadata = str(node_data.get("metadata", "")).strip()
+        content = str(node_data.get("data", "")).strip()
 
+        # 后端只负责组装数据，坐标统一设为 0，交给前端布局
         elements.append({
             "id": node_id,
             "type": "custom",
+            "label": title,
             "data": {
-                "label": node_name,
+                "label": title,
                 "type": node_data.get("type", "text"),
-                "content": node_data.get("data", "")[:100] + ("..." if len(str(node_data.get("data", ""))) > 100 else ""),
+                "content": content[:200] + ("..." if len(content) > 200 else ""),
+                "data": content,
+                "metadata": metadata,
+                "impact": node_data.get("impact", 0)
             },
-            "position": {"x": 0, "y": 0},
+            "position": {"x": 0, "y": 0}, 
         })
 
         if parent_id:
@@ -120,10 +136,12 @@ def convert_tree_to_vueflow(cctree: dict[str, Any], root_label: str = "Document 
                 "id": f"edge-{parent_id}-{node_id}",
                 "source": parent_id,
                 "target": node_id,
+                "animated": True,
+                "style": {"stroke": "#3b82f6", "strokeWidth": 2}
             })
 
-        for child_name, child_data in node_data.get("children", {}).items():
-            traverse(child_name, child_data, node_id)
+        for i, (child_name, child_data) in enumerate(node_data.get("children", {}).items()):
+            traverse(child_name, child_data, node_id, depth + 1, i)
 
     traverse(root_label, cctree)
     return elements

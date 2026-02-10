@@ -78,7 +78,7 @@ def _extract_extras(record: logging.LogRecord) -> dict[str, Any]:
     """
     extras: dict[str, Any] = {}
     for k, v in record.__dict__.items():
-        if k in _STANDARD_LOG_RECORD_ATTRS or k in {"request_id", "run_id"}:
+        if k in _STANDARD_LOG_RECORD_ATTRS or k in {"request_id", "run_id", "message", "asctime"}:
             continue
         if k.startswith("_"):
             continue

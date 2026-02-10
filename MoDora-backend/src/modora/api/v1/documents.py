@@ -17,15 +17,22 @@ from modora.core.services.document_processing import process_document_task
 router = APIRouter(tags=["documents"])
 logger = logging.getLogger("modora.api")
 
-def _settings_from_payload(payload: dict[str, Any] | None) -> Settings:
+def _settings_from_payload(payload: dict[str, Any] | None) -> tuple[Settings, str | None]:
     settings = Settings.load()
-    overrides: dict[str, Any] = {}
+    mode = None
     if payload:
+        mode = payload.get("selectedMode")
+        
+        overrides: dict[str, Any] = {}
         if payload.get("apiKey"):
             overrides["api_key"] = payload.get("apiKey")
         if payload.get("baseUrl"):
             overrides["api_base"] = payload.get("baseUrl")
-    return replace(settings, **overrides) if overrides else settings
+        
+        if overrides:
+            settings = replace(settings, **overrides)
+            
+    return settings, mode
 
 @router.get("/pdf/{file_name}/{page_index}/image")
 def get_pdf_image(file_name: str, page_index: int):
@@ -78,7 +85,7 @@ async def upload_file(
         except json.JSONDecodeError:
             cfg = {}
 
-    app_settings = _settings_from_payload(cfg)
+    app_settings, mode = _settings_from_payload(cfg)
     paths = resolve_paths(app_settings)
 
     file_location = paths.docs_dir / file.filename
@@ -89,6 +96,7 @@ async def upload_file(
         raise HTTPException(status_code=500, detail=f"File save failed: {e}")
 
     TASK_STATUS.set(file.filename, "pending")
+    # 提交后台任务，传入解析出的 mode
     background_tasks.add_task(
         process_document_task,
         str(file_location),
@@ -96,6 +104,7 @@ async def upload_file(
         app_settings,
         cfg,
         logger,
+        mode,
     )
     return {
         "filename": file.filename,

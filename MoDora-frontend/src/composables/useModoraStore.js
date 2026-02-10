@@ -52,8 +52,7 @@ const state = reactive({
         apiKey: '',
         baseUrl: '',
         layoutModel: 'paddle',
-        treeModel: 'qwen-vl-local',
-        qaModel: 'qwen-vl-local'
+        selectedMode: 'local'
     }
 });
 

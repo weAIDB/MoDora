@@ -17,12 +17,14 @@ class QAService:
     QA 服务类，负责协调检索、推理和验证流程。
     """
 
-    def __init__(self, settings: Settings | None = None):
+    def __init__(self, settings: Settings | None = None, mode: str | None = None):
         self.settings = settings or Settings()
-        self.local_llm = AsyncLLMFactory.create(self.settings, mode="local")
-        self.remote_llm = AsyncLLMFactory.create(self.settings, mode="remote")
+        # 如果指定了 mode，则所有 LLM 客户端都使用该 mode
+        # 否则，local_llm 强制 local，remote_llm 强制 remote
+        self.local_llm = AsyncLLMFactory.create(self.settings, mode=mode or "local")
+        self.remote_llm = AsyncLLMFactory.create(self.settings, mode=mode or "remote")
         self.cropper = PDFCropper()
-        self.semantic_retriever = SemanticRetriever(self.settings)
+        self.semantic_retriever = SemanticRetriever(self.settings, mode=mode)
         self.location_retriever = LocationRetriever()
 
     async def extract_location(self, query: str) -> Tuple[List[int], List[float]]:
@@ -76,6 +78,14 @@ class QAService:
                 # 根据精确位置裁剪图像
                 # TODO: 按照页来分组裁剪
                 images = self.cropper.crop_image(source_path, result.locations)
+                
+                logger.info(
+                    f"Reasoning with {len(result.text_map)} text segments and {len(images)} images",
+                    extra={
+                        "text_keys": list(result.text_map.keys()),
+                        "locations_count": len(result.locations)
+                    }
+                )
 
                 answer = await self.remote_llm.reason_retrieved(
                     query=query,
@@ -84,6 +94,7 @@ class QAService:
                     schema=str(schema),
                 )
             else:
+                logger.warning("No retrieval results found, skipping normal reasoning")
                 answer = "None"
 
         except Exception as e:
@@ -110,17 +121,17 @@ class QAService:
                 p = loc.page
                 if p not in pages_map:
                     pages_map[p] = []
-                pages_map[p].append(loc.to_dict())
+                # 只保留 bbox 坐标，不再嵌套 page 信息，因为外层已经按 page 分组了
+                pages_map[p].append(loc.bbox)
 
-            # 这里的 content 只是展示用，由于 RetrievalResult 目前没有按页存储文本，
-            # 我们简单合并所有文本作为展示，或者留空。
+            # 这里的 content 暂时合并所有文本作为展示
             all_text = "\n".join(result.text_map.values())
 
             for p, bboxes in pages_map.items():
                 retrieved_docs.append(
                     {
                         "page": p,
-                        "content": all_text[:1000],  # 限制长度
+                        "content": all_text,  # 这里的文本可以后续优化为只包含该页的文本
                         "bboxes": bboxes,
                     }
                 )
@@ -128,5 +139,6 @@ class QAService:
         return {
             "answer": answer,
             "retrieved_documents": retrieved_docs,
+            "node_impacts": {path: 1 for path in result.text_map.keys()},
             "retrieval_trace": trace,
         }

@@ -73,8 +73,9 @@ async def _build_tree(
     config: dict[str, Any] | None,
     logger: logging.Logger,
     ocr_res: OcrExtractResponse | None = None,
+    mode: str | None = None,
 ) -> None:
-    llm_mode = _resolve_llm_mode(config, "treeModel")
+    llm_mode = mode or _resolve_llm_mode(config, "selectedMode")
     llm = AsyncLLMFactory.create(settings, mode=llm_mode)
 
     if ocr_res is None:
@@ -106,18 +107,18 @@ async def _build_tree(
     cropper = PDFCropper()
     try:
         cp = await AsyncLevelGenerator(llm, cropper).generate_level(
-            cp, str(source_path)
+            str(source_path), cp, settings, logger
         )
     except Exception as e:
         logger.error(f"level generation failed: {e}")
 
     # constructor
-    constructor = TreeConstructor()
-    tree = constructor.construct(cp)
+    constructor = TreeConstructor(settings, logger)
+    tree = constructor.construct_tree(cp)
 
     # metadata enrichment
-    generator = AsyncMetadataGenerator(llm)
-    tree = await generator.enrich_tree(tree)
+    generator = AsyncMetadataGenerator(3, 2.0, llm, logger)
+    await generator.get_metadata(tree)
 
     tree_path = cache_dir / "tree.json"
     tree_path.write_text(
@@ -132,13 +133,14 @@ async def process_document_task(
     settings: Settings,
     config: dict[str, Any] | None,
     logger: logging.Logger,
+    mode: str | None = None,
 ) -> None:
     filename = Path(source_path).name
     TASK_STATUS.set(filename, "processing")
     logger.info(f"Start processing document: {filename}")
 
     try:
-        await _build_tree(Path(source_path), paths, settings, config, logger)
+        await _build_tree(Path(source_path), paths, settings, config, logger, mode=mode)
 
         # Update KB
         kb_path = paths.cache_dir / "knowledge_base.json"
@@ -149,7 +151,7 @@ async def process_document_task(
         node_cnt, leaf_cnt, depth = get_tree_stats(cache_dir / "tree.json")
 
         # Semantic tags
-        llm = AsyncLLMFactory.create(settings)
+        llm = AsyncLLMFactory.create(settings, mode=mode)
         tree_dict = json.loads((cache_dir / "tree.json").read_text(encoding="utf-8"))
         
         # Simple text extraction for tagging

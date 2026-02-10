@@ -16,9 +16,9 @@ class SemanticRetriever:
     基于语义理解的 CCTree 检索器。
     """
 
-    def __init__(self, settings: Settings | None = None):
+    def __init__(self, settings: Settings | None = None, mode: str | None = None):
         self.settings = settings or Settings()
-        self.llm = AsyncLLMFactory.create(self.settings, mode="local")
+        self.llm = AsyncLLMFactory.create(self.settings, mode=mode or "local")
         self.cropper = PDFCropper()
 
     async def retrieve(
@@ -150,7 +150,7 @@ class SemanticRetriever:
         使用 LLM 选择相关的子节点。
         """
         metadata_map = node.get_metadata_map()
-        children_list = list(node.children.values())
+        children_list = list(node.children.keys())
 
         prompt = select_children_prompt.format(
             query=query, list=children_list, path=path, metadata_map=metadata_map

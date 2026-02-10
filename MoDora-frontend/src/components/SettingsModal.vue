@@ -56,45 +56,29 @@
 
         <!-- Model Selection -->
         <div class="space-y-3">
-          <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Model Selection</label>
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">LLM Running Mode</label>
           
-          <!-- Tree Construction -->
-          <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Structure Parsing
-              <span class="text-xs text-slate-400 font-normal ml-1">(Tree Construction)</span>
-            </label>
-            <div class="relative">
-              <select 
-                v-model="form.treeModel"
-                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all dark:text-slate-200 appearance-none cursor-pointer"
-              >
-                <option value="qwen-vl-local">Qwen3-VL-8B-Instruct (Local)</option>
-                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-                <option value="gpt-4o-mini">GPT-4o Mini</option>
-              </select>
-              <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-            </div>
+          <div class="grid grid-cols-2 gap-3">
+            <button 
+              @click="form.selectedMode = 'local'"
+              :class="form.selectedMode === 'local' ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30' : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'"
+              class="px-4 py-3 rounded-xl text-sm font-bold transition-all flex flex-col items-center justify-center space-y-1 active:scale-95"
+            >
+              <i class="fa-solid fa-server text-lg"></i>
+              <span>Local LLM</span>
+            </button>
+            <button 
+              @click="form.selectedMode = 'remote'"
+              :class="form.selectedMode === 'remote' ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/30' : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700'"
+              class="px-4 py-3 rounded-xl text-sm font-bold transition-all flex flex-col items-center justify-center space-y-1 active:scale-95"
+            >
+              <i class="fa-solid fa-cloud text-lg"></i>
+              <span>Remote API</span>
+            </button>
           </div>
-
-          <!-- QA Model -->
-          <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Chat & Reasoning
-              <span class="text-xs text-slate-400 font-normal ml-1">(QA)</span>
-            </label>
-            <div class="relative">
-              <select 
-                v-model="form.qaModel"
-                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all dark:text-slate-200 appearance-none cursor-pointer"
-              >
-                <option value="qwen-vl-local">Qwen3-VL-8B-Instruct (Local)</option>
-                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-                <option value="gpt-4o-mini">GPT-4o Mini</option>
-              </select>
-              <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-            </div>
-          </div>
+          <p class="text-[10px] text-slate-400 dark:text-slate-500 italic px-1">
+            * Selected mode will be passed to backend factory for client initialization.
+          </p>
         </div>
 
       </div>
@@ -135,8 +119,7 @@ const form = ref({
   apiKey: '',
   baseUrl: '',
   layoutModel: 'paddle',
-  treeModel: 'qwen-vl-local',
-  qaModel: 'qwen-vl-local'
+  selectedMode: 'local'
 });
 
 // 初始化表单数据
