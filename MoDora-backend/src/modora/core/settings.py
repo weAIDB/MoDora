@@ -172,7 +172,8 @@ class Settings:
     ocr_model: str = "ppstructure"
     ocr_device: str = "gpu:6"
     ocr_lang: str = "en"
-    ocr_layout_unclip_ratio: float | tuple[float, float] | None = 1.1
+    ocr_layout_unclip_ratio: float | tuple[float, float] = 1.1
+    ocr_text_recognition_batch_size: int = 8
     ocr_use_table_recognition: bool = True
     ocr_use_doc_unwarping: bool = False
 
@@ -264,6 +265,7 @@ class Settings:
         ocr_layout_unclip_ratio = _coerce_float_or_pair(
             pick("ocr_layout_unclip_ratio", 0.5), default=0.5
         )
+        ocr_text_recognition_batch_size = int(pick("ocr_text_recognition_batch_size", 8))
         ocr_use_table_recognition = _coerce_bool(
             pick("ocr_use_table_recognition", True), default=True
         )
@@ -300,6 +302,7 @@ class Settings:
             ocr_device=ocr_device,
             ocr_lang=ocr_lang,
             ocr_layout_unclip_ratio=ocr_layout_unclip_ratio,
+            ocr_text_recognition_batch_size=ocr_text_recognition_batch_size,
             ocr_use_table_recognition=ocr_use_table_recognition,
             ocr_use_doc_unwarping=ocr_use_doc_unwarping,
         )

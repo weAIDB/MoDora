@@ -23,6 +23,7 @@ class PPStructureClient(OCRClient):
             "use_table_recognition": bool(settings.ocr_use_table_recognition),
             "use_doc_unwarping": bool(settings.ocr_use_doc_unwarping),
             "layout_unclip_ratio": settings.ocr_layout_unclip_ratio,
+            "text_recognition_batch_size": settings.ocr_text_recognition_batch_size,
         }
         self._model = PPStructureV3(**kwargs)
         self.device = device
@@ -67,6 +68,7 @@ class PaddleOCRVLClient(OCRClient):
             "use_chart_recognition": bool(settings.ocr_use_table_recognition),
             "use_doc_unwarping": bool(settings.ocr_use_doc_unwarping),
             "layout_unclip_ratio": settings.ocr_layout_unclip_ratio,
+            "text_recognition_batch_size": settings.ocr_text_recognition_batch_size,
         }
         self._model = PaddleOCRVL(**kwargs)
         self.device = device

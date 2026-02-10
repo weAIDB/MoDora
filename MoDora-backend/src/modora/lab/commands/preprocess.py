@@ -39,9 +39,13 @@ def _component_worker_wrapper(
     return asyncio.run(_run_get_components(res_path, co_path, logger))
 
 
-def _ocr_worker_run(pdf_path: str) -> tuple[dict[str, Any], int, float]:
+def _ocr_worker_run(pdf_path: str, config_path: str | None = None) -> tuple[dict[str, Any], int, float]:
     """执行 OCR 任务的工作函数"""
     t0 = time.monotonic()
+
+    # 确保在子进程中重新加载配置并初始化 OCR 模型
+    settings = Settings.load(config_path)
+    ensure_ocr_model_loaded(settings, logging.getLogger("modora.preprocess.ocr_worker"))
 
     model = get_ocr_model()
     if model is None:
@@ -93,6 +97,18 @@ def register(sub: argparse._SubParsersAction) -> None:
         help="Number of get_component workers (threads)",
     )
     p.add_argument(
+        "--ocr-workers",
+        type=int,
+        default=1,
+        help="Number of parallel OCR workers (processes). Set > 1 only if you have enough GPU memory.",
+    )
+    p.add_argument(
+        "--ocr-batch-size",
+        type=int,
+        default=1,
+        help="Text recognition batch size for OCR. Increasing this can improve GPU throughput.",
+    )
+    p.add_argument(
         "--resume",
         action="store_true",
         help="Skip steps whose output files already exist",
@@ -125,6 +141,7 @@ class PreprocessPipeline:
 
         self.cache_dir = str(getattr(args, "cache_dir", "cache"))
         self.component_workers = int(getattr(args, "component_workers", 8) or 1)
+        self.ocr_workers = int(getattr(args, "ocr_workers", 1) or 1)
         self.resume = bool(getattr(args, "resume", False)) and not bool(
             getattr(args, "overwrite", False)
         )
@@ -138,8 +155,10 @@ class PreprocessPipeline:
 
         # 并发控制
         self.current_pool: futures.ProcessPoolExecutor | None = None
+        self.ocr_pool: futures.ProcessPoolExecutor | None = None
         self.pool_lock = asyncio.Lock()
         self.submit_sem = asyncio.Semaphore(self.component_workers)
+        self.ocr_sem = asyncio.Semaphore(self.ocr_workers)
         self.co_tasks: dict[asyncio.Task, PreprocessJob] = {}
 
     def _tick(self, is_fail=False, is_skip=False) -> None:
@@ -195,10 +214,18 @@ class PreprocessPipeline:
             return False
 
         if not res_exists or not self.resume:
+            await self.ocr_sem.acquire()
             try:
                 loop = asyncio.get_running_loop()
+                async with self.pool_lock:
+                    if self.ocr_pool is None:
+                        self.ocr_pool = futures.ProcessPoolExecutor(
+                            max_workers=self.ocr_workers
+                        )
+                    pool = self.ocr_pool
+
                 payload, _, _ = await loop.run_in_executor(
-                    None, _ocr_worker_run, job.pdf_path
+                    pool, _ocr_worker_run, job.pdf_path, self.config_path
                 )
                 await loop.run_in_executor(
                     None,
@@ -220,6 +247,8 @@ class PreprocessPipeline:
                     extra={"task_name": "preprocess", "pdf_id": job.idx},
                 )
                 return False
+            finally:
+                self.ocr_sem.release()
         return True
 
     async def _submit_component_job(self, job: PreprocessJob, retry=0):
@@ -305,25 +334,36 @@ class PreprocessPipeline:
             failed=self.failed_count, skipped=self.skipped_count, refresh=False
         )
 
-        ensure_ocr_model_loaded(self.settings, self.logger)
+        # 在主进程预加载 OCR 模型（如果是单线程模式）
+        if self.ocr_workers == 1:
+            ensure_ocr_model_loaded(self.settings, self.logger)
 
         try:
+            # 所有的任务并行启动
+            ocr_tasks = []
             for job in jobs:
-                if await self.run_ocr_stage(job):
-                    task = asyncio.create_task(self._submit_component_job(job))
-                    self.co_tasks[task] = job
-                    task.add_done_callback(self._handle_task_done)
+                ocr_tasks.append(asyncio.create_task(self._process_full_pipeline(job)))
 
-            if self.co_tasks:
-                await asyncio.gather(*self.co_tasks.keys(), return_exceptions=True)
+            if ocr_tasks:
+                await asyncio.gather(*ocr_tasks, return_exceptions=True)
 
         finally:
             if self.current_pool:
                 self.current_pool.shutdown(wait=True)
+            if self.ocr_pool:
+                self.ocr_pool.shutdown(wait=True)
             if self.pbar:
                 self.pbar.close()
 
         return 2 if self.failed_count else 0
+
+    async def _process_full_pipeline(self, job: PreprocessJob):
+        """处理单个 PDF 的完整流水线（OCR + Component）"""
+        if await self.run_ocr_stage(job):
+            task = asyncio.create_task(self._submit_component_job(job))
+            self.co_tasks[task] = job
+            task.add_done_callback(self._handle_task_done)
+            await task
 
 
 def _handle_preprocess_ocr_pipeline(
@@ -333,6 +373,10 @@ def _handle_preprocess_ocr_pipeline(
     config_path = (getattr(args, "config", None) or "").strip() or None
     if config_path:
         os.environ["MODORA_CONFIG"] = config_path
+
+    # 如果 CLI 指定了 batch-size，则覆盖环境变量/配置
+    if getattr(args, "ocr_batch_size", None) is not None:
+        os.environ["MODORA_OCR_TEXT_RECOGNITION_BATCH_SIZE"] = str(args.ocr_batch_size)
 
     settings = Settings.load(config_path)
     configure_logging(settings)
