@@ -65,7 +65,13 @@ async def process_document_task(
     try:
         source_p = Path(source_path)
         # 1. 优先使用 OCR 模型；不可用时退化到 PDF 文本提取，保证流程可继续。
-        model = get_ocr_model()
+        model = None
+        try:
+            model = get_ocr_model(
+                settings=settings, logger=logger, create_if_missing=True
+            )
+        except Exception as e:
+            logger.warning(f"OCR model load failed, using PDF text fallback: {e}")
         if model is None:
             logger.warning("OCR model not available, using PDF text fallback")
             ocr_res = extract_pdf_blocks(str(source_p))
@@ -89,11 +95,19 @@ async def process_document_task(
 
         # 3. 调用 preprocess.py 中的两个核心编排函数
         # 得到 ComponentPack
-        cp = await get_components_async(ocr_res, logger)
+        cp = await get_components_async(
+            ocr_res, logger, settings=settings, config=config
+        )
         cp.save_json(str(cache_dir / "cp.json"))
 
         # 得到最终的 CCTree
-        tree = await build_tree_async(cp, logger, source_path=str(source_p))
+        tree = await build_tree_async(
+            cp,
+            logger,
+            source_path=str(source_p),
+            settings=settings,
+            config=config,
+        )
 
         # 4. 语义标签 (直接从根节点的 metadata 中提取)
         raw_metadata = tree.root.metadata or ""

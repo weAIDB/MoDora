@@ -16,10 +16,17 @@ from modora.api.v1.models import ChatRequest, ChatResponse, RetrievalItem
 router = APIRouter(tags=["chat"])
 logger = logging.getLogger("modora.api")
 
-def _settings_from_payload(payload: dict[str, Any] | None) -> tuple[Settings, str | None]:
+def _settings_from_payload(
+    payload: dict[str, Any] | None,
+) -> tuple[Settings, str | None, Settings, str | None]:
     settings = Settings.load()
-    settings, mode, _ = settings_from_ui_payload(settings, payload, model_key="qaModel")
-    return settings, mode
+    qa_settings, qa_mode, cfg = settings_from_ui_payload(
+        settings, payload, module_key="qaService"
+    )
+    retriever_settings, retriever_mode, _ = settings_from_ui_payload(
+        settings, cfg, module_key="retriever"
+    )
+    return qa_settings, qa_mode, retriever_settings, retriever_mode
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
@@ -28,7 +35,9 @@ async def chat_endpoint(request: ChatRequest):
     if not file_names:
         raise HTTPException(status_code=400, detail="File name(s) required")
 
-    app_settings, mode = _settings_from_payload(settings_payload)
+    app_settings, qa_mode, retriever_settings, retriever_mode = _settings_from_payload(
+        settings_payload
+    )
     paths = resolve_paths(app_settings)
 
     # 加载所有文档的树结构
@@ -67,7 +76,12 @@ async def chat_endpoint(request: ChatRequest):
         source_arg = source_paths[primary]
 
     # Use the core QAService with the overrides from payload
-    qa_service = QAService(app_settings, mode=mode)
+    qa_service = QAService(
+        app_settings,
+        qa_mode=qa_mode,
+        retriever_mode=retriever_mode,
+        retriever_settings=retriever_settings,
+    )
 
     try:
         # Use the correct method name 'qa' from core QAService

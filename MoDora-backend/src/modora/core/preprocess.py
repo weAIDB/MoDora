@@ -14,11 +14,14 @@ from modora.core.services import (
     AsyncMetadataGenerator,
 )
 from modora.core.settings import Settings
+from modora.core.utils.config import settings_from_ui_payload
 
 
 async def get_components_async(
     extracted_data: OcrExtractResponse,
     logger: logging.Logger,
+    settings: Settings | None = None,
+    config: dict | None = None,
 ) -> ComponentPack:
     """
     异步将 OCR 提取的扁平 Block 列表重组并增强为结构化的 ComponentPack。
@@ -41,7 +44,11 @@ async def get_components_async(
     co_pack = await loop.run_in_executor(None, analyzer.analyze, extracted_data, logger)
 
     # 2. 信息增强 (Enrichment)
-    llm = AsyncLLMFactory.create(mode="local")
+    base_settings = settings or Settings.load()
+    enrich_settings, enrich_mode, _ = settings_from_ui_payload(
+        base_settings, config, module_key="enrichment"
+    )
+    llm = AsyncLLMFactory.create(enrich_settings, mode=enrich_mode or "local")
     cropper = PDFCropper()
     enricher = EnrichmentService(llm, cropper)
 
@@ -55,6 +62,8 @@ async def build_tree_async(
     cp: ComponentPack,
     logger: logging.Logger,
     source_path: str = "",
+    settings: Settings | None = None,
+    config: dict | None = None,
 ):
     """
     异步构建 CCTree 文档树。
@@ -72,21 +81,28 @@ async def build_tree_async(
     返回:
         CCTree: 构建完成并包含元数据的文档树。
     """
-    settings = Settings.load()
-    # 使用远程 LLM 生成标题层级
-    llm_remote = AsyncLLMFactory.create(settings, mode="remote")
-    # 使用本地 LLM 生成元数据摘要
-    llm_local = AsyncLLMFactory.create(settings, mode="local")
+    base_settings = settings or Settings.load()
+    level_settings, level_mode, _ = settings_from_ui_payload(
+        base_settings, config, module_key="levelGenerator"
+    )
+    metadata_settings, metadata_mode, _ = settings_from_ui_payload(
+        base_settings, config, module_key="metadataGenerator"
+    )
+
+    llm_level = AsyncLLMFactory.create(level_settings, mode=level_mode or "remote")
+    llm_metadata = AsyncLLMFactory.create(
+        metadata_settings, mode=metadata_mode or "local"
+    )
 
     cropper = PDFCropper()
     generator = AsyncMetadataGenerator(
-        n0=2, growth_rate=2.0, logger=logger, llm_client=llm_local
+        n0=2, growth_rate=2.0, logger=logger, llm_client=llm_metadata
     )
-    constructor = TreeConstructor(settings, logger)
+    constructor = TreeConstructor(base_settings, logger)
 
     # 1. 标题层级增强
-    cp = await AsyncLevelGenerator(llm_remote, cropper).generate_level(
-        source_path=source_path, cp=cp, config=settings, logger=logger
+    cp = await AsyncLevelGenerator(llm_level, cropper).generate_level(
+        source_path=source_path, cp=cp, config=level_settings, logger=logger
     )
 
     # 2. 构造树结构

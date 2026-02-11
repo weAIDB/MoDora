@@ -17,14 +17,30 @@ class QAService:
     QA 服务类，负责协调检索、推理和验证流程。
     """
 
-    def __init__(self, settings: Settings | None = None, mode: str | None = None):
+    def __init__(
+        self,
+        settings: Settings | None = None,
+        mode: str | None = None,
+        *,
+        qa_mode: str | None = None,
+        retriever_mode: str | None = None,
+        retriever_settings: Settings | None = None,
+    ):
         self.settings = settings or Settings()
-        # 如果指定了 mode，则所有 LLM 客户端都使用该 mode
-        # 否则，local_llm 强制 local，remote_llm 强制 remote
+        self.retriever_settings = retriever_settings or self.settings
+
+        # 兼容旧接口：mode 未拆分时，同时作用于 QA 与 Retriever。
+        qa_mode = qa_mode or mode
+        retriever_mode = retriever_mode or mode
+
         self.local_llm = AsyncLLMFactory.create(self.settings, mode=mode or "local")
-        self.remote_llm = AsyncLLMFactory.create(self.settings, mode=mode or "remote")
+        self.remote_llm = AsyncLLMFactory.create(
+            self.settings, mode=qa_mode or "remote"
+        )
         self.cropper = PDFCropper()
-        self.semantic_retriever = SemanticRetriever(self.settings, mode=mode)
+        self.semantic_retriever = SemanticRetriever(
+            self.retriever_settings, mode=retriever_mode or "local"
+        )
         self.location_retriever = LocationRetriever()
 
     async def extract_location(self, query: str) -> Tuple[List[int], List[float]]:
