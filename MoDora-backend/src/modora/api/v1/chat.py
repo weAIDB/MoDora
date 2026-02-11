@@ -3,13 +3,13 @@ from __future__ import annotations
 import json
 import logging
 from typing import Any
-from dataclasses import replace
 
 from fastapi import APIRouter, HTTPException
 
 from modora.core.domain.cctree import CCTree
 from modora.core.settings import Settings
 from modora.core.utils.paths import resolve_paths
+from modora.core.utils.config import settings_from_ui_payload
 from modora.core.services.qa_service import QAService
 from modora.api.v1.models import ChatRequest, ChatResponse, RetrievalItem
 
@@ -18,20 +18,7 @@ logger = logging.getLogger("modora.api")
 
 def _settings_from_payload(payload: dict[str, Any] | None) -> tuple[Settings, str | None]:
     settings = Settings.load()
-    mode = None
-    if payload:
-        mode = payload.get("selectedMode")
-        
-        # 即使只传 mode，我们也允许覆盖 apiKey 和 baseUrl，以便用户在前端临时修改
-        overrides: dict[str, Any] = {}
-        if payload.get("apiKey"):
-            overrides["api_key"] = payload.get("apiKey")
-        if payload.get("baseUrl"):
-            overrides["api_base"] = payload.get("baseUrl")
-        
-        if overrides:
-            settings = replace(settings, **overrides)
-            
+    settings, mode, _ = settings_from_ui_payload(settings, payload, model_key="qaModel")
     return settings, mode
 
 @router.post("/chat", response_model=ChatResponse)

@@ -1,4 +1,5 @@
 import { reactive } from 'vue';
+import { DEFAULT_SETTINGS, normalizeSettings } from '../config/settingsContract';
 
 // 辅助：生成 ID
 const generateId = () => 'sess_' + Math.random().toString(36).substr(2, 9);
@@ -48,12 +49,7 @@ const state = reactive({
     globalTags: [],  // 所有已存在的标签
     
     // 全局设置
-    settings: JSON.parse(localStorage.getItem('modora_settings')) || {
-        apiKey: '',
-        baseUrl: '',
-        layoutModel: 'paddle',
-        selectedMode: 'local'
-    }
+    settings: normalizeSettings(JSON.parse(localStorage.getItem('modora_settings')) || DEFAULT_SETTINGS)
 });
 
 export function useModoraStore() {
@@ -316,7 +312,7 @@ export function useModoraStore() {
 
     // 动作：更新设置
     const updateSettings = (newSettings) => {
-        state.settings = { ...state.settings, ...newSettings };
+        state.settings = normalizeSettings({ ...state.settings, ...newSettings });
         localStorage.setItem('modora_settings', JSON.stringify(state.settings));
         console.log("Settings updated:", state.settings);
     };

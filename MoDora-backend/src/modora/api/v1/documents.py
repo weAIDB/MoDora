@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import logging
 from typing import Any
-from dataclasses import replace
 
 import fitz
 from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile
@@ -11,6 +10,7 @@ from fastapi.responses import StreamingResponse
 
 from modora.core.settings import Settings
 from modora.core.utils.paths import resolve_paths
+from modora.core.utils.config import settings_from_ui_payload
 from modora.core.services.task_store import TASK_STATUS
 from modora.core.services.document_processing import process_document_task
 
@@ -19,29 +19,8 @@ logger = logging.getLogger("modora.api")
 
 def _settings_from_payload(payload: dict[str, Any] | None) -> Settings:
     settings = Settings.load()
-    if not payload:
-        return settings
-
-    overrides: dict[str, Any] = {}
-    
-    # 基础连接配置
-    if payload.get("apiKey"):
-        overrides["api_key"] = payload.get("apiKey")
-    if payload.get("baseUrl"):
-        overrides["api_base"] = payload.get("baseUrl")
-    
-    # 模型配置
-    qa_model = payload.get("qaModel")
-    if qa_model:
-        if "local" in qa_model.lower():
-            overrides["llm_local_model"] = qa_model
-        else:
-            overrides["api_model"] = qa_model
-    
-    if payload.get("layoutModel"):
-        overrides["ocr_model"] = payload.get("layoutModel")
-
-    return replace(settings, **overrides) if overrides else settings
+    settings, _, _ = settings_from_ui_payload(settings, payload, model_key="treeModel")
+    return settings
 
 @router.get("/pdf/{file_name}/{page_index}/image")
 def get_pdf_image(file_name: str, page_index: int):

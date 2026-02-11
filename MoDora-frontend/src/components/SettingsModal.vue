@@ -81,6 +81,37 @@
           </p>
         </div>
 
+        <div class="h-px bg-slate-100 dark:bg-slate-700"></div>
+
+        <!-- Model Options -->
+        <div class="space-y-3">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Model Options</label>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tree Model</label>
+            <select
+              v-model="form.treeModel"
+              class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all dark:text-slate-200"
+            >
+              <option v-for="opt in activeModelOptions" :key="`tree-${opt.value}`" :value="opt.value">
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">QA Model</label>
+            <select
+              v-model="form.qaModel"
+              class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all dark:text-slate-200"
+            >
+              <option v-for="opt in activeModelOptions" :key="`qa-${opt.value}`" :value="opt.value">
+                {{ opt.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
       </div>
 
       <!-- 底部按钮 -->
@@ -104,8 +135,9 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useModoraStore } from '../composables/useModoraStore';
+import { DEFAULT_SETTINGS, normalizeSettings } from '../config/settingsContract';
 
 const props = defineProps({
   isOpen: Boolean
@@ -114,20 +146,42 @@ const props = defineProps({
 const emit = defineEmits(['close']);
 const store = useModoraStore();
 
+const LOCAL_MODELS = [
+  { value: 'qwen-vl-local', label: 'Qwen-VL Local' },
+];
+
+const REMOTE_MODELS = [
+  { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
+  { value: 'gpt-4o', label: 'GPT-4o' },
+  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+];
+
 const showKey = ref(false);
-const form = ref({
-  apiKey: '',
-  baseUrl: '',
-  layoutModel: 'paddle',
-  selectedMode: 'local'
-});
+const form = ref({ ...DEFAULT_SETTINGS });
+const activeModelOptions = computed(() =>
+  form.value.selectedMode === 'local' ? LOCAL_MODELS : REMOTE_MODELS
+);
 
 // 初始化表单数据
 watch(() => props.isOpen, (newVal) => {
   if (newVal) {
-    form.value = { ...store.state.settings };
+    form.value = normalizeSettings(store.state.settings);
   }
 });
+
+watch(
+  () => form.value.selectedMode,
+  () => {
+    const options = activeModelOptions.value;
+    const values = new Set(options.map((opt) => opt.value));
+    if (!values.has(form.value.treeModel)) {
+      form.value.treeModel = options[0].value;
+    }
+    if (!values.has(form.value.qaModel)) {
+      form.value.qaModel = options[0].value;
+    }
+  }
+);
 
 const close = () => {
   emit('close');
