@@ -188,7 +188,7 @@
                   <div class="flex flex-wrap gap-1 mt-0.5" v-if="store.state.kbDocs[doc.name]">
                     <!-- Show top 3 tags -->
                     <span 
-                      v-for="tag in store.state.kbDocs[doc.name].tags.slice(0, 3)" 
+                      v-for="tag in orderedTags(store.state.kbDocs[doc.name].tags).slice(0, 3)" 
                       :key="tag"
                       :class="getTagStyle(tag)"
                       class="px-1 py-0.5 text-[8px] rounded leading-none"
@@ -197,7 +197,7 @@
                     </span>
                     <!-- Semantic tags (different color) -->
                     <span 
-                      v-for="tag in store.state.kbDocs[doc.name].semantic_tags.slice(0, 1)" 
+                      v-for="tag in orderedTags(store.state.kbDocs[doc.name].semantic_tags).slice(0, 1)" 
                       :key="tag"
                       :class="getTagStyle(tag, true)"
                       class="px-1 py-0.5 text-[8px] rounded leading-none italic font-medium"
@@ -335,10 +335,10 @@
                   <div class="flex flex-col min-w-0">
                     <span class="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{{ name }}</span>
                     <div class="flex flex-wrap gap-1 mt-1.5">
-                      <span v-for="tag in info.tags" :key="tag" :class="getTagStyle(tag)" class="text-[9px] px-1.5 py-0.5 rounded-md">
+                      <span v-for="tag in orderedTags(info.tags)" :key="tag" :class="getTagStyle(tag)" class="text-[9px] px-1.5 py-0.5 rounded-md">
                         {{ tag }}
                       </span>
-                      <span v-for="tag in info.semantic_tags" :key="tag" :class="getTagStyle(tag, true)" class="text-[9px] px-1.5 py-0.5 rounded-md italic">
+                      <span v-for="tag in orderedTags(info.semantic_tags)" :key="tag" :class="getTagStyle(tag, true)" class="text-[9px] px-1.5 py-0.5 rounded-md italic">
                         {{ tag }}
                       </span>
                     </div>
@@ -435,7 +435,7 @@
                   <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-3 block">Active Tags</label>
                   <div class="flex flex-wrap gap-2 min-h-[120px] p-4 bg-slate-50/30 dark:bg-slate-900/10 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800/50 overflow-y-auto max-h-[200px] custom-scrollbar">
                     <span 
-                      v-for="tag in currentTags" 
+                      v-for="tag in orderedCurrentTags" 
                       :key="tag"
                       :class="getTagStyle(tag)"
                       class="flex items-center px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm group/active"
@@ -462,7 +462,7 @@
                 <div class="flex-1 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl p-4 border border-slate-100 dark:border-slate-800/50 overflow-y-auto max-h-[350px] custom-scrollbar pr-2">
                   <div class="flex flex-wrap gap-2">
                     <span 
-                      v-for="tag in store.state.globalTags" 
+                      v-for="tag in orderedGlobalTags" 
                       :key="tag"
                       :class="getTagStyle(tag)"
                       class="group/tag inline-flex items-center text-[11px] px-3 py-1.5 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95 shadow-sm"
@@ -538,6 +538,72 @@ const newTagInput = ref('');
 const showingKbSelector = ref(false);
 const kbSearchQuery = ref('');
 const selectedKbDocs = ref([]);
+
+const STAT_TAG_ORDER = [
+  'Long',
+  'Medium',
+  'Short',
+  'Table-Rich',
+  'Chart-Rich',
+  'Image-Rich',
+  'Complex Layout',
+  'Deep Hierarchy',
+];
+
+const STAT_TAG_PRIORITY = Object.fromEntries(
+  STAT_TAG_ORDER.map((tag, index) => [tag, index])
+);
+
+const TAG_COLORS = {
+  blue: 'bg-blue-50 text-blue-500 border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/30',
+  emerald: 'bg-emerald-50 text-emerald-500 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30',
+  amber: 'bg-amber-50 text-amber-500 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/30',
+  rose: 'bg-rose-50 text-rose-500 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800/30',
+  indigo: 'bg-indigo-50 text-indigo-500 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800/30',
+  purple: 'bg-purple-50 text-purple-500 border-purple-100 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800/30',
+  cyan: 'bg-cyan-50 text-cyan-500 border-cyan-100 dark:bg-cyan-900/20 dark:text-cyan-400 dark:border-cyan-800/30',
+  teal: 'bg-teal-50 text-teal-500 border-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:border-teal-800/30',
+};
+
+const FIXED_TAG_STYLE_MAP = {
+  Long: TAG_COLORS.rose,
+  Medium: TAG_COLORS.amber,
+  Short: TAG_COLORS.emerald,
+  'Table-Rich': TAG_COLORS.indigo,
+  'Chart-Rich': TAG_COLORS.purple,
+  'Image-Rich': TAG_COLORS.blue,
+  'Complex Layout': TAG_COLORS.cyan,
+  'Deep Hierarchy': TAG_COLORS.teal,
+  Document: TAG_COLORS.emerald,
+  'No Text Content': TAG_COLORS.purple,
+  'Analysis Failed': TAG_COLORS.emerald,
+};
+
+const HASH_COLOR_POOL = [
+  TAG_COLORS.blue,
+  TAG_COLORS.emerald,
+  TAG_COLORS.amber,
+  TAG_COLORS.rose,
+  TAG_COLORS.indigo,
+  TAG_COLORS.purple,
+  TAG_COLORS.cyan,
+  TAG_COLORS.teal,
+];
+
+const orderedTags = (tags) => {
+  if (!Array.isArray(tags)) return [];
+  return [...new Set(tags)]
+    .map((tag) => String(tag))
+    .sort((a, b) => {
+      const pa = STAT_TAG_PRIORITY[a] ?? Number.MAX_SAFE_INTEGER;
+      const pb = STAT_TAG_PRIORITY[b] ?? Number.MAX_SAFE_INTEGER;
+      if (pa !== pb) return pa - pb;
+      return a.localeCompare(b);
+    });
+};
+
+const orderedGlobalTags = computed(() => orderedTags(store.state.globalTags));
+const orderedCurrentTags = computed(() => orderedTags(currentTags.value));
 
 const filteredKbDocs = computed(() => {
   const query = kbSearchQuery.value.toLowerCase();
@@ -687,36 +753,11 @@ const onFileChange = async (e) => {
 
 // 获取标签样式
 const getTagStyle = (tag, isSemantic = false) => {
-  const hash = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  
-  // 预定义颜色系列
-  const colors = [
-    'bg-blue-50 text-blue-500 border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/30',
-    'bg-emerald-50 text-emerald-500 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30',
-    'bg-amber-50 text-amber-500 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/30',
-    'bg-rose-50 text-rose-500 border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800/30',
-    'bg-indigo-50 text-indigo-500 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800/30',
-    'bg-purple-50 text-purple-500 border-purple-100 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800/30',
-    'bg-cyan-50 text-cyan-500 border-cyan-100 dark:bg-cyan-900/20 dark:text-cyan-400 dark:border-cyan-800/30',
-    'bg-teal-50 text-teal-500 border-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:border-teal-800/30',
-  ];
+  const style = FIXED_TAG_STYLE_MAP[tag];
+  if (style) return `${style} border`;
 
-  // 规则标签映射
-  const ruleMap = {
-    'Long': colors[3],      // Rose
-    'Medium': colors[2],    // Amber
-    'Short': colors[1],     // Emerald
-    'Table-Rich': colors[4], // Indigo
-    'Chart-Rich': colors[5], // Purple
-    'Image-Rich': colors[0], // Blue
-    'Complex Layout': colors[6], // Cyan
-    'Deep Hierarchy': colors[7]  // Teal
-  };
-
-  if (ruleMap[tag]) return ruleMap[tag] + ' border';
-  
-  // 语义标签使用 hash 选择颜色
-  const colorIndex = hash % colors.length;
-  return colors[colorIndex] + (isSemantic ? ' border border-dashed' : ' border');
+  const hash = String(tag).split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const colorIndex = hash % HASH_COLOR_POOL.length;
+  return HASH_COLOR_POOL[colorIndex] + (isSemantic ? ' border border-dashed' : ' border');
 };
 </script>

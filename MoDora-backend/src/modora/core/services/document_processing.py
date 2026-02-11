@@ -12,8 +12,42 @@ from modora.core.utils.paths import AppPaths
 from modora.core.services.stats import get_component_stats, get_tree_stats
 from modora.core.services.task_store import TASK_STATUS
 from modora.core.infra.ocr.manager import get_ocr_model
+from modora.core.infra.pdf.fallback import extract_pdf_blocks
 from modora.core.domain.ocr import OcrExtractResponse, OCRBlock
 from modora.core.settings import Settings
+
+
+def _generate_auto_tags(
+    counts: dict[str, int],
+    variance: float,
+    pages: int,
+    depth: int,
+) -> list[str]:
+    """
+    生成基于统计特征的自动标签（与旧版规则一致）。
+    """
+    tags: list[str] = []
+
+    if pages > 20:
+        tags.append("Long")
+    elif pages > 5:
+        tags.append("Medium")
+    else:
+        tags.append("Short")
+
+    if counts.get("table", 0) > 3:
+        tags.append("Table-Rich")
+    if counts.get("chart", 0) > 3:
+        tags.append("Chart-Rich")
+    if counts.get("image", 0) > 5:
+        tags.append("Image-Rich")
+
+    if variance > 0.5:
+        tags.append("Complex Layout")
+    if depth > 5:
+        tags.append("Deep Hierarchy")
+
+    return tags
 
 
 async def process_document_task(
@@ -30,14 +64,20 @@ async def process_document_task(
 
     try:
         source_p = Path(source_path)
-        # 1. 直接使用 infra 的 OCR 模型
+        # 1. 优先使用 OCR 模型；不可用时退化到 PDF 文本提取，保证流程可继续。
         model = get_ocr_model()
-        
-        pdf_blocks: list[OCRBlock] = []
-        for page_blocks in model.predict_iter(str(source_p)):
-            pdf_blocks.extend(page_blocks)
-        
-        ocr_res = OcrExtractResponse(source=f"file:{source_p}", blocks=pdf_blocks)
+        if model is None:
+            logger.warning("OCR model not available, using PDF text fallback")
+            ocr_res = extract_pdf_blocks(str(source_p))
+        else:
+            try:
+                pdf_blocks: list[OCRBlock] = []
+                for page_blocks in model.predict_iter(str(source_p)):
+                    pdf_blocks.extend(page_blocks)
+                ocr_res = OcrExtractResponse(source=f"file:{source_p}", blocks=pdf_blocks)
+            except Exception as e:
+                logger.warning(f"OCR predict failed, using PDF text fallback: {e}")
+                ocr_res = extract_pdf_blocks(str(source_p))
 
         # 2. 缓存 OCR 结果
         cache_dir = paths.doc_cache_dir(filename)
@@ -74,10 +114,12 @@ async def process_document_task(
 
         counts, variance, pages = get_component_stats(cache_dir / "ocr.json")
         node_cnt, leaf_cnt, depth = get_tree_stats(cache_dir / "tree.json")
+        auto_tags = _generate_auto_tags(counts, variance, pages, depth)
 
         kb.update_doc_info(
             filename,
             {
+                "tags": auto_tags,
                 "stats": {
                     "pages": pages,
                     "counts": counts,
@@ -96,4 +138,3 @@ async def process_document_task(
     except Exception as e:
         logger.error(f"Failed to process document {filename}: {e}", exc_info=True)
         TASK_STATUS.set(filename, "failed")
-
