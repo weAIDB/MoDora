@@ -25,15 +25,7 @@ class PPStructureClient(OCRClient):
             "layout_unclip_ratio": settings.ocr_layout_unclip_ratio,
             "text_recognition_batch_size": settings.ocr_text_recognition_batch_size,
         }
-        try:
-            self._model = PPStructureV3(**kwargs)
-        except Exception as e:
-            # Compatibility: some paddleocr builds reject `lang` for PPStructureV3.
-            if "lang" in kwargs and "lang" in str(e).lower():
-                kwargs.pop("lang", None)
-                self._model = PPStructureV3(**kwargs)
-            else:
-                raise
+        self._model = PPStructureV3(**kwargs)
         self.device = device
         self.lang = kwargs.get("lang")
 
