@@ -98,7 +98,7 @@ def register(sub: argparse._SubParsersAction) -> None:
     )
     parser.add_argument(
         "--output",
-        help="Path to save the evaluation report (JSONL) (default: same as --input with .jsonl extension)",
+        help="Path to save the evaluation report (JSONL) (default: same as --result parent dir)",
     )
     parser.add_argument(
         "--analyze",
@@ -199,7 +199,13 @@ async def _run_evaluation(
         dataset = json.load(f)
 
     with open(result_path, "r", encoding="utf-8") as f:
-        results = json.load(f)
+        results_data = json.load(f)
+
+    # 兼容处理：如果 result.json 是字典格式 {"results": [...], "metrics": {...}}
+    if isinstance(results_data, dict) and "results" in results_data:
+        results = results_data["results"]
+    else:
+        results = results_data
 
     # 将预测结果按 ID 映射，以便快速查找
     prediction_map = {r["questionId"]: r for r in results}
@@ -248,16 +254,42 @@ async def _run_evaluation(
 
     anls = anls_score / total if total > 0 else 0.0
 
+    # 将指标保存回 result.json
+    try:
+        with open(result_path, "r", encoding="utf-8") as f:
+            results_data = json.load(f)
+
+        metrics = {
+            "total": total,
+            "correct": correct,
+            "accuracy": round(accuracy, 4),
+            "anls": round(anls, 4),
+        }
+
+        if isinstance(results_data, list):
+            output_data = {"metrics": metrics, "results": results_data}
+        else:
+            results_data["metrics"] = metrics
+            output_data = results_data
+
+        with open(result_path, "w", encoding="utf-8") as f:
+            json.dump(output_data, f, ensure_ascii=False, indent=2)
+        print(f"Metrics saved to {result_path}")
+    except Exception as e:
+        logger.error(f"Failed to save metrics to result.json: {e}")
+
     print("\nEvaluation Complete.")
     print(f"Total: {total}")
     print(f"Accuracy: {accuracy:.4f}")
     print(f"ANLS: {anls:.4f}")
     print(f"Detailed results saved to {output_path}")
 
-    return evaluated_items
+    return evaluated_items, metrics
 
 
-def _plot_results(evaluated_items: List[ResultItem], output_dir: Path):
+def _plot_results(
+    evaluated_items: List[ResultItem], output_dir: Path, overall_metrics: dict = None
+):
     """根据评估结果生成图表和汇总 CSV"""
     if not evaluated_items:
         print("No data to plot.")
@@ -408,16 +440,17 @@ def _handle_evaluate(args: argparse.Namespace, logger: logging.Logger) -> int:
         ensure_llm_local_loaded(Settings.load(), logger)
     try:
         input_path = Path(args.input)
+        result_path = Path(args.result)
         output_path = (
             Path(args.output)
             if args.output
-            else input_path.with_suffix(".jsonl")
+            else result_path.parent / "evaluation.jsonl"
         )
 
-        evaluated_items = asyncio.run(
+        evaluated_items, metrics = asyncio.run(
             _run_evaluation(
                 input_path,
-                Path(args.result),
+                result_path,
                 output_path,
                 args.concurrency,
                 logger,
@@ -426,7 +459,7 @@ def _handle_evaluate(args: argparse.Namespace, logger: logging.Logger) -> int:
         )
 
         if args.analyze:
-            _plot_results(evaluated_items, output_path.parent)
+            _plot_results(evaluated_items, output_path.parent, overall_metrics=metrics)
 
         return 0
     except Exception as e:

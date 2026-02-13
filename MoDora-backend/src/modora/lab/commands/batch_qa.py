@@ -252,11 +252,15 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
         if args.resume and final_output_path.exists():
             try:
                 with open(final_output_path, "r", encoding="utf-8") as f:
-                    existing_results = json.load(f)
+                    resume_data = json.load(f)
 
-                if not isinstance(existing_results, list):
+                if isinstance(resume_data, dict) and "results" in resume_data:
+                    existing_results = resume_data["results"]
+                elif isinstance(resume_data, list):
+                    existing_results = resume_data
+                else:
                     logger.warning(
-                        f"Existing results in {final_output_path} is not a list, ignoring for resume"
+                        f"Existing results in {final_output_path} has unknown format, ignoring for resume"
                     )
                     existing_results = []
 
@@ -292,8 +296,19 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
         }
         final_results = sorted(results_map.values(), key=lambda x: x["questionId"])
 
+        # 构造最终输出，尝试保留已有指标
+        if (
+            args.resume
+            and "resume_data" in locals()
+            and isinstance(resume_data, dict)
+            and "metrics" in resume_data
+        ):
+            final_output = {"metrics": resume_data["metrics"], "results": final_results}
+        else:
+            final_output = final_results
+
         with open(final_output_path, "w", encoding="utf-8") as f:
-            json.dump(final_results, f, ensure_ascii=False, indent=2)
+            json.dump(final_output, f, ensure_ascii=False, indent=2)
 
         logger.info(
             f"Batch QA finished. Total {len(final_results)} results saved to {final_output_path}"

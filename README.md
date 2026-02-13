@@ -245,9 +245,10 @@ modora <command> --help
 5. **Evaluation & Analysis**
    Calculate metrics (Accuracy, ANLS, ACNLS) and generate analysis charts.
    ```bash
-   # By default, evaluation results and charts will be saved alongside the input file
+   # By default, evaluation results and charts will be saved alongside the result.json file
    modora evaluate --input datasets/MMDA/test.json --result MoDora-backend/tmp/result.json
    ```
    This command will:
-   - Save the detailed evaluation to `test.jsonl`.
-   - Generate accuracy/ACNLS bar charts and summary CSVs in the same directory as the input.
+   - Update `result.json` with calculated metrics (Accuracy, ANLS, etc.).
+   - Save the detailed evaluation to `evaluation.jsonl` in the same directory as `result.json`.
+   - Generate accuracy/ACNLS bar charts and summary CSVs in the same directory.
