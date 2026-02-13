@@ -30,14 +30,14 @@ pip install --upgrade pip wheel setuptools packaging
 
 # Install PyTorch with CUDA support first
 # We pin to 2.5.1 to stay within lmdeploy's supported range (<= 2.8.0)
-echo "🔥 Installing Stable PyTorch (2.5.1) and Transformers (4.57.3)..."
+echo "🔥 Installing Stable PyTorch (2.5.1), Transformers (4.57.3) and LMDeploy (0.12.0)..."
 pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 transformers==4.57.3 --index-url https://download.pytorch.org/whl/cu124
 
 # Install PaddlePaddle for OCR support
 echo "� Installing PaddlePaddle GPU (v3.3.0) for OCR support..."
 pip install paddlepaddle-gpu==3.3.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu130/
 
-echo "�📦 Installing MoDora-backend and remaining requirements..."
+echo "�� Installing MoDora-backend and remaining requirements..."
 pip install -e .
 # Fix: PPStructureV3 requires additional ocr dependencies in paddlex
 pip install "paddlex[ocr]"

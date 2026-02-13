@@ -27,4 +27,4 @@ if [ -z "$MODORA_API_KEY" ]; then
 fi
 
 # Run FastAPI
-uvicorn modora.api.app:app --host 0.0.0.0 --port 8000 --reload
+uvicorn modora.api.app:app --host 0.0.0.0 --port 8005 --reload
