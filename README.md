@@ -170,10 +170,55 @@ uvicorn modora.api.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 **Using the CLI.**
+MoDora provides a comprehensive CLI for offline experiments, dataset preprocessing, and batch evaluation.
+
+First, activate the virtual environment:
 ```bash
-# Run CLI commands
-modora --help
+source MoDora-backend/venv/bin/activate
 ```
+
+Basic usage:
+```bash
+# General help
+modora --help
+
+# Subcommand help
+modora <command> --help
+```
+
+#### Core Commands:
+
+1. **OCR & Component Extraction**
+   Process raw PDFs to extract layout blocks and components.
+   ```bash
+   modora ocr --dataset datasets/MMDA --cache-dir MoDora-backend/cache_v5
+   ```
+
+2. **Tree Construction**
+   Build document hierarchy trees (tree.json) from extracted components.
+   ```bash
+   modora build-tree --dataset datasets/MMDA --cache-dir MoDora-backend/cache_v5
+   ```
+
+3. **Single Document QA**
+   Ask a question about a specific document using its constructed tree.
+   ```bash
+   modora qa <pdf_path> <tree_json_path> "Your question here"
+   ```
+
+4. **Batch QA Experiment**
+   Run multiple questions from a dataset against the constructed trees.
+   ```bash
+   modora batch-qa --dataset datasets/MMDA/test.json --cache MoDora-backend/cache_v5 --output MoDora-backend/tmp
+   ```
+
+5. **Evaluation**
+   Calculate metrics (Accuracy, F1, etc.) for the batch results.
+   ```bash
+   modora evaluate --input MoDora-backend/tmp/result.jsonl
+   ```
+
+---
 
 ### 2. Frontend Setup (MoDora-frontend)
 
