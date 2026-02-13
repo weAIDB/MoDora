@@ -97,7 +97,7 @@ Retrieval-Augmented Generation methods:
 
 - [TextRAG](./TextRAG.zip)
 
-## 🕹 Quick Start
+## 🚀 Quick Start (Web Application)
 
 ### 1. Automated Installation
 
@@ -169,7 +169,37 @@ export MODORA_API_MODEL="gpt-4o"
 uvicorn modora.api.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-**Using the CLI.**
+### 2. Frontend Setup (MoDora-frontend)
+
+**Environment.**
+Requires Node.js (v20.19.0+ or v22.12.0+).
+
+```bash
+cd MoDora-frontend
+npm install
+```
+
+**Running the Dev Server.**
+```bash
+npm run dev
+```
+
+### 3. Benchmark & Model
+
+**Benchmark.**
+Our MMDA Bench is in [MMDA](./datasets/MMDA/test.json).
+For DUDE and its samples subset, refer to [DUDE](https://huggingface.co/datasets/jordyvl/DUDE_loader/tree/main/data).
+
+**Model.**
+We support both remote APIs (e.g., GPT-4o) and local models (e.g., Qwen2.5-VL, Qwen3-Embedding).
+Configure model paths and settings in your environment or `config.json`.
+
+---
+
+## 🧪 CLI Usage (Experiments)
+
+> **Note**: The CLI is primarily designed for experimental purposes, such as offline dataset preprocessing and batch evaluation. Before using the CLI, please ensure you have downloaded the MMDA dataset to the `datasets/MMDA` directory.
+
 MoDora provides a comprehensive CLI for offline experiments, dataset preprocessing, and batch evaluation.
 
 First, activate the virtual environment:
@@ -217,30 +247,3 @@ modora <command> --help
    ```bash
    modora evaluate --input MoDora-backend/tmp/result.jsonl
    ```
-
----
-
-### 2. Frontend Setup (MoDora-frontend)
-
-**Environment.**
-Requires Node.js (v20.19.0+ or v22.12.0+).
-
-```bash
-cd MoDora-frontend
-npm install
-```
-
-**Running the Dev Server.**
-```bash
-npm run dev
-```
-
-### 3. Benchmark & Model
-
-**Benchmark.**
-Our MMDA Bench is in [MMDA](./datasets/MMDA/test.json).
-For DUDE and its samples subset, refer to [DUDE](https://huggingface.co/datasets/jordyvl/DUDE_loader/tree/main/data).
-
-**Model.**
-We support both remote APIs (e.g., GPT-4o) and local models (e.g., Qwen2.5-VL, Qwen3-Embedding).
-Configure model paths and settings in your environment or `config.json`.
