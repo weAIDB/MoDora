@@ -1,0 +1,46 @@
+{
+  "env": "dev",
+  "service_name": "modora-backend",
+  "log_level": "INFO",
+  "log_format": "text",
+  "log_to_file": false,
+  "log_dir": null,
+
+  "// Data paths": "Data and cache directories",
+  "docs_dir": null,
+  "cache_dir": null,
+
+  "// API 配置": "Used for external LLM API calls (OpenAI, Gemini, etc.)",
+  "api_base": "https://your-api-base-url/v1",
+  "api_key": "your-api-key",
+  "api_model": "gpt-4o",
+
+  "// 本地 LLM 配置": "Settings for local model serving via LMDeploy",
+  "llm_local_model": "./models/Qwen3-VL-8B-Instruct",
+  "llm_local_base_url": null,
+  "llm_local_api_key": "local",
+  "llm_local_port": 9001,
+  "llm_local_cuda_visible_devices": null,
+  "llm_local_startup_timeout_s": 600.0,
+  "llm_local_instances": [
+    {
+      "host": "127.0.0.1",
+      "port": 9014,
+      "cuda_visible_devices": "0"
+    },
+    {
+      "host": "127.0.0.1",
+      "port": 9015,
+      "cuda_visible_devices": "1"
+    }
+  ],
+
+  "// OCR 配置": "Structural recognition based on PaddleOCR",
+  "ocr_model": "ppstructure",
+  "ocr_device": "gpu:0",
+  "ocr_lang": "en",
+  "ocr_layout_unclip_ratio": 1.1,
+  "ocr_text_recognition_batch_size": 8,
+  "ocr_use_table_recognition": true,
+  "ocr_use_doc_unwarping": false
+}

@@ -99,78 +99,103 @@ Retrieval-Augmented Generation methods:
 
 ## 🕹 Quick Start
 
-#### 1. Clone Repository
+### 1. Automated Installation
 
-Please download this anonymous repository.
-
-#### 2. Environment & Benchmark & Model
-
-**Environment.**
-
-Use the following command to install the conda environment.
-
-To install paddleocr you can refer to (https://www.paddlepaddle.org.cn/install)
+We provide a one-click setup script that automatically creates a virtual environment and installs all dependencies (including PyTorch, LMDeploy, FlashAttention, and PaddleOCR):
 
 ```bash
-# create virtual environment
-conda create -n modora python=3.10
-conda activate modora
+# Grant execution permissions
+chmod +x setup.sh run.sh start_backend.sh start_frontend.sh
 
-# install required packages
-pip install -m requirements.txt
+# Run the setup script (this may take a while)
+./setup.sh
 ```
+
+### 2. Configuration
+
+Before starting the services, you need to configure the backend parameters. We provide an example file [local.example.json](file:///home/yukai/project/MoDora/MoDora-backend/configs/local.example.json).
+
+1. **Create Configuration File**:
+   ```bash
+   cp MoDora-backend/configs/local.example.json MoDora-backend/configs/local.json
+   ```
+
+2. **Core Configuration Items**:
+   Open `MoDora-backend/configs/local.json` and modify based on your environment:
+   - `api_key`: If you need to call external APIs (e.g., OpenAI or Gemini), enter your key here.
+   - `llm_local_model`: Absolute path to your local model (e.g., Qwen2-VL-7B-Instruct).
+   - `llm_local_instances`: Configure multiple inference instances by specifying different ports and `cuda_visible_devices` for multi-GPU parallelism.
+   - `ocr_device`: Device used for OCR, e.g., `gpu:0`.
+
+### 3. Execution
+
+Once installation and configuration are complete, you can use `run.sh` to start both backend and frontend services simultaneously:
+```bash
+./run.sh
+```
+
+---
+
+### 🛠 Manual Setup
+
+If you prefer to set up manually:
+
+#### 1. Backend Setup (MoDora-backend)
+
+**Environment.**
+Requires Python 3.10+.
+
+```bash
+cd MoDora-backend
+# Install the package in editable mode
+pip install -e .
+
+# Install additional dependencies for OCR and LLM
+# e.g., for PaddleOCR: pip install paddleocr paddlepaddle-gpu
+```
+
+**Configuration.**
+MoDora-backend supports environment variables or a JSON config file (path set via `MODORA_CONFIG`).
+
+```bash
+export MODORA_API_KEY="your-api-key"
+export MODORA_API_BASE="https://api.openai.com/v1"
+export MODORA_API_MODEL="gpt-4o"
+```
+
+**Running the API.**
+```bash
+# Start FastAPI server
+uvicorn modora.api.app:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Using the CLI.**
+```bash
+# Run CLI commands
+modora --help
+```
+
+### 2. Frontend Setup (MoDora-frontend)
+
+**Environment.**
+Requires Node.js (v20.19.0+ or v22.12.0+).
+
+```bash
+cd MoDora-frontend
+npm install
+```
+
+**Running the Dev Server.**
+```bash
+npm run dev
+```
+
+### 3. Benchmark & Model
 
 **Benchmark.**
-
 Our MMDA Bench is in [MMDA](./datasets/MMDA/test.json).
-
-For DUDE and its samples subset you can refer [DUDE](https://huggingface.co/datasets/jordyvl/DUDE_loader/tree/main/data).
+For DUDE and its samples subset, refer to [DUDE](https://huggingface.co/datasets/jordyvl/DUDE_loader/tree/main/data).
 
 **Model.**
-
-We call GPT-5 as LLM/MLLM via remote API, and locally implement Qwen2.5-VL-7B-Instruct and Qwen3-Embedding-8B. You can change them to more appropriate models according to your performance, cost and hardware requirements.
-
-[Qwen2.5-VL-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-7B-Instruct)
-
-[Qwen3-Embedding-8B](https://huggingface.co/Qwen/Qwen3-Embedding-8B)
-
-Set model configurations in constnts.py according to the model you actually use.
-
-```shell
-cd MoDora-main
-```
-
-```python
-API_KEY = "Your api key"
-API_URL = "Your api url"
-MODEL = "Your model"
-VL_MODEL_PATH = "The path to the local visual model"
-EM_MODEL_PATH = "The path to the local embedding model"
-```
-
-#### 3. Experiment
-
-First set path configurations in constnts.py according to your file paths.
-```python
-BASE_DIR = "../datasets/MMDA" # The path to the dataset
-CACHE_DIR = "cache" # The path to store the components and trees
-LOG_DIR = "log" # The path to store logs
-OUTPUT_DIR = "output" #The path to store execution results
-EVALUATION_DIR = "evaluation" # The path to store evaluation results
-```
-
-Then use the following command to start pipeline.
-```shell
-python pipeline.py
-```
-
-And finally evaluate the result. 
-```shell
-python ai_evaluate.py
-```
-
-After the first complete execution successes, you can also set ENABLE_CACHE as True to let the following experiments start directly from the cache of intermediate results.
-
-```python
-ENABLE_CACHE = True # False:complete test / True:starting from cache
-```
+We support both remote APIs (e.g., GPT-4o) and local models (e.g., Qwen2.5-VL, Qwen3-Embedding).
+Configure model paths and settings in your environment or `config.json`.
