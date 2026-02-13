@@ -1,36 +1,71 @@
 # Python
 __pycache__/
 *.py[cod]
-*.class
+*$py.class
+*.so
 
-# MoDora Directories
+# Environments
+venv/
+.venv/
+env/
+.env
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MoDora-backend/.pip_tmp/
+
+# MoDora Specific
 cache/
 log/
 output/
 evaluation/
-MoDora-backend/src/modora_backend.egg-info
-MoDora-backend/bin
+MoDora-backend/logs/
+MoDora-backend/tmp/
+MoDora-backend/cache*/
+MoDora-backend/exp_*/
+MoDora-backend/nohup.out
+MoDora-backend/failed_pdfs.txt
+MoDora-backend/analyze_logs.py
+MoDora-backend/count_tokens.py
+MoDora-backend/test.sh
+MoDora-backend/debug_*.py
+MoDora-backend/temp_*.json
 
-# Datasets & Large Files
+# Models & Data
+models/
 *.pdf
 datasets/
-models/
+MoDora-backend/src/modora/lab/output/
 
-# Environment variables
-.env
+# Frontend
+MoDora-frontend/node_modules/
+MoDora-frontend/dist/
+MoDora-frontend/.env.local
+MoDora-frontend/.env.development.local
+MoDora-frontend/.env.test.local
+MoDora-frontend/.env.production.local
 
-# OS specific
+# Configuration
+MoDora-backend/configs/local.json
+!MoDora-backend/configs/local.example.json
+
+# IDEs & OS
+.vscode/
+.idea/
 .DS_Store
-
-MoDora-backend/configs/*
-
-MoDora-backend/activate.sh
-
-MoDora-backend/logs/*
-MoDora-backend/tests/*
-MoDora-backend/tmp/*
-MoDora-backend/cache*
-MoDora-backend/exp_*
+.trae/
 *.log
-*.egg
-.trae
+*.swp
+*.bak
