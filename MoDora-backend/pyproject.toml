@@ -9,6 +9,17 @@ requires-python = ">=3.10"
 dependencies = [
   "fastapi",
   "uvicorn",
+  "pydantic",
+  "python-Levenshtein",
+  "tqdm",
+  "numpy",
+  "opencv-python",
+  "openai",
+  "pymupdf",
+  "Pillow",
+  "nvidia-ml-py",
+  "huggingface_hub",
+  "transformers>=4.45.0",
 ]
 
 [project.scripts]

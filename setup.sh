@@ -40,7 +40,6 @@ pip uninstall -y torch torchvision torchaudio nvidia-nccl-cu11 nvidia-nccl-cu12 
 pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 transformers==4.57.3 --index-url https://download.pytorch.org/whl/cu124
 
 echo "📦 Installing MoDora-backend and remaining requirements..."
-pip install nvidia-ml-py
 pip install -e .
 if [ -f "requirements.txt" ]; then
     pip install -r requirements.txt
@@ -72,8 +71,6 @@ pip install "paddlex[ocr]"
 echo "📥 Downloading Qwen model..."
 # Use HF_ENDPOINT for faster download in China if needed
 # export HF_ENDPOINT=https://hf-mirror.com
-# Ensure huggingface_hub is installed for the download script
-pip install huggingface_hub
 python ../download_model.py
 
 echo "✨ Backend setup complete!"
