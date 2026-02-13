@@ -8,8 +8,9 @@ from modora.core.infra.llm import BaseAsyncLLMClient
 
 
 class AsyncMetadataGenerator:
-    """
-    异步元数据生成器，负责为 CCTree 节点生成语义关键词。
+    """Asynchronous metadata generator.
+
+    Responsible for generating semantic keywords for CCTree nodes.
     """
 
     def __init__(
@@ -21,14 +22,14 @@ class AsyncMetadataGenerator:
     ):
         self.llm = llm_client
         self.logger = logger
-        self.n0 = n0  # 叶子节点关键词数量
-        self.growth_rate = growth_rate  # 子节点关键词数量增长率
+        self.n0 = n0  # Number of keywords for leaf nodes
+        self.growth_rate = growth_rate  # Growth rate of keywords for child nodes
 
     def _calculate_keyword_cnt(self, node: CCTreeNode, growth_rate: float = 2.0) -> int:
-        """
-        计算节点的关键词目标数量。
+        """Calculates the target number of keywords for a node.
 
-        基于节点的深度、高度以及子节点的关键词总量，通过对数增长模型计算。
+        Based on the node's depth, height, and the total keywords of child nodes,
+        calculated using a logarithmic growth model.
         """
         if not node.children:
             return self.n0
@@ -41,7 +42,7 @@ class AsyncMetadataGenerator:
         return keyword_cnt
 
     async def _generate_metadata(self, node: CCTreeNode, cnt: int) -> None:
-        """为文本节点生成基础元数据（关键词）。"""
+        """Generates basic metadata (keywords) for a text node."""
         try:
             node.metadata = await self.llm.generate_metadata(node.data, cnt)
         except Exception as e:
@@ -50,7 +51,7 @@ class AsyncMetadataGenerator:
             )
 
     async def _integrate_metadata(self, node: CCTreeNode, cnt: int) -> None:
-        """将当前节点和子节点的元数据进行整合，生成更高级别的摘要。"""
+        """Integrates metadata from the current node and its children to generate a higher-level summary."""
         children = list(node.children.values())
         if not children:
             return
@@ -65,36 +66,35 @@ class AsyncMetadataGenerator:
             )
 
     async def _get_node_metadata(self, node: CCTreeNode, cnt: int) -> None:
-        """根据节点类型获取或生成元数据。"""
+        """Retrieves or generates metadata based on the node type."""
         if node.type == "text":
-            # 文本节点：先生成，再整合子节点信息
+            # Text node: generate first, then integrate child node information
             await self._generate_metadata(node, cnt)
             await self._integrate_metadata(node, cnt)
         elif node.type == "root":
-            # 根节点：仅整合子节点信息
+            # Root node: integrate child node information only
             await self._integrate_metadata(node, cnt)
         elif node.metadata is None or node.metadata == "":
-            # 其他节点：默认使用原始数据
+            # Other nodes: use original data by default
             node.metadata = node.data
 
     async def _dfs(self, node: CCTreeNode, parent: CCTreeNode | None = None) -> None:
-        """深度优先遍历，从叶子节点向上生成元数据。"""
+        """Depth-first traversal, generating metadata from leaf nodes upwards."""
         if parent is not None:
             node.depth = parent.depth + 1
 
-        # 递归处理子节点
+        # Recursively process child nodes
         for child in list(node.children.values()):
             await self._dfs(child, node)
             node.height = max(node.height, child.height + 1)
 
-        # 计算当前节点的关键词数量并生成元数据
+        # Calculate keyword count for the current node and generate metadata
         node.keyword_cnt = self._calculate_keyword_cnt(node, self.growth_rate)
         await self._get_node_metadata(node, node.keyword_cnt)
 
     async def get_metadata(self, cctree: CCTree) -> None:
-        """
-        获取组件树的元数据。
+        """Retrieves metadata for the component tree.
 
-        通过 DFS 遍历整个树，利用 LLM 为每个节点生成语义化的元数据摘要。
+        Traverses the entire tree via DFS, using LLM to generate semantic metadata summaries for each node.
         """
         await self._dfs(cctree.root, None)

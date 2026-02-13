@@ -13,9 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class QAService:
-    """
-    QA 服务类，负责协调检索、推理和验证流程。
-    """
+    """QA service class, responsible for coordinating retrieval, reasoning, and verification processes."""
 
     def __init__(
         self,
@@ -29,7 +27,7 @@ class QAService:
         self.settings = settings or Settings()
         self.retriever_settings = retriever_settings or self.settings
 
-        # 兼容旧接口：mode 未拆分时，同时作用于 QA 与 Retriever。
+        # Backward compatibility: when mode is not split, it applies to both QA and Retriever.
         qa_mode = qa_mode or mode
         retriever_mode = retriever_mode or mode
 
@@ -44,13 +42,18 @@ class QAService:
         self.location_retriever = LocationRetriever()
 
     async def extract_location(self, query: str) -> Tuple[List[int], List[float]]:
-        """
-        从查询语句中提取位置信息（页码和坐标）。
+        """Extracts location information (page numbers and coordinates) from the query string.
+
+        Args:
+            query: The search query string.
+
+        Returns:
+            A tuple containing a list of page numbers and a list of coordinate floats.
         """
         prompt = location_extraction_prompt.format(query=query)
         response = await self.remote_llm.generate_text(prompt)
         try:
-            # 预期格式: "Page: [<page1>, <page2>]; Position: [<row>, <column>]"
+            # Expected format: "Page: [<page1>, <page2>]; Position: [<row>, <column>]"
             page_numbers = response.split("Page:")[1].split(";")[0].strip()
             position = response.split("Position:")[1].strip()
             page_list = ast.literal_eval(page_numbers)
@@ -64,12 +67,10 @@ class QAService:
     def _format_retrieved_docs(
         self, result: RetrievalResult, file_names: list[str] | None = None
     ) -> list[dict]:
+        """Organizes retrieved evidence documents.
+
+        Groups bboxes from the same page of the same file into a list and associates them with corresponding text content.
         """
-        整理检索到的证据文档。
-        将同一个文件同一页的 bbox 合并到一个列表中，并关联对应的文本内容。
-        """
-        if not result.locations:
-            return []
 
         # (file_name, page) -> {bboxes, content}
         grouped_data: dict[tuple[str | None, int], dict] = {}
@@ -81,10 +82,10 @@ class QAService:
 
             key = (fn, loc.page)
             if key not in grouped_data:
-                # 查找该节点对应的文本
+                # Find the text corresponding to this node
                 content = ""
                 for path, text in result.text_map.items():
-                    # 如果 path 中包含文件名或 path 本身就是我们要找的内容
+                    # If path contains filename or path itself is what we are looking for
                     if fn and fn in path:
                         content = text
                         break
@@ -110,18 +111,25 @@ class QAService:
         query: str,
         source_path: str | dict[str, str],
     ) -> dict:
-        """
-        执行完整的 QA 流程：提取位置 -> 检索 -> 推理 -> 验证/回退。
+        """Executes the complete QA workflow: location extraction -> retrieval -> reasoning -> verification/fallback.
+
+        Args:
+            tree (CCTree): The concept tree.
+            query (str): The user query.
+            source_path (str | dict[str, str]): Path to the source document(s).
+
+        Returns:
+            dict: The QA response and trace information.
         """
         page_list, position_vector = await self.extract_location(query)
 
         result = RetrievalResult()
 
-        # 1. 检索
+        # 1. Retrieval
         if -1 in page_list and position_vector == [-1.0, -1.0]:
             result = await self.semantic_retriever.retrieve(tree, query, source_path)
         else:
-            # 位置检索目前仅支持单文档，后续可扩展
+            # Location retrieval currently only supports single documents; can be extended later
             actual_source = (
                 list(source_path.values())[0]
                 if isinstance(source_path, dict)
@@ -131,7 +139,7 @@ class QAService:
                 tree, page_list, position_vector, actual_source
             )
 
-        # 2. 处理结果并推理
+        # 2. Process results and reason
         schema = tree.get_structure()
         answer = "None"
         trace = [
@@ -147,7 +155,7 @@ class QAService:
 
         try:
             if result.locations or result.text_map:
-                # 根据精确位置裁剪图像
+                # Crop images based on precise locations
                 images = self.cropper.crop_image(
                     source_path, result.locations, file_names=file_names
                 )
@@ -156,8 +164,8 @@ class QAService:
                     f"Reasoning with {len(result.text_map)} text segments and {len(images)} images",
                     extra={
                         "text_keys": list(result.text_map.keys()),
-                        "locations_count": len(result.locations)
-                    }
+                        "locations_count": len(result.locations),
+                    },
                 )
 
                 answer = await self.remote_llm.reason_retrieved(
@@ -174,10 +182,10 @@ class QAService:
             logger.error(f"Error in reasoning: {e}", exc_info=True)
             answer = "None"
 
-        # 3. 验证与回退
+        # 3. Verification and fallback
         if not await self.remote_llm.check_answer(query, answer):
             trace.append({"step": "fallback", "reason": "verification_failed"})
-            # 回退到整页推理 (多文档模式下暂不支持全页回退，或者只对第一文档做)
+            # Fallback to whole-page reasoning (multi-document mode does not support whole-page fallback yet, or only for the first document)
             if isinstance(source_path, str):
                 whole_doc = self.cropper.pdf_to_base64(source_path)
                 clean_tree_data = tree.get_clean_structure()
@@ -185,14 +193,16 @@ class QAService:
                     query=query, data=str(clean_tree_data), image=whole_doc
                 )
             else:
-                logger.warning("Multi-doc mode does not support whole-page fallback yet")
+                logger.warning(
+                    "Multi-doc mode does not support whole-page fallback yet"
+                )
         else:
             trace.append({"step": "verification", "status": "passed"})
 
-        # 整理返回的证据文档
+        # Organize the returned evidence documents
         retrieved_docs = self._format_retrieved_docs(result, file_names=file_names)
 
-        # 更新树节点的 impact 值
+        # Update the impact values of tree nodes
         all_impact_updates = {}
         for path in result.text_map.keys():
             updates = tree.update_impact(path)

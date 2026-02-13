@@ -16,6 +16,7 @@ from modora.api.v1.models import ChatRequest, ChatResponse, RetrievalItem
 router = APIRouter(tags=["chat"])
 logger = logging.getLogger("modora.api")
 
+
 def _settings_from_payload(
     payload: dict[str, Any] | None,
 ) -> tuple[Settings, str | None, Settings, str | None]:
@@ -28,10 +29,13 @@ def _settings_from_payload(
     )
     return qa_settings, qa_mode, retriever_settings, retriever_mode
 
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     settings_payload = request.settings or {}
-    file_names = request.file_names or ([] if not request.file_name else [request.file_name])
+    file_names = request.file_names or (
+        [] if not request.file_name else [request.file_name]
+    )
     if not file_names:
         raise HTTPException(status_code=400, detail="File name(s) required")
 
@@ -40,19 +44,19 @@ async def chat_endpoint(request: ChatRequest):
     )
     paths = resolve_paths(app_settings)
 
-    # 加载所有文档的树结构
+    # Load tree structures for all documents
     trees: dict[str, CCTree] = {}
     source_paths: dict[str, str] = {}
-    
+
     for fn in file_names:
         s_path = paths.docs_dir / fn
         if not s_path.exists():
             continue
-        
+
         t_path = paths.doc_cache_dir(fn) / "tree.json"
         if not t_path.exists():
             continue
-            
+
         try:
             t_dict = json.loads(t_path.read_text(encoding="utf-8"))
             trees[fn] = CCTree.from_dict(t_dict)
@@ -63,14 +67,14 @@ async def chat_endpoint(request: ChatRequest):
     if not trees:
         raise HTTPException(status_code=404, detail="No valid document trees found.")
 
-    # 根据文档数量决定是单文档还是多文档
+    # Decide between single or multi-document based on the number of documents
     if len(trees) > 1:
-        # 多文档：合并树
+        # Multi-document: Merge trees
         cctree = CCTree.merge_multi_trees(trees)
         source_arg = source_paths
-        primary = "multi_doc_session" # 仅作为标识
+        primary = "multi_doc_session"  # For identification only
     else:
-        # 单文档：保持原样
+        # Single document: Keep as is
         primary = list(trees.keys())[0]
         cctree = trees[primary]
         source_arg = source_paths[primary]
@@ -86,15 +90,15 @@ async def chat_endpoint(request: ChatRequest):
     try:
         # Use the correct method name 'qa' from core QAService
         qa_result = await qa_service.qa(cctree, request.query, source_arg)
-        
-        # 保存更新后的 impact 值到各文档的 tree.json
+
+        # Save updated impact values to each document's tree.json
         for fn, tree in trees.items():
             t_path = paths.doc_cache_dir(fn) / "tree.json"
             try:
                 tree.save_json(str(t_path))
             except Exception as e:
                 logger.warning(f"Failed to save updated tree for {fn}: {e}")
-                
+
     except Exception as e:
         logger.error(f"QA process failed: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"QA process failed: {e}")

@@ -31,7 +31,14 @@ LEGACY_MODEL_KEY_TO_MODULE = {
 
 
 def normalize_ui_settings(payload: dict[str, Any] | None) -> dict[str, Any]:
-    """标准化前端 settings 载荷，同时兼容 v1/v2。"""
+    """Standardize frontend settings payload while maintaining compatibility with v1/v2.
+
+    Args:
+        payload (dict[str, Any] | None): The settings payload from the frontend.
+
+    Returns:
+        dict[str, Any]: The normalized settings dictionary.
+    """
     if not isinstance(payload, dict):
         return {}
 
@@ -109,7 +116,15 @@ def get_pipeline_config(
     payload: dict[str, Any] | None,
     module_key: str,
 ) -> dict[str, str]:
-    """获取指定模块的配置，优先 v2 pipelines，其次回退 v1。"""
+    """Get configuration for the specified module, prioritizing v2 pipelines and falling back to v1.
+
+    Args:
+        payload (dict[str, Any] | None): The settings payload.
+        module_key (str): The key for the module (e.g., 'retriever', 'qaService').
+
+    Returns:
+        dict[str, str]: The configuration dictionary for the module.
+    """
     cfg = normalize_ui_settings(payload)
     if module_key not in MODULE_KEYS:
         return {}
@@ -127,7 +142,18 @@ def settings_from_ui_payload(
     model_key: str | None = None,
     module_key: str | None = None,
 ) -> tuple[Settings, str | None, dict[str, Any]]:
-    """从前端 settings 载荷构造后端 Settings 覆盖值。"""
+    """Construct backend Settings overrides from frontend settings payload.
+
+    Args:
+        base (Settings): The base Settings instance.
+        payload (dict[str, Any] | None): The settings payload from the UI.
+        model_key (str | None): Legacy model key.
+        module_key (str | None): Module key for pipeline config.
+
+    Returns:
+        tuple[Settings, str | None, dict[str, Any]]: A tuple containing the
+            updated Settings, the selected mode, and the normalized config.
+    """
     cfg = normalize_ui_settings(payload)
     overrides: dict[str, Any] = {}
 
@@ -141,9 +167,7 @@ def settings_from_ui_payload(
     if resolved_module is None and model_key:
         resolved_module = LEGACY_MODEL_KEY_TO_MODULE.get(model_key)
 
-    pipeline_cfg = (
-        get_pipeline_config(cfg, resolved_module) if resolved_module else {}
-    )
+    pipeline_cfg = get_pipeline_config(cfg, resolved_module) if resolved_module else {}
     selected_mode = pipeline_cfg.get("mode") or cfg.get("selectedMode")
 
     base_url = pipeline_cfg.get("baseUrl") or cfg.get("baseUrl")
@@ -157,7 +181,9 @@ def settings_from_ui_payload(
     if not model_name and model_key and cfg.get(model_key):
         model_name = str(cfg[model_key]).strip()
     if not model_name:
-        model_name = str(cfg.get("qaModel") or cfg.get("treeModel") or "").strip() or None
+        model_name = (
+            str(cfg.get("qaModel") or cfg.get("treeModel") or "").strip() or None
+        )
 
     if model_name and selected_mode != "local":
         overrides["api_model"] = model_name
@@ -167,7 +193,15 @@ def settings_from_ui_payload(
 
 
 def resolve_llm_mode(config: dict[str, Any] | None, key: str) -> str | None:
-    """从配置字典中解析 LLM 模式。"""
+    """Parse LLM mode from the configuration dictionary.
+
+    Args:
+        config (dict[str, Any] | None): The configuration dictionary.
+        key (str): The key to resolve the mode for.
+
+    Returns:
+        str | None: The resolved mode ('local' or 'remote'), or None.
+    """
     module = key
     if key in LEGACY_MODEL_KEY_TO_MODULE:
         module = LEGACY_MODEL_KEY_TO_MODULE[key]
@@ -182,7 +216,16 @@ def resolve_llm_mode(config: dict[str, Any] | None, key: str) -> str | None:
 def settings_with_overrides(
     base: Settings, overrides: dict[str, Any] | None, *, api_model: str | None = None
 ) -> Settings:
-    """使用覆盖参数创建新的 Settings 实例。"""
+    """Create a new Settings instance with override parameters.
+
+    Args:
+        base (Settings): The base Settings instance.
+        overrides (dict[str, Any] | None): Dictionary of overrides (e.g., apiKey, baseUrl).
+        api_model (str | None): Optional API model name override.
+
+    Returns:
+        Settings: A new Settings instance with applied overrides.
+    """
     payload: dict[str, Any] = {}
     if overrides:
         if overrides.get("apiKey"):

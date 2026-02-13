@@ -23,9 +23,7 @@ def _generate_auto_tags(
     pages: int,
     depth: int,
 ) -> list[str]:
-    """
-    生成基于统计特征的自动标签（与旧版规则一致）。
-    """
+    """Generates automatic tags based on statistical features (consistent with legacy rules)."""
     tags: list[str] = []
 
     if pages > 20:
@@ -64,7 +62,7 @@ async def process_document_task(
 
     try:
         source_p = Path(source_path)
-        # 1. 优先使用 OCR 模型；不可用时退化到 PDF 文本提取，保证流程可继续。
+        # 1. Prioritize using the OCR model; fallback to PDF text extraction when unavailable to ensure the process continues.
         model = None
         try:
             model = get_ocr_model(
@@ -80,12 +78,14 @@ async def process_document_task(
                 pdf_blocks: list[OCRBlock] = []
                 for page_blocks in model.predict_iter(str(source_p)):
                     pdf_blocks.extend(page_blocks)
-                ocr_res = OcrExtractResponse(source=f"file:{source_p}", blocks=pdf_blocks)
+                ocr_res = OcrExtractResponse(
+                    source=f"file:{source_p}", blocks=pdf_blocks
+                )
             except Exception as e:
                 logger.warning(f"OCR predict failed, using PDF text fallback: {e}")
                 ocr_res = extract_pdf_blocks(str(source_p))
 
-        # 2. 缓存 OCR 结果
+        # 2. Cache OCR results
         cache_dir = paths.doc_cache_dir(filename)
         cache_dir.mkdir(parents=True, exist_ok=True)
         (cache_dir / "ocr.json").write_text(
@@ -93,14 +93,14 @@ async def process_document_task(
             encoding="utf-8",
         )
 
-        # 3. 调用 preprocess.py 中的两个核心编排函数
-        # 得到 ComponentPack
+        # 3. Call the two core orchestration functions in preprocess.py
+        # Get ComponentPack
         cp = await get_components_async(
             ocr_res, logger, settings=settings, config=config
         )
         cp.save_json(str(cache_dir / "cp.json"))
 
-        # 得到最终的 CCTree
+        # Get the final CCTree
         tree = await build_tree_async(
             cp,
             logger,
@@ -109,20 +109,20 @@ async def process_document_task(
             config=config,
         )
 
-        # 4. 语义标签 (直接从根节点的 metadata 中提取)
+        # 4. Semantic tags (extracted directly from root node metadata)
         raw_metadata = tree.root.metadata or ""
         semantic_tags = [t.strip() for t in raw_metadata.split(";") if t.strip()][:5]
         if not semantic_tags:
             semantic_tags = ["Document"]
 
-        # 5. 持久化 Tree
+        # 5. Persist Tree
         tree_path = cache_dir / "tree.json"
         tree_path.write_text(
             json.dumps(tree.to_dict(), ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
 
-        # 6. 更新 KB 和统计信息
+        # 6. Update KB and statistical information
         kb_path = paths.cache_dir / "knowledge_base.json"
         kb = KnowledgeBaseManager(kb_path)
 

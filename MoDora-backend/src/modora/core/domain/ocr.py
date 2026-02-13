@@ -4,12 +4,11 @@ from pydantic import BaseModel
 
 
 class OCRBlock(BaseModel):
-    """
-    结构化 OCR 的单个 block。
+    """A single block of structured OCR.
 
     Attributes:
-        page_id: 从 1 开始的页号
-        bbox: [x0, y0, x1, y1]，与 PDF 坐标系对齐（用于后续裁剪/渲染）
+        page_id: Page number starting from 1.
+        bbox: [x0, y0, x1, y1], aligned with the PDF coordinate system (used for subsequent cropping/rendering).
     """
 
     page_id: int
@@ -19,15 +18,15 @@ class OCRBlock(BaseModel):
     content: str
 
     def is_title(self) -> bool:
-        """标题类 block（会触发新章节切分）。"""
+        """Title type block (triggers new chapter splitting)."""
         return self.label in ["title", "paragraph_title", "doc_title"]
 
     def is_figure(self) -> bool:
-        """非文本类 block（用于 enrichment：image/chart/table）。"""
+        """Non-text block (used for enrichment: image/chart/table)."""
         return self.label in ["image", "chart", "table"]
 
     def is_figure_title(self) -> bool:
-        """图片标题或视觉脚注（可能属于图/表的说明文字）。"""
+        """Figure title or visual footnote (may belong to figure/table caption)."""
         return self.label in ["figure_title", "vision_footnote"]
 
     def is_header(self) -> bool:
@@ -44,11 +43,11 @@ class OCRBlock(BaseModel):
 
 
 class OcrExtractResponse(BaseModel):
-    """
-    OCR 输出.
+    """OCR output.
+
     Attributes:
-        source: 输入的 pdf 路径.
-        blocks: 结构化 OCR 结果，每个 block 包含页号、边界框、标签和内容。
+        source: Input PDF path.
+        blocks: Structured OCR results, each block containing page number, bounding box, label, and content.
     """
 
     source: str

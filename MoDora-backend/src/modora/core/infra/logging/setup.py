@@ -10,29 +10,31 @@ from typing import Any
 from modora.core.infra.logging.context import get_request_id, get_run_id
 from modora.core.settings import Settings
 
-"""
-日志配置模块
+"""Logging Configuration Module.
 
-本模块提供了可配置的、支持结构化输出和上下文注入的日志系统。
-主要功能：
-1. 支持控制台和滚动文件两种日志输出方式
-2. 支持纯文本和JSON两种日志格式
-3. 自动为每条日志注入 request_id 和运行 run_id
-4. 提供自动化的日志文件轮转管理
+This module provides a configurable logging system that supports structured output
+and context injection.
 
-使用方式：
+Key Features:
+1. Supports console and rotating file output.
+2. Supports plain text and JSON log formats.
+3. Automatically injects request_id and run_id into each log entry.
+4. Provides automated log file rotation management.
+
+Usage:
     from modora.core.settings import Settings
     from modora.core.infra.logging.setup import configure_logging
     
-    settings = Settings()  # 加载配置
-    configure_logging(settings)  # 配置日志系统
+    settings = Settings()  # Load configuration
+    configure_logging(settings)  # Configure the logging system
 """
 
 
 class _ContextFilter(logging.Filter):
-    """日志上下文过滤器
+    """Logging context filter.
 
-    此过滤器会在每条日志记录被处理前调用，为其注入 request_id 和 run_id
+    This filter is called before each log record is processed to inject
+    request_id and run_id.
     """
 
     def filter(self, record: logging.LogRecord) -> bool:
@@ -66,19 +68,26 @@ _STANDARD_LOG_RECORD_ATTRS = {
 
 
 def _extract_extras(record: logging.LogRecord) -> dict[str, Any]:
-    """从日志记录中提取额外字段
+    """Extracts extra fields from the log record.
 
-    此函数会从日志记录中提取所有非标准字段，用于在JSON日志中包含额外上下文信息。
+    This function extracts all non-standard fields from the log record for
+    inclusion as additional context in JSON logs.
 
     Args:
-        record: 待处理的日志记录对象
+        record: The log record object to process.
 
     Returns:
-        包含所有额外字段的字典，键为字段名，值为对应字段值
+        A dictionary containing all extra fields, where keys are field names
+        and values are the corresponding field values.
     """
     extras: dict[str, Any] = {}
     for k, v in record.__dict__.items():
-        if k in _STANDARD_LOG_RECORD_ATTRS or k in {"request_id", "run_id", "message", "asctime"}:
+        if k in _STANDARD_LOG_RECORD_ATTRS or k in {
+            "request_id",
+            "run_id",
+            "message",
+            "asctime",
+        }:
             continue
         if k.startswith("_"):
             continue
@@ -87,15 +96,15 @@ def _extract_extras(record: logging.LogRecord) -> dict[str, Any]:
 
 
 _REST = "\x1b[0m"
-_COLOR_TIME = "\x1b[90m"     # 灰色
-_COLOR_NAME = "\x1b[35m"     # 紫色
-_COLOR_CONTEXT = "\x1b[90m"  # 灰色
+_COLOR_TIME = "\x1b[90m"  # Gray
+_COLOR_NAME = "\x1b[35m"  # Purple
+_COLOR_CONTEXT = "\x1b[90m"  # Gray
 _COLOR_BY_LEVEL = {
-    logging.DEBUG: "\x1b[34m",  # 蓝色
-    logging.INFO: "\x1b[32m",  # 绿色
-    logging.WARNING: "\x1b[33m",  # 黄色
-    logging.ERROR: "\x1b[31m",  # 红色
-    logging.CRITICAL: "\x1b[1;31m",  # 粗体红
+    logging.DEBUG: "\x1b[34m",  # Blue
+    logging.INFO: "\x1b[32m",  # Green
+    logging.WARNING: "\x1b[33m",  # Yellow
+    logging.ERROR: "\x1b[31m",  # Red
+    logging.CRITICAL: "\x1b[1;31m",  # Bold Red
 }
 
 
@@ -105,14 +114,16 @@ class _TextFormater(logging.Formatter):
         self._color = color
 
     def format(self, record: logging.LogRecord) -> str:
-        if not self._color or not (hasattr(sys.stderr, "isatty") and sys.stderr.isatty()):
+        if not self._color or not (
+            hasattr(sys.stderr, "isatty") and sys.stderr.isatty()
+        ):
             base = super().format(record)
             extras = _extract_extras(record)
             if extras:
                 base = f"{base} extra={json.dumps(extras, ensure_ascii=False)}"
             return base
 
-        # 带有颜色的格式化
+        # Formatted with color
         asctime = self.formatTime(record, self.datefmt)
         levelname = record.levelname
         name = record.name
@@ -122,8 +133,8 @@ class _TextFormater(logging.Formatter):
 
         level_color = _COLOR_BY_LEVEL.get(record.levelno, _REST)
 
-        # 构建彩色字符串
-        # 格式: %(asctime)s %(levelname)s %(name)s [req=%(request_id)s run=%(run_id)s] %(message)s
+        # Build colored string
+        # Format: %(asctime)s %(levelname)s %(name)s [req=%(request_id)s run=%(run_id)s] %(message)s
         formatted = (
             f"{_COLOR_TIME}{asctime}{_REST} "
             f"{level_color}{levelname:<8}{_REST} "
@@ -152,9 +163,10 @@ class _TextFormater(logging.Formatter):
 
 
 class _JsonFormatter(logging.Formatter):
-    """JSON格式日志格式化器
+    """JSON log formatter.
 
-    将日志记录转换为结构化JSON字符串，便于解析和统计
+    Converts log records into structured JSON strings for easy parsing and
+    statistical analysis.
     """
 
     def format(self, record: logging.LogRecord) -> str:
@@ -165,7 +177,7 @@ class _JsonFormatter(logging.Formatter):
             "request_id": getattr(record, "request_id", "-"),
             "run_id": getattr(record, "run_id", "-"),
         }
-        # 如果存在异常信息，将其格式化后加入载荷
+        # Format and add exception info to the payload if it exists
         extras = _extract_extras(record)
         if extras:
             payload["extras"] = extras
@@ -175,20 +187,22 @@ class _JsonFormatter(logging.Formatter):
 
 
 def configure_logging(settings: Settings) -> None:
-    """配置应用程序的日志系统
+    """Configures the application's logging system.
 
-    这是本模块的主入口函数。它会：
-    1. 清理现有的日志处理器
-    2. 根据配置设置日志级别
-    3. 配置控制台处理器（始终启用）
-    4. 配置文件处理器（如果启用）
-    5. 为所有处理器添加上下文过滤器和适当的格式化器
+    This is the main entry point for the module. It performs the following:
+    1. Clears existing log handlers.
+    2. Sets the log level based on configuration.
+    3. Configures the console handler (always enabled).
+    4. Configures the file handler (if enabled).
+    5. Adds context filters and appropriate formatters to all handlers.
 
     Args:
-        settings: 应用程序配置对象，包含日志相关的所有设置
+        settings: The application settings object, containing all logging
+            configurations.
 
     Note:
-        此函数会修改全局的根日志记录器(root logger)，影响整个应用程序的日志行为。
+        This function modifies the global root logger, affecting the logging
+        behavior of the entire application.
     """
     root = logging.getLogger()
     for h in list(root.handlers):
@@ -203,7 +217,7 @@ def configure_logging(settings: Settings) -> None:
 
     console = logging.StreamHandler()
     console.addFilter(context_filter)
-    # 一直以text格式打印到控制台
+    # Always print to console in text format
     console.setFormatter(_TextFormater(fmt_text, datefmt=datefmt, color=True))
     root.addHandler(console)
 

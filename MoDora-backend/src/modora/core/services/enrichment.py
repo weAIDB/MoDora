@@ -6,9 +6,10 @@ from modora.core.interfaces.media import ImageProvider
 
 
 class EnrichmentService:
-    """
-    信息增强服务。
-    负责协调图片提供者和 LLM 客户端，对文档中的非文本组件（图片、图表、表格）进行信息增强（生成标题、元数据和内容描述）。
+    """Information enrichment service.
+
+    Responsible for coordinating image providers and LLM clients to perform information enrichment
+    (generating titles, metadata, and content descriptions) for non-text components (images, charts, tables) in documents.
     """
 
     def __init__(
@@ -17,21 +18,26 @@ class EnrichmentService:
         image_provider: ImageProvider,
         max_workers: int = 4,
     ):
-        """
-        初始化信息增强服务。
+        """Initializes the information enrichment service.
 
         Args:
-            llm_client: LLM 客户端实例，用于生成文本标注
-            image_provider: 图片提供者实例，用于获取组件截图
-            max_workers: 并发处理的最大线程数
+            llm_client: LLM client instance for generating text annotations.
+            image_provider: Image provider instance for obtaining component screenshots.
+            max_workers: Maximum number of workers for concurrent processing.
         """
         self.llm = llm_client
         self.media = image_provider
         self.max_workers = max_workers
 
     async def enrich_async(self, co_pack: ComponentPack, source: str) -> ComponentPack:
-        """
-        异步执行增强流程。
+        """Asynchronously executes the enrichment process.
+
+        Args:
+            co_pack: The component pack to enrich.
+            source: The source document path or identifier.
+
+        Returns:
+            ComponentPack: The enriched component pack.
         """
         tasks = []
         for co in co_pack.body:
@@ -43,12 +49,12 @@ class EnrichmentService:
 
         async def _process_one(co):
             try:
-                # 获取组件截图（IO 操作，跑在线程池）
+                # Capture component screenshot (IO operation, runs in thread pool)
                 loop = asyncio.get_running_loop()
                 base64_img = await loop.run_in_executor(
                     None, self.media.crop_image, source, co
                 )
-                # 调用 LLM 生成标注（异步）
+                # Invoke LLM to generate annotations (Asynchronous)
                 title, metadata, data = await self.llm.generate_annotation_async(
                     base64_img, co.type
                 )
@@ -56,7 +62,7 @@ class EnrichmentService:
             except Exception:
                 return None
 
-        # 使用 asyncio.gather 并发处理
+        # Use asyncio.gather for concurrent processing
         sem = asyncio.Semaphore(self.max_workers)
 
         async def _sem_process(co):

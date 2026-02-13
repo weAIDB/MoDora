@@ -14,9 +14,9 @@ _llm_local_procs: dict[tuple[str, int], subprocess.Popen] = {}
 
 
 def _http_get(url: str, timeout_s: float) -> tuple[int, str]:
-    """
-    发送 HTTP GET 请求，用于健康检查。
-    捕获各类异常（包括超时），确保不抛出异常中断主流程。
+    """Send HTTP GET request for health check.
+
+    Catches various exceptions (including timeouts) to ensure main process is not interrupted.
     """
     req = urllib.request.Request(url, method="GET")
     try:
@@ -35,16 +35,15 @@ def _http_get(url: str, timeout_s: float) -> tuple[int, str]:
 
 
 def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
-    """
-    确保本地 LLM 服务（lmdeploy）已启动。
+    """Ensure local LLM service (lmdeploy) is started.
 
-    逻辑：
-    1. 检查配置，如果未启用 llm_local_model 则直接返回。
-    2. 解析 llm_local_instances 配置，确定需要启动的实例列表。
-    3. 对每个实例：
-       - 检查是否已有进程在运行且健康（通过 /v1/models 接口）。
-       - 如果端口未被占用且无响应，则启动新的 lmdeploy 子进程。
-    4. 轮询等待所有实例启动就绪（直到超时）。
+    Logic:
+    1. Check configuration. If llm_local_model is not enabled, return immediately.
+    2. Parse llm_local_instances configuration to determine the list of instances to start.
+    3. For each instance:
+       - Check if a process is already running and healthy (via /v1/models interface).
+       - If the port is not occupied and there's no response, start a new lmdeploy child process.
+    4. Poll and wait for all instances to be ready (until timeout).
     """
     global _llm_local_procs
 

@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+
 @dataclass(frozen=True)
 class BuildTreeJob:
-    """构建树任务的数据类"""
+    """Data class for tree construction tasks."""
+
     num: int
     pdf_path: Path
     co_path: Path
@@ -11,19 +13,23 @@ class BuildTreeJob:
     title_path: Path
     tree_path: Path
 
+
 @dataclass
 class QAJob:
-    """QA 任务的数据类，包含问题、PDF 路径、树路径和答案等信息"""
+    """Data class for QA tasks, containing information such as questions, PDF paths, tree paths, and answers."""
+
     question_id: int
     question: str
     pdf_path: Path
     tree_path: Path
-    answer: str  # Ground truth (标准答案)
+    answer: str  # Ground truth (standard answer)
     output_path: Path
+
 
 @dataclass(frozen=True)
 class PreprocessJob:
-    """预处理任务的数据类"""
+    """Data class for preprocessing tasks."""
+
     idx: int
     pdf_path: str
     out_dir: str

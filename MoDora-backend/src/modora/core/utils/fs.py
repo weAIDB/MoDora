@@ -2,28 +2,39 @@ import re
 from pathlib import Path
 from typing import Iterator
 
+
 def natural_key(text: str) -> list[str | int]:
-    """
-    用于文件名自然排序的 key 函数。
-    例如：['1.pdf', '2.pdf', '10.pdf'] 而不是 ['1.pdf', '10.pdf', '2.pdf']
+    """Key function for natural sorting of filenames.
+
+    Example:
+        ['1.pdf', '2.pdf', '10.pdf'] instead of ['1.pdf', '10.pdf', '2.pdf']
+
+    Args:
+        text (str): The filename or text to be keyed.
+
+    Returns:
+        list[str | int]: A list of strings and integers for sorting.
     """
     return [int(c) if c.isdigit() else c.lower() for c in re.split(r"(\d+)", text)]
 
+
 def iter_pdf_paths(dataset_dir: str | Path) -> Iterator[Path]:
-    """
-    迭代目录下的所有 PDF 文件，并按自然顺序排序。
+    """Iterate through all PDF files in the directory and sort them in natural order.
+
+    Args:
+        dataset_dir (str | Path): Path to the directory containing PDF files.
+
+    Yields:
+        Iterator[Path]: Iterator of Path objects for the PDF files.
     """
     p = Path(dataset_dir)
     if not p.is_dir():
         return
-    
-    # 查找所有 .pdf 文件（不区分大小写）
-    pdf_paths = [
-        f for f in p.iterdir() 
-        if f.is_file() and f.suffix.lower() == ".pdf"
-    ]
-    
-    # 按自然顺序排序
+
+    # Find all .pdf files (case-insensitive)
+    pdf_paths = [f for f in p.iterdir() if f.is_file() and f.suffix.lower() == ".pdf"]
+
+    # Sort in natural order
     pdf_paths.sort(key=lambda x: natural_key(x.name))
-    
+
     yield from pdf_paths

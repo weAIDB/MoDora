@@ -11,8 +11,9 @@ from modora.core.interfaces.media import ImageProvider
 
 
 class AsyncLevelGenerator:
-    """
-    异步层级生成器，负责利用 LLM 纠正或生成标题的层级结构（Markdown 风格）。
+    """Asynchronous hierarchy generator.
+
+    Responsible for using LLM to correct or generate title hierarchies (Markdown style).
     """
 
     def __init__(self, llm_client: AsyncLocalLLMClient, image_provider: ImageProvider):
@@ -20,7 +21,7 @@ class AsyncLevelGenerator:
         self.media = image_provider
 
     def _get_title_level(self, title: str) -> int:
-        """从带有 # 的标题字符串中解析出层级深度（例如 ### 标题 -> 3）。"""
+        """Parses hierarchy depth from a title string with # (e.g., ### Title -> 3)."""
         level = 0
         for char in title.lstrip():
             if char == "#":
@@ -36,36 +37,35 @@ class AsyncLevelGenerator:
         config: Settings,
         logger: logging.Logger,
     ) -> ComponentPack:
-        """
-        利用 LLM 为组件包中的文本标题生成或纠正层级信息。
+        """Uses LLM to generate or correct hierarchy information for text titles in the component pack.
 
-        参数:
-            source_path: PDF 源文件路径。
-            cp: 待处理的组件包。
-            config: 系统配置。
-            logger: 日志实例。
+        Args:
+            source_path: Path to the PDF source file.
+            cp: The component pack to process.
+            config: System settings.
+            logger: Logger instance.
 
-        返回:
-            ComponentPack: 更新了 title_level 的组件包。
+        Returns:
+            ComponentPack: Component pack with updated title_level.
         """
         text_components = [co for co in cp.body if co.type == "text"]
         located = [co for co in text_components if co.location]
         if not located:
             return cp
 
-        # 准备待处理的标题列表和对应的位置信息
+        # Prepare the list of titles to be processed and their corresponding location information
         title_list = [co.title for co in located]
         title_bbox_list = [co.location[0] for co in located]
 
-        # 裁剪标题区域的图像，辅助 LLM 进行视觉层级判断
+        # Crop the title area image to assist the LLM in visual hierarchy judgment
         image = self.media.crop_image(source_path, title_bbox_list)
 
         leveled_title: list[str] = []
         max_attempts = 3
-        # 带有重试机制的 LLM 调用
+        # LLM call with retry mechanism
         for attempt in range(1, max_attempts + 1):
             try:
-                # 调用本地多模态 LLM 生成带有 Markdown 层级的标题
+                # Invoke local multimodal LLM to generate titles with Markdown hierarchy
                 raw = await self.llm.generate_levels(title_list, image)
                 parsed = ast.literal_eval(raw)
                 if isinstance(parsed, list):
@@ -80,7 +80,7 @@ class AsyncLevelGenerator:
                 if attempt < max_attempts:
                     await asyncio.sleep(0.2 * attempt)
 
-        # 将生成的层级信息回填到组件中
+        # Fill the generated hierarchy information back into the components
         for co, title in zip(located, leveled_title):
             co.title_level = self._get_title_level(title)
 

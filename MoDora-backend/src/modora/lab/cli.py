@@ -13,8 +13,9 @@ from modora.lab.commands import (
     register_evaluate,
     register_health,
     register_preprocess,
-    register_qa
+    register_qa,
 )
+
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="modora")

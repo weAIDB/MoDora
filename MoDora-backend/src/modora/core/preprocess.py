@@ -23,27 +23,28 @@ async def get_components_async(
     settings: Settings | None = None,
     config: dict | None = None,
 ) -> ComponentPack:
+    """Asynchronously reassembles and enhances flat OCR-extracted Block lists into a structured ComponentPack.
+
+    This function orchestrates the following workflow:
+    1. Uses StructureAnalyzer to merge elements into Correlated-Components.
+    2. Uses EnrichmentService to perform LLM semantic enhancement on non-text components (e.g., images, tables).
+
+    Args:
+        extracted_data: Data object containing raw OCR results.
+        logger: Logging instance.
+        settings: Optional Settings object.
+        config: Optional configuration dictionary.
+
+    Returns:
+        ComponentPack: A component pack that has been structurally reassembled and semantically enhanced.
     """
-    异步将 OCR 提取的扁平 Block 列表重组并增强为结构化的 ComponentPack。
-
-    该函数编排了以下工作流：
-    1. 利用 StructureAnalyzer 对元素合并得到 Correlated-Component
-    2. 利用 EnrichmentService 对非文本组件（如图片、表格）进行 LLM 语义增强。
-
-    参数:
-        extracted_data: 包含 OCR 原始结果的数据对象。
-        logger: 日志实例。
-
-    返回:
-        ComponentPack: 经过结构化重组和语义增强的组件包。
-    """
-    # 1. 结构分析 (Structure Analysis)
-    # 为了避免阻塞主事件循环，放到 executor 中运行（处理 OCR 列表可能涉及大量循环计算）
+    # 1. Structure Analysis
+    # To avoid blocking the main event loop, run in an executor (OCR list processing may involve heavy computation)
     loop = asyncio.get_running_loop()
     analyzer = StructureAnalyzer()
     co_pack = await loop.run_in_executor(None, analyzer.analyze, extracted_data, logger)
 
-    # 2. 信息增强 (Enrichment)
+    # 2. Enrichment
     base_settings = settings or Settings.load()
     enrich_settings, enrich_mode, _ = settings_from_ui_payload(
         base_settings, config, module_key="enrichment"
@@ -52,7 +53,7 @@ async def get_components_async(
     cropper = PDFCropper()
     enricher = EnrichmentService(llm, cropper)
 
-    # 执行增强
+    # Execute enhancement
     co_pack = await enricher.enrich_async(co_pack, extracted_data.source)
 
     return co_pack
@@ -65,21 +66,22 @@ async def build_tree_async(
     settings: Settings | None = None,
     config: dict | None = None,
 ):
-    """
-    异步构建 CCTree 文档树。
+    """Asynchronously builds the CCTree document tree.
 
-    该函数编排了以下工作流：
-    1. 利用 AsyncLevelGenerator 生成或修正标题层级。
-    2. 利用 TreeConstructor 根据层级结构构造树。
-    3. 利用 AsyncMetadataGenerator 为树节点生成元数据摘要。
+    This function orchestrates the following workflow:
+    1. Uses AsyncLevelGenerator to generate or correct heading levels.
+    2. Uses TreeConstructor to construct the tree based on the level structure.
+    3. Uses AsyncMetadataGenerator to generate metadata summaries for tree nodes.
 
-    参数:
-        cp: 初始组件包。
-        logger: 日志实例。
-        source_path: PDF 源文件路径，用于层级生成时的视觉参考。
+    Args:
+        cp: Initial component pack.
+        logger: Logging instance.
+        source_path: Path to the PDF source file for visual reference during level generation.
+        settings: Optional Settings object.
+        config: Optional configuration dictionary.
 
-    返回:
-        CCTree: 构建完成并包含元数据的文档树。
+    Returns:
+        CCTree: The completed document tree containing metadata.
     """
     base_settings = settings or Settings.load()
     level_settings, level_mode, _ = settings_from_ui_payload(
@@ -100,15 +102,15 @@ async def build_tree_async(
     )
     constructor = TreeConstructor(base_settings, logger)
 
-    # 1. 标题层级增强
+    # 1. Heading level enhancement
     cp = await AsyncLevelGenerator(llm_level, cropper).generate_level(
         source_path=source_path, cp=cp, config=level_settings, logger=logger
     )
 
-    # 2. 构造树结构
+    # 2. Construct tree structure
     cctree = constructor.construct_tree(cp)
 
-    # 3. 语义元数据生成
+    # 3. Semantic metadata generation
     await generator.get_metadata(cctree)
 
     return cctree

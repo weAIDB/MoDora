@@ -17,12 +17,14 @@ from modora.core.services.document_processing import process_document_task
 router = APIRouter(tags=["documents"])
 logger = logging.getLogger("modora.api")
 
+
 def _settings_from_payload(payload: dict[str, Any] | None) -> Settings:
     settings = Settings.load()
     settings, _, _ = settings_from_ui_payload(
         settings, payload, module_key="levelGenerator"
     )
     return settings
+
 
 @router.get("/pdf/{file_name}/{page_index}/image")
 def get_pdf_image(file_name: str, page_index: int):
@@ -51,6 +53,7 @@ def get_pdf_image(file_name: str, page_index: int):
         logger.error(f"Error generating PDF image: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/task/status/{filename}")
 def get_task_status(filename: str):
     settings = Settings.load()
@@ -61,6 +64,7 @@ def get_task_status(filename: str):
         if (doc_cache / "tree.json").exists():
             return {"status": "completed"}
     return {"status": status}
+
 
 @router.post("/upload")
 async def upload_file(

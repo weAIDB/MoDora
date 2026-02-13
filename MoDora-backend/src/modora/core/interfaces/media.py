@@ -4,20 +4,19 @@ from modora.core.domain.component import Component
 
 
 class ImageProvider(Protocol):
-    """
-    图片提供者接口协议。
-    定义了从源文件（如 PDF）中获取图片数据的标准接口。
+    """Image provider interface protocol.
+
+    Defines the standard interface for obtaining image data from source files (e.g., PDFs).
     """
 
     def crop_image(self, source: str, component: Component) -> str:
-        """
-        根据组件的位置信息从源文件中裁剪图片。
+        """Crop an image from the source file based on the component's position information.
 
         Args:
-            source: 源文件路径或标识符
-            component: 包含位置信息的组件对象
+            source: The source file path or identifier.
+            component: The component object containing position information.
 
         Returns:
-            str: Base64 编码的图片字符串
+            str: Base64 encoded image string.
         """
         ...

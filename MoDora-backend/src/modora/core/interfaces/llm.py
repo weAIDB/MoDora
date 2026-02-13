@@ -2,9 +2,7 @@ from typing import Protocol, Tuple
 
 
 class AsyncLLMClient(Protocol):
-    """
-    异步 LLM 客户端接口协议。
-    """
+    """Asynchronous LLM client interface protocol."""
 
     async def generate_text(self, prompt: str) -> str: ...
 

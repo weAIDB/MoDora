@@ -2,7 +2,6 @@ import argparse
 import asyncio
 import json
 import logging
-import os
 from pathlib import Path
 from typing import List
 
@@ -23,7 +22,7 @@ from modora.core.settings import Settings
 
 
 class Evaluator:
-    """评估器类，用于判断生成的答案是否正确"""
+    """Evaluator class for determining if generated answers are correct."""
 
     def __init__(
         self, settings: Settings, logger: logging.Logger, use_remote: bool = False
@@ -36,7 +35,7 @@ class Evaluator:
             self.llm = AsyncLocalLLMClient()
 
     async def check_answer(self, query: str, answer: str) -> bool:
-        """检查回答是否有效"""
+        """Check if the answer is valid."""
         try:
             return await self.llm.check_answer(query, answer)
         except Exception as e:
@@ -44,16 +43,16 @@ class Evaluator:
             return False
 
     async def is_equal(self, query: str, references: List[str], prediction: str) -> str:
-        """判断预测答案是否与参考答案等价"""
+        """Determine if the predicted answer is equivalent to the reference answer."""
         if not prediction:
             return "F"
 
         for reference in references:
-            # 包含性检查：如果参考答案包含在预测中，则认为正确
+            # Inclusion check: if the reference answer is contained in the prediction, it's considered correct
             if reference.lower() in prediction.lower():
                 return "T"
 
-            # AI 辅助检查：使用 LLM 判断语义是否一致
+            # AI-assisted check: use LLM to judge semantic consistency
             try:
                 if await self.llm.evaluate(query, reference, prediction):
                     return "T"
@@ -65,7 +64,7 @@ class Evaluator:
     def anls_single_sample(
         self, prediction: str, references: List[str], threshold: float = 0.5
     ) -> float:
-        """计算单个样本的 ANLS (Average Normalized Levenshtein Similarity) 分数"""
+        """Calculate the ANLS (Average Normalized Levenshtein Similarity) score for a single sample."""
         max_nls = 0.0
         pred_str = prediction if prediction is not None else ""
 
@@ -84,7 +83,7 @@ class Evaluator:
 
 
 def register(sub: argparse._SubParsersAction) -> None:
-    """注册 evaluate 子命令"""
+    """Register the evaluate sub-command."""
     parser = sub.add_parser("evaluate", help="Evaluate QA results")
     parser.add_argument(
         "--input",
@@ -123,23 +122,23 @@ def register(sub: argparse._SubParsersAction) -> None:
 async def _process_single_item(
     item: dict, prediction_map: dict, evaluator: Evaluator, sem: asyncio.Semaphore
 ) -> ResultItem | None:
-    """处理单个评估项"""
+    """Process a single evaluation item."""
     async with sem:
         try:
             qid = item.get("questionId")
             if qid not in prediction_map:
-                # 缺少预测结果
+                # Missing prediction result
                 return None
 
             pred_item = prediction_map[qid]
             prediction = pred_item.get("prediction")
 
-            # 准备参考答案列表
+            # Prepare reference answers list
             answer = item.get("answer", [])
             if isinstance(answer, str):
                 answer = [answer]
             elif not isinstance(answer, list):
-                # 针对复杂数据集（如 DUDE）的回退逻辑
+                # Fallback logic for complex datasets (e.g., DUDE)
                 if "answers" in item:
                     answer = [", ".join(item["answers"])] + item.get(
                         "answers_variants", []
@@ -147,26 +146,19 @@ async def _process_single_item(
                 else:
                     answer = []
 
-            # AI 判定
-            judge = "F"
+            # AI evaluation
+            judge = await evaluator.is_equal(item["question"], answer, prediction)
 
-            # 针对不可回答问题的特殊逻辑
-            if item.get("answer_type") == "not-answerable":
-                is_valid_ans = await evaluator.check_answer(
-                    item["question"], prediction
-                )
-                if not is_valid_ans:
-                    judge = "T"
-                else:
-                    judge = "F"
-            else:
-                judge = await evaluator.is_equal(item["question"], answer, prediction)
+            # Special logic for unanswerable questions
+            if item.get("answer_type") == "not-answerable" and (
+                prediction is None or prediction == ""
+            ):
+                judge = "T"
 
-            # 构造 ResultItem
+            # Construct ResultItem
             result_item = ResultItem(
                 questionId=qid,
-                pdf_id=item.get("pdf_id", "")
-                or str(item.get("image_id", "")),  # 回退到 image_id
+                pdf_id=item.get("pdf_id", "") or str(item.get("image_id", "")),
                 question=item["question"],
                 answer=answer,
                 tag=item.get("tag"),
@@ -190,24 +182,24 @@ async def _run_evaluation(
     logger: logging.Logger,
     use_remote: bool = False,
 ):
-    """运行批量评估流程"""
+    """Run the batch evaluation process."""
     settings = Settings.load()
     evaluator = Evaluator(settings, logger, use_remote=use_remote)
 
-    # 加载数据集和预测结果
+    # Load dataset and prediction results
     with open(input_path, "r", encoding="utf-8") as f:
         dataset = json.load(f)
 
     with open(result_path, "r", encoding="utf-8") as f:
         results_data = json.load(f)
 
-    # 兼容处理：如果 result.json 是字典格式 {"results": [...], "metrics": {...}}
+    # Compatibility handling: if result.json is in dictionary format {"results": [...], "metrics": {...}}
     if isinstance(results_data, dict) and "results" in results_data:
         results = results_data["results"]
     else:
         results = results_data
 
-    # 将预测结果按 ID 映射，以便快速查找
+    # Map prediction results by ID for quick lookup
     prediction_map = {r["questionId"]: r for r in results}
 
     sem = asyncio.Semaphore(concurrency)
@@ -221,11 +213,11 @@ async def _run_evaluation(
         if res:
             evaluated_items.append(res)
 
-    # 保存评估结果
+    # Save evaluation results
     output_path.parent.mkdir(parents=True, exist_ok=True)
     write_results_file(str(output_path), evaluated_items)
 
-    # 计算各项指标
+    # Calculate metrics
     total = len(evaluated_items)
     correct = sum(1 for item in evaluated_items if item.judge == "T")
     accuracy = correct / total if total > 0 else 0.0
@@ -245,7 +237,7 @@ async def _run_evaluation(
                 anls_score += 1.0
             elif item.answer == [] or (
                 item.prediction is None and item.judge == "T"
-            ):  # 针对不可回答问题的近似处理
+            ):  # Approximate handling for unanswerable questions
                 anls_score += 1.0
             else:
                 anls_score += evaluator.anls_single_sample(item.prediction, item.answer)
@@ -254,7 +246,7 @@ async def _run_evaluation(
 
     anls = anls_score / total if total > 0 else 0.0
 
-    # 将指标保存回 result.json
+    # Save metrics back to result.json
     try:
         with open(result_path, "r", encoding="utf-8") as f:
             results_data = json.load(f)
@@ -290,7 +282,13 @@ async def _run_evaluation(
 def _plot_results(
     evaluated_items: List[ResultItem], output_dir: Path, overall_metrics: dict = None
 ):
-    """根据评估结果生成图表和汇总 CSV"""
+    """Generate charts and summary CSV based on evaluation results.
+
+    Args:
+        evaluated_items: List of evaluated result items.
+        output_dir: Directory to save the output.
+        overall_metrics: Overall evaluation metrics.
+    """
     if not evaluated_items:
         print("No data to plot.")
         return
@@ -301,12 +299,12 @@ def _plot_results(
         category = "Unknown"
         if isinstance(tag, str) and "-" in tag:
             try:
-                # 按照 analyze_eval.py 的逻辑，取连字符后的部分
+                # Follow the logic in analyze_eval.py, take the part after the hyphen
                 category = tag.split("-")[-1]
             except Exception:
                 pass
 
-        # 计算 ACNLS (包含性检查 + ANLS)
+        # Calculate ACNLS (Inclusion check + ANLS)
         acnls = 0.0
         contain = False
         pred_str = str(item.prediction).lower() if item.prediction is not None else ""
@@ -321,8 +319,8 @@ def _plot_results(
         if contain:
             acnls = 1.0
         else:
-            # 这里的 ANLS 计算逻辑复用 Evaluator 中的实现，但使用 threshold=0.5
-            # analyze_eval.py 中使用了 0.5 的阈值
+            # The ANLS calculation logic here reuses the implementation in Evaluator, but with threshold=0.5
+            # A threshold of 0.5 was used in analyze_eval.py
             max_nls = 0.0
             for ref in item.answer:
                 ref_str = str(ref).lower()
@@ -344,7 +342,7 @@ def _plot_results(
     df = pd.DataFrame(data)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 分组统计
+    # Grouped statistics
     grouped = df.groupby("tag")[["Accuracy", "ACNLS"]].mean().reset_index()
     grouped = grouped.sort_values("tag")
 
@@ -393,7 +391,9 @@ def _plot_results(
     # 3. Save Summaries
     grouped.to_csv(output_dir / "metrics_summary_by_tag.csv", index=False)
 
-    category_grouped = df.groupby("category")[["Accuracy", "ACNLS"]].mean().reset_index()
+    category_grouped = (
+        df.groupby("category")[["Accuracy", "ACNLS"]].mean().reset_index()
+    )
     category_grouped = category_grouped.sort_values("category")
     category_grouped.to_csv(output_dir / "metrics_summary_by_category.csv", index=False)
 
@@ -439,8 +439,16 @@ def _plot_results(
 
 
 def _handle_evaluate(args: argparse.Namespace, logger: logging.Logger) -> int:
-    """evaluate 命令的处理器"""
-    # 只有在不使用远程 LLM 时才确保本地 LLM 已加载
+    """Handler for the evaluate command.
+
+    Args:
+        args: Command line arguments.
+        logger: Logger instance.
+
+    Returns:
+        int: Exit code (0 for success, 1 for failure).
+    """
+    # Ensure local LLM is loaded only when not using remote LLM
     if not args.remote:
         ensure_llm_local_loaded(Settings.load(), logger)
     try:

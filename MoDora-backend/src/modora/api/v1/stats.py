@@ -16,6 +16,7 @@ from modora.api.v1.models import (
 router = APIRouter(tags=["stats"])
 logger = logging.getLogger("modora.api")
 
+
 @router.get("/docs/stats/{file_name}", response_model=DocStatsResponse)
 async def get_doc_stats(file_name: str):
     settings = Settings.load()
@@ -45,6 +46,7 @@ async def get_doc_stats(file_name: str):
         tags=tags,
         semantic_tags=semantic_tags,
     )
+
 
 @router.post("/session/stats", response_model=SessionStatsResponse)
 async def get_session_stats(request: SessionStatsRequest):
@@ -93,7 +95,9 @@ async def get_session_stats(request: SessionStatsRequest):
         valid_count += 1
 
     if valid_count == 0:
-        raise HTTPException(status_code=404, detail="No valid stats found for session files")
+        raise HTTPException(
+            status_code=404, detail="No valid stats found for session files"
+        )
 
     return SessionStatsResponse(
         total_files=valid_count,

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import base64
 from pathlib import Path
-from typing import Any
 
 import cv2
 import numpy as np
@@ -16,7 +15,10 @@ router = APIRouter(prefix="/ocr", tags=["ocr"])
 
 
 class OCRExtractRequest(BaseModel):
-    """OCR 输入：支持 base64 图片或本地图片路径（二选一）。"""
+    """OCR input request.
+
+    Supports either base64 image data or a local image path.
+    """
 
     image_base64: str | None = None
     file_path: str | None = None
@@ -68,7 +70,14 @@ def _strip_data_url_prefix(s: str) -> str:
 
 
 def _decode_image_bytes_to_rgb(raw: bytes):
-    """将输入图片 bytes 解码为 RGB ndarray，供 PPStructureV3 使用。"""
+    """Decode input image bytes to RGB ndarray for PPStructureV3.
+
+    Args:
+        raw: Raw image bytes.
+
+    Returns:
+        np.ndarray: Image in RGB format.
+    """
     buf = np.frombuffer(raw, dtype=np.uint8)
     img_bgr = cv2.imdecode(buf, cv2.IMREAD_COLOR)
     if img_bgr is None:
@@ -78,9 +87,16 @@ def _decode_image_bytes_to_rgb(raw: bytes):
 
 @router.post("/extract", response_model=OcrExtractResponse)
 def ocr_extract(request: OCRExtractRequest) -> OcrExtractResponse:
-    """
-    通用 OCR 提取接口（支持单图 Base64 或本地文件）。
-    主要用于调试或单张图片处理。
+    """General OCR extraction interface.
+
+    Supports single image via Base64 or local file. Mainly used for
+    debugging or single image processing.
+
+    Args:
+        request: OCR extraction request.
+
+    Returns:
+        OcrExtractResponse: Extracted OCR blocks.
     """
     model = get_ocr_model()
     if model is None:
@@ -106,9 +122,15 @@ def ocr_extract(request: OCRExtractRequest) -> OcrExtractResponse:
 
 @router.post("/extract_pdf", response_model=OcrExtractResponse)
 def ocr_extract_pdf(request: OCRExtractPdfRequest) -> OcrExtractResponse:
-    """
-    PDF OCR 提取接口。
-    逐页处理 PDF，返回所有页面的 Block 列表。
+    """PDF OCR extraction interface.
+
+    Processes PDF page by page and returns a list of blocks for all pages.
+
+    Args:
+        request: PDF OCR extraction request.
+
+    Returns:
+        OcrExtractResponse: Extracted OCR blocks from the PDF.
     """
     model = get_ocr_model()
     if model is None:

@@ -1,16 +1,26 @@
 import base64
-import json
-from pathlib import Path
 from PIL import Image
 import io
 import fitz
 
+
 def _normalize_pdf_path(pdf_path: str) -> str:
-    """兼容 source=file:/path/to.pdf 的形式，供 fitz.open 使用。"""
+    """Normalize the path format to be compatible with fitz.open.
+
+    Handles the 'file:/path/to.pdf' URI scheme by stripping the 'file:' prefix
+    if present.
+
+    Args:
+        pdf_path (str): The input PDF path, which may include a 'file:' prefix.
+
+    Returns:
+        str: The normalized file path.
+    """
     p = (pdf_path or "").strip()
     if p.startswith("file:"):
         p = p[len("file:") :]
     return p
+
 
 def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
     pdf_path = _normalize_pdf_path(pdf_path)
@@ -27,7 +37,7 @@ def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
             crop_range = data["bbox"]
             if page_idx < 0 or page_idx >= len(pdf_document):
                 continue
-            
+
             page = pdf_document[page_idx]
             pix = page.get_pixmap(clip=crop_range)
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
@@ -51,7 +61,7 @@ def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
     MAX_SIZE = 1024
     if merged_image.width > MAX_SIZE or merged_image.height > MAX_SIZE:
         merged_image.thumbnail((MAX_SIZE, MAX_SIZE), Image.Resampling.LANCZOS)
-    
+
     # Save to file for debugging
     output_filename = "debug_crop_output.png"
     merged_image.save(output_filename)
@@ -63,13 +73,14 @@ def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
     buffered.seek(0)
     return base64.b64encode(buffered.read()).decode("utf-8")
 
-# Data from the tree.json (node "BlockD \n\n前言\n\nPREFACE")
+
+# Data from the tree.json
 pdf_path = "/home/yukai/project/MoDora/datasets/MMDA/1.pdf"
 bbox_data = [
     {"bbox": [66.5, 181.5, 530.0, 333.5], "page": 3},
     {"bbox": [66.5, 373.0, 530.5, 491.5], "page": 3},
     {"bbox": [65.5, 532.0, 530.0, 617.5], "page": 3},
-    {"bbox": [66.5, 658.0, 529.0, 743.5], "page": 3}
+    {"bbox": [66.5, 658.0, 529.0, 743.5], "page": 3},
 ]
 
 if __name__ == "__main__":

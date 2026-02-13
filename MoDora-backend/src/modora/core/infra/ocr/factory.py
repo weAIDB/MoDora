@@ -4,18 +4,20 @@ from modora.core.infra.ocr.paddle import PPStructureClient, PaddleOCRVLClient
 
 
 class OCRFactory:
-    """
-    用于创建 OCR 客户端的工厂类。
-    """
+    """Factory class for creating OCR clients."""
 
     @staticmethod
     def create(settings: Settings) -> OCRClient:
-        """
-        根据指定的模型类型创建 OCR 客户端实例。
+        """Create an OCR client instance based on the specified model type.
 
-        模型类型 (settings.ocr_model):
-            "ppstructure" -> PPStructureV3 (默认)
-            "paddle_ocr_vl" -> PaddleOCRVL (可选)
+        Args:
+            settings: The settings object containing the ocr_model type.
+                Supported model types (settings.ocr_model):
+                - "ppstructure" -> PPStructureV3 (default)
+                - "paddle_ocr_vl" -> PaddleOCRVL (optional)
+
+        Returns:
+            OCRClient: An instance of the OCR client.
         """
         model = settings.ocr_model or "ppstructure"
         if model == "ppstructure":
@@ -23,4 +25,4 @@ class OCRFactory:
         elif model == "paddle_ocr_vl":
             return PaddleOCRVLClient(settings)
         else:
-            raise ValueError(f"未知 OCR 模型类型: {model}")
+            raise ValueError(f"Unknown OCR model type: {model}")

@@ -13,7 +13,11 @@ from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_
 
 
 def register(sub: argparse._SubParsersAction) -> None:
-    """注册 qa 子命令"""
+    """Register the qa subcommand.
+
+    Args:
+        sub: The sub-parsers action to add the parser to.
+    """
     parser = sub.add_parser("qa", help="Run QA on a single document")
     parser.add_argument("source_path", help="Path to the original PDF file")
     parser.add_argument("tree_path", help="Path to the tree.json file")
@@ -22,7 +26,15 @@ def register(sub: argparse._SubParsersAction) -> None:
 
 
 def _handle_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
-    """qa 命令的处理器"""
+    """Handler for the qa command.
+
+    Args:
+        args: Command line arguments.
+        logger: Logger instance.
+
+    Returns:
+        Exit code (0 for success, 1 for failure).
+    """
     settings = Settings.load()
     ensure_llm_local_loaded(settings, logger)
     try:
@@ -36,18 +48,32 @@ def _handle_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
 
 
 async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.Logger):
-    """运行单个文档的 QA 流程"""
+    """Run the QA process for a single document.
+
+    Args:
+        source_path: Path to the original PDF file.
+        tree_path: Path to the tree.json file.
+        query: The question to ask.
+        logger: Logger instance.
+    """
     settings = Settings.load()
     qa_service = QAService(settings)
 
-    # 加载树数据
+    # Load tree data
     logger.info(f"Loading tree from {tree_path}...")
     try:
         with open(tree_path, "r", encoding="utf-8") as f:
             tree_data = json.load(f)
 
         def dict_to_node(data):
-            """将字典转换为 CCTreeNode 对象"""
+            """Convert a dictionary to a CCTreeNode object.
+
+            Args:
+                data: The dictionary to convert.
+
+            Returns:
+                A CCTreeNode object.
+            """
             node = CCTreeNode(
                 type=data.get("type", "unknown"),
                 metadata=data.get("metadata"),
@@ -59,9 +85,9 @@ async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.L
                 node.children[k] = dict_to_node(v)
             return node
 
-        if "root" in tree_data:  # 如果包装在 {root: ...} 中
+        if "root" in tree_data:  # If wrapped in {root: ...}
             root_node = dict_to_node(tree_data["root"])
-        else:  # 如果是原始根节点
+        else:  # If it is the original root node
             root_node = dict_to_node(tree_data)
 
         cctree = CCTree(root=root_node)
@@ -70,11 +96,11 @@ async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.L
         logger.error(f"Failed to load tree: {e}")
         return
 
-    # 执行 QA
+    # Execute QA
     logger.info(f"Answering query: {query}")
     result = await qa_service.qa(cctree, query, source_path)
 
-    # 打印结果和检索追踪
+    # Print results and retrieval trace
     print("\n" + "=" * 50)
     print(f"QUESTION: {query}")
     print("-" * 50)

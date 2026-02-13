@@ -8,15 +8,15 @@ from pathlib import Path
 import fitz
 from PIL import Image
 
-from modora.core.domain.component import Component, Location
+from modora.core.domain.component import Location
 from modora.core.interfaces.media import ImageProvider
 
-# 如果裁剪失败（PDF打不开/页号越界/bbox非法等），返回 1x1 空白 PNG 的 base64。
+# If cropping fails (PDF cannot be opened / page number out of bounds / illegal bbox, etc.), return base64 of 1x1 blank PNG.
 _BLANK_1X1_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMBAFh4kXcAAAAASUVORK5CYII="
 
 
 def _normalize_pdf_path(pdf_path: str) -> str:
-    """兼容 source=file:/path/to.pdf 的形式，供 fitz.open 使用。"""
+    """Compatible with source=file:/path/to.pdf format for fitz.open."""
     p = (pdf_path or "").strip()
     if p.startswith("file:"):
         p = p[len("file:") :]
@@ -24,16 +24,16 @@ def _normalize_pdf_path(pdf_path: str) -> str:
 
 
 def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
-    """
-    从 PDF 中裁剪图像的独立任务函数。
-    该函数设计为可序列化的（picklable），可以在独立进程中运行。
+    """Independent task function to crop images from PDF.
 
-    参数:
-        pdf_path: PDF 文件路径。
-        bbox_data: 包含 'page' (从1开始) 和 'bbox' [x0, y0, x1, y1] 的字典列表。
+    This function is designed to be picklable and can run in an independent process.
 
-    返回:
-        合并后图像的 Base64 编码字符串。
+    Args:
+        pdf_path: Path to the PDF file.
+        bbox_data: List of dictionaries containing 'page' (1-based) and 'bbox' [x0, y0, x1, y1].
+
+    Returns:
+        Base64 encoded string of the merged image.
     """
     pdf_path = _normalize_pdf_path(pdf_path)
     try:
@@ -68,8 +68,8 @@ def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
         merged_image.paste(img, (0, y_offset))
         y_offset += int(img.height)
 
-    # 如果图像太大（例如 > 1024x1024），进行缩放
-    # 限制最大尺寸以减少 token 消耗
+    # If image is too large (e.g., > 1024x1024), perform scaling
+    # Limit maximum size to reduce token consumption
     MAX_SIZE = 1024
     if merged_image.width > MAX_SIZE or merged_image.height > MAX_SIZE:
         merged_image.thumbnail((MAX_SIZE, MAX_SIZE), Image.Resampling.LANCZOS)
@@ -81,10 +81,10 @@ def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
 
 
 def bbox_to_base64(pdf_path: str, bbox_list: list[Location]) -> str:
-    """
-    为了向后兼容的包装函数。
-    注意：直接调用此函数会在当前进程/线程中运行，这对于 fitz 来说可能不安全。
-    建议在并发场景下配合 ProcessPoolExecutor 使用 crop_pdf_image_task。
+    """Wrapper function for backward compatibility.
+
+    Note: Calling this function directly runs in the current process/thread, which may not be safe for fitz.
+    It is recommended to use crop_pdf_image_task with ProcessPoolExecutor in concurrent scenarios.
     """
     bbox_data = [{"page": loc.page, "bbox": loc.bbox} for loc in bbox_list]
     return crop_pdf_image_task(pdf_path, bbox_data)
@@ -93,36 +93,37 @@ def bbox_to_base64(pdf_path: str, bbox_list: list[Location]) -> str:
 def render_ocr_json_to_pdf(
     ocr_json_path: str, out_pdf_path: str | None = None, pdf_path: str | None = None
 ) -> str:
-    """
-    把 OCR 输出 JSON 中的 bbox/label 渲染回 PDF 页面，输出标注后的 PDF。
-    """
+    """Renders bbox/label from OCR output JSON back to PDF pages and outputs the annotated PDF."""
     ocr_p = Path(ocr_json_path)
     obj = json.loads(ocr_p.read_text(encoding="utf-8"))
     if not isinstance(obj, dict):
-        raise TypeError("OCR JSON 必须是一个对象")
+        raise ValueError("OCR JSON must be an object")
 
     if pdf_path is None:
-        src = obj.get("source")
-        if not isinstance(src, str) or not src.startswith("file:"):
-            raise ValueError("未提供 pdf_path 且 source 不是 file:<path> 格式")
-        pdf_path = src[len("file:") :]
+        source = obj.get("source", "")
+        if source.startswith("file:"):
+            pdf_path = source[len("file:") :]
+        else:
+            raise ValueError(
+                "pdf_path is not provided and source is not in file:<path> format"
+            )
 
     if out_pdf_path is None:
         out_pdf_path = str(ocr_p.with_suffix("")) + ".rendered.pdf"
 
-    blocks = obj.get("blocks")
+    blocks = obj.get("blocks", [])
     if not isinstance(blocks, list):
-        raise TypeError("blocks 必须是一个列表")
+        raise ValueError("blocks must be a list")
 
     def color_for(label: str) -> tuple[float, float, float]:
-        """为不同的标签生成固定的颜色。"""
+        """Generate fixed colors for different labels."""
         palette = [
-            (1.0, 0.0, 0.0),  # 红色
-            (0.0, 0.6, 0.0),  # 绿色
-            (0.0, 0.3, 1.0),  # 蓝色
-            (1.0, 0.5, 0.0),  # 橙色
-            (0.6, 0.0, 0.8),  # 紫色
-            (0.0, 0.7, 0.7),  # 青色
+            (1.0, 0.0, 0.0),  # Red
+            (0.0, 0.6, 0.0),  # Green
+            (0.0, 0.3, 1.0),  # Blue
+            (1.0, 0.5, 0.0),  # Orange
+            (0.6, 0.0, 0.8),  # Purple
+            (0.0, 0.7, 0.7),  # Cyan
         ]
         idx = abs(hash(label)) % len(palette)
         return palette[idx]
@@ -133,7 +134,7 @@ def render_ocr_json_to_pdf(
             if not isinstance(b, dict):
                 continue
             page_id = b.get("page_id")
-            bbox = [x for x in b.get("bbox")]
+            bbox = b.get("bbox")
             label = b.get("label")
             block_id = b.get("block_id")
 
@@ -174,9 +175,9 @@ def render_ocr_json_to_pdf(
 
 
 class PDFCropper(ImageProvider):
-    """
-    PDF 图片裁剪适配器。
-    实现了 ImageProvider 接口，使用 PyMuPDF (fitz) 从 PDF 中裁剪指定区域。
+    """PDF image cropping adapter.
+
+    Implements the ImageProvider interface, using PyMuPDF (fitz) to crop specified areas from PDF.
     """
 
     def crop_image(
@@ -185,27 +186,30 @@ class PDFCropper(ImageProvider):
         locations: list[Location],
         file_names: list[str] | None = None,
     ) -> list[str]:
-        """
-        根据位置信息裁剪图像。
-        支持单文档或多文档。如果是多文档，locations 中应包含正确的 file_name。
+        """Crop images based on location information.
+
+        Supports single or multiple documents. For multiple documents, locations should contain correct file_name.
 
         Args:
-            source_path: PDF 路径或文件名到路径的映射。
-            locations: 待裁剪的位置列表。
-            file_names: 可选的文件名列表，如果提供且 locations 中 file_name 为空，则默认使用第一个。
+            source_path: PDF path or mapping from filename to path.
+            locations: List of locations to crop.
+            file_names: Optional list of filenames. If provided and file_name in locations is empty, the first one is used by default.
 
         Returns:
-            裁剪后的 Base64 图像列表。
+            List of cropped Base64 images.
         """
         if not locations:
             return []
 
-        # 简单的实现：按文件分组裁剪，然后返回 base64 列表
-        # 在实际的多文档 RAG 中，通常我们会返回一个大的拼接图或多张图
-        # 这里为了兼容现有 reason_retrieved 接口，我们返回多张裁剪图
+        # Simple implementation: group cropping by file, then return base64 list
+        results: list[str] = []
+
+        # Simple implementation: Crop by file group and return base64 list
+        # In actual multi-document RAG, we typically return a large combined image or multiple images
+        # To maintain compatibility with the existing reason_retrieved interface, we return multiple cropped images
         results = []
 
-        # 分组
+        # Grouping
         grouped: dict[str, list[Location]] = {}
         for loc in locations:
             fn = loc.file_name
@@ -225,16 +229,21 @@ class PDFCropper(ImageProvider):
             if not path or not Path(str(path)).exists():
                 continue
 
-            # 使用现有的 bbox_to_base64 (同步版本，QAService 目前是同步调用它的)
-            # 注意：后期可以考虑优化为异步
+            # Use existing bbox_to_base64 (synchronous version, currently called synchronously by QAService)
+            # Note: Can be optimized to asynchronous later
             img_b64 = bbox_to_base64(str(path), locs)
             results.append(img_b64)
 
         return results
 
     def pdf_to_base64(self, source: str) -> str:
-        """
-        将整个 PDF（所有页面）转换为单个垂直堆叠的 Base64 图像。
+        """Converts the entire PDF (all pages) into a single vertically stacked Base64 image.
+
+        Args:
+            source: Path to the PDF file.
+
+        Returns:
+            Base64 encoded string of the combined image.
         """
         source = _normalize_pdf_path(source)
         try:
@@ -242,7 +251,7 @@ class PDFCropper(ImageProvider):
         except Exception:
             return _BLANK_1X1_PNG_BASE64
 
-        # 为每一页创建全页 bbox
+        # Create full-page bboxes for each page
         bbox_data = []
         for i, page in enumerate(doc):
             rect = page.rect

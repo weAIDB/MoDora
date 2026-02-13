@@ -17,7 +17,7 @@ from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_
 
 
 def register(sub: argparse._SubParsersAction) -> None:
-    """注册 batch-qa 子命令"""
+    """Register the batch-qa sub-command."""
     parser = sub.add_parser("batch-qa", help="Run batch QA experiments")
     parser.add_argument(
         "--dataset",
@@ -68,19 +68,19 @@ def register(sub: argparse._SubParsersAction) -> None:
 def resolve_paths(
     item: dict[str, Any], dataset_json_path: Path, cache_dir: Path, output_dir: Path
 ) -> QAJob | None:
-    """解析并验证数据集中每一项的路径，将其转换为 QAJob 对象"""
+    """Parse and validate the path of each item in the dataset, converting it into a QAJob object."""
     try:
         pdf_filename = item["pdf_id"]
         pdf_num = pdf_filename.replace(".pdf", "")
 
-        # PDF 路径：假设数据集目录结构是一致的
+        # PDF path: assume the dataset directory structure is consistent
         # /path/to/MMDA/test.json -> /path/to/MMDA/1.pdf
         pdf_path = dataset_json_path.parent / pdf_filename
 
-        # 树路径：cache_dir/<num>/tree.json
+        # Tree path: cache_dir/<num>/tree.json
         tree_path = cache_dir / pdf_num / "tree.json"
 
-        # 输出路径
+        # Output path
         output_path = output_dir / f"qa_{item['questionId']}_result.json"
 
         if not pdf_path.exists():
@@ -110,15 +110,15 @@ async def run_single_qa(
     logger: logging.Logger,
     debug: bool = False,
 ) -> dict[str, Any] | None:
-    """执行单个 QA 任务，包括加载树、调用 QA 服务并保存结果"""
+    """Execute a single QA task, including loading the tree, calling the QA service, and saving the results."""
     async with sem:
         try:
-            # 加载树数据
+            # Load tree data
             with open(job.tree_path, "r", encoding="utf-8") as f:
                 tree_data = json.load(f)
 
             def dict_to_node(data):
-                """将字典转换为 CCTreeNode 对象"""
+                """Convert a dictionary into a CCTreeNode object."""
                 node = CCTreeNode(
                     type=data.get("type", "unknown"),
                     metadata=data.get("metadata"),
@@ -139,7 +139,7 @@ async def run_single_qa(
 
             cctree = CCTree(root=root_node)
 
-            # 执行 QA
+            # Execute QA
             result = await qa_service.qa(cctree, job.question, str(job.pdf_path))
 
             output = {
@@ -147,34 +147,34 @@ async def run_single_qa(
                 "question": job.question,
                 "ground_truth": job.answer,
                 "prediction": result["answer"],
-                "evidence": result["retrieved_documents"],
+                "evidence": result.get("retrieved_documents", []),
                 "status": "success",
             }
 
-            # 保存中间结果
+            # Save intermediate results
             with open(job.output_path, "w", encoding="utf-8") as f:
                 json.dump(output, f, ensure_ascii=False, indent=2)
 
+            # Save prompts and images in debug mode
             if debug:
-                # 调试模式下保存 prompt 和图片
                 try:
                     debug_dir = job.output_path.parent / "debug" / str(job.question_id)
                     debug_dir.mkdir(parents=True, exist_ok=True)
 
                     debug_prompts = result.get("debug_prompts", {})
 
-                    # 保存推理上下文
+                    # Save inference context
                     with open(debug_dir / "prompt.txt", "w", encoding="utf-8") as f:
                         f.write(debug_prompts.get("reasoning_context", ""))
 
-                    # 保存回退上下文
+                    # Save fallback context
                     if debug_prompts.get("fallback_context"):
                         with open(
                             debug_dir / "fallback_prompt.txt", "w", encoding="utf-8"
                         ) as f:
                             f.write(debug_prompts.get("fallback_context", ""))
 
-                    # 保存图片
+                    # Save images
                     images = debug_prompts.get("images", [])
                     for i, img_b64 in enumerate(images):
                         try:
@@ -199,7 +199,7 @@ async def run_single_qa(
 async def run_batch_qa(
     jobs: List[QAJob], concurrency: int, logger: logging.Logger, debug: bool = False
 ) -> List[dict[str, Any]]:
-    """批量运行 QA 任务"""
+    """Run QA tasks in batch."""
     settings = Settings.load()
     qa_service = QAService(settings)
     sem = asyncio.Semaphore(concurrency)
@@ -216,7 +216,7 @@ async def run_batch_qa(
 
 
 def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
-    """batch-qa 命令的处理器"""
+    """Processor for the batch-qa command."""
     settings = Settings.load()
     ensure_llm_local_loaded(settings, logger)
 
@@ -229,7 +229,7 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
         with open(dataset_path, "r", encoding="utf-8") as f:
             dataset = json.load(f)
 
-        # 如果指定了标签，则按标签过滤
+        # Filter by tags if specified
         if args.tag:
             target_tags = set(t.strip() for t in args.tag.split(","))
             logger.info(f"Filtering by tags: {target_tags}")
@@ -241,12 +241,12 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
             if job:
                 jobs.append(job)
 
-        # 如果指定了数量限制
+        # Limit the number of tasks if specified
         if args.limit > 0:
             logger.info(f"Limiting to first {args.limit} tasks")
             jobs = jobs[: args.limit]
 
-        # 恢复逻辑：跳过已处理成功的问题
+        # Resume logic: skip successfully processed questions
         existing_results = []
         final_output_path = output_dir / "result.json"
         if args.resume and final_output_path.exists():
@@ -287,16 +287,16 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
                 run_batch_qa(jobs, args.concurrency, logger, args.debug)
             )
 
-        # 合并并保存最终摘要
+        # Merge and save final summary
         all_results = existing_results + new_results
 
-        # 按 questionId 去重，保留最新的结果
+        # Deduplicate by questionId, keeping the latest result
         results_map = {
             res["questionId"]: res for res in all_results if "questionId" in res
         }
         final_results = sorted(results_map.values(), key=lambda x: x["questionId"])
 
-        # 构造最终输出，尝试保留已有指标
+        # Construct final output, trying to preserve existing metrics
         if (
             args.resume
             and "resume_data" in locals()

@@ -26,24 +26,43 @@ from modora.core.utils.pydantic import pydantic_dump, pydantic_validate
 def _component_worker_wrapper(
     res_path: str, co_path: str, config_path: str | None
 ) -> tuple[int, int, float]:
-    """
-    组件提取工作函数。
-    在单独的进程中运行，以避免 C 扩展（如 fitz）导致的 GIL 和段错误问题。
+    """Component extraction worker function.
+
+    Runs in a separate process to avoid GIL and segmentation fault issues
+    caused by C extensions (e.g., fitz).
+
+    Args:
+        res_path: Path to the OCR results file.
+        co_path: Path to save the extracted components.
+        config_path: Path to the configuration file.
+
+    Returns:
+        A tuple containing (number of blocks, number of components, elapsed time).
     """
 
     logger = logging.getLogger("modora.preprocess.worker")
     if not logger.handlers:
         logging.basicConfig(level=logging.INFO)
 
-    # 在工作进程自己的事件循环中运行异步逻辑
+    # Run asynchronous logic in the worker process's own event loop
     return asyncio.run(_run_get_components(res_path, co_path, logger))
 
 
-def _ocr_worker_run(pdf_path: str, config_path: str | None = None) -> tuple[dict[str, Any], int, float]:
-    """执行 OCR 任务的工作函数"""
+def _ocr_worker_run(
+    pdf_path: str, config_path: str | None = None
+) -> tuple[dict[str, Any], int, float]:
+    """Worker function to execute OCR tasks.
+
+    Args:
+        pdf_path: Path to the PDF file.
+        config_path: Path to the configuration file.
+
+    Returns:
+        A tuple containing (OCR payload, number of blocks, elapsed time).
+    """
     t0 = time.monotonic()
 
-    # 确保在子进程中重新加载配置并初始化 OCR 模型
+    # Ensure configuration is reloaded and OCR model is initialized in the child process
     settings = Settings.load(config_path)
     ensure_ocr_model_loaded(settings, logging.getLogger("modora.preprocess.ocr_worker"))
 
@@ -66,7 +85,18 @@ def _ocr_worker_run(pdf_path: str, config_path: str | None = None) -> tuple[dict
 async def _run_get_components(
     res_path: str, co_path: str, logger: logging.Logger
 ) -> tuple[int, int, float]:
-    """运行组件提取逻辑：从 OCR 结果中提取文档组件并保存"""
+    """Run component extraction logic.
+
+    Extracts document components from OCR results and saves them.
+
+    Args:
+        res_path: Path to the OCR results file.
+        co_path: Path to save the extracted components.
+        logger: Logger instance.
+
+    Returns:
+        A tuple containing (number of blocks, number of body components, elapsed time).
+    """
     t0 = time.monotonic()
     obj = json.loads(Path(res_path).read_text(encoding="utf-8"))
     ocr_res = pydantic_validate(OcrExtractResponse, obj)
@@ -78,7 +108,11 @@ async def _run_get_components(
 
 
 def register(sub: argparse._SubParsersAction) -> None:
-    """注册 ocr 子命令"""
+    """Register the ocr subcommand.
+
+    Args:
+        sub: The sub-parsers action to add the parser to.
+    """
     p = sub.add_parser("ocr", help="Run OCR+get_component for dataset PDFs")
     p.add_argument(
         "--dataset",
@@ -122,9 +156,9 @@ def register(sub: argparse._SubParsersAction) -> None:
 
 
 class PreprocessPipeline:
-    """
-    预处理流水线：PDF -> OCR (单线程) -> Components (多进程)。
-    支持断点续传和进程池故障恢复。
+    """Preprocessing pipeline: PDF -> OCR (single-threaded) -> Components (multi-processed).
+
+    Supports resume and process pool failure recovery.
     """
 
     def __init__(
@@ -153,7 +187,7 @@ class PreprocessPipeline:
         self.skipped_count = 0
         self.pbar: tqdm | None = None
 
-        # 并发控制
+        # Concurrency control
         self.current_pool: futures.ProcessPoolExecutor | None = None
         self.ocr_pool: futures.ProcessPoolExecutor | None = None
         self.pool_lock = asyncio.Lock()
@@ -161,8 +195,13 @@ class PreprocessPipeline:
         self.ocr_sem = asyncio.Semaphore(self.ocr_workers)
         self.co_tasks: dict[asyncio.Task, PreprocessJob] = {}
 
-    def _tick(self, is_fail=False, is_skip=False) -> None:
-        """更新进度条和计数器"""
+    def _tick(self, is_fail: bool = False, is_skip: bool = False) -> None:
+        """Update progress bar and counters.
+
+        Args:
+            is_fail: Whether the current job failed.
+            is_skip: Whether the current job was skipped.
+        """
         self.done_count += 1
         if is_fail:
             self.failed_count += 1
@@ -175,7 +214,11 @@ class PreprocessPipeline:
             )
 
     def prepare_jobs(self) -> list[PreprocessJob]:
-        """准备任务列表"""
+        """Prepare the list of jobs.
+
+        Returns:
+            A list of PreprocessJob instances.
+        """
         pdf_paths = list(iter_pdf_paths(str(self.args.dataset)))
         if not pdf_paths:
             return []
@@ -195,7 +238,14 @@ class PreprocessPipeline:
         return self.jobs
 
     async def run_ocr_stage(self, job: PreprocessJob) -> bool:
-        """执行 OCR 阶段"""
+        """Execute the OCR stage for a given job.
+
+        Args:
+            job: The preprocessing job to execute.
+
+        Returns:
+            True if the OCR stage was successful or skipped, False otherwise.
+        """
         os.makedirs(job.out_dir, exist_ok=True)
         res_exists = os.path.isfile(job.res_path)
         co_exists = os.path.isfile(job.co_path)
@@ -251,8 +301,13 @@ class PreprocessPipeline:
                 self.ocr_sem.release()
         return True
 
-    async def _submit_component_job(self, job: PreprocessJob, retry=0):
-        """提交组件提取任务到进程池，包含重试和进程池恢复逻辑"""
+    async def _submit_component_job(self, job: PreprocessJob, retry: int = 0):
+        """Submit component extraction task to process pool with retry and recovery logic.
+
+        Args:
+            job: The preprocessing job to submit.
+            retry: Current retry count. Defaults to 0.
+        """
         await self.submit_sem.acquire()
         try:
             loop = asyncio.get_running_loop()
@@ -290,7 +345,7 @@ class PreprocessPipeline:
             self.submit_sem.release()
 
     def _handle_task_done(self, t: asyncio.Task):
-        """处理组件提取任务完成后的回调"""
+        """Handle the completion of a component extraction task."""
         if t not in self.co_tasks:
             return
         job = self.co_tasks.pop(t)
@@ -323,7 +378,11 @@ class PreprocessPipeline:
             )
 
     async def run(self) -> int:
-        """运行流水线"""
+        """Run the preprocessing pipeline.
+
+        Returns:
+            0 if successful, 2 if there were failures.
+        """
         jobs = self.prepare_jobs()
         if not jobs:
             self.logger.error("no pdf files found")
@@ -334,12 +393,12 @@ class PreprocessPipeline:
             failed=self.failed_count, skipped=self.skipped_count, refresh=False
         )
 
-        # 在主进程预加载 OCR 模型（如果是单线程模式）
+        # Preload OCR model in the main process if running in single-threaded mode.
         if self.ocr_workers == 1:
             ensure_ocr_model_loaded(self.settings, self.logger)
 
         try:
-            # 所有的任务并行启动
+            # Start all tasks in parallel.
             ocr_tasks = []
             for job in jobs:
                 ocr_tasks.append(asyncio.create_task(self._process_full_pipeline(job)))
@@ -358,7 +417,11 @@ class PreprocessPipeline:
         return 2 if self.failed_count else 0
 
     async def _process_full_pipeline(self, job: PreprocessJob):
-        """处理单个 PDF 的完整流水线（OCR + Component）"""
+        """Process the full pipeline for a single PDF (OCR + Component extraction).
+
+        Args:
+            job: The preprocessing job to execute.
+        """
         if await self.run_ocr_stage(job):
             task = asyncio.create_task(self._submit_component_job(job))
             self.co_tasks[task] = job
@@ -369,12 +432,20 @@ class PreprocessPipeline:
 def _handle_preprocess_ocr_pipeline(
     args: argparse.Namespace, logger: logging.Logger
 ) -> int:
-    """预处理流水线入口"""
+    """Entry point for the preprocessing pipeline.
+
+    Args:
+        args: Command line arguments.
+        logger: Logger instance.
+
+    Returns:
+        The exit code of the pipeline.
+    """
     config_path = (getattr(args, "config", None) or "").strip() or None
     if config_path:
         os.environ["MODORA_CONFIG"] = config_path
 
-    # 如果 CLI 指定了 batch-size，则覆盖环境变量/配置
+    # Override environment variable/config if batch-size is specified in CLI.
     if getattr(args, "ocr_batch_size", None) is not None:
         os.environ["MODORA_OCR_TEXT_RECOGNITION_BATCH_SIZE"] = str(args.ocr_batch_size)
 

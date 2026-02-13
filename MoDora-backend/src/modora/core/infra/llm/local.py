@@ -9,9 +9,10 @@ from modora.core.settings import Settings
 
 
 class AsyncLocalLLMClient(BaseAsyncLLMClient):
-    """
-    异步本地 LLM 客户端，继承自 BaseAsyncLLMClient。
-    支持本地多实例轮询负载均衡，同时兼容通过 API Key 和 Base URL 使用外部 API。
+    """Asynchronous local LLM client, inherited from BaseAsyncLLMClient.
+
+    Supports local multi-instance polling load balancing, while also compatible with
+    external APIs via API Key and Base URL.
     """
 
     _rr_lock = threading.Lock()
@@ -21,12 +22,12 @@ class AsyncLocalLLMClient(BaseAsyncLLMClient):
         super().__init__(settings)
 
     def _list_base_urls(self) -> list[str]:
-        """获取所有可用的 Base URL 列表。"""
-        # 1. 优先使用显式配置的 llm_local_base_url
+        """Get a list of all available Base URLs."""
+        # 1. Prioritize using explicitly configured llm_local_base_url
         if self.settings.llm_local_base_url:
             return [self.settings.llm_local_base_url.rstrip("/")]
 
-        # 2. 其次使用本地多实例配置
+        # 2. Then use local multi-instance configuration
         instances = list(getattr(self.settings, "llm_local_instances", ()) or ())
         if instances:
             urls: list[str] = []
@@ -39,11 +40,11 @@ class AsyncLocalLLMClient(BaseAsyncLLMClient):
                 urls.append(f"http://{host}:{port}/v1")
             return urls
 
-        # 3. 回退到默认本地端口
+        # 3. Fallback to default local port
         return [f"http://127.0.0.1:{self.settings.llm_local_port}/v1"]
 
     def _get_next_start_index(self, n: int) -> int:
-        """获取轮询的下一个起始索引。"""
+        """Get the next starting index for round-robin."""
         if n <= 1:
             return 0
         with self._rr_lock:
@@ -54,7 +55,7 @@ class AsyncLocalLLMClient(BaseAsyncLLMClient):
     def _create_messages(
         self, prompt: str, base64_image: str | list[str] | None = None
     ) -> list[dict[str, Any]]:
-        """构建 OpenAI 格式的消息列表。"""
+        """Build message list in OpenAI format."""
         messages = [
             {
                 "role": "user",
@@ -79,8 +80,9 @@ class AsyncLocalLLMClient(BaseAsyncLLMClient):
     async def _call_llm(
         self, prompt: str, base64_image: str | list[str] | None = None
     ) -> str:
-        """
-        调用 LLM 的核心实现。支持多实例轮询和外部 API 兼容。
+        """Core implementation for calling LLM.
+
+        Supports multi-instance round-robin and external API compatibility.
         """
         model = self.settings.llm_local_model
         if not model:
@@ -90,7 +92,7 @@ class AsyncLocalLLMClient(BaseAsyncLLMClient):
         start = self._get_next_start_index(len(base_urls))
         messages = self._create_messages(prompt, base64_image)
 
-        # 优先使用本地配置的 API Key
+        # Prioritize using locally configured API Key
         api_key = self.settings.llm_local_api_key or "sk-no-key"
 
         last_exc: Exception | None = None

@@ -8,9 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 class PPStructureClient(OCRClient):
-    """
-    基于 PPStructureV3 的 OCR 客户端。
-    支持版面分析、表格识别和文档去畸变。
+    """OCR client based on PPStructureV3.
+
+    Supports layout analysis, table recognition, and document dewarping.
     """
 
     def __init__(self, settings: Settings):
@@ -30,7 +30,15 @@ class PPStructureClient(OCRClient):
         self.lang = kwargs.get("lang")
 
     def _parse_response(self, res: Any, page_id: int) -> list[OCRBlock]:
-        """将 PPStructureV3 的响应结果解析为 OCRBlock 列表。"""
+        """Parse the response from PPStructureV3 into a list of OCRBlocks.
+
+        Args:
+            res: The response from the model.
+            page_id: The ID of the page.
+
+        Returns:
+            list[OCRBlock]: A list of parsed OCR blocks.
+        """
         res_list = res["parsing_res_list"]
 
         blocks: list[OCRBlock] = []
@@ -48,15 +56,22 @@ class PPStructureClient(OCRClient):
         return blocks
 
     def predict_iter(self, images_or_path: Any) -> Iterator[list[OCRBlock]]:
-        """迭代预测图像或路径中的 OCR 结果。"""
+        """Iteratively predict OCR results for images or paths.
+
+        Args:
+            images_or_path: Images or a path to images to process.
+
+        Yields:
+            Iterator[list[OCRBlock]]: An iterator yielding a list of OCR blocks for each image.
+        """
         for i, res in enumerate(self._model.predict_iter(images_or_path)):
             yield self._parse_response(res, page_id=i + 1)
 
 
 class PaddleOCRVLClient(OCRClient):
-    """
-    基于 PaddleOCRVL-1.5 模型的 OCR 客户端。
-    这个模型更加准确，但是目前速度很慢
+    """OCR client based on the PaddleOCRVL-1.5 model.
+
+    This model is more accurate but is currently very slow.
     """
 
     def __init__(self, settings: Settings, model_class_name: str = "PaddleOCRVL"):
@@ -74,8 +89,14 @@ class PaddleOCRVLClient(OCRClient):
         self.device = device
 
     def _parse_response(self, res: Any, page_id: int) -> list[OCRBlock]:
-        """
-        将 PaddleOCRVL 的响应结果解析为 OCRBlock 列表。
+        """Parse the response from PaddleOCRVL into a list of OCRBlocks.
+
+        Args:
+            res: The response from the model.
+            page_id: The ID of the page.
+
+        Returns:
+            list[OCRBlock]: A list of parsed OCR blocks.
         """
         res_list = res["parsing_res_list"]
 
@@ -94,6 +115,13 @@ class PaddleOCRVLClient(OCRClient):
         return blocks
 
     def predict_iter(self, images_or_path: Any) -> Iterator[list[OCRBlock]]:
-        """迭代预测图像或路径中的 OCR 结果。"""
+        """Iteratively predict OCR results for images or paths.
+
+        Args:
+            images_or_path: Images or a path to images to process.
+
+        Yields:
+            Iterator[list[OCRBlock]]: An iterator yielding a list of OCR blocks for each image.
+        """
         for i, res in enumerate(self._model.predict_iter(images_or_path)):
             yield self._parse_response(res, page_id=i + 1)

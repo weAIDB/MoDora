@@ -33,9 +33,13 @@ def _ocr_settings_key(settings: Settings) -> tuple:
 
 
 def ensure_ocr_model_loaded(settings: Settings, logger: logging.Logger) -> None:
-    """
-    确保 OCR 模型已加载。
-    如果尚未初始化，则根据设置创建 OCR 客户端实例。
+    """Ensure that the OCR model is loaded.
+
+    If not already initialized, an OCR client instance is created based on the settings.
+
+    Args:
+        settings: The settings object.
+        logger: The logger object.
     """
     get_ocr_model(settings=settings, logger=logger, create_if_missing=True)
 
@@ -46,10 +50,15 @@ def get_ocr_model(
     *,
     create_if_missing: bool = False,
 ) -> Optional[OCRClient]:
-    """获取 OCR 客户端实例。
+    """Get an OCR client instance.
 
-    - 未传 settings: 返回默认实例（应用启动时加载的实例）。
-    - 传入 settings 且 create_if_missing=True: 按配置获取或创建实例（带缓存复用）。
+    Args:
+        settings: Optional settings object. If not provided, returns the default instance.
+        logger: Optional logger object.
+        create_if_missing: Whether to create a new instance if one does not exist for the settings.
+
+    Returns:
+        Optional[OCRClient]: The OCR client instance or None if not found and create_if_missing is False.
     """
     global _default_ocr_key
 
@@ -76,7 +85,7 @@ def get_ocr_model(
                 _default_ocr_key = key
             if logger is not None:
                 logger.info(
-                    "OCR 模型已就绪",
+                    "OCR model is ready",
                     extra={
                         "ocr_model": settings.ocr_model,
                         "ocr_device": settings.ocr_device,
@@ -85,5 +94,5 @@ def get_ocr_model(
             return client
         except Exception as e:
             if logger is not None:
-                logger.error(f"加载 OCR 模型失败: {e}")
+                logger.error(f"Failed to load OCR model: {e}")
             raise

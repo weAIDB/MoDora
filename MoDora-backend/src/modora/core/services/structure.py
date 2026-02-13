@@ -12,7 +12,7 @@ from modora.core.domain import (
 
 
 class StructureAnalyzer:
-    """负责将 OCR 扁平结果分析为结构化的 ComponentPack。"""
+    """Analyzes flat OCR results into a structured ComponentPack."""
 
     def analyze(
         self, extracted_data: OcrExtractResponse, logger: logging.Logger
@@ -33,31 +33,31 @@ class StructureAnalyzer:
             location = Location(bbox=block.bbox, page=block.page_id)
             if block.is_title():
                 cur_text_title = block.content
-                # 如果之前的组件有内容, 将其添加到body中
+                # If the previous component has content, add it to the body
                 if cur_text_co.title != TITLE or cur_text_co.data != "":
                     co_pack.body.append(cur_text_co)
                 co_pack.body.extend(non_text_cache)
-                # 按照当前标题初始化一个新的文本组件
+                # Initialize a new text component according to the current title
                 non_text_cache.clear()
                 cur_text_co = Component(type="text", title=cur_text_title)
-                # 必须把标题本身的 bbox 也加入到新组件的 location 中
+                # The title's own bbox must also be added to the location of the new component
                 cur_text_co.location.append(location)
-                # 同时把标题内容也加到 data 中，确保 check_node 文本包含标题
+                # Also add the title content to data to ensure check_node text contains the title
                 cur_text_co.data = cur_text_title
 
             elif block.is_figure():
                 cur_figure_co = Component(
                     type=block.label, title=cur_figure_title, location=[location]
                 )
-                # 标题在图的上方
+                # Title is above the figure
                 if i > 0 and ocr_blocks[i - 1].is_figure_title():
                     cur_figure_title = ocr_blocks[i - 1].content
                     cur_figure_co.location.append(location)
-                # 标题在图的下方
+                # Title is below the figure
                 elif i + 1 < len(ocr_blocks) and ocr_blocks[i + 1].is_figure_title():
                     cur_figure_title = ocr_blocks[i + 1].content
                     cur_figure_co.location.append(location)
-                # 没有标题
+                # No title
                 else:
                     cur_figure_title = TITLE
 

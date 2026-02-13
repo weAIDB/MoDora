@@ -10,13 +10,12 @@ TITLE = "Default Title"
 
 @dataclass(slots=True)
 class Location:
-    """
-    组件在 PDF 页面上的定位信息。
+    """Location information of a component on a PDF page.
 
     Attributes:
-        bbox: 边界框坐标 [x0, y0, x1, y1]。
-        page: 页码，从 1 开始计数。
-        file_name: 文件名，用于多文档问答。
+        bbox: Bounding box coordinates [x0, y0, x1, y1].
+        page: Page number, starting from 1.
+        file_name: File name, used for multi-document Q&A.
     """
 
     bbox: list[float]
@@ -24,7 +23,7 @@ class Location:
     file_name: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        """将定位信息序列化为字典。"""
+        """Serializes the location information to a dictionary."""
         d = {"bbox": list(self.bbox), "page": int(self.page)}
         if self.file_name:
             d["file_name"] = self.file_name
@@ -32,7 +31,7 @@ class Location:
 
     @staticmethod
     def from_dict(obj: dict[str, Any]) -> "Location":
-        """从字典反序列化为 Location 对象。"""
+        """Deserializes from a dictionary to a Location object."""
         bbox = obj.get("bbox")
         page = obj.get("page")
         file_name = obj.get("file_name")
@@ -44,17 +43,17 @@ class Location:
 
 @dataclass(slots=True)
 class Component:
-    """
-    文档基础组件。
-    表示从 PDF 中提取出的最小语义单元（如一段文字、一张图片、一个表格等）。
+    """Basic document component.
+
+    Represents the smallest semantic unit extracted from a PDF (e.g., a paragraph of text, an image, a table, etc.).
 
     Attributes:
-        type: 组件类型 (如 'text', 'image', 'chart', 'table', 'header', 'footer' 等)。
-        title: 组件标题，默认为 "Default Title"。
-        title_level: 标题级别，用于构建层级结构 (1 为最高级)。
-        metadata: 存储与该组件相关的额外元数据。
-        data: 组件的原始内容或提取出的文本内容。
-        location: 该组件在 PDF 页面中的位置列表 (可能跨越多个区域或页面)。
+        type: Component type (e.g., 'text', 'image', 'chart', 'table', 'header', 'footer', etc.).
+        title: Component title, defaults to "Default Title".
+        title_level: Title level used to build hierarchical structures (1 is the highest level).
+        metadata: Stores additional metadata related to this component.
+        data: Original content or extracted text content of the component.
+        location: List of positions for this component in the PDF pages (may span multiple areas or pages).
     """
 
     type: str
@@ -65,7 +64,7 @@ class Component:
     location: list[Location] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
-        """将组件序列化为字典。"""
+        """Serializes the component to a dictionary."""
         return {
             "type": self.type,
             "title": self.title,
@@ -77,7 +76,7 @@ class Component:
 
     @staticmethod
     def from_dict(obj: dict[str, Any]) -> "Component":
-        """从字典反序列化为 Component 对象。"""
+        """Deserializes from a dictionary to a Component object."""
         locs: list[Location] = []
         raw_locs = obj.get("location")
         if isinstance(raw_locs, list):
@@ -96,15 +95,15 @@ class Component:
 
 @dataclass(slots=True)
 class Supplement:
-    """
-    文档补充信息集合。
-    按页码聚合页眉、页脚、页码和边栏等辅助信息。
+    """A collection of supplementary document information.
+
+    Aggregates auxiliary information such as headers, footers, page numbers, and sidebars by page number.
 
     Attributes:
-        header: 页码到页眉组件的映射。
-        footer: 页码到页脚组件的映射。
-        number: 页码到页码组件的映射。
-        aside: 页码到边栏组件的映射。
+        header: Mapping from page number to header components.
+        footer: Mapping from page number to footer components.
+        number: Mapping from page number to page number components.
+        aside: Mapping from page number to sidebar components.
     """
 
     header: dict[int, Component] = field(default_factory=dict)
@@ -113,7 +112,7 @@ class Supplement:
     aside: dict[int, Component] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
-        """将补充信息序列化为字典。"""
+        """Serializes the supplementary information to a dictionary."""
 
         def dump_map(m: dict[int, Component]) -> dict[str, Any]:
             out: dict[str, Any] = {}
@@ -130,7 +129,7 @@ class Supplement:
 
     @staticmethod
     def from_dict(obj: dict[str, Any]) -> "Supplement":
-        """从字典反序列化为 Supplement 对象。"""
+        """Deserializes from a dictionary to a Supplement object."""
 
         def load_map(x: Any) -> dict[int, Component]:
             out: dict[int, Component] = {}
@@ -155,20 +154,20 @@ class Supplement:
 
 @dataclass(slots=True)
 class ComponentPack:
-    """
-    整份文档的组件打包对象。
-    包含正文组件列表和补充信息。
+    """A collection of components for the entire document.
+
+    Contains a list of body components and supplementary information.
 
     Attributes:
-        body: 文档正文中的所有组件列表。
-        supplement: 文档的页眉页脚等补充信息。
+        body: List of all components in the document body.
+        supplement: Supplementary information such as headers and footers.
     """
 
     body: list[Component] = field(default_factory=list)
     supplement: Supplement = field(default_factory=Supplement)
 
     def to_dict(self) -> dict[str, Any]:
-        """将打包对象序列化为字典。"""
+        """Serializes the packed object to a dictionary."""
         return {
             "body": [co.to_dict() for co in self.body],
             "supplement": self.supplement.to_dict(),
@@ -176,7 +175,7 @@ class ComponentPack:
 
     @staticmethod
     def from_dict(obj: dict[str, Any]) -> "ComponentPack":
-        """从字典反序列化为 ComponentPack 对象。"""
+        """Deserializes from a dictionary to a ComponentPack object."""
         body: list[Component] = []
         raw_body = obj.get("body")
         if isinstance(raw_body, list):
@@ -191,8 +190,14 @@ class ComponentPack:
         )
         return ComponentPack(body=body, supplement=supp)
 
-    def save_json(self, path: str) -> None:
-        """将 ComponentPack 保存为 JSON 文件（用于离线调试、回放或中间结果持久化）。"""
+    def dump_json(self, path: str | Path) -> None:
+        """Saves the ComponentPack as a JSON file.
+
+        Used for offline debugging, playback, or intermediate result persistence.
+
+        Args:
+            path: The path to save the JSON file to.
+        """
         p = Path(path)
         p.write_text(
             json.dumps(self.to_dict(), ensure_ascii=False, indent=2, default=str),
@@ -201,7 +206,7 @@ class ComponentPack:
 
     @staticmethod
     def load_json(path: str) -> "ComponentPack":
-        """从 JSON 文件加载 ComponentPack 对象。"""
+        """Load a ComponentPack object from a JSON file."""
         p = Path(path)
         obj = json.loads(p.read_text(encoding="utf-8"))
         if not isinstance(obj, dict):

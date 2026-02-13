@@ -19,7 +19,11 @@ from modora.core.utils import iter_pdf_paths
 
 
 def register(sub: argparse._SubParsersAction) -> None:
-    """注册 build-tree 子命令"""
+    """Register the build-tree subcommand.
+
+    Args:
+        sub: The sub-parsers action to add the parser to.
+    """
     p = sub.add_parser("build-tree", help="Build title.json and tree.json for dataset")
     p.add_argument(
         "--dataset",
@@ -45,7 +49,18 @@ def register(sub: argparse._SubParsersAction) -> None:
 
 
 def _resolve_concurrency(args: argparse.Namespace, settings: Settings) -> int:
-    """解析并发数，如果未指定则根据本地 LLM 实例数量确定"""
+    """Resolve the concurrency level.
+
+    If not specified, the concurrency level is determined by the number of local
+    LLM instances.
+
+    Args:
+        args: Command-line arguments.
+        settings: Application settings.
+
+    Returns:
+        The resolved concurrency level.
+    """
     concurrency = int(getattr(args, "concurrency", 0) or 0)
     if concurrency <= 0:
         inst = list(getattr(settings, "llm_local_instances", ()) or ())
@@ -56,7 +71,17 @@ def _resolve_concurrency(args: argparse.Namespace, settings: Settings) -> int:
 def _build_jobs(
     pdf_paths: list[Path], cache_dir: Path, logger: logging.Logger, pbar: Any
 ) -> tuple[list[BuildTreeJob], int]:
-    """根据 PDF 路径构建任务列表，并验证 co.json 是否存在"""
+    """Build a list of jobs based on PDF paths and verify the existence of co.json.
+
+    Args:
+        pdf_paths: List of paths to the PDF files.
+        cache_dir: Directory containing the cache files.
+        logger: Logger instance for error reporting.
+        pbar: Progress bar instance.
+
+    Returns:
+        A tuple containing the list of jobs and the number of failed jobs.
+    """
     jobs: list[BuildTreeJob] = []
     failed = 0
     for pdf_path in pdf_paths:
@@ -96,14 +121,25 @@ def _build_jobs(
 async def _run_one_job(
     job: BuildTreeJob, sem: asyncio.Semaphore, logger: logging.Logger
 ) -> bool:
-    """执行单个构建树任务：加载 co.json，构建树，提取标题，并保存结果"""
+    """Run a single build-tree job.
+
+    Loads co.json, builds the tree, extracts titles, and saves the results.
+
+    Args:
+        job: The build-tree job to run.
+        sem: Semaphore for concurrency control.
+        logger: Logger instance for logging events.
+
+    Returns:
+        True if the job completed successfully, False otherwise.
+    """
     async with sem:
         try:
             cp = await asyncio.to_thread(ComponentPack.load_json, str(job.co_path))
             source = f"file:{str(job.pdf_path)}"
             tree = await build_tree_async(cp, logger, source)
 
-            # 提取并格式化标题信息
+            # Extract and format title information
             titles: list[dict[str, Any]] = []
             for co in cp.body:
                 if co.type != "text":
@@ -119,15 +155,15 @@ async def _run_one_job(
                 )
 
             payload = {"source": source, "titles": titles}
-            # 确保输出目录存在
+            # Ensure output directory exists
             await asyncio.to_thread(os.makedirs, job.out_dir, exist_ok=True)
-            # 保存标题信息
+            # Save title information
             await asyncio.to_thread(
                 job.title_path.write_text,
                 json.dumps(payload, ensure_ascii=False, indent=2, default=str),
                 "utf-8",
             )
-            # 保存树结构
+            # Save tree structure
             await asyncio.to_thread(tree.save_json, str(job.tree_path))
             return True
         except Exception as e:
@@ -148,7 +184,17 @@ async def _run_one_job(
 async def _run_jobs(
     jobs: list[BuildTreeJob], concurrency: int, logger: logging.Logger, pbar: Any
 ) -> tuple[int, int]:
-    """批量运行构建任务"""
+    """Run build jobs in batches.
+
+    Args:
+        jobs: List of jobs to run.
+        concurrency: Number of concurrent jobs.
+        logger: Logger instance.
+        pbar: Progress bar instance.
+
+    Returns:
+        A tuple containing the number of successful and failed jobs.
+    """
     sem = asyncio.Semaphore(concurrency)
     tasks = [asyncio.create_task(_run_one_job(job, sem, logger)) for job in jobs]
     ok = 0
@@ -163,7 +209,15 @@ async def _run_jobs(
 
 
 def _handle_build_tree(args: argparse.Namespace, logger: logging.Logger) -> int:
-    """build-tree 命令的处理器"""
+    """Handler for the build-tree command.
+
+    Args:
+        args: Command-line arguments.
+        logger: Logger instance.
+
+    Returns:
+        Exit code (0 for success, non-zero for failure).
+    """
     config_path = (getattr(args, "config", None) or "").strip() or None
     if config_path:
         os.environ["MODORA_CONFIG"] = config_path
@@ -177,7 +231,7 @@ def _handle_build_tree(args: argparse.Namespace, logger: logging.Logger) -> int:
 
         pdf_paths = list(iter_pdf_paths(dataset_dir))
 
-        # 应用白名单过滤
+        # Apply whitelist filtering
         filter_list_path = (getattr(args, "filter_list", None) or "").strip()
         if filter_list_path:
             filter_path = Path(filter_list_path).resolve()

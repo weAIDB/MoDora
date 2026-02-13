@@ -7,9 +7,7 @@ from modora.core.domain import CCTree, CCTreeNode, RetrievalResult
 
 
 class LocationRetriever:
-    """
-    基于 PDF 位置信息的检索器。
-    """
+    """Retriever based on PDF location information."""
 
     def retrieve(
         self,
@@ -18,17 +16,16 @@ class LocationRetriever:
         position_vector: List[float],
         pdf_path: str,
     ) -> RetrievalResult:
-        """
-        根据页码和网格位置检索节点。
+        """Retrieves nodes based on page numbers and grid positions.
 
-        参数:
-            tree: CCTree 实例。
-            page_list: 目标页码列表（1-based）。
-            position_vector: 网格位置向量 [row, col]。
-            pdf_path: PDF 文件路径。
+        Args:
+            tree (CCTree): CCTree instance.
+            page_list (List[int]): Target page numbers (1-based).
+            position_vector (List[float]): Grid position vector [row, col].
+            pdf_path (str): Path to the PDF file.
 
-        返回:
-            RetrievalResult: 包含命中的文本映射和位置列表。
+        Returns:
+            RetrievalResult: Contains matched text mappings and location lists.
         """
         result = RetrievalResult()
 
@@ -36,7 +33,7 @@ class LocationRetriever:
         try:
             target_pages = self._resolve_page_list(page_list, doc.page_count)
 
-            # 预计算页面尺寸以避免重复调用
+            # Precompute page dimensions to avoid redundant calls
             page_dims = {}
             for p in target_pages:
                 if 1 <= p <= doc.page_count:
@@ -49,7 +46,7 @@ class LocationRetriever:
 
                 dims = page_dims[page_number]
 
-                # 从 CCTree 根节点开始遍历
+                # Start traversing from the CCTree root node
                 self._traverse_tree(
                     node=tree.root,
                     path="root",
@@ -64,7 +61,7 @@ class LocationRetriever:
         return result
 
     def _resolve_page_list(self, page_list: List[int], total_pages: int) -> List[int]:
-        """解析页码列表，处理 -1（表示所有页面）的情况。"""
+        """Parses the page list, handling the case of -1 (representing all pages)."""
         if -1 in page_list:
             return list(range(1, total_pages + 1))
         return page_list
@@ -78,8 +75,8 @@ class LocationRetriever:
         position_vector: List[float],
         result: RetrievalResult,
     ):
-        """递归遍历树，检查节点是否与指定位置重叠。"""
-        # 确定当前页面上有哪些位置被命中
+        """Recursively traverses the tree to check if nodes overlap with the specified location."""
+        # Determine which locations on the current page are hit
         hit_locations = []
         for loc in node.location:
             if loc.page == page_number:
@@ -91,7 +88,7 @@ class LocationRetriever:
                 result.text_map[path] = node.data
             result.locations.extend(hit_locations)
 
-        # 递归检查子节点
+        # Recursively check child nodes
         for child_key, child_node in node.children.items():
             child_path = f"{path}--{child_key}"
             self._traverse_tree(
@@ -104,19 +101,19 @@ class LocationRetriever:
         page_dims: Tuple[float, float],
         position_vector: List[float],
     ) -> bool:
-        """检查给定的 bbox 是否与指定的网格位置重叠。"""
+        """Checks if the given bbox overlaps with the specified grid position."""
         page_width, page_height = page_dims
         x0, y0, x1, y1 = self._normalize_bbox(bbox, page_width, page_height)
 
         row, column = position_vector
 
-        # 3x3 网格计算
+        # 3x3 grid calculation
         grid_x0 = (column - 1) / 3 if column != -1 else 0.0
         grid_x1 = column / 3 if column != -1 else 1.0
         grid_y0 = (row - 1) / 3 if row != -1 else 0.0
         grid_y1 = row / 3 if row != -1 else 1.0
 
-        # 检查重叠
+        # Check for overlap
         x_overlap = not (x1 <= grid_x0 or x0 >= grid_x1)
         y_overlap = not (y1 <= grid_y0 or y0 >= grid_y1)
 
@@ -126,7 +123,7 @@ class LocationRetriever:
     def _normalize_bbox(
         bbox: List[float], page_width: float, page_height: float
     ) -> List[float]:
-        """将绝对坐标 bbox 归一化为 [0, 1] 相对坐标。"""
+        """Normalizes the absolute coordinate bbox to [0, 1] relative coordinates."""
         return [
             bbox[0] / page_width,
             bbox[1] / page_height,

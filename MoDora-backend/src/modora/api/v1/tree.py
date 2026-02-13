@@ -13,10 +13,16 @@ from modora.core.utils.tree import (
     validate_tree_structure,
     TreeNode,
 )
-from modora.api.v1.models import TreeRequest, TreeResponse, TreeUpdateRequest, NodeUpdateRequest
+from modora.api.v1.models import (
+    TreeRequest,
+    TreeResponse,
+    TreeUpdateRequest,
+    NodeUpdateRequest,
+)
 
 router = APIRouter(tags=["tree"])
 logger = logging.getLogger("modora.api")
+
 
 @router.post("/tree", response_model=TreeResponse)
 async def get_document_tree(request: TreeRequest):
@@ -30,6 +36,7 @@ async def get_document_tree(request: TreeRequest):
     elements = convert_tree_to_vueflow(tree_dict, root_label=request.file_name)
     return TreeResponse(elements=elements)
 
+
 @router.post("/tree/update")
 def update_tree_endpoint(request: TreeUpdateRequest):
     settings = Settings.load()
@@ -37,7 +44,9 @@ def update_tree_endpoint(request: TreeUpdateRequest):
 
     tree_path = paths.doc_cache_dir(request.file_name) / "tree.json"
     if not tree_path.exists():
-        raise HTTPException(status_code=404, detail=f"Tree cache not found: {tree_path}")
+        raise HTTPException(
+            status_code=404, detail=f"Tree cache not found: {tree_path}"
+        )
 
     original_tree_dict = json.loads(tree_path.read_text(encoding="utf-8"))
     try:
@@ -53,6 +62,7 @@ def update_tree_endpoint(request: TreeUpdateRequest):
         raise HTTPException(status_code=400, detail=f"Invalid tree structure: {ve}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/tree/node/update")
 def update_node_endpoint(request: NodeUpdateRequest):
@@ -86,7 +96,9 @@ def update_node_endpoint(request: NodeUpdateRequest):
                 current_node.title = request.new_data.get("title", current_node.title)
                 current_node.type = request.new_data.get("type", current_node.type)
                 current_node.data = request.new_data.get("data", current_node.data)
-                current_node.metadata = request.new_data.get("metadata", current_node.metadata)
+                current_node.metadata = request.new_data.get(
+                    "metadata", current_node.metadata
+                )
         elif request.action == "delete":
             if parent_node:
                 parent_node.delete_child(current_node)

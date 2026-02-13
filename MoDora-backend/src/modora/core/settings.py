@@ -6,28 +6,27 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-""" 
-系统配置模块
+"""System configuration module.
 
-本模块提供应用程序配置管理功能，支持从环境变量和JSON配置文件加载配置。
-配置加载优先级：环境变量 > 配置文件 > 默认值
+This module provides application configuration management functions, supporting
+configuration loading from environment variables and JSON configuration files.
+Configuration loading priority: Environment variables > Configuration files > Default values.
 
-主要功能：
-    - 类型安全的配置值转换
-    - 多源配置合并（环境变量、配置文件）
-
+Main features:
+    - Type-safe configuration value conversion.
+    - Multi-source configuration merging (environment variables, configuration files).
 """
 
 
 def _coerce_bool(val: Any, default: bool = False) -> bool:
-    """
-    将来自环境变量或者配置文件的值转为 bool
+    """Coerces a value from environment variables or configuration files into a boolean.
+
     Args:
-        val: 待转换的值
-        default: 默认值，当 val 为 None 时返回
+        val: The value to be converted.
+        default: The default value to return if val is None.
 
     Returns:
-        转换后的 bool 值
+        bool: The converted boolean value.
     """
     if val is None:
         return default
@@ -130,19 +129,20 @@ class LlmLocalInstance:
 
 @dataclass(frozen=True)
 class Settings:
-    """应用程序配置类
+    """Application configuration class.
 
-    配置字段说明：
-        - env: 运行环境 (dev/test/prod)
-        - service_name: 服务标识符 (service/lab)
-        - log_level: 日志级别 (DEBUG/INFO/WARNING/ERROR/CRITICAL)
-        - log_format: 日志格式 (text/json)
-        - log_to_file: 是否启用文件日志
-        - log_dir: 日志目录路径，为None时使用默认位置
-        - api_base: API服务基础URL
-        - api_key: API认证密钥
+    Attributes:
+        env: Running environment (dev/test/prod).
+        service_name: Service identifier (service/lab).
+        log_level: Log level (DEBUG/INFO/WARNING/ERROR/CRITICAL).
+        log_format: Log format (text/json).
+        log_to_file: Whether to enable file logging.
+        log_dir: Log directory path, default location is used if None.
+        api_base: API service base URL.
+        api_key: API authentication key.
 
-    注意：所有字段都有默认值，确保配置对象始终有效。
+    Note:
+        All fields have default values to ensure the configuration object is always valid.
     """
 
     env: str = "dev"
@@ -179,11 +179,11 @@ class Settings:
 
     @staticmethod
     def load(config_path: str | None = None) -> "Settings":
-        """从多个来源加载配置
-        
-        设置环境变量以优化运行环境：
-        1. TOKENIZERS_PARALLELISM: 设置为 false 以避免多进程警告和死锁。
-        2. PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK: 设置为 True 以跳过 PaddlePDX 的模型源连接检查。
+        """Loads configuration from multiple sources.
+
+        Sets environment variables to optimize the running environment:
+        1. TOKENIZERS_PARALLELISM: Set to false to avoid multiprocessing warnings and deadlocks.
+        2. PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK: Set to True to skip model source connection checks for PaddlePDX.
         """
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
         os.environ["PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK"] = "True"
@@ -265,7 +265,9 @@ class Settings:
         ocr_layout_unclip_ratio = _coerce_float_or_pair(
             pick("ocr_layout_unclip_ratio", 0.5), default=0.5
         )
-        ocr_text_recognition_batch_size = int(pick("ocr_text_recognition_batch_size", 8))
+        ocr_text_recognition_batch_size = int(
+            pick("ocr_text_recognition_batch_size", 8)
+        )
         ocr_use_table_recognition = _coerce_bool(
             pick("ocr_use_table_recognition", True), default=True
         )
@@ -309,27 +311,26 @@ class Settings:
 
 
 if __name__ == "__main__":
-    """
-    配置加载示例
+    """Configuration loading examples.
 
-    方式1：使用默认配置
+    Method 1: Using default configuration
         settings = Settings.load()
 
-    方式2：指定配置文件
+    Method 2: Specifying a configuration file
         settings = Settings.load("/path/to/config.json")
-    或者
+    Or
         export MODORA_CONFIG=/path/to/config.json
 
-    方式3：通过环境变量
+    Method 3: Via environment variables
         export MODORA_ENV=prod
         export MODORA_LOG_LEVEL=DEBUG
         settings = Settings.load()
 
-    方式4：混合使用
+    Method 4: Mixed usage
         export MODORA_API_KEY=your-key
         settings = Settings.load("config.json")
     """
-    # 演示如何使用
+    # Demonstration of how to use
     settings = Settings.load()
     print(f"Environment: {settings.env}")
     print(f"Log Level: {settings.log_level}")
