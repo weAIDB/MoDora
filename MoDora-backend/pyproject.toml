@@ -20,6 +20,9 @@ dependencies = [
   "nvidia-ml-py",
   "huggingface_hub",
   "transformers>=4.45.0",
+  "pandas",
+  "seaborn",
+  "matplotlib",
 ]
 
 [project.scripts]

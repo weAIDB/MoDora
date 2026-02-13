@@ -2,10 +2,14 @@ import argparse
 import asyncio
 import json
 import logging
+import os
 from pathlib import Path
 from typing import List
 
 import Levenshtein
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 from modora.core.domain.results import ResultItem, write_results_file
@@ -94,8 +98,13 @@ def register(sub: argparse._SubParsersAction) -> None:
     )
     parser.add_argument(
         "--output",
-        default="/home/yukai/project/MoDora/MoDora-backend/tmp/evaluation.jsonl",
-        help="Path to save the evaluation report (JSONL)",
+        help="Path to save the evaluation report (JSONL) (default: same as --input with .jsonl extension)",
+    )
+    parser.add_argument(
+        "--analyze",
+        action="store_true",
+        default=True,
+        help="Whether to analyze the results and generate charts (default: True)",
     )
     parser.add_argument(
         "--concurrency",
@@ -245,6 +254,152 @@ async def _run_evaluation(
     print(f"ANLS: {anls:.4f}")
     print(f"Detailed results saved to {output_path}")
 
+    return evaluated_items
+
+
+def _plot_results(evaluated_items: List[ResultItem], output_dir: Path):
+    """根据评估结果生成图表和汇总 CSV"""
+    if not evaluated_items:
+        print("No data to plot.")
+        return
+
+    data = []
+    for item in evaluated_items:
+        tag = item.tag or "Unknown"
+        category = "Unknown"
+        if isinstance(tag, str) and "-" in tag:
+            try:
+                # 按照 analyze_eval.py 的逻辑，取连字符后的部分
+                category = tag.split("-")[-1]
+            except Exception:
+                pass
+
+        # 计算 ACNLS (包含性检查 + ANLS)
+        acnls = 0.0
+        contain = False
+        pred_str = str(item.prediction).lower() if item.prediction is not None else ""
+
+        if item.answer:
+            for ans in item.answer:
+                ans_str = str(ans).lower()
+                if ans_str and ans_str in pred_str:
+                    contain = True
+                    break
+
+        if contain:
+            acnls = 1.0
+        else:
+            # 这里的 ANLS 计算逻辑复用 Evaluator 中的实现，但使用 threshold=0.5
+            # analyze_eval.py 中使用了 0.5 的阈值
+            max_nls = 0.0
+            for ref in item.answer:
+                ref_str = str(ref).lower()
+                dist = Levenshtein.distance(pred_str, ref_str)
+                max_len = max(len(pred_str), len(ref_str))
+                nls = 1.0 - (dist / max_len) if max_len > 0 else 1.0
+                max_nls = max(max_nls, nls)
+            acnls = max_nls if max_nls > 0.5 else 0.0
+
+        data.append(
+            {
+                "tag": tag,
+                "category": category,
+                "Accuracy": 1.0 if item.judge == "T" else 0.0,
+                "ACNLS": acnls,
+            }
+        )
+
+    df = pd.DataFrame(data)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # 分组统计
+    grouped = df.groupby("tag")[["Accuracy", "ACNLS"]].mean().reset_index()
+    grouped = grouped.sort_values("tag")
+
+    sns.set_theme(style="whitegrid")
+
+    # 1. Plot Accuracy per Tag
+    plt.figure(figsize=(12, 6))
+    ax = sns.barplot(
+        x="tag", y="Accuracy", data=grouped, hue="tag", palette="viridis", legend=False
+    )
+    plt.title("Accuracy per Tag", fontsize=16)
+    plt.ylim(0, 1.1)
+    for p in ax.patches:
+        ax.annotate(
+            f"{p.get_height():.2f}",
+            (p.get_x() + p.get_width() / 2.0, p.get_height()),
+            ha="center",
+            va="center",
+            xytext=(0, 9),
+            textcoords="offset points",
+        )
+    plt.tight_layout()
+    plt.savefig(output_dir / "accuracy_per_tag.png")
+    plt.close()
+
+    # 2. Plot ACNLS per Tag
+    plt.figure(figsize=(12, 6))
+    ax = sns.barplot(
+        x="tag", y="ACNLS", data=grouped, hue="tag", palette="magma", legend=False
+    )
+    plt.title("ACNLS per Tag", fontsize=16)
+    plt.ylim(0, 1.1)
+    for p in ax.patches:
+        ax.annotate(
+            f"{p.get_height():.2f}",
+            (p.get_x() + p.get_width() / 2.0, p.get_height()),
+            ha="center",
+            va="center",
+            xytext=(0, 9),
+            textcoords="offset points",
+        )
+    plt.tight_layout()
+    plt.savefig(output_dir / "acnls_per_tag.png")
+    plt.close()
+
+    # 3. Save Summaries
+    grouped.to_csv(output_dir / "metrics_summary_by_tag.csv", index=False)
+
+    category_grouped = df.groupby("category")[["Accuracy", "ACNLS"]].mean().reset_index()
+    category_grouped = category_grouped.sort_values("category")
+    category_grouped.to_csv(output_dir / "metrics_summary_by_category.csv", index=False)
+
+    # 4. Plot Category Metrics
+    for metric in ["Accuracy", "ACNLS"]:
+        plt.figure(figsize=(10, 6))
+        palette = "viridis" if metric == "Accuracy" else "magma"
+        ax = sns.barplot(
+            x="category",
+            y=metric,
+            data=category_grouped,
+            hue="category",
+            palette=palette,
+            legend=False,
+        )
+        plt.title(f"{metric} per Category", fontsize=16)
+        plt.ylim(0, 1.1)
+        for p in ax.patches:
+            ax.annotate(
+                f"{p.get_height():.2f}",
+                (p.get_x() + p.get_width() / 2.0, p.get_height()),
+                ha="center",
+                va="center",
+                xytext=(0, 9),
+                textcoords="offset points",
+            )
+        plt.tight_layout()
+        plt.savefig(output_dir / f"{metric.lower()}_per_category.png")
+        plt.close()
+
+    print(f"\nAnalysis results (charts and CSVs) saved to {output_dir}")
+    print("\nSummary by Tag:")
+    print(grouped)
+    print("\nSummary by Category:")
+    print(category_grouped)
+    print("\nOverall Metrics:")
+    print(df[["Accuracy", "ACNLS"]].mean())
+
 
 def _handle_evaluate(args: argparse.Namespace, logger: logging.Logger) -> int:
     """evaluate 命令的处理器"""
@@ -252,16 +407,27 @@ def _handle_evaluate(args: argparse.Namespace, logger: logging.Logger) -> int:
     if not args.remote:
         ensure_llm_local_loaded(Settings.load(), logger)
     try:
-        asyncio.run(
+        input_path = Path(args.input)
+        output_path = (
+            Path(args.output)
+            if args.output
+            else input_path.with_suffix(".jsonl")
+        )
+
+        evaluated_items = asyncio.run(
             _run_evaluation(
-                Path(args.input),
+                input_path,
                 Path(args.result),
-                Path(args.output),
+                output_path,
                 args.concurrency,
                 logger,
                 use_remote=args.remote,
             )
         )
+
+        if args.analyze:
+            _plot_results(evaluated_items, output_path.parent)
+
         return 0
     except Exception as e:
         logger.error(f"Evaluation failed: {e}")

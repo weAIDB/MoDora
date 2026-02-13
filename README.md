@@ -97,7 +97,7 @@ Retrieval-Augmented Generation methods:
 
 - [TextRAG](./TextRAG.zip)
 
-## 🚀 Quick Start (Web Application)
+## 🚀 Quick Start 
 
 ### 1. Automated Installation
 
@@ -242,8 +242,12 @@ modora <command> --help
    modora batch-qa --dataset datasets/MMDA/test.json --cache MoDora-backend/cache_v5 --output MoDora-backend/tmp
    ```
 
-5. **Evaluation**
-   Calculate metrics (Accuracy, F1, etc.) for the batch results.
+5. **Evaluation & Analysis**
+   Calculate metrics (Accuracy, ANLS, ACNLS) and generate analysis charts.
    ```bash
-   modora evaluate --input MoDora-backend/tmp/result.jsonl
+   # By default, evaluation results and charts will be saved alongside the input file
+   modora evaluate --input datasets/MMDA/test.json --result MoDora-backend/tmp/result.json
    ```
+   This command will:
+   - Save the detailed evaluation to `test.jsonl`.
+   - Generate accuracy/ACNLS bar charts and summary CSVs in the same directory as the input.
