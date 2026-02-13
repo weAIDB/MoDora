@@ -23,6 +23,7 @@ dependencies = [
   "pandas",
   "seaborn",
   "matplotlib",
+  "python-multipart",
   "paddleocr",
   "paddlex>=3.4.2",
 ]
