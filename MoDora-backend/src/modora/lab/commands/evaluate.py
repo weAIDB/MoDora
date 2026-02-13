@@ -424,6 +424,11 @@ def _plot_results(
         plt.savefig(output_dir / f"{metric.lower()}_per_category.png")
         plt.close()
 
+    # 5. Save Overall Metrics if provided
+    if overall_metrics:
+        with open(output_dir / "overall_metrics.json", "w", encoding="utf-8") as f:
+            json.dump(overall_metrics, f, ensure_ascii=False, indent=2)
+
     print(f"\nAnalysis results (charts and CSVs) saved to {output_dir}")
     print("\nSummary by Tag:")
     print(grouped)
