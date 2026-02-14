@@ -16,7 +16,7 @@ class PPStructureClient(OCRClient):
     def __init__(self, settings: Settings):
         from paddleocr import PPStructureV3
 
-        device = (settings.ocr_device or "").strip() or "gpu:6"
+        device = (settings.ocr_device or "").strip() or "gpu:7"
         kwargs: dict[str, Any] = {
             "device": device,
             "lang": settings.ocr_lang or "en",
@@ -77,7 +77,7 @@ class PaddleOCRVLClient(OCRClient):
     def __init__(self, settings: Settings, model_class_name: str = "PaddleOCRVL"):
         from paddleocr import PaddleOCRVL
 
-        device = (settings.ocr_device or "").strip() or "gpu:6"
+        device = (settings.ocr_device or "").strip() or "gpu:7"
         kwargs: dict[str, Any] = {
             "device": device,
             "use_chart_recognition": bool(settings.ocr_use_table_recognition),

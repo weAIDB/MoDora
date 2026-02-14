@@ -98,7 +98,7 @@ async def process_document_task(
         cp = await get_components_async(
             ocr_res, logger, settings=settings, config=config
         )
-        cp.save_json(str(cache_dir / "cp.json"))
+        cp.dump_json(str(cache_dir / "cp.json"))
 
         # Get the final CCTree
         tree = await build_tree_async(

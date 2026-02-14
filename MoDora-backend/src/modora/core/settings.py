@@ -170,7 +170,7 @@ class Settings:
     llm_local_instances: tuple[LlmLocalInstance, ...] = ()
 
     ocr_model: str = "ppstructure"
-    ocr_device: str = "gpu:6"
+    ocr_device: str = "gpu:7"
     ocr_lang: str = "en"
     ocr_layout_unclip_ratio: float | tuple[float, float] = 1.1
     ocr_text_recognition_batch_size: int = 8
@@ -260,10 +260,10 @@ class Settings:
             )
 
         ocr_model = _clean_str(pick("ocr_model", "ppstructure"))
-        ocr_device = _clean_str(pick("ocr_device", "gpu:6")) or "gpu:6"
+        ocr_device = _clean_str(pick("ocr_device", "gpu:7")) or "gpu:7"
         ocr_lang = _clean_str(pick("ocr_lang", "en"))
         ocr_layout_unclip_ratio = _coerce_float_or_pair(
-            pick("ocr_layout_unclip_ratio", 0.5), default=0.5
+            pick("ocr_layout_unclip_ratio", 1.2), default=1.2
         )
         ocr_text_recognition_batch_size = int(
             pick("ocr_text_recognition_batch_size", 8)

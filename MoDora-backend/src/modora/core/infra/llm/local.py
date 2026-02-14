@@ -69,12 +69,19 @@ class AsyncLocalLLMClient(BaseAsyncLLMClient):
                 base64_image = [base64_image]
 
             for img in base64_image:
-                messages[0]["content"].append(
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{img}"},
-                    }
-                )
+                # Only process if img looks like Base64 (no spaces and sufficient length)
+                if isinstance(img, str) and len(img) > 100 and " " not in img:
+                    img = img.strip()
+                    padding = len(img) % 4
+                    if padding > 0:
+                        img += "=" * (4 - padding)
+                
+                    messages[0]["content"].append(
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{img}"},
+                        }
+                    )
         return messages
 
     async def _call_llm(
