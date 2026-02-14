@@ -159,10 +159,10 @@ def convert_tree_to_vueflow(
                     "style": {"stroke": "#3b82f6", "strokeWidth": 2},
                 }
             )
+        
+        children = list(node_data.get("children", {}).items())
 
-        for i, (child_name, child_data) in enumerate(
-            node_data.get("children", {}).items()
-        ):
+        for i, (child_name, child_data) in enumerate(reversed(children)):
             traverse(child_name, child_data, node_id, depth + 1, i)
 
     traverse(root_label, cctree)
@@ -172,6 +172,85 @@ def convert_tree_to_vueflow(
 def reconstruct_tree_from_elements(
     elements: list[dict[str, Any]], original_tree: dict[str, Any], root_name: str
 ) -> dict[str, Any]:
-    # This is a complex mapping back from VueFlow elements to the CCTree dict.
-    # For now, we assume simple mapping or throw error if not supported.
-    return original_tree
+    """Reconstruct the CCTree dictionary structure from Vue Flow elements.
+
+    Args:
+        elements (list[dict[str, Any]]): List of Vue Flow nodes and edges.
+        original_tree (dict[str, Any]): The original CCTree dictionary (used to preserve data not in elements).
+        root_name (str): The name of the root node.
+
+    Returns:
+        dict[str, Any]: The reconstructed CCTree dictionary.
+    """
+    # 1. 创建节点映射，方便通过 ID 查找
+    nodes_map = {}
+    edges = []
+    
+    # 建立原始数据的映射，以便找回 location 等信息
+    original_nodes_data = {}
+    def map_original(name, data):
+        original_nodes_data[name] = data
+        for child_name, child_data in data.get("children", {}).items():
+            map_original(child_name, child_data)
+    
+    map_original(root_name, original_tree)
+
+    for el in elements:
+        if "source" in el and "target" in el:
+            edges.append(el)
+        else:
+            nodes_map[el["id"]] = el
+
+    # 2. 建立父子关系映射
+    parent_to_children = {}
+    for edge in edges:
+        source = edge["source"]
+        target = edge["target"]
+        if source not in parent_to_children:
+            parent_to_children[source] = []
+        parent_to_children[source].append(target)
+
+    # 3. 递归构建树结构
+    def build_node(node_id):
+        node_el = nodes_map.get(node_id)
+        if not node_el:
+            return None
+        
+        node_name = node_el.get("label", node_el.get("data", {}).get("label", ""))
+        node_data_attr = node_el.get("data", {})
+        
+        # 尝试从原始树中获取丢失的详细信息 (如 location)
+        orig_data = original_nodes_data.get(node_name, {})
+        
+        reconstructed = {
+            "type": node_data_attr.get("type", orig_data.get("type", "text")),
+            "metadata": node_data_attr.get("metadata", orig_data.get("metadata", "")),
+            "data": node_data_attr.get("data", orig_data.get("data", "")),
+            "location": orig_data.get("location", []),
+            "impact": node_data_attr.get("impact", orig_data.get("impact", 0)),
+            "children": {}
+        }
+
+        # 递归处理子节点
+        child_ids = parent_to_children.get(node_id, [])
+        for child_id in reversed(child_ids):
+            child_node_el = nodes_map.get(child_id)
+            if child_node_el:
+                child_name = child_node_el.get("label", child_node_el.get("data", {}).get("label", ""))
+                child_struct = build_node(child_id)
+                if child_struct:
+                    reconstructed["children"][child_name] = child_struct
+                    
+        return reconstructed
+
+    # 找到根节点的 ID (通常是 "root" 或者没有被作为 target 的节点)
+    root_id = "root"
+    if root_id not in nodes_map:
+        # 如果没有固定 ID 为 root 的节点，找入度为 0 的节点
+        all_targets = {e["target"] for e in edges}
+        potential_roots = [nid for nid in nodes_map if nid not in all_targets]
+        if potential_roots:
+            root_id = potential_roots[0]
+
+    result_tree = build_node(root_id)
+    return result_tree if result_tree else original_tree
