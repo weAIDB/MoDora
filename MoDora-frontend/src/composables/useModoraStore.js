@@ -409,8 +409,6 @@ export function useModoraStore() {
                 session.name = filename;
             }
             
-            alert("文档处理完成！");
-            
         } catch (e) {
             console.error("Upload Error:", e);
             alert("上传失败: " + e.message);

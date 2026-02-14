@@ -158,7 +158,15 @@
                  {{ Math.round(store.state.uploadProgress) }}%
                </span>
             </div>
-            <input ref="fileInputRef" type="file" class="hidden" @change="onFileChange" :disabled="store.state.isUploading" accept=".pdf,.txt,.md" />
+            <input 
+              ref="fileInputRef" 
+              type="file" 
+              class="hidden" 
+              multiple
+              @change="onFileChange" 
+              :disabled="store.state.isUploading" 
+              accept=".pdf" 
+            />
           </div>
 
           <!-- Knowledge Base Import -->
@@ -746,9 +754,15 @@ const getFileIcon = (type) => {
 };
 
 const onFileChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  await store.uploadFile(file);
+  const files = e.target.files;
+  if (!files || files.length === 0) return;
+  
+  for (let i = 0; i < files.length; i++) {
+    await store.uploadFile(files[i]);
+  }
+  
+  // 重置 input，允许重复上传同一个文件
+  e.target.value = '';
 };
 
 // 获取标签样式

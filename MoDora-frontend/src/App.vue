@@ -4,7 +4,28 @@
     1. Remove bg-slate-50, use transparent background (since body already has gradient)
     2. Add padding (p-4), make main area float above background for better layering
   -->
-  <div class="flex h-screen w-screen overflow-hidden p-4 md:p-6 gap-4 md:gap-6">
+  <div 
+    class="flex h-screen w-screen overflow-hidden p-4 md:p-6 gap-4 md:gap-6 relative"
+    @dragover.prevent="onDragOver"
+    @dragenter.prevent="onDragOver"
+    @dragleave.prevent="onDragLeave"
+    @drop.prevent="onDrop"
+  >
+    <!-- Global Drag Overlay -->
+    <transition name="fade">
+      <div 
+        v-if="isDraggingGlobal" 
+        class="fixed inset-0 z-[1000] flex items-center justify-center bg-primary-500/10 backdrop-blur-[2px] pointer-events-none"
+      >
+        <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-2xl border-4 border-dashed border-primary-500 flex flex-col items-center animate-in zoom-in-95 duration-200">
+          <div class="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mb-4">
+            <i class="fa-solid fa-cloud-arrow-up text-4xl text-primary-500 animate-bounce"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Drop PDF to upload</h2>
+          <p class="text-slate-500 dark:text-slate-400 mt-2">Currently only supports PDF files</p>
+        </div>
+      </div>
+    </transition>
     
     <!-- 1. Left Sidebar -->
     <!-- Add glass-panel class for frosted glass and rounded corners -->
@@ -88,6 +109,43 @@ import { useModoraStore } from './composables/useModoraStore';
 
 const store = useModoraStore();
 const showSettings = ref(false);
+const isDraggingGlobal = ref(false);
+let dragCounter = 0;
+
+const onDragOver = (e) => {
+  if (store.state.isUploading) return;
+  e.dataTransfer.dropEffect = 'copy';
+  if (dragCounter === 0) {
+    isDraggingGlobal.value = true;
+  }
+  dragCounter++;
+};
+
+const onDragLeave = () => {
+  dragCounter--;
+  if (dragCounter <= 0) {
+    dragCounter = 0;
+    isDraggingGlobal.value = false;
+  }
+};
+
+const onDrop = async (e) => {
+  dragCounter = 0;
+  isDraggingGlobal.value = false;
+  
+  if (store.state.isUploading) return;
+  
+  const files = e.dataTransfer.files;
+  if (files && files.length > 0) {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (ext === 'pdf') {
+        await store.uploadFile(file);
+      }
+    }
+  }
+};
 </script>
 
 <style>
@@ -109,5 +167,16 @@ const showSettings = ref(false);
   transform: translateX(0);
   width: 45%;
   opacity: 1;
+}
+
+/* Fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
