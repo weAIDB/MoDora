@@ -8,44 +8,560 @@ MoDora is an LLM-powered framework for semi-structured document analysis. It int
 MoDora combines OCR, Embedding models and MLLMs in preprocessing, tree construction and tree-based analysis, without the need for extra training or fine-tuning. The experiment on two datasets with various documents and question types demonstrates its superior performance compared to existing methods.
 
 **Examples**
-| **Question**                                                                                                                       | **Answer**                                   | **UDOP**                                                                                  | **DocOwl2**                                                                  | **M3DocRAG**                                                         | **SV-RAG**                                                                                                        | **TextRAG**                                                                                                  | **ZenDB**                                                                  | **QUEST**                                   | **GPT-5**                                      | **MoDora **                                                                    |
-|------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|-------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|---------------------------------------------|------------------------------------------------|--------------------------------------------------------------------------------|
-| Is Bitmex launched earlier than South Korea's ban on Bitcoin derivatives?                                                          | Yes                                          | no                                                                                        | Yes                                                                          | Yes                                                                  | Yes, Bitmex was launched in 2014, while South Korea's ban on Bitcoin derivatives was announced in 2017.           | Yes. BitMEX launched in 2014, while South Korea’s Bitcoin derivatives ban began on 2017-12-11.               | Not specified.                                                             |                                             | Yes.                                           | Yes—BitMEX launched in Jan 2014, while South Korea’s ban was on Dec 11, 2017.  |
-| What is the title at the top of the third page?                                                                                    | Preface                                      | The title of the third page is "The Changing World"                                       | PREFACE                                                                      | 2018 Global Digital Asset Derivatives Research Report                | 2018 Global Digital Asset Derivatives Research Report                                                             | LEGAL NOTICES                                                                                                | Digital Asset Derivatives                                                  | Not found.                                  | Working with Apps                              | PREFACE                                                                        |
-| When was this document published?                                                                                                  | November 30, 2023                            | 2023 September 6, 2000                                                                    | 2023-11-10                                                                   | 2023-11-13                                                           | The document was published on November 30, 2023.                                                                  | The publication date is not stated in the provided text.                                                     | November 30, 2023                                                          | 2023-11-30                                  | November 30, 2023                              | November 30, 2023                                                              |
-| What image is in the center of page 2?                                                                                             | QR code                                      | The image is in the center of page 2.                                                     | not answerable                                                               | A QR code.                                                           | QR code                                                                                                           | Not specified in the provided information.                                                                   | Not specified.                                                             | Not specified.                              | A QR code.                                     | A QR code.                                                                     |
-| What was the decline in the electrical equipment industry last week?                                                               | 2.36%                                        | 3%                                                                                        | not answerable                                                               | -2.36%                                                               | The decline in the electrical equipment industry last week was 0.6%.                                              | Down 2.36%.                                                                                                  | Not specified in the provided context.                                     | -2.36%                                      | -3.4%                                          | Down 2.36%.                                                                    |
-| What is the fourth section of the report?                                                                                          | Investment Strategy and Key Recommendations  | scientific report                                                                         | not answerable                                                               | Risk warning                                                         | The fourth section of the report is titled "2.2.1 New Energy Source."                                             | Not specified in the provided information.                                                                   | Investment Strategy and Key Recommendations                                | Unknown                                     | Real estate market                             | Investment Strategy and Key Recommendations                                    |
-| How many references are there?                                                                                                     | 13                                           | 3                                                                                         | 37                                                                           | 13                                                                   | There are 5 references in the text.                                                                               | 11                                                                                                           | 13                                                                         |                                             | 13                                             | 13                                                                             |
-| What is the actual number of the second page?                                                                                      | 266                                          | 240                                                                                       | 2                                                                            | 265                                                                  | The actual number of the second page is 266.                                                                      | 3070                                                                                                         | 266                                                                        | Not found                                   | 266                                            | 266                                                                            |
-| What was the amount of the year-on-year increase in the largest proportion of RMB loans in November 2022?                          | 23.2 billion                                 | 9%                                                                                        | 12.40%                                                                       | 58.6 billion yuan                                                    | The largest proportion of RMB loans in November 2022 increased by 7.8%.                                           | Down by 60 billion yuan year on year (1210 billion yuan vs 1270 billion yuan)                                | 23.2 billion yuan                                                          | N/A                                         | 0.20 trillion yuan                             | 23.2 billion yuan                                                              |
-| Which color is used to emphasize key text?                                                                                         | Red                                          | Blue                                                                                      | Yellow                                                                       | Red                                                                  | The color used to emphasize key text is red.                                                                      | Red                                                                                                          | Not specified.                                                             | None                                        | Red                                            | Red                                                                            |
-| What is the stock code of the company discussed in the document?                                                                   | 002624                                       | HK                                                                                        | 002624                                                                       | 002624                                                               | 002624                                                                                                            | 002624                                                                                                       |                                                                            | 002624                                      | 002891.SZ                                      | 002624                                                                         |
-| Which kind of companies have more workers deployed in trades irrelevent to their skills certification                              | Small companies                              | ad hoc                                                                                    | small firms                                                                  | Small companies.                                                     | smaller firms                                                                                                     | Smaller companies.                                                                                           | Small companies                                                            |                                             | Main contractor (general building) companies.  | Smaller firms.                                                                 |
-| What is the required page length for manuscripts submitted?                                                                        | Between 16 and 20 pages                      | 240                                                                                       | between 16 and 20 double-spaced pages                                        | 16–20 double-spaced pages.                                           | Manuscripts should be between 16 and 20 double-spaced typed pages, with margins of at least one inch.             | Between 16 and 20 double-spaced typed pages.                                                                 | Between 16 and 20 double-spaced typed pages.                               | None                                        | 16–20 double-spaced pages.                     | 16–20 double-spaced pages.                                                     |
-| What is the main underwriting amount of the company's equity financing scale in 2018?                                              | 1783                                         | 57.8                                                                                      | not answerable                                                               | 95.3 billion yuan                                                    | The main underwriting amount of the company's equity financing scale in 2018 is 541.                              | Not specified in the provided text (it appears only in the chart, which isn’t readable here).                | 91.116 billion yuan                                                        | N/A                                         | 56.6 billion yuan                              | 178.3 billion yuan                                                             |
-| What is the name of the second document in the image?                                                                              | Traffic Engineering Report                   | The second document in the image is called Peachtree Industrial Boulevard.                | not answerable                                                               | Traffic Engineering Report                                           | Signal Clearance Intervals                                                                                        | PED CLEARANCE                                                                                                | Cannot be determined from the provided context.                            | 39132487.txt                                | Traffic Engineering Report                     | Traffic Engineering Report                                                     |
-| What is the percentage yield of compound IX?                                                                                       | 65%                                          | 10.7%                                                                                     | 65%                                                                          | 65%                                                                  | The percentage yield of compound IX is 65%.                                                                       | Not specified in the provided information.                                                                   | Not specified.                                                             | N/A                                         | 65%                                            | 65%                                                                            |
-| In which solvent are the title amides readily soluble?                                                                             | DMSO                                         | Common organic solvents but dissolve readily in DMSO.                                     | common organic solvents                                                      | DMSO                                                                 | The title amides are readily soluble in common organic solvents but dissolve readily in DMSO.                     | DMSO (dimethyl sulfoxide).                                                                                   | DMSO                                                                       | Not specified.                              | DMSO                                           | DMSO.                                                                          |
-| Who is the author of "Logic as Algebra"?                                                                                           | Paul Halmos and Steven Givant                | David Greenberg                                                                           | Paul Halmos                                                                  | Paul R. Halmos and Steven Givant                                     | Paul Halmos and Steven Givant                                                                                     | Paul Halmos and Steven Givant.                                                                               | Paul R. Halmos and Steven Givant                                           | None                                        | Paul R. Halmos and Steven Givant               | Paul Halmos and Steven Givant.                                                 |
-| What is the serial number associated with this package?                                                                            | 41850                                        | 00228                                                                                     | 41850                                                                        | A1850                                                                | 41850                                                                                                             | U202141850                                                                                                   | Not provided.                                                              | U202141850                                  | 41850                                          | U202141850                                                                     |
-| Which knitting technique is used to join the yarn in a circle?                                                                     | Joining in Round                             | Using a bobbin of yarn                                                                    | Crochet Cast-On                                                              | Joining in the round.                                                | K2tog                                                                                                             | Join in the round (knitting in the round).                                                                   | Pass Slipped Stitch Over (PSSO) after casting on one extra stitch.         | Knitting in the round.                      | Joining in the round.                          | Joining in the round.                                                          |
-| How many yards of worsted weight yarn is needed to makes 2 gloves?                                                                 | 135 yards                                    | 240 lbs                                                                                   | 135 yards/60g                                                                | 100 yards                                                            | 135 yards                                                                                                         | About 135 yards (60 g) of worsted weight yarn for a pair (2 gloves).                                         | 135 yards                                                                  | 135 yards                                   | About 150 yards.                               | 135 yards                                                                      |
-| What is the unemployment rate in the year with the lowest labor force participation rate in the 16-24 age group?                   | 15%                                          | 9%                                                                                        | 6.0%                                                                         | 25%                                                                  | The unemployment rate in the year with the lowest labor force participation rate in the 16-24 age group is 13.0%. | Cannot be determined from the provided information.                                                          | 14.9%                                                                      |                                             | 10%                                            | About 15% (in 2020).                                                           |
-| Around what date did the outbreak of the epidemic occur in China?                                                                  | 2022-03-04                                   | 86-10-08-90                                                                               | 2022-01-01                                                                   | Around February 2020.                                                | The outbreak of the epidemic occurred in China around 4 months ago.                                               | Around July 2022.                                                                                            | Around the first quarter of 2020.                                          |                                             | Around January 20, 2020.                       | Around March 2022.                                                             |
-| What is the HTI ESG of Triangle Tyre?                                                                                              | 3.0-4.0-4.0                                  | HTI ESG of Triangle Tyre is 0-5.                                                          | Maintain Outperform                                                          | 3                                                                    | The HTI ESG of Triangle Tyre is 601163 CH.                                                                        | 3.0-4.0-4.0                                                                                                  | 3.0-4.0-4.                                                                 | 3.0-4.0-4.0                                 | BBB                                            | 3.0–4.0–4.0 (E–S–G)                                                            |
-| What are the main colors of text in the document?                                                                                  | Blue and black                               | Text is blue                                                                              | white, orange, black                                                         | Black and blue.                                                      | The main colors of text in the document are black and blue.                                                       | Not specified. The provided text contains no color information, so the main text colors can’t be determined. | Not specified.                                                             |                                             | Black and blue.                                | Black and blue (with occasional gray).                                         |
-| What points does SWOT refer to?                                                                                                    | Strength, weakness, opportunities, threatens | SWOT refers to the number of points a person has earned in a given year.                  | Strength, Weakness, Opportunity, Threat                                      | Strengths, Weaknesses, Opportunities, and Threats.                   | SWOT refers to Strengths, Weaknesses, Opportunities, and Threats.                                                 | Strengths, Weaknesses, Opportunities, and Threats.                                                           | Strengths, Weaknesses, Opportunities, Threats.                             | Not specified in the document.              | Strengths, Weaknesses, Opportunities, Threats. | Strengths, Weaknesses, Opportunities, and Threats.                             |
-| What is the willingness of residents to travel in the first quarter of 2022?                                                       | 85.32%                                       | 0%                                                                                        | 85.32%                                                                       | 86.3%                                                                | 78%                                                                                                               | 85.32%                                                                                                       | High.                                                                      |                                             | 53.7%                                          | 85.32%                                                                         |
-| How many charts are in the page 4?                                                                                                 | 2 charts                                     | 3                                                                                         | 8                                                                            | 6                                                                    | There are no charts on page 4.                                                                                    | 3                                                                                                            | 3                                                                          |                                             | 0                                              | 2                                                                              |
-| What type of needle is needed for the Little Star Cowl?                                                                            | 12 mm (US 17) 16” circular needle            | A 12 mm (US 17) circular needle                                                           | Circular needle                                                              | A 16-inch circular needle.                                           | US 17) 16" circular needle                                                                                        | A 16" circular needle, size 12 mm (US 17).                                                                   | A 16-inch circular needle (12 mm/US 17).                                   | 12 mm (US 17) 16-inch circular needle.      | 12 mm (US 17) 16-inch circular needle          | A 12 mm (US 17) 16-inch circular needle.                                       |
-| What color is the textile shown in the document?                                                                                   | Red                                          | Blue                                                                                      | Red                                                                          | Red                                                                  | Red                                                                                                               | Not specified.                                                                                               | Not specified.                                                             | Unknown                                     | Red                                            | Red                                                                            |
-| What is the main section following 'ABBREVIATIONS'?                                                                                | CONSTRUCTION                                 | The main section following 'ABBREVIATIONS' is the main section following 'ABBREVIATIONS'. | CONSTRUCTION                                                                 | CONSTRUCTION                                                         | The main section following 'ABBREVIATIONS' is the 'SPECIFICATIONS' section.                                       | Needles.                                                                                                     | Pattern                                                                    |                                             | CONSTRUCTION                                   | CONSTRUCTION:                                                                  |
-| What are the horizontal and vertical axes of Figure 4?                                                                             | Distance and densitu profile                 | The horizontal and vertical axes of Figure 4 are a horizontal and vertical axis.          | x-axis: distance, y-axis: gauss                                              | Horizontal: Orientation (degrees); Vertical: Normal error (degrees). | The horizontal axis is labeled as \( d_x \) and the vertical axis is labeled as \( d_y \).                        | Horizontal axis: Orientation angle (degrees) Vertical axis: Angular error (radians)                          | Horizontal: distance from the surface (x − x0). Vertical: density D (0–1). | Horizontal axis: None; Vertical axis: None. | x and y                                        | Horizontal: Distance x; Vertical: Density profile.                             |
-| According to the current investment rating, how much does the stock rise at least relative to the Shanghai and Shenzhen 300 index? | 20%                                          | 12%                                                                                       | The stock rises at least 200 relative to the Shanghai and Shenzhen 300 index | ≥20%                                                                 | The stock rises at least 194.86% relative to the Shanghai and Shenzhen 300 index.                                 | At least 20% above the CSI 300 (Shanghai and Shenzhen 300) index.                                            | 20%                                                                        |                                             | 20%                                            | At least 20%                                                                   |
-| What is the temperature range for the testing of paper chromatography reagents?                                                    | 110–120°C                                    | 10 - 20 wg.                                                                               | 0 to 20°C                                                                    | 110–120 °C                                                           | The temperature range for the testing of paper chromatography reagents is 110-120°C.                              | 20–25 °C.                                                                                                    | 110–120°C                                                                  | 110–120°C, 60–80°C, and 40–45°C.            | 110–120 °C                                     | 110–120°C                                                                      |
-| What is the distribution coefficient of Benzol?                                                                                    | 160                                          | The distribution coefficient of Benzol is K.                                              | 160                                                                          | 160                                                                  | The distribution coefficient of Benzol (Benzol) is 160.                                                           | 160                                                                                                          |                                                                            | 10.4                                        | 150                                            | 160                                                                            |
-
+<table style="width: 100%; table-layout: fixed; font-size: 12px; border-collapse: collapse; border: 1px solid #dfe2e5; margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word;">
+  <thead><tr>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; width: 25%;">Question</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">Answer</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">UDOP</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">DocOwl2</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">M3DocRAG</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">SV-RAG</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">TextRAG</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">ZenDB</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">QUEST</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">GPT-5</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">MoDora </th>
+  </tr></thead><tbody>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Is Bitmex launched earlier than South Korea's ban on Bitcoin derivatives?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">no</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes, Bitmex was launched in 2014, while South Korea's ban on Bitcoin derivatives was announced in 2017.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes. BitMEX launched in 2014, while South Korea’s Bitcoin derivatives ban began on 2017-12-11.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Yes—BitMEX launched in Jan 2014, while South Korea’s ban was on Dec 11, 2017.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the title at the top of the third page?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Preface</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The title of the third page is "The Changing World"</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">PREFACE</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2018 Global Digital Asset Derivatives Research Report</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2018 Global Digital Asset Derivatives Research Report</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">LEGAL NOTICES</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Digital Asset Derivatives</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not found.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Working with Apps</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>PREFACE</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">When was this document published?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">November 30, 2023</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2023 September 6, 2000</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2023-11-10</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2023-11-13</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The document was published on November 30, 2023.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The publication date is not stated in the provided text.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">November 30, 2023</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2023-11-30</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">November 30, 2023</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>November 30, 2023</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What image is in the center of page 2?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">QR code</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The image is in the center of page 2.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">not answerable</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">A QR code.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">QR code</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified in the provided information.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">A QR code.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>A QR code.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What was the decline in the electrical equipment industry last week?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2.36%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">not answerable</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">-2.36%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The decline in the electrical equipment industry last week was 0.6%.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Down 2.36%.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified in the provided context.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">-2.36%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">-3.4%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Down 2.36%.</b></td>
+    </tr>
+  </tbody></table>
+<details style="margin-top: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 6px;">
+  <summary style="font-weight: bold; cursor: pointer; color: #0366d6;"> Click to view more examples</summary>
+  <div style="margin-top: 10px;">
+<table style="width: 100%; table-layout: fixed; font-size: 12px; border-collapse: collapse; border: 1px solid #dfe2e5; margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word;">
+  <thead><tr>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; width: 25%;">Question</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">Answer</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">UDOP</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">DocOwl2</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">M3DocRAG</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">SV-RAG</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">TextRAG</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">ZenDB</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">QUEST</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">GPT-5</th>
+    <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; ">MoDora </th>
+  </tr></thead><tbody>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Is Bitmex launched earlier than South Korea's ban on Bitcoin derivatives?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">no</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes, Bitmex was launched in 2014, while South Korea's ban on Bitcoin derivatives was announced in 2017.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes. BitMEX launched in 2014, while South Korea’s Bitcoin derivatives ban began on 2017-12-11.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yes.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Yes—BitMEX launched in Jan 2014, while South Korea’s ban was on Dec 11, 2017.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the title at the top of the third page?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Preface</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The title of the third page is "The Changing World"</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">PREFACE</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2018 Global Digital Asset Derivatives Research Report</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2018 Global Digital Asset Derivatives Research Report</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">LEGAL NOTICES</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Digital Asset Derivatives</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not found.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Working with Apps</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>PREFACE</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">When was this document published?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">November 30, 2023</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2023 September 6, 2000</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2023-11-10</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2023-11-13</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The document was published on November 30, 2023.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The publication date is not stated in the provided text.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">November 30, 2023</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2023-11-30</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">November 30, 2023</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>November 30, 2023</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What image is in the center of page 2?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">QR code</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The image is in the center of page 2.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">not answerable</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">A QR code.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">QR code</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified in the provided information.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">A QR code.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>A QR code.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What was the decline in the electrical equipment industry last week?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2.36%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">not answerable</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">-2.36%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The decline in the electrical equipment industry last week was 0.6%.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Down 2.36%.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified in the provided context.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">-2.36%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">-3.4%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Down 2.36%.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the fourth section of the report?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Investment Strategy and Key Recommendations</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">scientific report</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">not answerable</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Risk warning</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The fourth section of the report is titled "2.2.1 New Energy Source."</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified in the provided information.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Investment Strategy and Key Recommendations</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Unknown</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Real estate market</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Investment Strategy and Key Recommendations</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">How many references are there?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">13</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">37</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">13</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">There are 5 references in the text.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">11</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">13</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">13</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>13</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the actual number of the second page?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">266</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">240</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">265</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The actual number of the second page is 266.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3070</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">266</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not found</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">266</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>266</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What was the amount of the year-on-year increase in the largest proportion of RMB loans in November 2022?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">23.2 billion</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">9%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">12.40%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">58.6 billion yuan</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The largest proportion of RMB loans in November 2022 increased by 7.8%.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Down by 60 billion yuan year on year (1210 billion yuan vs 1270 billion yuan)</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">23.2 billion yuan</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">N/A</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">0.20 trillion yuan</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>23.2 billion yuan</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Which color is used to emphasize key text?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Red</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Blue</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Yellow</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Red</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The color used to emphasize key text is red.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Red</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">None</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Red</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Red</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the stock code of the company discussed in the document?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">002624</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">HK</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">002624</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">002624</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">002624</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">002624</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">002624</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">002891.SZ</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>002624</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Which kind of companies have more workers deployed in trades irrelevent to their skills certification</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Small companies</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">ad hoc</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">small firms</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Small companies.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">smaller firms</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Smaller companies.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Small companies</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Main contractor (general building) companies.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Smaller firms.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the required page length for manuscripts submitted?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Between 16 and 20 pages</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">240</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">between 16 and 20 double-spaced pages</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">16–20 double-spaced pages.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Manuscripts should be between 16 and 20 double-spaced typed pages, with margins of at least one inch.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Between 16 and 20 double-spaced typed pages.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Between 16 and 20 double-spaced typed pages.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">None</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">16–20 double-spaced pages.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>16–20 double-spaced pages.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the main underwriting amount of the company's equity financing scale in 2018?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">1783</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">57.8</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">not answerable</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">95.3 billion yuan</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The main underwriting amount of the company's equity financing scale in 2018 is 541.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified in the provided text (it appears only in the chart, which isn’t readable here).</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">91.116 billion yuan</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">N/A</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">56.6 billion yuan</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>178.3 billion yuan</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the name of the second document in the image?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Traffic Engineering Report</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The second document in the image is called Peachtree Industrial Boulevard.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">not answerable</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Traffic Engineering Report</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Signal Clearance Intervals</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">PED CLEARANCE</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Cannot be determined from the provided context.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">39132487.txt</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Traffic Engineering Report</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Traffic Engineering Report</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the percentage yield of compound IX?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">65%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">10.7%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">65%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">65%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The percentage yield of compound IX is 65%.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified in the provided information.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">N/A</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">65%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>65%</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">In which solvent are the title amides readily soluble?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">DMSO</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Common organic solvents but dissolve readily in DMSO.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">common organic solvents</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">DMSO</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The title amides are readily soluble in common organic solvents but dissolve readily in DMSO.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">DMSO (dimethyl sulfoxide).</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">DMSO</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">DMSO</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>DMSO.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Who is the author of "Logic as Algebra"?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Paul Halmos and Steven Givant</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">David Greenberg</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Paul Halmos</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Paul R. Halmos and Steven Givant</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Paul Halmos and Steven Givant</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Paul Halmos and Steven Givant.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Paul R. Halmos and Steven Givant</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">None</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Paul R. Halmos and Steven Givant</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Paul Halmos and Steven Givant.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the serial number associated with this package?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">41850</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">00228</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">41850</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">A1850</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">41850</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">U202141850</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not provided.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">U202141850</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">41850</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>U202141850</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Which knitting technique is used to join the yarn in a circle?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Joining in Round</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Using a bobbin of yarn</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Crochet Cast-On</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Joining in the round.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">K2tog</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Join in the round (knitting in the round).</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Pass Slipped Stitch Over (PSSO) after casting on one extra stitch.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Knitting in the round.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Joining in the round.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Joining in the round.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">How many yards of worsted weight yarn is needed to makes 2 gloves?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">135 yards</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">240 lbs</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">135 yards/60g</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">100 yards</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">135 yards</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">About 135 yards (60 g) of worsted weight yarn for a pair (2 gloves).</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">135 yards</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">135 yards</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">About 150 yards.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>135 yards</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the unemployment rate in the year with the lowest labor force participation rate in the 16-24 age group?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">15%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">9%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">6.0%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">25%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The unemployment rate in the year with the lowest labor force participation rate in the 16-24 age group is 13.0%.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Cannot be determined from the provided information.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">14.9%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">10%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>About 15% (in 2020).</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Around what date did the outbreak of the epidemic occur in China?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2022-03-04</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">86-10-08-90</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2022-01-01</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Around February 2020.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The outbreak of the epidemic occurred in China around 4 months ago.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Around July 2022.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Around the first quarter of 2020.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Around January 20, 2020.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Around March 2022.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the HTI ESG of Triangle Tyre?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3.0-4.0-4.0</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">HTI ESG of Triangle Tyre is 0-5.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Maintain Outperform</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The HTI ESG of Triangle Tyre is 601163 CH.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3.0-4.0-4.0</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3.0-4.0-4.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3.0-4.0-4.0</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">BBB</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>3.0–4.0–4.0 (E–S–G)</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What are the main colors of text in the document?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Blue and black</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Text is blue</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">white, orange, black</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Black and blue.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The main colors of text in the document are black and blue.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified. The provided text contains no color information, so the main text colors can’t be determined.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Black and blue.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Black and blue (with occasional gray).</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What points does SWOT refer to?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Strength, weakness, opportunities, threatens</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">SWOT refers to the number of points a person has earned in a given year.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Strength, Weakness, Opportunity, Threat</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Strengths, Weaknesses, Opportunities, and Threats.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">SWOT refers to Strengths, Weaknesses, Opportunities, and Threats.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Strengths, Weaknesses, Opportunities, and Threats.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Strengths, Weaknesses, Opportunities, Threats.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified in the document.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Strengths, Weaknesses, Opportunities, Threats.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Strengths, Weaknesses, Opportunities, and Threats.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the willingness of residents to travel in the first quarter of 2022?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">85.32%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">0%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">85.32%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">86.3%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">78%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">85.32%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">High.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">53.7%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>85.32%</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">How many charts are in the page 4?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">2 charts</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">8</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">6</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">There are no charts on page 4.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">3</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">0</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>2</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What type of needle is needed for the Little Star Cowl?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">12 mm (US 17) 16” circular needle</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">A 12 mm (US 17) circular needle</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Circular needle</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">A 16-inch circular needle.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">US 17) 16" circular needle</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">A 16" circular needle, size 12 mm (US 17).</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">A 16-inch circular needle (12 mm/US 17).</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">12 mm (US 17) 16-inch circular needle.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">12 mm (US 17) 16-inch circular needle</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>A 12 mm (US 17) 16-inch circular needle.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What color is the textile shown in the document?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Red</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Blue</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Red</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Red</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Red</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Not specified.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Unknown</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Red</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Red</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the main section following 'ABBREVIATIONS'?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">CONSTRUCTION</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The main section following 'ABBREVIATIONS' is the main section following 'ABBREVIATIONS'.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">CONSTRUCTION</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">CONSTRUCTION</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The main section following 'ABBREVIATIONS' is the 'SPECIFICATIONS' section.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Needles.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Pattern</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">CONSTRUCTION</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>CONSTRUCTION:</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What are the horizontal and vertical axes of Figure 4?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Distance and densitu profile</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The horizontal and vertical axes of Figure 4 are a horizontal and vertical axis.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">x-axis: distance, y-axis: gauss</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Horizontal: Orientation (degrees); Vertical: Normal error (degrees).</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The horizontal axis is labeled as \\( d_x \\) and the vertical axis is labeled as \\( d_y \\).</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Horizontal axis: Orientation angle (degrees) Vertical axis: Angular error (radians)</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Horizontal: distance from the surface (x − x0). Vertical: density D (0–1).</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">Horizontal axis: None; Vertical axis: None.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">x and y</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>Horizontal: Distance x; Vertical: Density profile.</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">According to the current investment rating, how much does the stock rise at least relative to the Shanghai and Shenzhen 300 index?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">20%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">12%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The stock rises at least 200 relative to the Shanghai and Shenzhen 300 index</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">≥20%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The stock rises at least 194.86% relative to the Shanghai and Shenzhen 300 index.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">At least 20% above the CSI 300 (Shanghai and Shenzhen 300) index.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">20%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">20%</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>At least 20%</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the temperature range for the testing of paper chromatography reagents?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">110–120°C</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">10 - 20 wg.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">0 to 20°C</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">110–120 °C</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The temperature range for the testing of paper chromatography reagents is 110-120°C.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">20–25 °C.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">110–120°C</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">110–120°C, 60–80°C, and 40–45°C.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">110–120 °C</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>110–120°C</b></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">What is the distribution coefficient of Benzol?</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">160</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The distribution coefficient of Benzol is K.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">160</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">160</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">The distribution coefficient of Benzol (Benzol) is 160.</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">160</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"></td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">10.4</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;">150</td>
+      <td style="padding: 8px 4px; border: 1px solid #dfe2e5; line-height: 1.3; vertical-align: top;"><b>160</b></td>
+    </tr>
+  </tbody></table>
+  </div></details>
 The full results of MoDora and baselines are shown in [Results](./Results/resmodora.jsonl).
 
 ## 💻 MMDA Bench
