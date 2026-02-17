@@ -5,7 +5,10 @@
 
 MoDora is an LLM-powered framework for semi-structured document analysis. It introduces the Component-Correlation Tree (CCTree) to model semi-structured documents with diverse elements and complicated layouts.
 
-MoDora combines OCR, Embedding models and MLLMs in preprocessing, tree construction and tree-based analysis, without the need for extra training or fine-tuning. The experiment on two datasets with various documents and question types demonstrates its superior performance compared to existing methods.
+<img width="2453" height="1229" alt="image" src="https://github.com/user-attachments/assets/2dcd4e49-2ec8-4ced-8789-0363503548b4" />
+
+MoDora combines OCR and MLLMs in preprocessing, tree construction and tree-based analysis, without the need for extra training or fine-tuning. The experiment on two datasets with various documents and question types demonstrates its superior performance compared to existing methods.
+
 
 **Examples**
 <table style="width: 100%; table-layout: fixed; font-size: 12px; border-collapse: collapse; border: 1px solid #dfe2e5; margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word;">
@@ -562,6 +565,7 @@ MoDora combines OCR, Embedding models and MLLMs in preprocessing, tree construct
     </tr>
   </tbody></table>
   </div></details>
+  
 The full results of MoDora and baselines are shown in [Results](./Results/resmodora.jsonl).
 
 ## 💻 MMDA Bench
@@ -707,7 +711,7 @@ Our MMDA Bench is in [MMDA](./datasets/MMDA/test.json).
 For DUDE and its samples subset, refer to [DUDE](https://huggingface.co/datasets/jordyvl/DUDE_loader/tree/main/data).
 
 **Model.**
-We support both remote APIs (e.g., GPT-4o) and local models (e.g., Qwen2.5-VL, Qwen3-Embedding).
+We support both remote APIs (e.g., GPT-5) and local models (e.g., Qwen3-VL-8B-Instruct).
 Configure model paths and settings in your environment or `config.json`.
 
 ---
