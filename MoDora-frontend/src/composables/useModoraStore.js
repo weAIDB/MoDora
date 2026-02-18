@@ -49,7 +49,8 @@ const state = reactive({
     globalTags: [],  // 所有已存在的标签
     
     // 全局设置
-    settings: normalizeSettings(JSON.parse(localStorage.getItem('modora_settings')) || DEFAULT_SETTINGS)
+    settings: normalizeSettings(JSON.parse(localStorage.getItem('modora_settings')) || DEFAULT_SETTINGS),
+    modelInstances: []
 });
 
 export function useModoraStore() {
@@ -206,7 +207,9 @@ export function useModoraStore() {
                 try {
                     const errData = await response.json();
                     if (errData.detail) errorMessage += `: ${errData.detail}`;
-                } catch (e) {}
+                } catch (error) {
+                    console.error("Error parsing error response:", error);
+                }
                 throw new Error(errorMessage);
             }
 
@@ -315,6 +318,38 @@ export function useModoraStore() {
         state.settings = normalizeSettings({ ...state.settings, ...newSettings });
         localStorage.setItem('modora_settings', JSON.stringify(state.settings));
         console.log("Settings updated:", state.settings);
+    };
+
+    const loadSettings = async () => {
+        try {
+            const res = await fetch('/api/settings/ui');
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.settings) {
+                    state.settings = normalizeSettings(data.settings);
+                    localStorage.setItem('modora_settings', JSON.stringify(state.settings));
+                }
+            }
+        } catch (e) {
+            console.error("Failed to load settings:", e);
+        }
+    };
+
+    const loadModelInstances = async () => {
+        try {
+            const res = await fetch('/api/models/instances');
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data.instances)) {
+                    state.modelInstances = data.instances;
+                } else {
+                    state.modelInstances = [];
+                }
+            }
+        } catch (e) {
+            state.modelInstances = [];
+            console.error("Failed to load model instances:", e);
+        }
     };
 
     const uploadFile = async (file) => {
@@ -621,6 +656,8 @@ export function useModoraStore() {
         saveTreeStructure,
         updateTreeNode,
         updateSettings,
+        loadSettings,
+        loadModelInstances,
         fetchKbDocs,
         fetchGlobalTags,
         updateDocTags,

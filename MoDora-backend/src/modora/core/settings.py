@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -128,6 +128,16 @@ class LlmLocalInstance:
 
 
 @dataclass(frozen=True)
+class ModelInstance:
+    type: str
+    model: str | None = None
+    base_url: str | None = None
+    api_key: str | None = None
+    port: int | None = None
+    device: str | None = None
+
+
+@dataclass(frozen=True)
 class Settings:
     """Application configuration class.
 
@@ -160,6 +170,8 @@ class Settings:
     api_base: str | None = None
     api_key: str | None = None
     api_model: str | None = None
+
+    model_instances: dict[str, ModelInstance] = field(default_factory=dict)
 
     llm_local_model: str | None = None
     llm_local_base_url: str | None = None
@@ -217,6 +229,42 @@ class Settings:
         api_base = _clean_str(pick("api_base", None))
         api_key = _clean_str(pick("api_key", None))
         api_model = _clean_str(pick("api_model", None))
+
+        model_instances_raw = _coerce_json(pick("model_instances", None))
+        model_instances: dict[str, ModelInstance] = {}
+        if isinstance(model_instances_raw, dict):
+            for name, payload in model_instances_raw.items():
+                if not isinstance(payload, dict):
+                    continue
+                inst_type = _clean_str(payload.get("type", None)) or ""
+                inst_type = inst_type.lower()
+                if inst_type not in {"local", "remote"}:
+                    continue
+                model = _clean_str(payload.get("model", None))
+                base_url = _clean_str(
+                    payload.get("base_url", None) or payload.get("baseUrl", None)
+                )
+                api_key_val = _clean_str(
+                    payload.get("api_key", None) or payload.get("apiKey", None)
+                )
+                key = _clean_str(name) or str(name)
+                port_val = payload.get("port", None)
+                try:
+                    port = int(port_val) if port_val is not None else None
+                except Exception:
+                    port = None
+                device = _clean_str(
+                    payload.get("device", None)
+                    or payload.get("cuda_visible_devices", None)
+                )
+                model_instances[key] = ModelInstance(
+                    type=inst_type,
+                    model=model,
+                    base_url=base_url,
+                    api_key=api_key_val,
+                    port=port,
+                    device=device,
+                )
 
         llm_local_model = _clean_str(pick("llm_local_model", None))
         llm_local_base_url = _clean_str(pick("llm_local_base_url", None))
@@ -293,6 +341,7 @@ class Settings:
             api_base=api_base,
             api_key=api_key,
             api_model=api_model,
+            model_instances=model_instances,
             llm_local_model=llm_local_model,
             llm_local_base_url=llm_local_base_url,
             llm_local_api_key=llm_local_api_key,
@@ -308,6 +357,50 @@ class Settings:
             ocr_use_table_recognition=ocr_use_table_recognition,
             ocr_use_doc_unwarping=ocr_use_doc_unwarping,
         )
+
+    def resolve_model_instance(self, instance_id: str | None) -> ModelInstance | None:
+        if not instance_id:
+            return None
+        key = instance_id.strip()
+        if not key:
+            return None
+        inst = self.model_instances.get(key)
+        if inst:
+            return inst
+        if key in {"local", "local-default"}:
+            return ModelInstance(
+                type="local",
+                model=self.llm_local_model,
+                base_url=self.llm_local_base_url,
+                api_key=self.llm_local_api_key,
+                port=self.llm_local_port,
+                device=self.llm_local_cuda_visible_devices,
+            )
+        if key in {"remote", "remote-default"}:
+            return ModelInstance(
+                type="remote",
+                model=self.api_model,
+                base_url=self.api_base,
+                api_key=self.api_key,
+            )
+        if key == "default":
+            if self.api_base or self.api_key or self.api_model:
+                return ModelInstance(
+                    type="remote",
+                    model=self.api_model,
+                    base_url=self.api_base,
+                    api_key=self.api_key,
+                )
+            if self.llm_local_model or self.llm_local_base_url:
+                return ModelInstance(
+                    type="local",
+                    model=self.llm_local_model,
+                    base_url=self.llm_local_base_url,
+                    api_key=self.llm_local_api_key,
+                    port=self.llm_local_port,
+                    device=self.llm_local_cuda_visible_devices,
+                )
+        return None
 
 
 if __name__ == "__main__":

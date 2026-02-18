@@ -142,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch, computed } from 'vue';
+import { ref, onMounted, nextTick, computed } from 'vue';
 import { VueFlow, useVueFlow, Handle, Position } from '@vue-flow/core';
 import { Background } from '@vue-flow/background';
 import { Controls } from '@vue-flow/controls';
@@ -160,11 +160,9 @@ const { isDark } = useDarkTheme();
 
 const {
   addNodes, removeNodes, addEdges,
-  setCenter, getNodes, getEdges,
-  onNodesChange, onEdgesChange,
+  setCenter,
   getSelectedElements,
-  project, dimensions, viewport,
-  fitView
+  dimensions, viewport
 } = useVueFlow();
 
 const elements = ref([]);
@@ -250,12 +248,6 @@ const getHeatmapDynamicStyle = (impact) => {
     fontWeight: normalized > 0.7 ? 'bold' : 'normal',
     transition: 'all 0.3s ease'
   };
-};
-
-const getHeatmapStyle = (impact) => {
-  // 旧方法保留用于兼容，但主要使用上面的动态样式
-  if (!impact || impact <= 0) return 'bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 opacity-60 grayscale';
-  return ''; 
 };
 
 // --- 编辑状态 ---

@@ -15,6 +15,21 @@
   "api_key": "your-api-key",
   "api_model": "gpt-4o",
 
+  "model_instances": {
+    "local-default": {
+      "type": "local",
+      "model": "./models/Qwen3-VL-8B-Instruct",
+      "base_url": "http://127.0.0.1:9001/v1",
+      "api_key": "local"
+    },
+    "remote-default": {
+      "type": "remote",
+      "model": "gpt-4o",
+      "base_url": "https://your-api-base-url/v1",
+      "api_key": "your-api-key"
+    }
+  },
+
   "// 本地 LLM 配置": "Settings for local model serving via LMDeploy",
   "llm_local_model": "./models/Qwen3-VL-8B-Instruct",
   "llm_local_base_url": null,

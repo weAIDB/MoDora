@@ -75,7 +75,7 @@ class AsyncLocalLLMClient(BaseAsyncLLMClient):
                     padding = len(img) % 4
                     if padding > 0:
                         img += "=" * (4 - padding)
-                
+
                     messages[0]["content"].append(
                         {
                             "type": "image_url",

@@ -1,4 +1,4 @@
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const isDark = ref(false);
 

@@ -20,6 +20,7 @@ from modora.api.v1.documents import router as doc_router
 from modora.api.v1.kb import router as kb_router
 from modora.api.v1.tree import router as tree_router
 from modora.api.v1.stats import router as stats_router
+from modora.api.v1.model_instances import router as model_instances_router
 from modora.api.ocr.router import router as ocr_router
 
 settings = Settings.load()
@@ -61,6 +62,7 @@ app.include_router(doc_router, prefix="/api")
 app.include_router(kb_router, prefix="/api")
 app.include_router(tree_router, prefix="/api")
 app.include_router(stats_router, prefix="/api")
+app.include_router(model_instances_router, prefix="/api")
 app.include_router(ocr_router, prefix="/api")
 
 

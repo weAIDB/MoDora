@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import AppSidebar from './components/AppSidebar.vue';
 import ChatWindow from './components/ChatWindow.vue';
 import InteractiveTree from './components/InteractiveTree.vue';
@@ -111,6 +111,11 @@ const store = useModoraStore();
 const showSettings = ref(false);
 const isDraggingGlobal = ref(false);
 let dragCounter = 0;
+
+onMounted(() => {
+  store.loadSettings();
+  store.loadModelInstances();
+});
 
 const onDragOver = (e) => {
   if (store.state.isUploading) return;

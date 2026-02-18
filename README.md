@@ -629,19 +629,15 @@ chmod +x setup.sh run.sh start_backend.sh start_frontend.sh
 
 ### 2. Configuration
 
-Before starting the services, you need to configure the backend parameters. We provide an example file [local.example.json](file:///home/yukai/project/MoDora/MoDora-backend/configs/local.example.json).
+Model configuration is handled interactively by `./setup.sh`. It creates `MoDora-backend/configs/local.json` (based on `local.example.json`) and writes the model selections you input.
 
-1. **Create Configuration File**:
-   ```bash
-   cp MoDora-backend/configs/local.example.json MoDora-backend/configs/local.json
-   ```
+**What setup.sh configures:**
+- `model_instances`: All available model instances (local/remote). Each item includes `type`, `model`, and optional `base_url`, `port`, `device`.
+- `ui_settings.pipelines`: Which model instance each module uses (`enrichment`, `retriever`, `qaService`, etc.).
+- `ui_settings.ocr.provider`: OCR model selection (`ppstructure` or `paddle_ocr_vl`).
+- Local model download: you input a model name (HuggingFace repo id). The model is downloaded into `MoDora-backend/models/<model_name>` if it does not exist.
 
-2. **Core Configuration Items**:
-   Open `MoDora-backend/configs/local.json` and modify based on your environment:
-   - `api_key`: If you need to call external APIs (e.g., OpenAI or Gemini), enter your key here.
-   - `llm_local_model`: Absolute path to your local model (e.g., Qwen2-VL-7B-Instruct).
-   - `llm_local_instances`: Configure multiple inference instances by specifying different ports and `cuda_visible_devices` for multi-GPU parallelism.
-   - `ocr_device`: Device used for OCR, e.g., `gpu:0`.
+If you need to tweak values later, edit `MoDora-backend/configs/local.json` directly and restart the backend.
 
 ### 3. Execution
 
@@ -671,18 +667,19 @@ pip install -e .
 ```
 
 **Configuration.**
-MoDora-backend supports environment variables or a JSON config file (path set via `MODORA_CONFIG`).
+MoDora-backend supports environment variables or a JSON config file (path set via `MODORA_CONFIG`). If you are not using `setup.sh`, create your own `local.json`:
 
 ```bash
-export MODORA_API_KEY="your-api-key"
-export MODORA_API_BASE="https://api.openai.com/v1"
-export MODORA_API_MODEL="gpt-4o"
+cp MoDora-backend/configs/local.example.json MoDora-backend/configs/local.json
+export MODORA_CONFIG="MoDora-backend/configs/local.json"
 ```
+
+Edit `local.json` to set `model_instances` and `ui_settings` for module-level model selection. Remote models require `api_key`/`base_url`, and local models require `model` (local path) and optional `port`/`device`.
 
 **Running the API.**
 ```bash
 # Start FastAPI server
-uvicorn modora.api.app:app --host 0.0.0.0 --port 8000 --reload
+uvicorn modora.api.app:app --host 0.0.0.0 --port 8005 --reload
 ```
 
 ### 2. Frontend Setup (MoDora-frontend)

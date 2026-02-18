@@ -2,15 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 from dataclasses import replace
-from modora.core.settings import Settings
+from modora.core.settings import LlmLocalInstance, Settings
 
 ALLOWED_UI_SETTINGS_KEYS = {
-    "apiKey",
-    "baseUrl",
-    "selectedMode",
-    "layoutModel",
-    "qaModel",
-    "treeModel",
     "ocr",
     "pipelines",
     "schemaVersion",
@@ -24,14 +18,9 @@ MODULE_KEYS = {
     "qaService",
 }
 
-LEGACY_MODEL_KEY_TO_MODULE = {
-    "qaModel": "qaService",
-    "treeModel": "levelGenerator",
-}
-
 
 def normalize_ui_settings(payload: dict[str, Any] | None) -> dict[str, Any]:
-    """Standardize frontend settings payload while maintaining compatibility with v1/v2.
+    """Standardize frontend settings payload.
 
     Args:
         payload (dict[str, Any] | None): The settings payload from the frontend.
@@ -46,16 +35,6 @@ def normalize_ui_settings(payload: dict[str, Any] | None) -> dict[str, Any]:
     for key in ALLOWED_UI_SETTINGS_KEYS:
         if key in payload:
             normalized[key] = payload[key]
-
-    mode = str(normalized.get("selectedMode") or "").lower()
-    if mode in {"local", "remote"}:
-        normalized["selectedMode"] = mode
-    elif "selectedMode" in normalized:
-        normalized.pop("selectedMode", None)
-
-    for key in ("apiKey", "baseUrl", "layoutModel", "qaModel", "treeModel"):
-        if key in normalized and normalized[key] is not None:
-            normalized[key] = str(normalized[key]).strip()
 
     if isinstance(normalized.get("ocr"), dict):
         provider = normalized["ocr"].get("provider")
@@ -74,16 +53,9 @@ def normalize_ui_settings(payload: dict[str, Any] | None) -> dict[str, Any]:
             if module not in MODULE_KEYS or not isinstance(value, dict):
                 continue
             item: dict[str, str] = {}
-            mode = str(value.get("mode") or "").strip().lower()
-            if mode in {"local", "remote"}:
-                item["mode"] = mode
-            for field in ("model", "baseUrl", "apiKey"):
-                raw = value.get(field)
-                if raw is None:
-                    continue
-                clean = str(raw).strip()
-                if clean:
-                    item[field] = clean
+            model_instance = value.get("modelInstance")
+            if isinstance(model_instance, str) and model_instance.strip():
+                item["modelInstance"] = model_instance.strip()
             clean_pipelines[module] = item
         normalized["pipelines"] = clean_pipelines
     elif "pipelines" in normalized:
@@ -92,31 +64,11 @@ def normalize_ui_settings(payload: dict[str, Any] | None) -> dict[str, Any]:
     return normalized
 
 
-def _legacy_pipeline_fallback(cfg: dict[str, Any], module_key: str) -> dict[str, str]:
-    fallback: dict[str, str] = {}
-    mode = cfg.get("selectedMode")
-    if mode in {"local", "remote"}:
-        fallback["mode"] = mode
-
-    if module_key in {"levelGenerator", "metadataGenerator"}:
-        model_name = cfg.get("treeModel") or cfg.get("qaModel")
-    else:
-        model_name = cfg.get("qaModel") or cfg.get("treeModel")
-    if model_name:
-        fallback["model"] = str(model_name).strip()
-
-    if cfg.get("baseUrl"):
-        fallback["baseUrl"] = str(cfg["baseUrl"]).strip()
-    if cfg.get("apiKey"):
-        fallback["apiKey"] = str(cfg["apiKey"]).strip()
-    return fallback
-
-
 def get_pipeline_config(
     payload: dict[str, Any] | None,
     module_key: str,
 ) -> dict[str, str]:
-    """Get configuration for the specified module, prioritizing v2 pipelines and falling back to v1.
+    """Get configuration for the specified module.
 
     Args:
         payload (dict[str, Any] | None): The settings payload.
@@ -132,14 +84,13 @@ def get_pipeline_config(
     pipelines = cfg.get("pipelines")
     if isinstance(pipelines, dict) and isinstance(pipelines.get(module_key), dict):
         return dict(pipelines[module_key])
-    return _legacy_pipeline_fallback(cfg, module_key)
+    return {}
 
 
 def settings_from_ui_payload(
     base: Settings,
     payload: dict[str, Any] | None,
     *,
-    model_key: str | None = None,
     module_key: str | None = None,
 ) -> tuple[Settings, str | None, dict[str, Any]]:
     """Construct backend Settings overrides from frontend settings payload.
@@ -147,7 +98,6 @@ def settings_from_ui_payload(
     Args:
         base (Settings): The base Settings instance.
         payload (dict[str, Any] | None): The settings payload from the UI.
-        model_key (str | None): Legacy model key.
         module_key (str | None): Module key for pipeline config.
 
     Returns:
@@ -160,78 +110,45 @@ def settings_from_ui_payload(
     ocr = cfg.get("ocr")
     if isinstance(ocr, dict) and ocr.get("provider"):
         overrides["ocr_model"] = ocr["provider"]
-    elif cfg.get("layoutModel"):
-        overrides["ocr_model"] = cfg["layoutModel"]
 
-    resolved_module = module_key
-    if resolved_module is None and model_key:
-        resolved_module = LEGACY_MODEL_KEY_TO_MODULE.get(model_key)
+    pipeline_cfg = get_pipeline_config(cfg, module_key) if module_key else {}
+    model_instance_id = pipeline_cfg.get("modelInstance")
+    model_instance = base.resolve_model_instance(model_instance_id)
+    selected_mode = model_instance.type if model_instance else None
 
-    pipeline_cfg = get_pipeline_config(cfg, resolved_module) if resolved_module else {}
-    selected_mode = pipeline_cfg.get("mode") or cfg.get("selectedMode")
-
-    base_url = pipeline_cfg.get("baseUrl") or cfg.get("baseUrl")
-    api_key = pipeline_cfg.get("apiKey") or cfg.get("apiKey")
-    if base_url:
-        overrides["api_base"] = base_url
-    if api_key:
-        overrides["api_key"] = api_key
-
-    model_name = pipeline_cfg.get("model")
-    if not model_name and model_key and cfg.get(model_key):
-        model_name = str(cfg[model_key]).strip()
-    if not model_name:
-        model_name = (
-            str(cfg.get("qaModel") or cfg.get("treeModel") or "").strip() or None
-        )
-
-    if model_name and selected_mode != "local":
-        overrides["api_model"] = model_name
+    if model_instance:
+        if model_instance.type == "remote":
+            base_url = model_instance.base_url
+            api_key = model_instance.api_key
+            model_name = model_instance.model
+            if base_url:
+                overrides["api_base"] = base_url
+            if api_key:
+                overrides["api_key"] = api_key
+            if model_name:
+                overrides["api_model"] = model_name
+        else:
+            base_url = model_instance.base_url
+            api_key = model_instance.api_key
+            model_name = model_instance.model
+            port = model_instance.port
+            device = model_instance.device
+            if base_url:
+                overrides["llm_local_base_url"] = base_url
+            elif port:
+                overrides["llm_local_base_url"] = f"http://127.0.0.1:{port}/v1"
+            if api_key:
+                overrides["llm_local_api_key"] = api_key
+            if model_name:
+                overrides["llm_local_model"] = model_name
+            if port or device:
+                overrides["llm_local_instances"] = (
+                    LlmLocalInstance(
+                        host="127.0.0.1",
+                        port=port or base.llm_local_port,
+                        cuda_visible_devices=device,
+                    ),
+                )
 
     settings = replace(base, **overrides) if overrides else base
     return settings, selected_mode, cfg
-
-
-def resolve_llm_mode(config: dict[str, Any] | None, key: str) -> str | None:
-    """Parse LLM mode from the configuration dictionary.
-
-    Args:
-        config (dict[str, Any] | None): The configuration dictionary.
-        key (str): The key to resolve the mode for.
-
-    Returns:
-        str | None: The resolved mode ('local' or 'remote'), or None.
-    """
-    module = key
-    if key in LEGACY_MODEL_KEY_TO_MODULE:
-        module = LEGACY_MODEL_KEY_TO_MODULE[key]
-    pipeline_cfg = get_pipeline_config(config, module)
-    if pipeline_cfg.get("mode") in {"local", "remote"}:
-        return pipeline_cfg["mode"]
-    cfg = normalize_ui_settings(config)
-    val = str(cfg.get("selectedMode") or "").lower()
-    return val if val in {"local", "remote"} else None
-
-
-def settings_with_overrides(
-    base: Settings, overrides: dict[str, Any] | None, *, api_model: str | None = None
-) -> Settings:
-    """Create a new Settings instance with override parameters.
-
-    Args:
-        base (Settings): The base Settings instance.
-        overrides (dict[str, Any] | None): Dictionary of overrides (e.g., apiKey, baseUrl).
-        api_model (str | None): Optional API model name override.
-
-    Returns:
-        Settings: A new Settings instance with applied overrides.
-    """
-    payload: dict[str, Any] = {}
-    if overrides:
-        if overrides.get("apiKey"):
-            payload["api_key"] = overrides.get("apiKey")
-        if overrides.get("baseUrl"):
-            payload["api_base"] = overrides.get("baseUrl")
-    if api_model:
-        payload["api_model"] = api_model
-    return replace(base, **payload) if payload else base

@@ -4,8 +4,13 @@ import sys
 
 def download_model():
     # Model configuration
-    repo_id = "Qwen/Qwen3-VL-8B-Instruct"  
-    model_dir = os.path.abspath("./models/Qwen3-VL-8B-Instruct")
+    repo_id = os.environ.get("MODEL_REPO_ID", "Qwen/Qwen3-VL-8B-Instruct")
+    model_dir_env = os.environ.get("MODEL_DIR", "")
+    model_dir = (
+        os.path.abspath(model_dir_env)
+        if model_dir_env
+        else os.path.abspath("./models/Qwen3-VL-8B-Instruct")
+    )
     
     print(f"🚀 Starting download for {repo_id}...")
     print(f"📁 Target directory: {model_dir}")

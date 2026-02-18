@@ -6,6 +6,8 @@ import subprocess
 import time
 import urllib.error
 import urllib.request
+from pathlib import Path
+from urllib.parse import urlparse
 from typing import Any
 
 from modora.core.settings import Settings
@@ -34,6 +36,38 @@ def _http_get(url: str, timeout_s: float) -> tuple[int, str]:
         return 0, "timeout"
 
 
+def _parse_base_url(base_url: str) -> tuple[str | None, int | None]:
+    if not base_url:
+        return None, None
+    val = base_url.strip()
+    if not val:
+        return None, None
+    if "://" not in val:
+        val = "http://" + val
+    parsed = urlparse(val)
+    return parsed.hostname, parsed.port
+
+
+def _resolve_model_path(model: str) -> str:
+    if not model:
+        return model
+    p = Path(model)
+    if p.is_absolute() and p.exists():
+        return str(p)
+    cwd_path = Path.cwd() / p
+    if cwd_path.exists():
+        return str(cwd_path)
+    backend_root = Path(__file__).resolve().parents[5]
+    backend_path = backend_root / p
+    if backend_path.exists():
+        return str(backend_path)
+    repo_root = Path(__file__).resolve().parents[6]
+    repo_path = repo_root / p
+    if repo_path.exists():
+        return str(repo_path)
+    return model
+
+
 def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
     """Ensure local LLM service (lmdeploy) is started.
 
@@ -47,36 +81,64 @@ def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
     """
     global _llm_local_procs
 
-    if not settings.llm_local_model:
+    local_entries: list[tuple[str, int, str | None, str | None]] = []
+    for inst in settings.model_instances.values():
+        if inst.type != "local":
+            continue
+        if not inst.model:
+            continue
+        host = "127.0.0.1"
+        port = inst.port
+        if inst.base_url and not port:
+            parsed_host, parsed_port = _parse_base_url(inst.base_url)
+            if parsed_host:
+                host = parsed_host
+            if parsed_port:
+                port = parsed_port
+        if not port:
+            port = settings.llm_local_port
+        local_entries.append(
+            (host, int(port), _resolve_model_path(inst.model), inst.device)
+        )
+
+    if not local_entries and not settings.llm_local_model:
         logger.info("local llm disabled", extra={"llm_local_model": None})
         return
 
-    instances = list(getattr(settings, "llm_local_instances", ()) or ())
-    if not instances:
-        instances = [
-            type(
-                "_TmpInst",
-                (),
-                {
-                    "host": "127.0.0.1",
-                    "port": int(settings.llm_local_port),
-                    "cuda_visible_devices": settings.llm_local_cuda_visible_devices,
-                },
-            )()
-        ]
+    bases: list[tuple[str, int, str, str | None, str]] = []
+    if local_entries:
+        for host, port, model, device in local_entries:
+            url_host = "localhost" if host in {"0.0.0.0"} else host
+            base = f"http://{url_host}:{port}/v1"
+            bases.append((host, port, base, device, model))
+    else:
+        instances = list(getattr(settings, "llm_local_instances", ()) or ())
+        if not instances:
+            instances = [
+                type(
+                    "_TmpInst",
+                    (),
+                    {
+                        "host": "127.0.0.1",
+                        "port": int(settings.llm_local_port),
+                        "cuda_visible_devices": settings.llm_local_cuda_visible_devices,
+                    },
+                )()
+            ]
 
-    bases: list[tuple[str, int, str, str | None]] = []
-    for inst in instances:
-        host = (getattr(inst, "host", None) or "127.0.0.1").strip() or "127.0.0.1"
-        port = int(
-            getattr(inst, "port", settings.llm_local_port) or settings.llm_local_port
-        )
-        url_host = "localhost" if host in {"0.0.0.0"} else host
-        base = f"http://{url_host}:{port}/v1"
-        cuda_visible_devices = getattr(inst, "cuda_visible_devices", None)
-        bases.append((host, port, base, cuda_visible_devices))
+        for inst in instances:
+            host = (getattr(inst, "host", None) or "127.0.0.1").strip() or "127.0.0.1"
+            port = int(
+                getattr(inst, "port", settings.llm_local_port)
+                or settings.llm_local_port
+            )
+            url_host = "localhost" if host in {"0.0.0.0"} else host
+            base = f"http://{url_host}:{port}/v1"
+            cuda_visible_devices = getattr(inst, "cuda_visible_devices", None)
+            model_path = _resolve_model_path(settings.llm_local_model)
+            bases.append((host, port, base, cuda_visible_devices, model_path))
 
-    for host, port, base, cuda_visible_devices in bases:
+    for host, port, base, cuda_visible_devices, model in bases:
         key = (host, port)
         proc = _llm_local_procs.get(key)
         if proc is not None and proc.poll() is None:
@@ -94,7 +156,7 @@ def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
             "lmdeploy",
             "serve",
             "api_server",
-            settings.llm_local_model,
+            model,
             "--server-port",
             str(port),
         ]
@@ -105,15 +167,16 @@ def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
                 "cuda_visible": cuda_visible_devices,
                 "host": host,
                 "port": port,
+                "model": model,
             },
         )
         _llm_local_procs[key] = subprocess.Popen(cmd, env=env)
 
     deadline = time.time() + float(settings.llm_local_startup_timeout_s)
     last: str | None = None
-    pending: set[tuple[str, int]] = {(h, p) for h, p, _, _ in bases}
+    pending: set[tuple[str, int]] = {(h, p) for h, p, _, _, _ in bases}
     while time.time() < deadline:
-        for host, port, base, _ in bases:
+        for host, port, base, _, _ in bases:
             key = (host, port)
             if key not in pending:
                 continue
@@ -134,7 +197,7 @@ def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
         if not pending:
             logger.info(
                 "local llm servers started",
-                extra={"base_urls": [b for _, _, b, _ in bases]},
+                extra={"base_urls": [b for _, _, b, _, _ in bases]},
             )
             return
         time.sleep(0.5)

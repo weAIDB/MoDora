@@ -159,7 +159,7 @@ def convert_tree_to_vueflow(
                     "style": {"stroke": "#3b82f6", "strokeWidth": 2},
                 }
             )
-        
+
         children = list(node_data.get("children", {}).items())
 
         for i, (child_name, child_data) in enumerate(reversed(children)):
@@ -185,14 +185,15 @@ def reconstruct_tree_from_elements(
     # 1. 创建节点映射，方便通过 ID 查找
     nodes_map = {}
     edges = []
-    
+
     # 建立原始数据的映射，以便找回 location 等信息
     original_nodes_data = {}
+
     def map_original(name, data):
         original_nodes_data[name] = data
         for child_name, child_data in data.get("children", {}).items():
             map_original(child_name, child_data)
-    
+
     map_original(root_name, original_tree)
 
     for el in elements:
@@ -215,20 +216,20 @@ def reconstruct_tree_from_elements(
         node_el = nodes_map.get(node_id)
         if not node_el:
             return None
-        
+
         node_name = node_el.get("label", node_el.get("data", {}).get("label", ""))
         node_data_attr = node_el.get("data", {})
-        
+
         # 尝试从原始树中获取丢失的详细信息 (如 location)
         orig_data = original_nodes_data.get(node_name, {})
-        
+
         reconstructed = {
             "type": node_data_attr.get("type", orig_data.get("type", "text")),
             "metadata": node_data_attr.get("metadata", orig_data.get("metadata", "")),
             "data": node_data_attr.get("data", orig_data.get("data", "")),
             "location": orig_data.get("location", []),
             "impact": node_data_attr.get("impact", orig_data.get("impact", 0)),
-            "children": {}
+            "children": {},
         }
 
         # 递归处理子节点
@@ -236,11 +237,13 @@ def reconstruct_tree_from_elements(
         for child_id in reversed(child_ids):
             child_node_el = nodes_map.get(child_id)
             if child_node_el:
-                child_name = child_node_el.get("label", child_node_el.get("data", {}).get("label", ""))
+                child_name = child_node_el.get(
+                    "label", child_node_el.get("data", {}).get("label", "")
+                )
                 child_struct = build_node(child_id)
                 if child_struct:
                     reconstructed["children"][child_name] = child_struct
-                    
+
         return reconstructed
 
     # 找到根节点的 ID (通常是 "root" 或者没有被作为 target 的节点)
