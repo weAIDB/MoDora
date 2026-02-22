@@ -450,7 +450,7 @@ def _handle_evaluate(args: argparse.Namespace, logger: logging.Logger) -> int:
     """
     # Ensure local LLM is loaded only when not using remote LLM
     if not args.remote:
-        ensure_llm_local_loaded(Settings.load(), logger)
+        ensure_llm_local_loaded(Settings.load(), logger, force=True)
     try:
         input_path = Path(args.input)
         result_path = Path(args.result)

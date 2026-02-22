@@ -27,6 +27,7 @@ dependencies = [
   "lmdeploy==0.12.0",
   "paddleocr",
   "paddlex>=3.4.2",
+  "chromadb",
 ]
 
 [project.scripts]

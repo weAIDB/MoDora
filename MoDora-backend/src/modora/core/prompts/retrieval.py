@@ -106,6 +106,18 @@ If yes, output T, otherwise output F.
 You only need to output T or F, without any other content.
 """
 
+rerank_prompt = """
+### Instruction
+Given a query and a passage, output a relevance score between 0 and 1. The score should reflect how likely the passage contains evidence needed to answer the query.
+Only output the score as a number.
+
+### Query
+{query}
+
+### Passage
+{passage}
+"""
+
 image_reasoning_prompt = """
 ### Instruction
 Now we have a query and a document. Given the document schema, the textual evidence pieces retrieved from it and the visual image of their corresponding areas, please return a short and concise answer to the query.

@@ -69,3 +69,4 @@ MoDora-backend/configs/local.json
 *.log
 *.swp
 *.bak
+MoDora-backend/data/

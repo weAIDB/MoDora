@@ -14,6 +14,10 @@ from modora.core.domain.jobs import QAJob
 from modora.core.services.qa_service import QAService
 from modora.core.settings import Settings
 from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.utils.config import (
+    load_ui_settings_from_config,
+    settings_from_ui_payload,
+)
 
 
 def register(sub: argparse._SubParsersAction) -> None:
@@ -197,11 +201,13 @@ async def run_single_qa(
 
 
 async def run_batch_qa(
-    jobs: List[QAJob], concurrency: int, logger: logging.Logger, debug: bool = False
+    jobs: List[QAJob],
+    qa_service: QAService,
+    concurrency: int,
+    logger: logging.Logger,
+    debug: bool = False,
 ) -> List[dict[str, Any]]:
     """Run QA tasks in batch."""
-    settings = Settings.load()
-    qa_service = QAService(settings)
     sem = asyncio.Semaphore(concurrency)
 
     tasks = [run_single_qa(job, qa_service, sem, logger, debug) for job in jobs]
@@ -217,10 +223,25 @@ async def run_batch_qa(
 
 def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
     """Processor for the batch-qa command."""
-    settings = Settings.load()
-    ensure_llm_local_loaded(settings, logger)
+    config_path = getattr(args, "config", None)
+    settings = Settings.load(config_path)
+    ensure_llm_local_loaded(settings, logger, config_path=config_path)
 
     try:
+        ui_settings = load_ui_settings_from_config(config_path)
+        qa_settings, qa_mode, cfg = settings_from_ui_payload(
+            settings, ui_settings, module_key="qaService"
+        )
+        retriever_settings, retriever_mode, _ = settings_from_ui_payload(
+            settings, cfg, module_key="retriever"
+        )
+        qa_service = QAService(
+            qa_settings,
+            qa_mode=qa_mode,
+            retriever_settings=retriever_settings,
+            retriever_mode=retriever_mode,
+        )
+
         dataset_path = Path(args.dataset).resolve()
         cache_dir = Path(args.cache).resolve()
         output_dir = Path(args.output).resolve()
@@ -284,7 +305,7 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
         new_results = []
         if jobs:
             new_results = asyncio.run(
-                run_batch_qa(jobs, args.concurrency, logger, args.debug)
+                run_batch_qa(jobs, qa_service, args.concurrency, logger, args.debug)
             )
 
         # Merge and save final summary

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import re
+from typing import Any
 from abc import ABC, abstractmethod
 from typing import Tuple
+
+import httpx
 
 from modora.core.settings import Settings
 from modora.core.prompts import (
@@ -19,6 +22,7 @@ from modora.core.prompts import (
     check_answer_prompt,
     whole_reasoning_prompt,
     image_reasoning_prompt,
+    rerank_prompt,
     evaluation_prompt,
 )
 
@@ -31,6 +35,23 @@ def _bool_string(s: str) -> bool:
     return False
 
 
+def _parse_score(s: str) -> float:
+    if not s:
+        return 0.0
+    nums = re.findall(r"-?\d+(?:\.\d+)?", s)
+    if not nums:
+        return 0.0
+    try:
+        score = float(nums[0])
+    except Exception:
+        return 0.0
+    if score < 0.0:
+        return 0.0
+    if score > 1.0:
+        return 1.0
+    return score
+
+
 def _prompt_for_type(cp_type: str) -> str:
     """Select the corresponding enrichment prompt based on the component type."""
     t = (cp_type or "").strip().lower()
@@ -39,6 +60,37 @@ def _prompt_for_type(cp_type: str) -> str:
     if t == "chart":
         return chart_enrichment_prompt
     return image_enrichment_prompt
+
+
+def _normalize_endpoint(base_url: str, endpoint: str) -> str:
+    base = base_url.rstrip("/")
+    ep = endpoint.strip("/")
+    if not ep:
+        return base
+    if base.endswith(f"/{ep}"):
+        return base
+    return f"{base}/{ep}"
+
+
+def _build_headers(api_key: str | None) -> dict[str, str]:
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["Authorization"] = api_key
+    return headers
+
+
+async def _post_json(
+    url: str,
+    payload: dict[str, Any],
+    headers: dict[str, str],
+    timeout: float,
+) -> dict[str, Any]:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            url, json=payload, headers=headers, timeout=timeout
+        )
+        response.raise_for_status()
+        return response.json()
 
 
 class BaseAsyncLLMClient(ABC):
@@ -110,6 +162,11 @@ class BaseAsyncLLMClient(ABC):
         prompt = check_node_prompt2.format(data=data, query=query)
         res = await self._call_llm(prompt, base64_image)
         return _bool_string(res)
+
+    async def rerank_score(self, query: str, passage: str) -> float:
+        prompt = rerank_prompt.format(query=query, passage=passage)
+        res = await self._call_llm(prompt)
+        return _parse_score(res or "")
 
     async def evaluate(self, query: str, reference: str, prediction: str) -> bool:
         """Evaluate whether the generated answer is semantically consistent with the reference answer."""

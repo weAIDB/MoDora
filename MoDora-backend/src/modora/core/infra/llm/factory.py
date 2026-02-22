@@ -3,8 +3,10 @@ from __future__ import annotations
 import logging
 from modora.core.settings import Settings
 from modora.core.infra.llm.base import BaseAsyncLLMClient
+from modora.core.infra.llm.embedding import AsyncEmbeddingClient
 from modora.core.infra.llm.local import AsyncLocalLLMClient
 from modora.core.infra.llm.remote import AsyncRemoteLLMClient
+from modora.core.infra.llm.rerank import AsyncRerankClient
 
 
 class AsyncLLMFactory:
@@ -60,3 +62,13 @@ class AsyncLLMFactory:
             "No explicit LLM configuration found in settings, defaulting to AsyncRemoteLLMClient (will attempt local.json fallback)"
         )
         return AsyncRemoteLLMClient(settings)
+
+    @staticmethod
+    def create_embedding(settings: Settings | None = None) -> AsyncEmbeddingClient:
+        settings = settings or Settings.load()
+        return AsyncEmbeddingClient(settings)
+
+    @staticmethod
+    def create_rerank(settings: Settings | None = None) -> AsyncRerankClient:
+        settings = settings or Settings.load()
+        return AsyncRerankClient(settings)

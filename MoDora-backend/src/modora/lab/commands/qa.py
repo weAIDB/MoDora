@@ -10,6 +10,10 @@ from modora.core.domain.component import Location
 from modora.core.services.qa_service import QAService
 from modora.core.settings import Settings
 from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.utils.config import (
+    load_ui_settings_from_config,
+    settings_from_ui_payload,
+)
 
 
 def register(sub: argparse._SubParsersAction) -> None:
@@ -35,10 +39,29 @@ def _handle_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
     Returns:
         Exit code (0 for success, 1 for failure).
     """
-    settings = Settings.load()
-    ensure_llm_local_loaded(settings, logger)
+    config_path = getattr(args, "config", None)
+    settings = Settings.load(config_path)
+    ensure_llm_local_loaded(settings, logger, config_path=config_path)
     try:
-        asyncio.run(run_qa(args.source_path, args.tree_path, args.query, logger))
+        ui_settings = load_ui_settings_from_config(config_path)
+        qa_settings, qa_mode, cfg = settings_from_ui_payload(
+            settings, ui_settings, module_key="qaService"
+        )
+        retriever_settings, retriever_mode, _ = settings_from_ui_payload(
+            settings, cfg, module_key="retriever"
+        )
+        asyncio.run(
+            run_qa(
+                args.source_path,
+                args.tree_path,
+                args.query,
+                qa_settings,
+                qa_mode,
+                retriever_settings,
+                retriever_mode,
+                logger,
+            )
+        )
         return 0
     except Exception as e:
         logger.error(f"QA failed: {e}")
@@ -47,7 +70,16 @@ def _handle_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
         shutdown_llm_local()
 
 
-async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.Logger):
+async def run_qa(
+    source_path: str,
+    tree_path: str,
+    query: str,
+    qa_settings: Settings,
+    qa_mode: str | None,
+    retriever_settings: Settings,
+    retriever_mode: str | None,
+    logger: logging.Logger,
+):
     """Run the QA process for a single document.
 
     Args:
@@ -56,8 +88,12 @@ async def run_qa(source_path: str, tree_path: str, query: str, logger: logging.L
         query: The question to ask.
         logger: Logger instance.
     """
-    settings = Settings.load()
-    qa_service = QAService(settings)
+    qa_service = QAService(
+        qa_settings,
+        qa_mode=qa_mode,
+        retriever_settings=retriever_settings,
+        retriever_mode=retriever_mode,
+    )
 
     # Load tree data
     logger.info(f"Loading tree from {tree_path}...")

@@ -87,6 +87,7 @@ class LocationRetriever:
             if node.data:
                 result.text_map[path] = node.data
             result.locations.extend(hit_locations)
+            result.locations_by_path.setdefault(path, []).extend(hit_locations)
 
         # Recursively check child nodes
         for child_key, child_node in node.children.items():

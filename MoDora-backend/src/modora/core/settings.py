@@ -166,10 +166,17 @@ class Settings:
     # Data paths
     docs_dir: str | None = None
     cache_dir: str | None = None
+    chroma_persist_path: str | None = None
 
     api_base: str | None = None
     api_key: str | None = None
     api_model: str | None = None
+    embedding_api_base: str | None = None
+    embedding_api_key: str | None = None
+    embedding_model_name: str | None = None
+    rerank_api_base: str | None = None
+    rerank_api_key: str | None = None
+    rerank_model_name: str | None = None
 
     model_instances: dict[str, ModelInstance] = field(default_factory=dict)
 
@@ -202,7 +209,12 @@ class Settings:
 
         cfg_path = (config_path or os.getenv("MODORA_CONFIG") or "").strip()
         cfg: dict[str, Any] = {}
-        if cfg_path and os.path.exists(cfg_path):
+
+        if not cfg_path:
+            backend_root = Path(__file__).resolve().parents[3]
+            cfg_path = backend_root / "configs" / "local.json"
+
+        if os.path.exists(cfg_path):
             cfg = _read_json(cfg_path)
 
         def pick(key: str, default: Any = None) -> Any:
@@ -225,10 +237,19 @@ class Settings:
             log_format = "text"
         log_to_file = _coerce_bool(pick("log_to_file", False))
         log_dir = _clean_str(pick("log_dir", None))
+        chroma_persist_path = _clean_str(pick("chroma_persist_path", None))
 
         api_base = _clean_str(pick("api_base", None))
         api_key = _clean_str(pick("api_key", None))
         api_model = _clean_str(pick("api_model", None))
+        embedding_api_base = _clean_str(pick("embedding_api_base", None))
+        embedding_api_key = _clean_str(pick("embedding_api_key", None))
+        embedding_model_name = _clean_str(
+            pick("embedding_model_name", "text-embedding-3-large")
+        )
+        rerank_api_base = _clean_str(pick("rerank_api_base", None))
+        rerank_api_key = _clean_str(pick("rerank_api_key", None))
+        rerank_model_name = _clean_str(pick("rerank_model_name", None))
 
         model_instances_raw = _coerce_json(pick("model_instances", None))
         model_instances: dict[str, ModelInstance] = {}
@@ -338,9 +359,16 @@ class Settings:
             log_dir=log_dir,
             docs_dir=docs_dir,
             cache_dir=cache_dir,
+            chroma_persist_path=chroma_persist_path,
             api_base=api_base,
             api_key=api_key,
             api_model=api_model,
+            embedding_api_base=embedding_api_base,
+            embedding_api_key=embedding_api_key,
+            embedding_model_name=embedding_model_name,
+            rerank_api_base=rerank_api_base,
+            rerank_api_key=rerank_api_key,
+            rerank_model_name=rerank_model_name,
             model_instances=model_instances,
             llm_local_model=llm_local_model,
             llm_local_base_url=llm_local_base_url,

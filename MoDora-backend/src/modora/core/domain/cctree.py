@@ -354,6 +354,7 @@ class RetrievalResult:
 
     text_map: Dict[str, str] = field(default_factory=dict)
     locations: List[Location] = field(default_factory=list)
+    locations_by_path: Dict[str, List[Location]] = field(default_factory=dict)
 
     def update(self, other: "RetrievalResult") -> None:
         """Merges another retrieval result.
@@ -363,3 +364,11 @@ class RetrievalResult:
         """
         self.text_map.update(other.text_map)
         self.locations.extend(other.locations)
+        if other.locations_by_path:
+            for path, locs in other.locations_by_path.items():
+                if not locs:
+                    continue
+                if path in self.locations_by_path:
+                    self.locations_by_path[path].extend(locs)
+                else:
+                    self.locations_by_path[path] = list(locs)

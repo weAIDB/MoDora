@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 from dataclasses import replace
+import json
+import os
+from pathlib import Path
 from modora.core.settings import LlmLocalInstance, Settings
 
 ALLOWED_UI_SETTINGS_KEYS = {
@@ -152,3 +155,24 @@ def settings_from_ui_payload(
 
     settings = replace(base, **overrides) if overrides else base
     return settings, selected_mode, cfg
+
+
+def load_ui_settings_from_config(
+    config_path: str | None = None,
+) -> dict[str, Any] | None:
+    cfg_path = (config_path or os.getenv("MODORA_CONFIG") or "").strip()
+    if not cfg_path:
+        backend_root = Path(__file__).resolve().parents[4]
+        default_cfg = backend_root / "configs" / "local.json"
+        if default_cfg.exists():
+            cfg_path = str(default_cfg)
+    if not cfg_path:
+        return None
+    try:
+        with open(cfg_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict) and isinstance(data.get("ui_settings"), dict):
+            return data["ui_settings"]
+    except Exception:
+        return None
+    return None

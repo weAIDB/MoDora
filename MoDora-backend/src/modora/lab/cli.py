@@ -14,6 +14,7 @@ from modora.lab.commands import (
     register_health,
     register_preprocess,
     register_qa,
+    register_cache_images,
 )
 
 
@@ -31,6 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     register_batch_qa(sub)
     register_evaluate(sub)
     register_preprocess(sub)
+    register_cache_images(sub)
 
     args = parser.parse_args(argv)
 

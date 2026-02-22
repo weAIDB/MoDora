@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import sqlite3
 from pathlib import Path
 
 import fitz
@@ -10,6 +11,8 @@ from PIL import Image
 
 from modora.core.domain.component import Location
 from modora.core.interfaces.media import ImageProvider
+from modora.core.settings import Settings
+from modora.core.utils.paths import resolve_paths
 
 # If cropping fails (PDF cannot be opened / page number out of bounds / illegal bbox, etc.), return base64 of 1x1 blank PNG.
 _BLANK_1X1_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMBAFh4kXcAAAAASUVORK5CYII="
@@ -21,6 +24,180 @@ def _normalize_pdf_path(pdf_path: str) -> str:
     if p.startswith("file:"):
         p = p[len("file:") :]
     return p
+
+
+def _image_to_base64(img: Image.Image) -> str:
+    buffered = io.BytesIO()
+    img.save(buffered, format="PNG")
+    buffered.seek(0)
+    return base64.b64encode(buffered.read()).decode("utf-8")
+
+
+def _base64_to_image(data: str) -> Image.Image | None:
+    try:
+        raw = base64.b64decode(data)
+        img = Image.open(io.BytesIO(raw))
+        return img.convert("RGB")
+    except Exception:
+        return None
+
+
+def _merge_images_to_base64(images: list[Image.Image | None]) -> str:
+    valid = [img for img in images if img is not None]
+    if not valid:
+        return _BLANK_1X1_PNG_BASE64
+
+    total_width = max(int(img.width) for img in valid)
+    total_height = sum(int(img.height) for img in valid)
+    merged_image = Image.new("RGB", (total_width, total_height))
+
+    y_offset = 0
+    for img in valid:
+        merged_image.paste(img, (0, y_offset))
+        y_offset += int(img.height)
+
+    MAX_SIZE = 1024
+    if merged_image.width > MAX_SIZE or merged_image.height > MAX_SIZE:
+        merged_image.thumbnail((MAX_SIZE, MAX_SIZE), Image.Resampling.LANCZOS)
+
+    return _image_to_base64(merged_image)
+
+
+def _crop_bboxes_to_images(
+    pdf_path: str, bbox_data: list[dict]
+) -> list[Image.Image | None]:
+    pdf_path = _normalize_pdf_path(pdf_path)
+    try:
+        pdf_document = fitz.open(pdf_path)
+    except Exception:
+        return [None for _ in bbox_data]
+
+    images: list[Image.Image | None] = []
+    try:
+        for data in bbox_data:
+            page_idx = data["page"] - 1
+            crop_range = data["bbox"]
+            if page_idx < 0 or page_idx >= len(pdf_document):
+                images.append(None)
+                continue
+            try:
+                page = pdf_document[page_idx]
+                
+                # Ensure crop_range is within page bounds to avoid SystemError
+                # crop_range is [x0, y0, x1, y1]
+                rect = fitz.Rect(crop_range)
+                # Intersect with page rect to ensure it's valid
+                # if rect is completely outside, intersection is empty or invalid
+                safe_rect = rect & page.rect
+                
+                if safe_rect.is_empty or safe_rect.width <= 0 or safe_rect.height <= 0:
+                    images.append(None)
+                    continue
+
+                pix = page.get_pixmap(clip=safe_rect)
+                if pix.width < 1 or pix.height < 1:
+                    images.append(None)
+                    continue
+                    
+                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                images.append(img)
+            except Exception:
+                images.append(None)
+    finally:
+        pdf_document.close()
+
+    return images
+
+
+def crop_bboxes_to_base64_list(pdf_path: str, bbox_data: list[dict]) -> list[str | None]:
+    images = _crop_bboxes_to_images(pdf_path, bbox_data)
+    result: list[str | None] = []
+    for img in images:
+        if img is None:
+            result.append(None)
+            continue
+        result.append(_image_to_base64(img))
+    return result
+
+
+class ImageCache:
+    def __init__(self, db_path: str | Path):
+        self.db_path = Path(db_path)
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._init_db()
+
+    def _init_db(self) -> None:
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("PRAGMA journal_mode=WAL;")
+                conn.execute(
+                    "CREATE TABLE IF NOT EXISTS images (key TEXT PRIMARY KEY, base64 TEXT NOT NULL)"
+                )
+        except Exception:
+            return
+
+    def _make_key(self, pdf_path: str, page: int, bbox: list[float]) -> str:
+        p = str(Path(_normalize_pdf_path(pdf_path)).expanduser().resolve())
+        b = json.dumps(
+            [round(float(x), 2) for x in bbox[:4]], separators=(",", ":")
+        )
+        return f"{p}::{int(page)}::{b}"
+
+    def get(self, pdf_path: str, page: int, bbox: list[float]) -> str | None:
+        key = self._make_key(pdf_path, page, bbox)
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cur = conn.cursor()
+                cur.execute("SELECT base64 FROM images WHERE key = ?", (key,))
+                row = cur.fetchone()
+                if row:
+                    return row[0]
+        except Exception:
+            return None
+        return None
+
+    def set(self, pdf_path: str, page: int, bbox: list[float], base64_str: str) -> None:
+        key = self._make_key(pdf_path, page, bbox)
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute(
+                    "INSERT OR REPLACE INTO images (key, base64) VALUES (?, ?)",
+                    (key, base64_str),
+                )
+        except Exception:
+            return
+
+    def set_batch(self, items: list[tuple[str, int, list[float], str]]) -> None:
+        data = [
+            (self._make_key(pdf_path, page, bbox), b64)
+            for pdf_path, page, bbox, b64 in items
+        ]
+        if not data:
+            return
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.executemany(
+                    "INSERT OR REPLACE INTO images (key, base64) VALUES (?, ?)", data
+                )
+        except Exception:
+            return
+
+
+_image_cache_instance: ImageCache | None = None
+
+
+def _get_image_cache() -> ImageCache | None:
+    global _image_cache_instance
+    if _image_cache_instance is not None:
+        return _image_cache_instance
+    try:
+        settings = Settings.load()
+        paths = resolve_paths(settings)
+        db_path = paths.cache_dir / "image_cache.db"
+        _image_cache_instance = ImageCache(db_path)
+        return _image_cache_instance
+    except Exception:
+        return None
 
 
 def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
@@ -35,49 +212,8 @@ def crop_pdf_image_task(pdf_path: str, bbox_data: list[dict]) -> str:
     Returns:
         Base64 encoded string of the merged image.
     """
-    pdf_path = _normalize_pdf_path(pdf_path)
-    try:
-        pdf_document = fitz.open(pdf_path)
-    except Exception:
-        return _BLANK_1X1_PNG_BASE64
-
-    images: list[Image.Image] = []
-    try:
-        for data in bbox_data:
-            page_idx = data["page"] - 1
-            crop_range = data["bbox"]
-            if page_idx < 0 or page_idx >= len(pdf_document):
-                continue
-
-            page = pdf_document[page_idx]
-            pix = page.get_pixmap(clip=crop_range)
-            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-            images.append(img)
-    finally:
-        pdf_document.close()
-
-    if not images:
-        return _BLANK_1X1_PNG_BASE64
-
-    total_width = max(int(img.width) for img in images)
-    total_height = sum(int(img.height) for img in images)
-    merged_image = Image.new("RGB", (total_width, total_height))
-
-    y_offset = 0
-    for img in images:
-        merged_image.paste(img, (0, y_offset))
-        y_offset += int(img.height)
-
-    # If image is too large (e.g., > 1024x1024), perform scaling
-    # Limit maximum size to reduce token consumption
-    MAX_SIZE = 1024
-    if merged_image.width > MAX_SIZE or merged_image.height > MAX_SIZE:
-        merged_image.thumbnail((MAX_SIZE, MAX_SIZE), Image.Resampling.LANCZOS)
-
-    buffered = io.BytesIO()
-    merged_image.save(buffered, format="PNG")
-    buffered.seek(0)
-    return base64.b64encode(buffered.read()).decode("utf-8")
+    images = _crop_bboxes_to_images(pdf_path, bbox_data)
+    return _merge_images_to_base64(images)
 
 
 def bbox_to_base64(pdf_path: str, bbox_list: list[Location]) -> str:
@@ -201,13 +337,8 @@ class PDFCropper(ImageProvider):
         if not locations:
             return []
 
-        # Simple implementation: group cropping by file, then return base64 list
         results: list[str] = []
-
-        # Simple implementation: Crop by file group and return base64 list
-        # In actual multi-document RAG, we typically return a large combined image or multiple images
-        # To maintain compatibility with the existing reason_retrieved interface, we return multiple cropped images
-        results = []
+        cache = _get_image_cache()
 
         # Grouping
         grouped: dict[str, list[Location]] = {}
@@ -228,9 +359,37 @@ class PDFCropper(ImageProvider):
                 path = source_path.get(fn, "")
             if not path or not Path(str(path)).exists():
                 continue
+            if cache:
+                images: list[Image.Image | None] = [None] * len(locs)
+                missing: list[tuple[int, Location]] = []
+                for idx, loc in enumerate(locs):
+                    b64 = cache.get(str(path), loc.page, loc.bbox)
+                    if b64:
+                        img = _base64_to_image(b64)
+                        if img is not None:
+                            images[idx] = img
+                            continue
+                    missing.append((idx, loc))
 
-            # Use existing bbox_to_base64 (synchronous version, currently called synchronously by QAService)
-            # Note: Can be optimized to asynchronous later
+                if missing:
+                    bbox_data = [
+                        {"page": loc.page, "bbox": loc.bbox} for _, loc in missing
+                    ]
+                    cropped = _crop_bboxes_to_images(str(path), bbox_data)
+                    batch: list[tuple[str, int, list[float], str]] = []
+                    for (idx, loc), img in zip(missing, cropped):
+                        if img is None:
+                            continue
+                        images[idx] = img
+                        b64 = _image_to_base64(img)
+                        batch.append((str(path), loc.page, loc.bbox, b64))
+                    if batch:
+                        cache.set_batch(batch)
+
+                if any(img is not None for img in images):
+                    results.append(_merge_images_to_base64(images))
+                    continue
+
             img_b64 = bbox_to_base64(str(path), locs)
             results.append(img_b64)
 

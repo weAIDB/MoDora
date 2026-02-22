@@ -4,6 +4,7 @@ from .config import register as register_config
 from .evaluate import register as register_evaluate
 from .health import register as register_health
 from .preprocess import register as register_preprocess
+from .cache_images import register as register_cache_images
 from .qa import register as register_qa
 
 __all__ = [
@@ -13,5 +14,6 @@ __all__ = [
     "register_evaluate",
     "register_health",
     "register_preprocess",
+    "register_cache_images",
     "register_qa",
 ]

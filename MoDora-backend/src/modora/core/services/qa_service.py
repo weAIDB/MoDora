@@ -7,7 +7,11 @@ from modora.core.domain import CCTree, RetrievalResult
 from modora.core.infra.llm import AsyncLLMFactory
 from modora.core.infra.pdf import PDFCropper
 from modora.core.prompts import location_extraction_prompt
-from modora.core.services.retrieve import LocationRetriever, SemanticRetriever
+from modora.core.services.retrieve import (
+    LocationRetriever,
+    SemanticRetriever,
+    VectorRetriever,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,19 +28,21 @@ class QAService:
         retriever_mode: str | None = None,
         retriever_settings: Settings | None = None,
     ):
-        self.settings = settings or Settings()
+        self.settings = settings or Settings.load()
         self.retriever_settings = retriever_settings or self.settings
 
         # Backward compatibility: when mode is not split, it applies to both QA and Retriever.
         qa_mode = qa_mode or mode
         retriever_mode = retriever_mode or mode
 
-        self.local_llm = AsyncLLMFactory.create(self.settings, mode=mode or "local")
         self.remote_llm = AsyncLLMFactory.create(
             self.settings, mode=qa_mode or "remote"
         )
         self.cropper = PDFCropper()
         self.semantic_retriever = SemanticRetriever(
+            self.retriever_settings, mode=retriever_mode or "local"
+        )
+        self.vector_retriever = VectorRetriever(
             self.retriever_settings, mode=retriever_mode or "local"
         )
         self.location_retriever = LocationRetriever()
@@ -65,44 +71,67 @@ class QAService:
         return page_list, position_vector
 
     def _format_retrieved_docs(
-        self, result: RetrievalResult, file_names: list[str] | None = None
+        self,
+        result: RetrievalResult,
+        file_names: list[str] | None = None,
+        retriever_by_key: (
+            dict[tuple[str | None, str | None, int], set[str]] | None
+        ) = None,
     ) -> list[dict]:
         """Organizes retrieved evidence documents.
 
         Groups bboxes from the same page of the same file into a list and associates them with corresponding text content.
         """
 
-        # (file_name, page) -> {bboxes, content}
-        grouped_data: dict[tuple[str | None, int], dict] = {}
+        retriever_by_key = retriever_by_key or {}
+        locations_by_path = getattr(result, "locations_by_path", {}) or {}
+        if locations_by_path:
+            grouped_data: dict[tuple[str, str | None, int], dict] = {}
+            for path, locs in locations_by_path.items():
+                content = result.text_map.get(path, "")
+                for loc in locs:
+                    fn = loc.file_name
+                    if not fn and file_names:
+                        fn = file_names[0]
+                    key = (path, fn, loc.page)
+                    if key not in grouped_data:
+                        grouped_data[key] = {
+                            "file_name": fn,
+                            "page": loc.page,
+                            "content": content,
+                            "bboxes": [],
+                            "retrievers": sorted(
+                                list(retriever_by_key.get(key, set()))
+                            ),
+                        }
+                    if loc.bbox not in grouped_data[key]["bboxes"]:
+                        grouped_data[key]["bboxes"].append(loc.bbox)
+            return list(grouped_data.values())
 
+        grouped_data: dict[tuple[str | None, str | None, int], dict] = {}
         for loc in result.locations:
             fn = loc.file_name
             if not fn and file_names:
                 fn = file_names[0]
-
-            key = (fn, loc.page)
+            key = (None, fn, loc.page)
             if key not in grouped_data:
-                # Find the text corresponding to this node
                 content = ""
                 for path, text in result.text_map.items():
-                    # If path contains filename or path itself is what we are looking for
                     if fn and fn in path:
                         content = text
                         break
                     elif not fn:
                         content = text
                         break
-
                 grouped_data[key] = {
                     "file_name": fn,
                     "page": loc.page,
                     "content": content,
                     "bboxes": [],
+                    "retrievers": sorted(list(retriever_by_key.get(key, set()))),
                 }
-
             if loc.bbox not in grouped_data[key]["bboxes"]:
                 grouped_data[key]["bboxes"].append(loc.bbox)
-
         return list(grouped_data.values())
 
     async def qa(
@@ -127,7 +156,14 @@ class QAService:
 
         # 1. Retrieval
         if -1 in page_list and position_vector == [-1.0, -1.0]:
-            result = await self.semantic_retriever.retrieve(tree, query, source_path)
+            semantic_result = await self.semantic_retriever.retrieve(
+                tree, query, source_path
+            )
+            vector_result = await self.vector_retriever.retrieve(
+                tree, query, source_path
+            )
+            result.update(semantic_result)
+            result.update(vector_result)
         else:
             # Location retrieval currently only supports single documents; can be extended later
             actual_source = (
@@ -148,10 +184,44 @@ class QAService:
                 "page_list": page_list,
                 "position_vector": position_vector,
             },
-            {"step": "retrieve", "locations_count": len(result.locations)},
+            {
+                "step": "retrieve",
+                "locations_count": len(result.locations),
+                "semantic_locations_count": (
+                    len(semantic_result.locations)
+                    if -1 in page_list and position_vector == [-1.0, -1.0]
+                    else 0
+                ),
+                "vector_locations_count": (
+                    len(vector_result.locations)
+                    if -1 in page_list and position_vector == [-1.0, -1.0]
+                    else 0
+                ),
+            },
         ]
 
         file_names = list(source_path.keys()) if isinstance(source_path, dict) else None
+        retriever_by_key: dict[tuple[str | None, str | None, int], set[str]] = {}
+
+        def add_retriever_map(
+            retrieval_result: RetrievalResult, retriever: str
+        ) -> None:
+            locations_by_path = getattr(retrieval_result, "locations_by_path", {}) or {}
+            if locations_by_path:
+                for path, locs in locations_by_path.items():
+                    for loc in locs:
+                        fn = loc.file_name
+                        if not fn and file_names:
+                            fn = file_names[0]
+                        key = (path, fn, loc.page)
+                        retriever_by_key.setdefault(key, set()).add(retriever)
+            else:
+                for loc in retrieval_result.locations:
+                    fn = loc.file_name
+                    if not fn and file_names:
+                        fn = file_names[0]
+                    key = (None, fn, loc.page)
+                    retriever_by_key.setdefault(key, set()).add(retriever)
 
         try:
             if result.locations or result.text_map:
@@ -199,8 +269,15 @@ class QAService:
         else:
             trace.append({"step": "verification", "status": "passed"})
 
-        # Organize the returned evidence documents
-        retrieved_docs = self._format_retrieved_docs(result, file_names=file_names)
+        if -1 in page_list and position_vector == [-1.0, -1.0]:
+            add_retriever_map(semantic_result, "semantic")
+            add_retriever_map(vector_result, "vector")
+        else:
+            add_retriever_map(result, "location")
+
+        retrieved_docs = self._format_retrieved_docs(
+            result, file_names=file_names, retriever_by_key=retriever_by_key
+        )
 
         # Update the impact values of tree nodes
         all_impact_updates = {}

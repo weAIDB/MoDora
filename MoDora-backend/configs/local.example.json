@@ -14,6 +14,12 @@
   "api_base": "https://your-api-base-url/v1",
   "api_key": "your-api-key",
   "api_model": "gpt-4o",
+  "embedding_api_base": "https://api.deepinfra.com/v1/openai",
+  "embedding_api_key": "your-embedding-api-key",
+  "embedding_model_name": "Qwen/Qwen3-Embedding-4B",
+  "rerank_api_base": "https://api.deepinfra.com/v1/inference",
+  "rerank_api_key": "your-rerank-api-key",
+  "rerank_model_name": "Qwen/Qwen3-Reranker-4B",
 
   "model_instances": {
     "local-default": {
@@ -24,7 +30,7 @@
     },
     "remote-default": {
       "type": "remote",
-      "model": "gpt-4o",
+      "model": "gpt-5",
       "base_url": "https://your-api-base-url/v1",
       "api_key": "your-api-key"
     }

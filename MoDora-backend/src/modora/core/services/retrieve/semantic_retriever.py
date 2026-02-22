@@ -15,7 +15,7 @@ class SemanticRetriever:
     """CCTree retriever based on semantic understanding."""
 
     def __init__(self, settings: Settings | None = None, mode: str | None = None):
-        self.settings = settings or Settings()
+        self.settings = settings or Settings.load()
         self.llm = AsyncLLMFactory.create(self.settings, mode=mode or "local")
         self.cropper = PDFCropper()
 
@@ -151,8 +151,9 @@ class SemanticRetriever:
             ):
                 if node.data:
                     result.text_map[path] = node.data
-                # Semantic matching means the entire node is relevant
-                result.locations.extend(node.location)
+                if node.location:
+                    result.locations.extend(node.location)
+                    result.locations_by_path.setdefault(path, []).extend(node.location)
 
             # If child nodes exist, perform selection
             if node.children:
