@@ -82,14 +82,14 @@ def _crop_bboxes_to_images(
                 continue
             try:
                 page = pdf_document[page_idx]
-                
+
                 # Ensure crop_range is within page bounds to avoid SystemError
                 # crop_range is [x0, y0, x1, y1]
                 rect = fitz.Rect(crop_range)
                 # Intersect with page rect to ensure it's valid
                 # if rect is completely outside, intersection is empty or invalid
                 safe_rect = rect & page.rect
-                
+
                 if safe_rect.is_empty or safe_rect.width <= 0 or safe_rect.height <= 0:
                     images.append(None)
                     continue
@@ -98,7 +98,7 @@ def _crop_bboxes_to_images(
                 if pix.width < 1 or pix.height < 1:
                     images.append(None)
                     continue
-                    
+
                 img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
                 images.append(img)
             except Exception:
@@ -109,7 +109,9 @@ def _crop_bboxes_to_images(
     return images
 
 
-def crop_bboxes_to_base64_list(pdf_path: str, bbox_data: list[dict]) -> list[str | None]:
+def crop_bboxes_to_base64_list(
+    pdf_path: str, bbox_data: list[dict]
+) -> list[str | None]:
     images = _crop_bboxes_to_images(pdf_path, bbox_data)
     result: list[str | None] = []
     for img in images:
@@ -138,9 +140,7 @@ class ImageCache:
 
     def _make_key(self, pdf_path: str, page: int, bbox: list[float]) -> str:
         p = str(Path(_normalize_pdf_path(pdf_path)).expanduser().resolve())
-        b = json.dumps(
-            [round(float(x), 2) for x in bbox[:4]], separators=(",", ":")
-        )
+        b = json.dumps([round(float(x), 2) for x in bbox[:4]], separators=(",", ":"))
         return f"{p}::{int(page)}::{b}"
 
     def get(self, pdf_path: str, page: int, bbox: list[float]) -> str | None:

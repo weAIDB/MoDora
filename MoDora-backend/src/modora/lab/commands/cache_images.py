@@ -16,7 +16,11 @@ from modora.core.utils.fs import iter_pdf_paths
 
 def register(sub: argparse._SubParsersAction) -> None:
     p = sub.add_parser("cache-images", help="Precompute image cache for bbox crops")
-    p.add_argument("--dataset", default="/home/yukai/project/MoDora/datasets/MMDA", help="Path to a PDF file or directory")
+    p.add_argument(
+        "--dataset",
+        default="/home/yukai/project/MoDora/datasets/MMDA",
+        help="Path to a PDF file or directory",
+    )
     p.add_argument(
         "--cache-dir", default=None, help="Cache directory containing tree.json"
     )
@@ -77,7 +81,11 @@ def _handle_cache_images(args: argparse.Namespace, logger: logging.Logger) -> in
             except Exception as e:
                 logger.error(
                     "failed to load tree",
-                    extra={"pdf": str(pdf_path), "tree": str(tree_path), "error": str(e)},
+                    extra={
+                        "pdf": str(pdf_path),
+                        "tree": str(tree_path),
+                        "error": str(e),
+                    },
                 )
                 pbar.update(1)
                 continue
