@@ -1,5 +1,19 @@
 # MoDora
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+
+## 📑 Table of Contents
+
+- [Introduction](#-introduction)
+- [MMDA Bench](#-mmda-bench)
+- [Performance](#-performance)
+- [Quick Start](#-quick-start)
+  - [Automated Installation](#1-automated-installation)
+  - [Configuration](#2-configuration)
+  - [Execution](#3-execution)
+  - [Manual Setup](#-manual-setup)
+- [CLI Usage](#-cli-usage-experiments)
 
 ## ✨ Introduction
 
@@ -11,6 +25,7 @@ MoDora combines OCR and MLLMs in preprocessing, tree construction and tree-based
 
 
 **Examples**
+
 <table style="width: 100%; table-layout: fixed; font-size: 12px; border-collapse: collapse; border: 1px solid #dfe2e5; margin-bottom: 10px; word-wrap: break-word; overflow-wrap: break-word;">
   <thead><tr>
     <th style="padding: 8px 4px; border: 1px solid #dfe2e5; background-color: #f6f8fa; font-weight: 600; text-align: left; width: 25%;">Question</th>
@@ -565,7 +580,8 @@ MoDora combines OCR and MLLMs in preprocessing, tree construction and tree-based
     </tr>
   </tbody></table>
   </div></details>
-  
+
+
 The full results of MoDora and baselines are shown in [Results](./Results/resmodora.jsonl).
 
 ## 💻 MMDA Bench
@@ -579,17 +595,17 @@ You can visit it here [MMDA](./datasets/MMDA/test.json), and some documents invo
 
 The following table demonstrates the AIC-Acc and ACNLS score of different methods over MMDA Bench. The AIC-Acc and ACNLS are the modified versions of Acc and ANLS metrics respectively.
 
-**Metric** | **ACNLS(%)** | **AIC-Acc(%)**
-:---:|:---:|:---:|
- UDOP | 15.44 | 15.77 |
- DocOwl2 | 29.38 | 29.58 |
- M3DocRAG | 41.12 | 47.42 |
- SV-RAG | 33.06 | 37.75 |
- TextRAG | 29.57 | 36.24 |
- ZenDB | 36.68 | 47.14 |
- QUEST | 12.42 | 15.68 |
- GPT-5 | 41.55 | 46.48 |
- MoDora | 55.23 | 73.33 |
+| **Metric** | **ACNLS(%)** | **AIC-Acc(%)** |
+| :--------: | :----------: | :------------: |
+|    UDOP    |    15.44     |     15.77      |
+|  DocOwl2   |    29.38     |     29.58      |
+|  M3DocRAG  |    41.12     |     47.42      |
+|   SV-RAG   |    33.06     |     37.75      |
+|  TextRAG   |    29.57     |     36.24      |
+|   ZenDB    |    36.68     |     47.14      |
+|   QUEST    |    12.42     |     15.68      |
+|   GPT-5    |    41.55     |     46.48      |
+|   MoDora   |    55.23     |     73.33      |
 
 **Baselines**
 
@@ -636,6 +652,7 @@ chmod +x setup.sh run.sh start_backend.sh start_frontend.sh
 Model configuration is handled interactively by `./setup.sh`. It creates `MoDora-backend/configs/local.json` (based on `local.example.json`) and writes the model selections you input.
 
 **What setup.sh configures:**
+
 - `model_instances`: All available model instances (local/remote). Each item includes `type`, `model`, and optional `base_url`, `port`, `device`.
 - `ui_settings.pipelines`: Which model instance each module uses (`enrichment`, `retriever`, `qaService`, etc.).
 - `ui_settings.ocr.provider`: OCR model selection (`ppstructure` or `paddle_ocr_vl`).
@@ -646,6 +663,7 @@ If you need to tweak values later, edit `MoDora-backend/configs/local.json` dire
 ### 3. Execution
 
 Once installation and configuration are complete, you can use `run.sh` to start both backend and frontend services simultaneously:
+
 ```bash
 ./run.sh
 ```
@@ -681,6 +699,7 @@ export MODORA_CONFIG="MoDora-backend/configs/local.json"
 Edit `local.json` to set `model_instances` and `ui_settings` for module-level model selection. Remote models require `api_key`/`base_url`, and local models require `model` (local path) and optional `port`/`device`.
 
 **Running the API.**
+
 ```bash
 # Start FastAPI server
 uvicorn modora.api.app:app --host 0.0.0.0 --port 8005 --reload
@@ -697,6 +716,7 @@ npm install
 ```
 
 **Running the Dev Server.**
+
 ```bash
 npm run dev
 ```
@@ -720,11 +740,13 @@ Configure model paths and settings in your environment or `config.json`.
 MoDora provides a comprehensive CLI for offline experiments, dataset preprocessing, and batch evaluation.
 
 First, activate the virtual environment:
+
 ```bash
 source MoDora-backend/venv/bin/activate
 ```
 
 Basic usage:
+
 ```bash
 # General help
 modora --help
@@ -737,35 +759,42 @@ modora <command> --help
 
 1. **OCR & Component Extraction**
    Process raw PDFs to extract layout blocks and components.
+
    ```bash
    modora ocr --dataset datasets/MMDA --cache-dir MoDora-backend/cache_v5
    ```
 
 2. **Tree Construction**
    Build document hierarchy trees (tree.json) from extracted components.
+
    ```bash
    modora build-tree --dataset datasets/MMDA --cache-dir MoDora-backend/cache_v5
    ```
 
 3. **Single Document QA**
    Ask a question about a specific document using its constructed tree.
+
    ```bash
    modora qa <pdf_path> <tree_json_path> "Your question here"
    ```
 
 4. **Batch QA Experiment**
    Run multiple questions from a dataset against the constructed trees.
+
    ```bash
    modora batch-qa --dataset datasets/MMDA/test.json --cache MoDora-backend/cache_v5 --output MoDora-backend/tmp
    ```
 
 5. **Evaluation & Analysis**
    Calculate metrics (Accuracy, ANLS, ACNLS) and generate analysis charts.
+
    ```bash
    # By default, evaluation results and charts will be saved alongside the result.json file
    modora evaluate --input datasets/MMDA/test.json --result MoDora-backend/tmp/result.json
    ```
+
    This command will:
+
    - Update `result.json` with calculated metrics (Accuracy, ANLS, etc.).
    - Save the detailed evaluation to `evaluation.jsonl` in the same directory as `result.json`.
    - Generate accuracy/ACNLS bar charts and summary CSVs in the same directory.
