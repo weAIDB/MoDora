@@ -58,8 +58,8 @@ MoDora-frontend/.env.test.local
 MoDora-frontend/.env.production.local
 
 # Configuration
-MoDora-backend/configs/local.json
-!MoDora-backend/configs/local.example.json
+local.json
+!local.example.json
 
 # IDEs & OS
 .vscode/
