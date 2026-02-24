@@ -25,17 +25,17 @@ def register(sub: argparse._SubParsersAction) -> None:
     parser = sub.add_parser("batch-qa", help="Run batch QA experiments")
     parser.add_argument(
         "--dataset",
-        default="/home/yukai/project/MoDora/datasets/MMDA/test.json",
+        default=None,
         help="Path to the dataset JSON file (e.g., test.json)",
     )
     parser.add_argument(
         "--cache",
-        default="/home/yukai/project/MoDora/MoDora-backend/cache_v5",
+        default=None,
         help="Path to the cache directory containing trees",
     )
     parser.add_argument(
         "--output",
-        default="/home/yukai/project/MoDora/MoDora-backend/tmp",
+        default=None,
         help="Directory to save intermediate and final results",
     )
     parser.add_argument(
@@ -229,22 +229,28 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
 
     try:
         ui_settings = load_ui_settings_from_config(config_path)
-        qa_settings, qa_mode, cfg = settings_from_ui_payload(
+        qa_settings, _, qa_instance_id, cfg = settings_from_ui_payload(
             settings, ui_settings, module_key="qaService"
         )
-        retriever_settings, retriever_mode, _ = settings_from_ui_payload(
+        retriever_settings, _, retriever_instance_id, _ = settings_from_ui_payload(
             settings, cfg, module_key="retriever"
         )
         qa_service = QAService(
             qa_settings,
-            qa_mode=qa_mode,
+            qa_instance=qa_instance_id,
             retriever_settings=retriever_settings,
-            retriever_mode=retriever_mode,
+            retriever_instance=retriever_instance_id,
         )
 
-        dataset_path = Path(args.dataset).resolve()
-        cache_dir = Path(args.cache).resolve()
-        output_dir = Path(args.output).resolve()
+        dataset_value = (getattr(args, "dataset", None) or "").strip()
+        cache_value = (getattr(args, "cache", None) or "").strip()
+        output_value = (getattr(args, "output", None) or "").strip()
+
+        dataset_path = Path(
+            dataset_value or (Path(settings.docs_dir or "") / "test.json")
+        ).resolve()
+        cache_dir = Path(cache_value or (settings.cache_dir or "")).resolve()
+        output_dir = Path(output_value or (settings.cache_dir or "")).resolve()
         output_dir.mkdir(parents=True, exist_ok=True)
 
         with open(dataset_path, "r", encoding="utf-8") as f:

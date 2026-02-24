@@ -650,7 +650,7 @@
 
 ### 2. Configuration
 
-  Model configuration is handled interactively by `./setup.sh`. It creates `MoDora-backend/configs/local.json` (based on `local.example.json`) and writes the model selections you input.
+  Model configuration is handled interactively by `./setup.sh`. It creates `local.json` (based on `local.example.json`) in the project root and writes the model selections you input.
 
   **What setup.sh configures:**
 
@@ -659,7 +659,7 @@
   - `ui_settings.ocr.provider`: OCR model selection (`ppstructure` or `paddle_ocr_vl`).
   - Local model download: you input a model name (HuggingFace repo id). The model is downloaded into `MoDora-backend/models/<model_name>` if it does not exist.
 
-  If you need to tweak values later, edit `MoDora-backend/configs/local.json` directly and restart the backend.
+  If you need to tweak values later, edit `local.json` in the project root and restart the backend.
 
 ### 3. Execution
 
@@ -693,8 +693,8 @@
   MoDora-backend supports environment variables or a JSON config file (path set via `MODORA_CONFIG`). If you are not using `setup.sh`, create your own `local.json`:
 
 ```bash
-  cp MoDora-backend/configs/local.example.json MoDora-backend/configs/local.json
-  export MODORA_CONFIG="MoDora-backend/configs/local.json"
+  cp local.example.json local.json
+  export MODORA_CONFIG="local.json"
 ```
 
   Edit `local.json` to set `model_instances` and `ui_settings` for module-level model selection. Remote models require `api_key`/`base_url`, and local models require `model` (local path) and optional `port`/`device`.

@@ -18,7 +18,7 @@ def register(sub: argparse._SubParsersAction) -> None:
     p = sub.add_parser("cache-images", help="Precompute image cache for bbox crops")
     p.add_argument(
         "--dataset",
-        default="/home/yukai/project/MoDora/datasets/MMDA",
+        default=None,
         help="Path to a PDF file or directory",
     )
     p.add_argument(

@@ -44,10 +44,10 @@ def _handle_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
     ensure_llm_local_loaded(settings, logger, config_path=config_path)
     try:
         ui_settings = load_ui_settings_from_config(config_path)
-        qa_settings, qa_mode, cfg = settings_from_ui_payload(
+        qa_settings, qa_mode, _, cfg = settings_from_ui_payload(
             settings, ui_settings, module_key="qaService"
         )
-        retriever_settings, retriever_mode, _ = settings_from_ui_payload(
+        retriever_settings, retriever_mode, _, _ = settings_from_ui_payload(
             settings, cfg, module_key="retriever"
         )
         asyncio.run(

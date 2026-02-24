@@ -191,15 +191,17 @@ export function useModoraStore() {
 
         try {
             // 发起真实 API 请求
+            const payload = { 
+                file_names: fileNames,
+                file_name: fileNames[0],
+                query: currentQuery,
+                settings: state.settings
+            };
+            console.log("Chat request payload:", payload);
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    file_names: fileNames, // 发送多文件列表
-                    file_name: fileNames[0], // 兼容旧接口
-                    query: currentQuery,
-                    settings: state.settings // 传递全局设置
-                })
+                body: JSON.stringify(payload)
             });
 
             if (!response.ok) {

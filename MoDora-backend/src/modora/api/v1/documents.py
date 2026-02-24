@@ -20,7 +20,7 @@ logger = logging.getLogger("modora.api")
 
 def _settings_from_payload(payload: dict[str, Any] | None) -> Settings:
     settings = Settings.load()
-    settings, _, _ = settings_from_ui_payload(
+    settings, _, _, _ = settings_from_ui_payload(
         settings, payload, module_key="levelGenerator"
     )
     return settings

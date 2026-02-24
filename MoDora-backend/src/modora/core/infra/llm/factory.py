@@ -14,52 +14,45 @@ class AsyncLLMFactory:
 
     @staticmethod
     def create(
-        settings: Settings | None = None, mode: str | None = None
+        settings: Settings | None = None, instance_id: str | None = None
     ) -> BaseAsyncLLMClient:
         """Creates and returns a suitable AsyncLLMClient instance.
 
         Args:
             settings: Configuration object. If None, the default configuration is loaded.
-            mode: Explicit mode selection ("local" or "remote"). If None, it is automatically
-                detected based on priority.
+            instance_id: Optional specific model instance ID to use. If provided, it determines
+                whether to use a local or remote client.
 
         Returns:
             A suitable AsyncLLMClient instance.
-
-        Priority logic (when mode is None):
-            1. Local Qwen (if llm_local_model is configured).
-            2. Remote OpenAI-compatible interface (if api_key and api_base are configured).
         """
         settings = settings or Settings.load()
         logger = logging.getLogger(__name__)
 
-        if mode:
-            mode = mode.lower().strip()
-            if mode == "local":
-                logger.info("Forced mode to 'local'. Using AsyncLocalLLMClient.")
-                return AsyncLocalLLMClient(settings)
-            elif mode == "remote":
-                logger.info("Forced mode to 'remote'. Using AsyncRemoteLLMClient.")
-                return AsyncRemoteLLMClient(settings)
+        # If instance_id is provided, resolve it and use its configuration
+        if instance_id:
+            instance = settings.resolve_model_instance(instance_id)
+            if instance:
+                if instance.type == "local":
+                    return AsyncLocalLLMClient(settings, instance_id=instance_id)
+                else:
+                    return AsyncRemoteLLMClient(settings, instance_id=instance_id)
             else:
-                logger.warning(
-                    f"Unknown mode '{mode}', falling back to auto-detection."
-                )
+                logger.warning(f"Instance ID '{instance_id}' not found in settings.")
 
-        # Check local LLM configuration
-        if settings.llm_local_model:
-            logger.info(
-                f"Using AsyncLocalLLMClient with model: {settings.llm_local_model}"
-            )
-            return AsyncLocalLLMClient(settings)
-
-        # Check remote API configuration
-        if settings.api_key and settings.api_base:
-            logger.info("Using AsyncRemoteLLMClient with configured API settings")
-            return AsyncRemoteLLMClient(settings)
+        # Auto-detection based on model_instances
+        for inst_id, inst in settings.model_instances.items():
+            if inst.type == "local" and inst.model:
+                logger.info(f"Auto-detected local model instance: {inst_id}")
+                return AsyncLocalLLMClient(settings, instance_id=inst_id)
+        
+        for inst_id, inst in settings.model_instances.items():
+            if inst.type == "remote" and inst.base_url and inst.api_key:
+                logger.info(f"Auto-detected remote model instance: {inst_id}")
+                return AsyncRemoteLLMClient(settings, instance_id=inst_id)
 
         logger.info(
-            "No explicit LLM configuration found in settings, defaulting to AsyncRemoteLLMClient (will attempt local.json fallback)"
+            "No explicit LLM configuration found, defaulting to AsyncRemoteLLMClient"
         )
         return AsyncRemoteLLMClient(settings)
 

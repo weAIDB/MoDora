@@ -12,12 +12,8 @@ logger = logging.getLogger(__name__)
 class AsyncEmbeddingClient:
     def __init__(self, settings: Settings | None = None):
         self.settings = settings or Settings()
-        self.embedding_api_key = (
-            self.settings.embedding_api_key or self.settings.api_key
-        )
-        self.embedding_api_base = (
-            self.settings.embedding_api_base or self.settings.api_base
-        )
+        self.embedding_api_key = self.settings.embedding_api_key
+        self.embedding_api_base = self.settings.embedding_api_base
         self.embedding_model_name = (
             self.settings.embedding_model_name or "text-embedding-3-large"
         )

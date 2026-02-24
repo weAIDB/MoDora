@@ -150,6 +150,7 @@ class Settings:
         log_dir: Log directory path, default location is used if None.
         api_base: API service base URL.
         api_key: API authentication key.
+        api_port: API service port.
 
     Note:
         All fields have default values to ensure the configuration object is always valid.
@@ -166,35 +167,38 @@ class Settings:
     # Data paths
     docs_dir: str | None = None
     cache_dir: str | None = None
+    exp_dir: str | None = None
     chroma_persist_path: str | None = None
 
     api_base: str | None = None
     api_key: str | None = None
-    api_model: str | None = None
+    api_port: int = 8005
+
     embedding_api_base: str | None = None
     embedding_api_key: str | None = None
     embedding_model_name: str | None = None
+
     rerank_api_base: str | None = None
     rerank_api_key: str | None = None
     rerank_model_name: str | None = None
 
     model_instances: dict[str, ModelInstance] = field(default_factory=dict)
 
-    llm_local_model: str | None = None
-    llm_local_base_url: str | None = None
-    llm_local_api_key: str = "local"
-    llm_local_port: int = 9001
-    llm_local_cuda_visible_devices: str | None = None
     llm_local_startup_timeout_s: float = 600.0
-    llm_local_instances: tuple[LlmLocalInstance, ...] = ()
 
     ocr_model: str = "ppstructure"
     ocr_device: str = "gpu:7"
     ocr_lang: str = "en"
-    ocr_layout_unclip_ratio: float | tuple[float, float] = 1.1
+    ocr_layout_unclip_ratio: float | tuple[float, float] = 1.2
     ocr_text_recognition_batch_size: int = 8
     ocr_use_table_recognition: bool = True
     ocr_use_doc_unwarping: bool = False
+
+    enable_vector_search: bool = True
+
+    def resolve_model_instance(self, inst_id: str) -> ModelInstance | None:
+        """Resolves a model instance by its ID."""
+        return self.model_instances.get(inst_id)
 
     @staticmethod
     def load(config_path: str | None = None) -> "Settings":
@@ -212,7 +216,20 @@ class Settings:
 
         if not cfg_path:
             backend_root = Path(__file__).resolve().parents[3]
-            cfg_path = backend_root / "configs" / "local.json"
+            project_root = backend_root.parent
+
+            possible_paths = [
+                project_root / "local.json",
+                backend_root / "configs" / "local.json",
+            ]
+
+            for p in possible_paths:
+                if p.exists():
+                    cfg_path = str(p)
+                    break
+
+            if not cfg_path:
+                cfg_path = str(project_root / "local.json")
 
         if os.path.exists(cfg_path):
             cfg = _read_json(cfg_path)
@@ -241,7 +258,8 @@ class Settings:
 
         api_base = _clean_str(pick("api_base", None))
         api_key = _clean_str(pick("api_key", None))
-        api_model = _clean_str(pick("api_model", None))
+        api_port = int(pick("api_port", 8005))
+
         embedding_api_base = _clean_str(pick("embedding_api_base", None))
         embedding_api_key = _clean_str(pick("embedding_api_key", None))
         embedding_model_name = _clean_str(
@@ -287,57 +305,7 @@ class Settings:
                     device=device,
                 )
 
-        llm_local_model = _clean_str(pick("llm_local_model", None))
-        llm_local_base_url = _clean_str(pick("llm_local_base_url", None))
-        llm_local_api_key = _clean_str(pick("llm_local_api_key", "local"))
-        llm_local_port = int(pick("llm_local_port", 9001))
-        llm_local_cuda_visible_devices = _clean_str(
-            pick("llm_local_cuda_visible_devices", None)
-        )
         llm_local_startup_timeout_s = float(pick("llm_local_startup_timeout_s", 600.0))
-
-        # Proactively infer llm_local_* from model_instances if not explicitly set
-        if not llm_local_model:
-            for inst in model_instances.values():
-                if inst.type == "local" and inst.model:
-                    llm_local_model = inst.model
-                    if inst.port:
-                        llm_local_port = inst.port
-                    if inst.device:
-                        llm_local_cuda_visible_devices = inst.device
-                    break
-
-        llm_local_instances_raw = _coerce_json(pick("llm_local_instances", None))
-        llm_local_instances: tuple[LlmLocalInstance, ...] = ()
-        if isinstance(llm_local_instances_raw, list):
-            inst_list: list[LlmLocalInstance] = []
-            for it in llm_local_instances_raw:
-                if not isinstance(it, dict):
-                    continue
-                port_raw = it.get("port", None)
-                if port_raw is None:
-                    continue
-                try:
-                    port = int(port_raw)
-                except Exception:
-                    continue
-                host = _clean_str(it.get("host", None)) or "127.0.0.1"
-                cuda_visible_devices = _clean_str(it.get("cuda_visible_devices", None))
-                inst_list.append(
-                    LlmLocalInstance(
-                        host=host, port=port, cuda_visible_devices=cuda_visible_devices
-                    )
-                )
-            llm_local_instances = tuple(inst_list)
-
-        if not llm_local_instances and llm_local_model:
-            llm_local_instances = (
-                LlmLocalInstance(
-                    host="127.0.0.1",
-                    port=llm_local_port,
-                    cuda_visible_devices=llm_local_cuda_visible_devices,
-                ),
-            )
 
         ocr_model = _clean_str(pick("ocr_model", "ppstructure"))
         ocr_device = _clean_str(pick("ocr_device", "gpu:7")) or "gpu:7"
@@ -354,12 +322,24 @@ class Settings:
         ocr_use_doc_unwarping = _coerce_bool(
             pick("ocr_use_doc_unwarping", False), default=False
         )
+        enable_vector_search = _coerce_bool(
+            pick("enable_vector_search", True), default=True
+        )
 
         repo_root = Path(__file__).resolve().parents[4]
         default_docs = str(repo_root / "datasets" / "MMDA")
-        default_cache = str(repo_root / "MoDora-backend" / "cache")
-        docs_dir = _clean_str(pick("docs_dir", default_docs)) or default_docs
-        cache_dir = _clean_str(pick("cache_dir", default_cache)) or default_cache
+        default_cache = str(repo_root / "cache")
+
+        def _resolve_path(val: str | None, default: str) -> str:
+            raw = _clean_str(val) or default
+            p = Path(raw).expanduser()
+            if not p.is_absolute():
+                p = repo_root / p
+            return str(p)
+
+        docs_dir = _resolve_path(pick("docs_dir", default_docs), default_docs)
+        cache_dir = _resolve_path(pick("cache_dir", default_cache), default_cache)
+        exp_dir = _resolve_path(pick("exp_dir", cache_dir), cache_dir)
 
         return Settings(
             env=env,
@@ -370,10 +350,11 @@ class Settings:
             log_dir=log_dir,
             docs_dir=docs_dir,
             cache_dir=cache_dir,
+            exp_dir=exp_dir,
             chroma_persist_path=chroma_persist_path,
             api_base=api_base,
             api_key=api_key,
-            api_model=api_model,
+            api_port=api_port,
             embedding_api_base=embedding_api_base,
             embedding_api_key=embedding_api_key,
             embedding_model_name=embedding_model_name,
@@ -381,13 +362,7 @@ class Settings:
             rerank_api_key=rerank_api_key,
             rerank_model_name=rerank_model_name,
             model_instances=model_instances,
-            llm_local_model=llm_local_model,
-            llm_local_base_url=llm_local_base_url,
-            llm_local_api_key=llm_local_api_key,
-            llm_local_port=llm_local_port,
-            llm_local_cuda_visible_devices=llm_local_cuda_visible_devices,
             llm_local_startup_timeout_s=llm_local_startup_timeout_s,
-            llm_local_instances=llm_local_instances,
             ocr_model=ocr_model,
             ocr_device=ocr_device,
             ocr_lang=ocr_lang,
@@ -395,75 +370,5 @@ class Settings:
             ocr_text_recognition_batch_size=ocr_text_recognition_batch_size,
             ocr_use_table_recognition=ocr_use_table_recognition,
             ocr_use_doc_unwarping=ocr_use_doc_unwarping,
+            enable_vector_search=enable_vector_search,
         )
-
-    def resolve_model_instance(self, instance_id: str | None) -> ModelInstance | None:
-        if not instance_id:
-            return None
-        key = instance_id.strip()
-        if not key:
-            return None
-        inst = self.model_instances.get(key)
-        if inst:
-            return inst
-        if key in {"local", "local-default"}:
-            return ModelInstance(
-                type="local",
-                model=self.llm_local_model,
-                base_url=self.llm_local_base_url,
-                api_key=self.llm_local_api_key,
-                port=self.llm_local_port,
-                device=self.llm_local_cuda_visible_devices,
-            )
-        if key in {"remote", "remote-default"}:
-            return ModelInstance(
-                type="remote",
-                model=self.api_model,
-                base_url=self.api_base,
-                api_key=self.api_key,
-            )
-        if key == "default":
-            if self.api_base or self.api_key or self.api_model:
-                return ModelInstance(
-                    type="remote",
-                    model=self.api_model,
-                    base_url=self.api_base,
-                    api_key=self.api_key,
-                )
-            if self.llm_local_model or self.llm_local_base_url:
-                return ModelInstance(
-                    type="local",
-                    model=self.llm_local_model,
-                    base_url=self.llm_local_base_url,
-                    api_key=self.llm_local_api_key,
-                    port=self.llm_local_port,
-                    device=self.llm_local_cuda_visible_devices,
-                )
-        return None
-
-
-if __name__ == "__main__":
-    """Configuration loading examples.
-
-    Method 1: Using default configuration
-        settings = Settings.load()
-
-    Method 2: Specifying a configuration file
-        settings = Settings.load("/path/to/config.json")
-    Or
-        export MODORA_CONFIG=/path/to/config.json
-
-    Method 3: Via environment variables
-        export MODORA_ENV=prod
-        export MODORA_LOG_LEVEL=DEBUG
-        settings = Settings.load()
-
-    Method 4: Mixed usage
-        export MODORA_API_KEY=your-key
-        settings = Settings.load("config.json")
-    """
-    # Demonstration of how to use
-    settings = Settings.load()
-    print(f"Environment: {settings.env}")
-    print(f"Log Level: {settings.log_level}")
-    print(f"API Base: {settings.api_base or 'Not set'}")

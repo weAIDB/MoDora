@@ -12,26 +12,23 @@
   "chroma_persist_path": "./cache/chroma",
 
   "// API 配置": "Used for external LLM API calls (OpenAI, Gemini, etc.)",
-  "api_base": "https://api.openai.com/v1",
-  "api_key": "your-api-key",
-  "api_model": "gpt-4o",
-  "embedding_api_base": "https://api.openai.com/v1",
+  "embedding_api_base": "https://www.dmxapi.cn/v1/embeddings",
   "embedding_api_key": "your-api-key",
-  "embedding_model_name": "text-embedding-3-large",
-  "rerank_api_base": null,
-  "rerank_api_key": null,
-  "rerank_model_name": null,
+  "embedding_model_name": "Qwen/Qwen3-Embedding-8B",
+  "rerank_api_base": "https://www.dmxapi.cn/v1/rerank",
+  "rerank_api_key": "your-api-key",
+  "rerank_model_name": "qwen3-rerank",
 
   "model_instances": {
     "local-default": {
       "type": "local",
-      "model": "./models/Qwen3-VL-8B-Instruct",
+      "model": "./models/your-local-model",
       "port": 9001,
       "device": "0"
     },
     "remote-default": {
       "type": "remote",
-      "model": "gpt-5",
+      "model": "your-remote-model",
       "base_url": "https://your-api-base-url/v1",
       "api_key": "your-api-key"
     }
@@ -45,6 +42,7 @@
   "ocr_text_recognition_batch_size": 8,
   "ocr_use_table_recognition": true,
   "ocr_use_doc_unwarping": false,
+  "enable_vector_search": true,
 
   "ui_settings": {
     "schemaVersion": 3,

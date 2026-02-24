@@ -14,9 +14,15 @@ logger = logging.getLogger(__name__)
 class SemanticRetriever:
     """CCTree retriever based on semantic understanding."""
 
-    def __init__(self, settings: Settings | None = None, mode: str | None = None):
+    def __init__(
+        self,
+        settings: Settings | None = None,
+        instance_id: str | None = None,
+    ):
         self.settings = settings or Settings.load()
-        self.llm = AsyncLLMFactory.create(self.settings, mode=mode or "local")
+        self.llm = AsyncLLMFactory.create(
+            self.settings, instance_id=instance_id
+        )
         self.cropper = PDFCropper()
 
     async def retrieve(

@@ -46,10 +46,10 @@ async def get_components_async(
 
     # 2. Enrichment
     base_settings = settings or Settings.load()
-    enrich_settings, enrich_mode, _ = settings_from_ui_payload(
+    enrich_settings, _, enrich_instance_id, _ = settings_from_ui_payload(
         base_settings, config, module_key="enrichment"
     )
-    llm = AsyncLLMFactory.create(enrich_settings, mode=enrich_mode or "local")
+    llm = AsyncLLMFactory.create(enrich_settings, instance_id=enrich_instance_id)
     cropper = PDFCropper()
     enricher = EnrichmentService(llm, cropper)
 
@@ -84,16 +84,16 @@ async def build_tree_async(
         CCTree: The completed document tree containing metadata.
     """
     base_settings = settings or Settings.load()
-    level_settings, level_mode, _ = settings_from_ui_payload(
+    level_settings, _, level_instance_id, _ = settings_from_ui_payload(
         base_settings, config, module_key="levelGenerator"
     )
-    metadata_settings, metadata_mode, _ = settings_from_ui_payload(
+    metadata_settings, _, metadata_instance_id, _ = settings_from_ui_payload(
         base_settings, config, module_key="metadataGenerator"
     )
 
-    llm_level = AsyncLLMFactory.create(level_settings, mode=level_mode or "remote")
+    llm_level = AsyncLLMFactory.create(level_settings, instance_id=level_instance_id)
     llm_metadata = AsyncLLMFactory.create(
-        metadata_settings, mode=metadata_mode or "local"
+        metadata_settings, instance_id=metadata_instance_id
     )
 
     cropper = PDFCropper()

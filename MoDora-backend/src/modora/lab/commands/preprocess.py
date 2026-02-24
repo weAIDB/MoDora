@@ -17,10 +17,12 @@ from modora.core.settings import Settings
 from modora.core.domain.jobs import PreprocessJob
 from modora.core.domain.ocr import OcrExtractResponse, OCRBlock
 from modora.core.infra.ocr.manager import ensure_ocr_model_loaded, get_ocr_model
+from modora.core.infra.pdf.fallback import extract_pdf_blocks
 from modora.core.infra.logging.setup import configure_logging
 from modora.core.infra.llm import ensure_llm_local_loaded, shutdown_llm_local
 from modora.core.utils.fs import iter_pdf_paths
 from modora.core.utils.pydantic import pydantic_dump, pydantic_validate
+from modora.core.utils.config import load_ui_settings_from_config
 
 
 def _component_worker_wrapper(
@@ -45,7 +47,7 @@ def _component_worker_wrapper(
         logging.basicConfig(level=logging.INFO)
 
     # Run asynchronous logic in the worker process's own event loop
-    return asyncio.run(_run_get_components(res_path, co_path, logger))
+    return asyncio.run(_run_get_components(res_path, co_path, logger, config_path))
 
 
 def _ocr_worker_run(
@@ -61,21 +63,29 @@ def _ocr_worker_run(
         A tuple containing (OCR payload, number of blocks, elapsed time).
     """
     t0 = time.monotonic()
+    logger = logging.getLogger("modora.preprocess.ocr_worker")
 
-    # Ensure configuration is reloaded and OCR model is initialized in the child process
+    # Ensure configuration is reloaded and OCR model is initialized
     settings = Settings.load(config_path)
-    ensure_ocr_model_loaded(settings, logging.getLogger("modora.preprocess.ocr_worker"))
+    ensure_ocr_model_loaded(settings, logger)
 
     model = get_ocr_model()
     if model is None:
         raise RuntimeError("OCR model not loaded")
 
-    pdf_blocks: list[OCRBlock] = []
-    source = f"file:{pdf_path}"
-    for page_blocks in model.predict_iter(pdf_path):
-        pdf_blocks.extend(page_blocks)
-
-    ocr_res = OcrExtractResponse(source=source, blocks=pdf_blocks)
+    try:
+        pdf_blocks: list[OCRBlock] = []
+        source = f"file:{pdf_path}"
+        for page_blocks in model.predict_iter(pdf_path):
+            pdf_blocks.extend(page_blocks)
+        ocr_res = OcrExtractResponse(source=source, blocks=pdf_blocks)
+    except Exception as e:
+        logger.warning(
+            "ocr predict failed, using pdf text fallback",
+            extra={"task_name": "ocr", "pdf": pdf_path, "error": str(e)},
+            exc_info=True,
+        )
+        ocr_res = extract_pdf_blocks(pdf_path)
     payload = pydantic_dump(ocr_res)
     blocks = payload.get("blocks") if isinstance(payload, dict) else None
     n_blocks = len(blocks) if isinstance(blocks, list) else 0
@@ -83,7 +93,7 @@ def _ocr_worker_run(
 
 
 async def _run_get_components(
-    res_path: str, co_path: str, logger: logging.Logger
+    res_path: str, co_path: str, logger: logging.Logger, config_path: str | None
 ) -> tuple[int, int, float]:
     """Run component extraction logic.
 
@@ -101,7 +111,8 @@ async def _run_get_components(
     obj = json.loads(Path(res_path).read_text(encoding="utf-8"))
     ocr_res = pydantic_validate(OcrExtractResponse, obj)
     blocks_n = len(getattr(ocr_res, "blocks", []) or [])
-    co_pack = await get_components_async(ocr_res, logger)
+    ui_settings = load_ui_settings_from_config(config_path)
+    co_pack = await get_components_async(ocr_res, logger, config=ui_settings)
     body_n = len(co_pack.body)
     co_pack.save_json(co_path)
     return blocks_n, body_n, time.monotonic() - t0
@@ -116,12 +127,12 @@ def register(sub: argparse._SubParsersAction) -> None:
     p = sub.add_parser("ocr", help="Run OCR+get_component for dataset PDFs")
     p.add_argument(
         "--dataset",
-        default="/home/yukai/project/MoDora/datasets/MMDA",
+        default=None,
         help="Path to a PDF file or directory",
     )
     p.add_argument(
         "--cache-dir",
-        default="cache_v4",
+        default=None,
         help="Cache directory (writes <num>/res.json and <num>/co.json)",
     )
     p.add_argument(
@@ -129,12 +140,6 @@ def register(sub: argparse._SubParsersAction) -> None:
         type=int,
         default=64,
         help="Number of get_component workers (threads)",
-    )
-    p.add_argument(
-        "--ocr-workers",
-        type=int,
-        default=1,
-        help="Number of parallel OCR workers (processes). Set > 1 only if you have enough GPU memory.",
     )
     p.add_argument(
         "--ocr-batch-size",
@@ -175,7 +180,6 @@ class PreprocessPipeline:
 
         self.cache_dir = str(getattr(args, "cache_dir", "cache"))
         self.component_workers = int(getattr(args, "component_workers", 8) or 1)
-        self.ocr_workers = int(getattr(args, "ocr_workers", 1) or 1)
         self.resume = bool(getattr(args, "resume", False)) and not bool(
             getattr(args, "overwrite", False)
         )
@@ -189,10 +193,8 @@ class PreprocessPipeline:
 
         # Concurrency control
         self.current_pool: futures.ProcessPoolExecutor | None = None
-        self.ocr_pool: futures.ProcessPoolExecutor | None = None
         self.pool_lock = asyncio.Lock()
         self.submit_sem = asyncio.Semaphore(self.component_workers)
-        self.ocr_sem = asyncio.Semaphore(self.ocr_workers)
         self.co_tasks: dict[asyncio.Task, PreprocessJob] = {}
 
     def _tick(self, is_fail: bool = False, is_skip: bool = False) -> None:
@@ -210,7 +212,10 @@ class PreprocessPipeline:
         if self.pbar:
             self.pbar.update(1)
             self.pbar.set_postfix(
-                failed=self.failed_count, skipped=self.skipped_count, refresh=False
+                success=self.done_count - self.failed_count - self.skipped_count,
+                failed=self.failed_count,
+                skipped=self.skipped_count,
+                refresh=False,
             )
 
     def prepare_jobs(self) -> list[PreprocessJob]:
@@ -251,31 +256,16 @@ class PreprocessPipeline:
         co_exists = os.path.isfile(job.co_path)
 
         if self.resume and res_exists and co_exists:
-            self.logger.info(
-                "pdf done (skipped)",
-                extra={
-                    "task_name": "get_component",
-                    "pdf": job.pdf_path,
-                    "res": job.res_path,
-                    "co": job.co_path,
-                },
-            )
             self._tick(is_skip=True)
             return False
 
         if not res_exists or not self.resume:
-            await self.ocr_sem.acquire()
             try:
                 loop = asyncio.get_running_loop()
-                async with self.pool_lock:
-                    if self.ocr_pool is None:
-                        self.ocr_pool = futures.ProcessPoolExecutor(
-                            max_workers=self.ocr_workers
-                        )
-                    pool = self.ocr_pool
-
+                # Run OCR directly in the main process (using thread pool)
+                # to avoid CUDA initialization issues with fork.
                 payload, _, _ = await loop.run_in_executor(
-                    pool, _ocr_worker_run, job.pdf_path, self.config_path
+                    None, _ocr_worker_run, job.pdf_path, self.config_path
                 )
                 await loop.run_in_executor(
                     None,
@@ -298,7 +288,7 @@ class PreprocessPipeline:
                 )
                 return False
             finally:
-                self.ocr_sem.release()
+                pass
         return True
 
     async def _submit_component_job(self, job: PreprocessJob, retry: int = 0):
@@ -351,15 +341,6 @@ class PreprocessPipeline:
         job = self.co_tasks.pop(t)
         try:
             t.result()
-            self.logger.info(
-                "pdf done",
-                extra={
-                    "task_name": "get_component",
-                    "pdf": job.pdf_path,
-                    "res": job.res_path,
-                    "co": job.co_path,
-                },
-            )
             self._tick()
         except Exception as e:
             self.logger.error(
@@ -388,15 +369,20 @@ class PreprocessPipeline:
             self.logger.error("no pdf files found")
             return 2
 
-        self.pbar = tqdm(total=self.total, unit="pdf", dynamic_ncols=True)
+        self.pbar = tqdm(
+            total=self.total, unit="pdf", dynamic_ncols=True, disable=False
+        )
         self.pbar.set_postfix(
-            failed=self.failed_count, skipped=self.skipped_count, refresh=False
+            success=self.done_count - self.failed_count - self.skipped_count,
+            failed=self.failed_count,
+            skipped=self.skipped_count,
+            refresh=False,
         )
 
-        # Preload OCR model in the main process if running in single-threaded mode.
-        if self.ocr_workers == 1:
-            ensure_ocr_model_loaded(self.settings, self.logger)
+        # Preload OCR model in the main process.
+        ensure_ocr_model_loaded(self.settings, self.logger)
 
+        cancelled = False
         try:
             # Start all tasks in parallel.
             ocr_tasks = []
@@ -405,12 +391,16 @@ class PreprocessPipeline:
 
             if ocr_tasks:
                 await asyncio.gather(*ocr_tasks, return_exceptions=True)
+        except asyncio.CancelledError:
+            cancelled = True
+            raise
 
         finally:
             if self.current_pool:
-                self.current_pool.shutdown(wait=True)
-            if self.ocr_pool:
-                self.ocr_pool.shutdown(wait=True)
+                if cancelled:
+                    self.current_pool.shutdown(wait=False, cancel_futures=True)
+                else:
+                    self.current_pool.shutdown(wait=True)
             if self.pbar:
                 self.pbar.close()
 
@@ -422,6 +412,8 @@ class PreprocessPipeline:
         Args:
             job: The preprocessing job to execute.
         """
+        if self.pbar:
+            self.pbar.set_description(Path(job.pdf_path).name, refresh=False)
         if await self.run_ocr_stage(job):
             task = asyncio.create_task(self._submit_component_job(job))
             self.co_tasks[task] = job
@@ -454,6 +446,10 @@ def _handle_preprocess_ocr_pipeline(
     ensure_llm_local_loaded(settings, logger)
 
     try:
+        if not getattr(args, "dataset", None):
+            args.dataset = settings.docs_dir
+        if not getattr(args, "cache_dir", None):
+            args.cache_dir = settings.cache_dir
         pipeline = PreprocessPipeline(args, settings, logger, config_path)
         result = asyncio.run(pipeline.run())
 

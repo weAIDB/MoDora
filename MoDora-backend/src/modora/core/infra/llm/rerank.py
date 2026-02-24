@@ -16,7 +16,7 @@ class AsyncRerankClient:
     ):
         self.settings = settings or Settings()
         self.rerank_api_base = self.settings.rerank_api_base
-        self.rerank_api_key = self.settings.rerank_api_key or self.settings.api_key
+        self.rerank_api_key = self.settings.rerank_api_key
         self.rerank_model_name = self.settings.rerank_model_name
 
     async def rerank(self, query: str, documents: List[str]) -> List[float]:

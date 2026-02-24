@@ -99,9 +99,15 @@ class BaseAsyncLLMClient(ABC):
     Implements common business logic and defines LLM interaction interfaces.
     """
 
-    def __init__(self, settings: Settings | None = None):
-        """Initialize the client and load the configuration."""
+    def __init__(self, settings: Settings | None = None, instance_id: str | None = None):
+        """Initialize the client and load the configuration.
+
+        Args:
+            settings: Configuration object.
+            instance_id: Optional specific model instance ID to use.
+        """
         self.settings = settings or Settings.load()
+        self.instance_id = instance_id
 
     @abstractmethod
     async def _call_llm(

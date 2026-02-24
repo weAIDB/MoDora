@@ -15,7 +15,7 @@ class VectorRetriever:
     def __init__(
         self,
         settings: Settings | None = None,
-        mode: str | None = None,
+        instance_id: str | None = None,
         *,
         top_k: int = 5,
         min_score: float = 0.15,

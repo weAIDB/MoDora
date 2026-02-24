@@ -31,8 +31,13 @@ def normalize_ui_settings(payload: dict[str, Any] | None) -> dict[str, Any]:
     Returns:
         dict[str, Any]: The normalized settings dictionary.
     """
-    if not isinstance(payload, dict):
-        return {}
+    if not isinstance(payload, dict) or not payload:
+        # If payload is empty or invalid, return a default pipeline structure
+        return {
+            "pipelines": {
+                k: {"modelInstance": "local-default"} for k in MODULE_KEYS
+            }
+        }
 
     normalized: dict[str, Any] = {}
     for key in ALLOWED_UI_SETTINGS_KEYS:
@@ -57,6 +62,9 @@ def normalize_ui_settings(payload: dict[str, Any] | None) -> dict[str, Any]:
                 continue
             item: dict[str, str] = {}
             model_instance = value.get("modelInstance")
+            if model_instance is None:
+                raise ValueError(f"Missing 'modelInstance' for module '{module}'")
+            
             if isinstance(model_instance, str) and model_instance.strip():
                 item["modelInstance"] = model_instance.strip()
             clean_pipelines[module] = item
@@ -95,7 +103,7 @@ def settings_from_ui_payload(
     payload: dict[str, Any] | None,
     *,
     module_key: str | None = None,
-) -> tuple[Settings, str | None, dict[str, Any]]:
+) -> tuple[Settings, str | None, str | None, dict[str, Any]]:
     """Construct backend Settings overrides from frontend settings payload.
 
     Args:
@@ -104,8 +112,8 @@ def settings_from_ui_payload(
         module_key (str | None): Module key for pipeline config.
 
     Returns:
-        tuple[Settings, str | None, dict[str, Any]]: A tuple containing the
-            updated Settings, the selected mode, and the normalized config.
+        tuple[Settings, str | None, str | None, dict[str, Any]]: A tuple containing the
+            updated Settings, the selected mode, the model instance ID, and the normalized config.
     """
     cfg = normalize_ui_settings(payload)
     overrides: dict[str, Any] = {}
@@ -119,42 +127,8 @@ def settings_from_ui_payload(
     model_instance = base.resolve_model_instance(model_instance_id)
     selected_mode = model_instance.type if model_instance else None
 
-    if model_instance:
-        if model_instance.type == "remote":
-            base_url = model_instance.base_url
-            api_key = model_instance.api_key
-            model_name = model_instance.model
-            if base_url:
-                overrides["api_base"] = base_url
-            if api_key:
-                overrides["api_key"] = api_key
-            if model_name:
-                overrides["api_model"] = model_name
-        else:
-            base_url = model_instance.base_url
-            api_key = model_instance.api_key
-            model_name = model_instance.model
-            port = model_instance.port
-            device = model_instance.device
-            if base_url:
-                overrides["llm_local_base_url"] = base_url
-            elif port:
-                overrides["llm_local_base_url"] = f"http://127.0.0.1:{port}/v1"
-            if api_key:
-                overrides["llm_local_api_key"] = api_key
-            if model_name:
-                overrides["llm_local_model"] = model_name
-            if port or device:
-                overrides["llm_local_instances"] = (
-                    LlmLocalInstance(
-                        host="127.0.0.1",
-                        port=port or base.llm_local_port,
-                        cuda_visible_devices=device,
-                    ),
-                )
-
     settings = replace(base, **overrides) if overrides else base
-    return settings, selected_mode, cfg
+    return settings, selected_mode, model_instance_id, cfg
 
 
 def load_ui_settings_from_config(

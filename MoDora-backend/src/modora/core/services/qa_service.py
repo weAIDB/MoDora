@@ -22,28 +22,27 @@ class QAService:
     def __init__(
         self,
         settings: Settings | None = None,
-        mode: str | None = None,
         *,
-        qa_mode: str | None = None,
-        retriever_mode: str | None = None,
+        qa_instance: str | None = None,
+        retriever_instance: str | None = None,
         retriever_settings: Settings | None = None,
     ):
         self.settings = settings or Settings.load()
         self.retriever_settings = retriever_settings or self.settings
 
-        # Backward compatibility: when mode is not split, it applies to both QA and Retriever.
-        qa_mode = qa_mode or mode
-        retriever_mode = retriever_mode or mode
-
+        # Use AsyncLLMFactory.create to properly handle local/remote switching based on instance_id
         self.remote_llm = AsyncLLMFactory.create(
-            self.settings, mode=qa_mode or "remote"
+            self.settings, instance_id=qa_instance
         )
         self.cropper = PDFCropper()
         self.semantic_retriever = SemanticRetriever(
-            self.retriever_settings, mode=retriever_mode or "local"
+            self.retriever_settings,
+            instance_id=retriever_instance,
         )
-        self.vector_retriever = VectorRetriever(
-            self.retriever_settings, mode=retriever_mode or "local"
+        self.vector_retriever = (
+            VectorRetriever(self.retriever_settings, instance_id=retriever_instance)
+            if self.retriever_settings.enable_vector_search
+            else None
         )
         self.location_retriever = LocationRetriever()
 
@@ -159,9 +158,12 @@ class QAService:
             semantic_result = await self.semantic_retriever.retrieve(
                 tree, query, source_path
             )
-            vector_result = await self.vector_retriever.retrieve(
-                tree, query, source_path
-            )
+            if self.vector_retriever:
+                vector_result = await self.vector_retriever.retrieve(
+                    tree, query, source_path
+                )
+            else:
+                vector_result = RetrievalResult()
             result.update(semantic_result)
             result.update(vector_result)
         else:
