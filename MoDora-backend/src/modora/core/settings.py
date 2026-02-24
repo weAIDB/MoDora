@@ -296,6 +296,17 @@ class Settings:
         )
         llm_local_startup_timeout_s = float(pick("llm_local_startup_timeout_s", 600.0))
 
+        # Proactively infer llm_local_* from model_instances if not explicitly set
+        if not llm_local_model:
+            for inst in model_instances.values():
+                if inst.type == "local" and inst.model:
+                    llm_local_model = inst.model
+                    if inst.port:
+                        llm_local_port = inst.port
+                    if inst.device:
+                        llm_local_cuda_visible_devices = inst.device
+                    break
+
         llm_local_instances_raw = _coerce_json(pick("llm_local_instances", None))
         llm_local_instances: tuple[LlmLocalInstance, ...] = ()
         if isinstance(llm_local_instances_raw, list):

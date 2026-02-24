@@ -7,26 +7,27 @@
   "log_dir": null,
 
   "// Data paths": "Data and cache directories",
-  "docs_dir": null,
-  "cache_dir": null,
+  "docs_dir": "./datasets/MMDA",
+  "cache_dir": "./cache",
+  "chroma_persist_path": "./cache/chroma",
 
   "// API 配置": "Used for external LLM API calls (OpenAI, Gemini, etc.)",
-  "api_base": "https://your-api-base-url/v1",
+  "api_base": "https://api.openai.com/v1",
   "api_key": "your-api-key",
   "api_model": "gpt-4o",
-  "embedding_api_base": "https://api.deepinfra.com/v1/openai",
-  "embedding_api_key": "your-embedding-api-key",
-  "embedding_model_name": "Qwen/Qwen3-Embedding-4B",
-  "rerank_api_base": "https://api.deepinfra.com/v1/inference",
-  "rerank_api_key": "your-rerank-api-key",
-  "rerank_model_name": "Qwen/Qwen3-Reranker-4B",
+  "embedding_api_base": "https://api.openai.com/v1",
+  "embedding_api_key": "your-api-key",
+  "embedding_model_name": "text-embedding-3-large",
+  "rerank_api_base": null,
+  "rerank_api_key": null,
+  "rerank_model_name": null,
 
   "model_instances": {
     "local-default": {
       "type": "local",
       "model": "./models/Qwen3-VL-8B-Instruct",
-      "base_url": "http://127.0.0.1:9001/v1",
-      "api_key": "local"
+      "port": 9001,
+      "device": "0"
     },
     "remote-default": {
       "type": "remote",
@@ -36,32 +37,23 @@
     }
   },
 
-  "// 本地 LLM 配置": "Settings for local model serving via LMDeploy",
-  "llm_local_model": "./models/Qwen3-VL-8B-Instruct",
-  "llm_local_base_url": null,
-  "llm_local_api_key": "local",
-  "llm_local_port": 9001,
-  "llm_local_cuda_visible_devices": null,
-  "llm_local_startup_timeout_s": 600.0,
-  "llm_local_instances": [
-    {
-      "host": "127.0.0.1",
-      "port": 9014,
-      "cuda_visible_devices": "0"
-    },
-    {
-      "host": "127.0.0.1",
-      "port": 9015,
-      "cuda_visible_devices": "1"
-    }
-  ],
-
-  "// OCR 配置": "Structural recognition based on PaddleOCR",
+  "// OCR 配置": "Structural recognition based on PaddleOCR (ppstructure or paddle_ocr_vl)",
   "ocr_model": "ppstructure",
   "ocr_device": "gpu:0",
   "ocr_lang": "en",
-  "ocr_layout_unclip_ratio": 1.1,
+  "ocr_layout_unclip_ratio": 1.2,
   "ocr_text_recognition_batch_size": 8,
   "ocr_use_table_recognition": true,
-  "ocr_use_doc_unwarping": false
+  "ocr_use_doc_unwarping": false,
+
+  "ui_settings": {
+    "schemaVersion": 3,
+    "pipelines": {
+      "enrichment": { "modelInstance": "local-default" },
+      "levelGenerator": { "modelInstance": "local-default" },
+      "metadataGenerator": { "modelInstance": "local-default" },
+      "retriever": { "modelInstance": "local-default" },
+      "qaService": { "modelInstance": "local-default" }
+    }
+  }
 }

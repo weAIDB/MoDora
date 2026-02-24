@@ -7,7 +7,19 @@ set -e
 echo "🚀 Starting MoDora setup..."
 ROOT_DIR="$(pwd)"
 CONFIG_PATH="$ROOT_DIR/MoDora-backend/configs/local.json"
+EXAMPLE_CONFIG_PATH="$ROOT_DIR/MoDora-backend/configs/local.example.json"
 LOCAL_MODEL_DIR="MoDora-backend/models"
+
+if [ ! -f "$CONFIG_PATH" ]; then
+    echo "📄 Configuration file not found. Creating it from template..."
+    if [ -f "$EXAMPLE_CONFIG_PATH" ]; then
+        cp "$EXAMPLE_CONFIG_PATH" "$CONFIG_PATH"
+        echo "✅ local.json created."
+    else
+        echo "❌ Error: Could not find template config: $EXAMPLE_CONFIG_PATH"
+        exit 1
+    fi
+fi
 
 MODEL_INSTANCES_FILE="$(mktemp)"
 PIPELINES_FILE="$(mktemp)"
