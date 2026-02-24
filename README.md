@@ -12,17 +12,24 @@
   - [Automated Installation](#1-automated-installation)
   - [Configuration](#2-configuration)
   - [Execution](#3-execution)
-  - [Manual Setup](#-manual-setup)
+- [Manual Setup](#-manual-setup)
 - [CLI Usage](#-cli-usage-experiments)
 
 
 ## ✨ Introduction
 
-  MoDora is an LLM-powered framework for semi-structured document analysis. It introduces the Component-Correlation Tree (CCTree) to model semi-structured documents with diverse elements and complicated layouts.
+  MoDora is an LLM-powered framework for semi-structured document analysis. It introduces the Component-Correlation Tree (CCTree) to model semi-structured documents with diverse elements and complicated layouts. It combines preprocessing with OCR-parsed elements, tree construction and tree-based analysis, without the need for extra training or fine-tuning. The experiment on two datasets with various documents and question types demonstrates its superior performance compared to existing methods.
+
+> - **2026.2:** Our paper "*MoDora: Tree-Based Semi-Structured Document Analysis System*" has been accepted by SIGMOD 2026.
+
+## 📚 Features
+- 🎯 **Management & Analysis**: Effectively extract document structures and features, answering user questions based on content retrival. Support multi-document management and cross-document analysis.
+
+- 🔄 **Visualization & Integration**: Visualize the document structure (tree) and the frequency of nodes' participation in analysis (heatmap) intuitively. Users can further modify the tree structure according to their needs in the user interface.
+
+- 👫 **Flexibility & Options**: Provide a configuration solution for flexibly adjusting backend models (local/API). And different modules can also be processed using different models.
 
   <img width="2453" height="1229" alt="image" src="https://github.com/user-attachments/assets/2dcd4e49-2ec8-4ced-8789-0363503548b4" />
-
-  MoDora combines OCR and MLLMs in preprocessing, tree construction and tree-based analysis, without the need for extra training or fine-tuning. The experiment on two datasets with various documents and question types demonstrates its superior performance compared to existing methods.
 
 
   **Examples**
@@ -596,43 +603,40 @@
 
   The following table demonstrates the AIC-Acc and ACNLS score of different methods over MMDA Bench. The AIC-Acc and ACNLS are the modified versions of Acc and ANLS metrics respectively.
 
-| **Metric** | **ACNLS(%)** | **AIC-Acc(%)** |
-| :--------: | :----------: | :------------: |
-|    UDOP    |    15.44     |     15.77      |
-|  DocOwl2   |    29.38     |     29.58      |
-|  M3DocRAG  |    41.12     |     47.42      |
-|   SV-RAG   |    33.06     |     37.75      |
-|  TextRAG   |    29.57     |     36.24      |
-|   ZenDB    |    36.68     |     47.14      |
-|   QUEST    |    12.42     |     15.68      |
-|   GPT-5    |    41.55     |     46.48      |
-|   MoDora   |    55.23     |     73.33      |
+| **Metric**      | UDOP | LayoutLMv3 |DocOwl2 | M3DocRAG | SV-RAG | TextRAG | ZenDB | QUEST | GPT-5 | DocAgent | MoDora |
+| :----: | :------: | :--: | :-----: | :------: | :----: | :-----: | :---: | :---: | :---: | :----: | :----: |
+| **ACNLS(%)**    | 15.44 | 13.96 | 29.38 | 41.12 | 33.06 | 29.57 | 36.68 | 18.84 | 41.55 | 37.10 | 55.23 |
+| **AIC-Acc(%)**  | 15.77 | 17.37 | 29.58 | 47.42 | 37.75 | 36.24 | 47.14 | 24.32 | 46.48 | 57.09 | 73.33 |
 
   **Baselines**
 
-  Content extraction methods:
+Content extraction methods:
 
-  - [QUEST](./QUEST.zip)
+- [QUEST](./QUEST.zip)
 
-  Structure extraction methods:
+Structure extraction methods:
 
-  - [ZenDB](https://github.com/Ruiying-Ma/SHTRAG)
+- [ZenDB](https://github.com/Ruiying-Ma/SHTRAG)
 
-  End-to-End model methods:
+- [DocAgent](https://aclanthology.org/2025.emnlp-main.893/)
 
-  - [GPT-5](https://openai.com/index/introducing-gpt-5/)
+End-to-End model methods:
 
-  - [DocOwl2](https://github.com/X-PLUG/mPLUG-DocOwl/tree/main/DocOwl2)
+- [GPT-5](https://openai.com/index/introducing-gpt-5/)
 
-  - [UDOP](https://github.com/microsoft/UDOP)
+- [DocOwl2](https://github.com/X-PLUG/mPLUG-DocOwl/tree/main/DocOwl2)
 
-  Retrieval-Augmented Generation methods:
+- [UDOP](https://github.com/microsoft/UDOP)
 
-  - [M3DocRAG](https://github.com/bloomberg/m3docrag/tree/main)
+- [LayoutLMv3](https://hf-mirror.com/rubentito/layoutlmv3-base-mpdocvqa)
+ 
+Retrieval-Augmented Generation methods:
 
-  - [SV-RAG](https://github.com/puar-playground/Self-Visual-RAG/tree/main)
+- [M3DocRAG](https://github.com/bloomberg/m3docrag/tree/main)
 
-  - [TextRAG](./TextRAG.zip)
+- [SV-RAG](https://github.com/puar-playground/Self-Visual-RAG/tree/main)
+
+- [TextRAG](./TextRAG.zip)
 
 ## 🚀 Quick Start 
 
@@ -671,11 +675,11 @@
 
 ---
 
-### 🛠 Manual Setup
+## 🛠 Manual Setup
 
   If you prefer to set up manually:
 
-#### 1. Backend Setup (MoDora-backend)
+### 1. Backend Setup (MoDora-backend)
 
   **Environment.**
   Requires Python 3.10+.
@@ -756,7 +760,7 @@
   modora <command> --help
 ```
 
-#### Core Commands:
+### Core Commands:
 
   1. **OCR & Component Extraction**
      Process raw PDFs to extract layout blocks and components.
