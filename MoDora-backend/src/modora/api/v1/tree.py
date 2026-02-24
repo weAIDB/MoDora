@@ -4,6 +4,7 @@ import json
 import logging
 from fastapi import APIRouter, HTTPException
 
+from modora.core.domain.cctree import CCTree
 from modora.core.settings import Settings
 from modora.core.utils.paths import resolve_paths
 from modora.core.utils.tree import (
@@ -54,6 +55,7 @@ def update_tree_endpoint(request: TreeUpdateRequest):
             request.elements, original_tree_dict, request.file_name
         )
         validate_tree_structure(new_tree_dict)
+        CCTree.normalize_tree_dict(new_tree_dict)
         tree_path.write_text(
             json.dumps(new_tree_dict, ensure_ascii=False, indent=2), encoding="utf-8"
         )
@@ -116,6 +118,7 @@ def update_node_endpoint(request: NodeUpdateRequest):
             raise HTTPException(status_code=400, detail="Unknown action")
 
         new_tree_dict = root.to_dict()
+        CCTree.normalize_tree_dict(new_tree_dict)
         tree_path.write_text(
             json.dumps(new_tree_dict, ensure_ascii=False, indent=2), encoding="utf-8"
         )

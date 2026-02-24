@@ -256,6 +256,28 @@ class CCTree:
         obj = json.loads(p.read_text(encoding="utf-8"))
         return CCTree.from_dict(obj)
 
+    @staticmethod
+    def normalize_tree_dict(tree: dict[str, Any]) -> dict[str, Any]:
+        def visit(node: dict[str, Any], depth: int) -> int:
+            if not isinstance(node, dict):
+                return 0
+            node.setdefault("keyword_cnt", 0)
+            node["depth"] = depth
+            children = node.get("children")
+            if not isinstance(children, dict):
+                children = {}
+                node["children"] = children
+            max_child_height = 0
+            for child in children.values():
+                child_height = visit(child, depth + 1)
+                if child_height > max_child_height:
+                    max_child_height = child_height
+            node["height"] = max_child_height + 1
+            return node["height"]
+
+        visit(tree, 1)
+        return tree
+
     def get_structure(self) -> dict[str, Any]:
         """Gets the skeletal structure of the entire tree.
 

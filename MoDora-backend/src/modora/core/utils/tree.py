@@ -229,6 +229,7 @@ def reconstruct_tree_from_elements(
             "data": node_data_attr.get("data", orig_data.get("data", "")),
             "location": orig_data.get("location", []),
             "impact": node_data_attr.get("impact", orig_data.get("impact", 0)),
+            "keyword_cnt": orig_data.get("keyword_cnt", 0),
             "children": {},
         }
 
