@@ -93,7 +93,7 @@
   {
     "questionId": 14,
     "question": "What is the stock code of the company discussed in the document?",
-    "answer": "002694",
+    "answer": "002624",
     "pdf_id": "7.pdf",
     "tag": "1-1"
   },
@@ -247,7 +247,7 @@
   {
     "questionId": 36,
     "question": "What are the month on month growth rates of labor force participation rate and manufacturing hourly wage in August?",
-    "answer": "62.8%, 0.1%.",
+    "answer": "Labor force participation rate: +0.2 percentage points MoM\n- Manufacturing hourly wage: +0.1% MoM",
     "pdf_id": "19.pdf",
     "tag": "2-1"
   },
@@ -569,7 +569,7 @@
   {
     "questionId": 82,
     "question": "What is the title of the article in the top section of the document?",
-    "answer": "Efficient training of ankle foot orthosis-users provokes plasticity in soleus muscle activity of true nonparetic individuals with cerebral palsy - Preliminary results",
+    "answer": "Effects of tuning of ankle foot orthoses-footwear combination using wedges on stance phase knee hyperextension in children with cerebral palsy – Preliminary results",
     "pdf_id": "42.pdf",
     "tag": "1-4"
   },
@@ -660,7 +660,7 @@
   {
     "questionId": 95,
     "question": "What is the events on Apr 11, 2013 according to the calendar?",
-    "answer": "Clergy Connection at Rockawalkin UMC (C)",
+    "answer": "- Clergy Connection at Rockawalkin UMC   - Chesapeake Walk to Emmaus – Women’s Weekend (Apr 11–14)",
     "pdf_id": "48.pdf",
     "tag": "1-1"
   },
@@ -681,7 +681,7 @@
   {
     "questionId": 98,
     "question": "How long time is suggested to learn dowse each day?",
-    "answer": "A few minutes",
+    "answer": "5–10 minutes each day.",
     "pdf_id": "50.pdf",
     "tag": "1-1"
   },
@@ -744,7 +744,7 @@
   {
     "questionId": 107,
     "question": "When is the independent energy storage power station built and put into operation?",
-    "answer": "2023-08",
+    "answer": "2023年8月初",
     "pdf_id": "54.pdf",
     "tag": "1-1"
   },
@@ -765,7 +765,7 @@
   {
     "questionId": 110,
     "question": "What is the title of the document?",
-    "answer": "Tailoring and tuning of the broadband spectrum of dissipative-soliton-resonance and frequency-doubled single-tightly-focused Gaussian beams.",
+    "answer": "Tailoring and tuning of the broadband spectrum of a step-chirped grating based frequency doubler using tightly-focused Gaussian beams",
     "pdf_id": "56.pdf",
     "tag": "1-1"
   },
@@ -793,7 +793,7 @@
   {
     "questionId": 114,
     "question": "What is the total net profit of the company in the year with the largest quarterly net profit growth?",
-    "answer": "223 million",
+    "answer": "2.52亿元",
     "pdf_id": "58.pdf",
     "tag": "2-2"
   },
@@ -1066,7 +1066,7 @@
   {
     "questionId": 153,
     "question": "What is the weekly increase of the last ranked company in the valuation table of listed companies?",
-    "answer": "1.65%",
+    "answer": "1.03%",
     "pdf_id": "78.pdf",
     "tag": "2-2"
   },
@@ -1479,7 +1479,7 @@
   {
     "questionId": 212,
     "question": "What is the expected net profit attributable to the parent company in the next year of the year the report is released?",
-    "answer": "650 million",
+    "answer": "约5.53亿元（2023E）",
     "pdf_id": "107.pdf",
     "tag": "2-1"
   },
@@ -1611,10 +1611,10 @@
   },
   {
     "questionId": 231,
-    "question": "What are the themes of two pictures in page 3?",
-    "answer": "Mind, heart",
+    "question": "How many figures are there in the document?",
+    "answer": "12",
     "pdf_id": "117.pdf",
-    "tag": "2-4"
+    "tag": "2-2"
   },
   {
     "questionId": 232,
@@ -1696,7 +1696,7 @@
   {
     "questionId": 243,
     "question": "Who describes the occurrence of \"take-over\"?",
-    "answer": "Jan E. Bouwens and Bert Overlaet",
+    "answer": "Jan E. Bouwen and Bert Overlaet.",
     "pdf_id": "123.pdf",
     "tag": "1-1"
   },
@@ -2074,7 +2074,7 @@
   {
     "questionId": 297,
     "question": "What is the delivery address on the document?",
-    "answer": "facal, cscd, 44 cc, Sweden",
+    "answer": "fasd, asd, 44, cc, Sweden",
     "pdf_id": "150.pdf",
     "tag": "1-4"
   },
@@ -2192,8 +2192,8 @@
   },
   {
     "questionId": 314,
-    "question": "What is at the top left corner of page 1?",
-    "answer": "2023年04月11日",
+    "question": "What is at the top right corner of page 1?",
+    "answer": "华鑫证券",
     "pdf_id": "158.pdf",
     "tag": "1-4"
   },
@@ -2242,7 +2242,7 @@
   {
     "questionId": 321,
     "question": "What is shown at the bottom of page 5?",
-    "answer": "A chart with knitting instructions.",
+    "answer": "E.A. Kelley, all rights reserved.  Contact: oddlief@gmail.com",
     "pdf_id": "162.pdf",
     "tag": "1-4"
   },
@@ -3061,7 +3061,7 @@
   {
     "questionId": 438,
     "question": "What is the biggest drop in the last week for the stocks recommended this week?",
-    "answer": "-4.59%",
+    "answer": "-6.67%",
     "pdf_id": "220.pdf",
     "tag": "2-1"
   },
@@ -3116,22 +3116,22 @@
   },
   {
     "questionId": 446,
-    "question": "Which two colors are used to distinguish Yes and No?",
-    "answer": "Green and Gray",
+    "question": "Which color is used to distinguish Yes?",
+    "answer": "Green",
     "pdf_id": "224.pdf",
     "tag": "2-5"
   },
   {
     "questionId": 447,
     "question": "When was the document received?",
-    "answer": "October 29, 2001.",
+    "answer": "9 October 2001.",
     "pdf_id": "225.pdf",
     "tag": "1-1"
   },
   {
     "questionId": 448,
-    "question": "What is shown in Figure 1 on page 9-2?",
-    "answer": "Map of ray paths of PKPbc through the inner core.",
+    "question": "What does triangles indicate in Figure 1 on page 9-2?",
+    "answer": "stations.",
     "pdf_id": "225.pdf",
     "tag": "1-4"
   },
@@ -3158,10 +3158,10 @@
   },
   {
     "questionId": 452,
-    "question": "Where can authors find templates for paper preparation?",
-    "answer": "the Publications area of the IAS website at [http://www.ewh.ieee.org/soc/ias/pub-dept/options.html](http://www.ewh.ieee.org/soc/ias/pub-dept/options.html).",
+    "question": "Which websites are mentioned in the article?",
+    "answer": " http://www.ewh.ieee.org/soc/ias/pub-dept/options.html, http://smca-ieee.manuscriptcentral.com, http://www.ieee.org/about/documentation/copyright/cfrmlink.htm, http://www.ieee.org/publications_standards/publications/authors/auth_names_native_lang.pdf, http://www.ieee.org/publications_standards/publications/graphical_abstract.pdf.",
     "pdf_id": "227.pdf",
-    "tag": "1-1"
+    "tag": "2-1"
   },
   {
     "questionId": 453,
@@ -3179,10 +3179,10 @@
   },
   {
     "questionId": 455,
-    "question": "What sections contain schematic diagrams in the document?",
-    "answer": "Pattern and Work picot bind off",
+    "question": "What is written on the top of page 1?",
+    "answer": "Another design from Wandering Cat Studio",
     "pdf_id": "229.pdf",
-    "tag": "2-3"
+    "tag": "1-4"
   },
   {
     "questionId": 456,
@@ -3242,15 +3242,15 @@
   },
   {
     "questionId": 464,
-    "question": "What is the color used for the heading of the \"Introduction\" section, and how is the section content aligned?",
-    "answer": "red,justified.",
+    "question": "What is the color used for the heading of the \"Introduction\" section?",
+    "answer": "red.",
     "pdf_id": "233.pdf",
-    "tag": "2-5"
+    "tag": "1-5"
   },
   {
     "questionId": 465,
-    "question": "Which country has the highest percentage of distribution for Cephalosporins?",
-    "answer": "Turkey",
+    "question": "What is the percentage of the sample in the experimental survey is male?",
+    "answer": "52.30%",
     "pdf_id": "234.pdf",
     "tag": "1-1"
   },
@@ -3313,7 +3313,7 @@
   {
     "questionId": 474,
     "question": "What is the coupon code for a $5 discount at Oakridge Hobbies?",
-    "answer": "045-618575",
+    "answer": "OH5-618575",
     "pdf_id": "238.pdf",
     "tag": "1-1"
   },
@@ -3326,8 +3326,8 @@
   },
   {
     "questionId": 476,
-    "question": "What material is shown in the micrograph of Figure 1b?",
-    "answer": "elemental Cd and Te, cubic CdTe structure",
+    "question": "When did the article received?",
+    "answer": "4 February 2004",
     "pdf_id": "239.pdf",
     "tag": "1-1"
   },
@@ -3439,7 +3439,7 @@
   {
     "questionId": 492,
     "question": "What colors are used in the letter diagrams?",
-    "answer": "Red, green, yellow",
+    "answer": "Red, green",
     "pdf_id": "247.pdf",
     "tag": "1-5"
   },
@@ -3487,15 +3487,15 @@
   },
   {
     "questionId": 499,
-    "question": "How many staircases are labeled as \"Staircase D\" in the floor plans?",
-    "answer": "2",
+    "question": "Where are the photographs from?",
+    "answer": "http://davidsmall.com",
     "pdf_id": "251.pdf",
-    "tag": "2-1"
+    "tag": "1-1"
   },
   {
     "questionId": 500,
     "question": "Analyzing the images with furniture and room layouts, what is the dominant color theme used in the furniture?",
-    "answer": "Blue",
+    "answer": "Brown",
     "pdf_id": "251.pdf",
     "tag": "2-5"
   },
@@ -3522,8 +3522,8 @@
   },
   {
     "questionId": 504,
-    "question": "What is the focus of the article titled \"Nanoscale banded 90° domain patterns in (111) oriented(Pb , La) TiO3 thin ﬁlms\"?",
-    "answer": "Examining nanoscale banded domain patterns and properties of (111) oriented Pb1.1 La0.1TiO3 thin films prepared by radiofrequency sputtering.",
+    "question": "When does the article titled \"Nanoscale banded 90° domain patterns in (111) oriented(Pb , La) TiO3 thin ﬁlms\" received?",
+    "answer": "5 February 2006",
     "pdf_id": "253.pdf",
     "tag": "1-1"
   },
@@ -3620,8 +3620,8 @@
   },
   {
     "questionId": 518,
-    "question": "For what purpose is establishing context indispensable?",
-    "answer": "To define norms, standards, or thresholds for sustainability performance and measure, manage, and report sustainability activities effectively.",
+    "question": "How many factors are involved in determining context?",
+    "answer": "4",
     "pdf_id": "260.pdf",
     "tag": "1-1"
   },
@@ -3669,8 +3669,8 @@
   },
   {
     "questionId": 525,
-    "question": "What is the name of the person serving as the Chief Executive Officer as of this document?",
-    "answer": "Volker Trautz",
+    "question": "What is the main color of page 1?",
+    "answer": "purple.",
     "pdf_id": "264.pdf",
     "tag": "1-1"
   },
@@ -3698,7 +3698,7 @@
   {
     "questionId": 529,
     "question": "What is the title at the top of page 2?",
-    "answer": "EMISSION INVENTORY",
+    "answer": "证券研究报告",
     "pdf_id": "266.pdf",
     "tag": "1-4"
   },
@@ -3726,7 +3726,7 @@
   {
     "questionId": 533,
     "question": "What size circular needle is recommended for the beret?",
-    "answer": "6 US (4 mm) circular needle.",
+    "answer": "US 2 (2.75 mm) circular needle, minimum 24\" long.",
     "pdf_id": "268.pdf",
     "tag": "1-1"
   },
@@ -3775,7 +3775,7 @@
   {
     "questionId": 540,
     "question": "What colors are used in the section illustrations besides the text?",
-    "answer": "Red and yellow",
+    "answer": "Blue, red, and green.",
     "pdf_id": "272.pdf",
     "tag": "1-5"
   },
@@ -3817,7 +3817,7 @@
   {
     "questionId": 546,
     "question": "What is the page number on the second page of the document?",
-    "answer": "328",
+    "answer": "327",
     "pdf_id": "275.pdf",
     "tag": "1-4"
   },
@@ -3852,7 +3852,7 @@
   {
     "questionId": 551,
     "question": "During which season is wildflower honey listed as available?",
-    "answer": "Spring",
+    "answer": "Summer",
     "pdf_id": "278.pdf",
     "tag": "1-1"
   },
@@ -3866,7 +3866,7 @@
   {
     "questionId": 553,
     "question": "Based on the data for smartphone brand popularity in China and India, which brand shows consistent presence in both markets?",
-    "answer": "Xiaomi",
+    "answer": "Apple and Samsung.",
     "pdf_id": "280.pdf",
     "tag": "2-2"
   },
@@ -3929,7 +3929,7 @@
   {
     "questionId": 562,
     "question": "What is the date of the edition in the top section?",
-    "answer": "NUMBER 11 • APRIL 7, 2017",
+    "answer": "APRIL 7, 2017",
     "pdf_id": "285.pdf",
     "tag": "1-4"
   },
@@ -3999,14 +3999,14 @@
   {
     "questionId": 572,
     "question": "Who has been a front rank official of the most important organizations and societies in the United States connected with education?",
-    "answer": "Hollis Dann.",
+    "answer": "Edgar W. Knight.",
     "pdf_id": "290.pdf",
     "tag": "1-1"
   },
   {
     "questionId": 573,
     "question": "Who are the authors of The Young Citizen at Work and Play?",
-    "answer": "Walter B.Pitkin, Harold F. Hughes, Cloth. D. Appleton",
+    "answer": "Walter B.Pitkin, Harold F. Hughes. ",
     "pdf_id": "290.pdf",
     "tag": "1-1"
   },
@@ -4034,7 +4034,7 @@
   {
     "questionId": 577,
     "question": "What is the capital adequacy ratio for Ping An Bank in 2018?",
-    "answer": "11.50%",
+    "answer": "11.88%",
     "pdf_id": "292.pdf",
     "tag": "2-1"
   },
@@ -4068,10 +4068,10 @@
   },
   {
     "questionId": 582,
-    "question": "How did the popularity of \"Brand A\" change between 2019 and 2022 according to the charts?",
-    "answer": "The popularity of \"Brand A\" increased from 30% in 2019 to 45% in 2022.",
+    "question": "What is the main color of page 1?",
+    "answer": "Orange.",
     "pdf_id": "295.pdf",
-    "tag": "1-2"
+    "tag": "1-5"
   },
   {
     "questionId": 583,
@@ -4103,10 +4103,10 @@
   },
   {
     "questionId": 587,
-    "question": "Based on the sales graph and the rankings table, which region had a sales increase but still ranked lower compared to others in its category?",
-    "answer": "Shikoku had a sales increase but ranked lower compared to other regions in its category.",
+    "question": "What is written on the top of page 1?",
+    "answer": "国海证券.",
     "pdf_id": "297.pdf",
-    "tag": "2-2"
+    "tag": "1-4"
   },
   {
     "questionId": 588,
@@ -4223,7 +4223,7 @@
   {
     "questionId": 604,
     "question": "What is the last page number referenced on the document page and who is the author associated with it?",
-    "answer": " 323, Williams, L.",
+    "answer": " 218 — Yap, M.",
     "pdf_id": "306.pdf",
     "tag": "2-4"
   },
@@ -4272,7 +4272,7 @@
   {
     "questionId": 611,
     "question": "What is displayed at the top of page 3?",
-    "answer": "About This Report",
+    "answer": " Ninestar 2022环境、社会及治理报告",
     "pdf_id": "309.pdf",
     "tag": "1-4"
   },
@@ -4447,7 +4447,7 @@
   {
     "questionId": 636,
     "question": "What are the main steps listed under \"Newborn Knitted Bonnet/Pixie Hat Photography\"?",
-    "answer": "Materials; Gauge; Pattern; Using double-pointed needles and sizes.",
+    "answer": "- Initial stage of knitting - Further along with more rows completed - Near completion with final shaping ",
     "pdf_id": "322.pdf",
     "tag": "1-4"
   },
@@ -4545,7 +4545,7 @@
   {
     "questionId": 650,
     "question": "What is the color of the title 'The Bachelor Party'?",
-    "answer": "Orange",
+    "answer": "Green",
     "pdf_id": "329.pdf",
     "tag": "1-5"
   },
@@ -4587,7 +4587,7 @@
   {
     "questionId": 656,
     "question": "What is the green line labeled as in Figure 3?",
-    "answer": "1.5 s Tref",
+    "answer": "T2ref = 1.5 s.",
     "pdf_id": "332.pdf",
     "tag": "1-5"
   },
@@ -4642,10 +4642,10 @@
   },
   {
     "questionId": 664,
-    "question": "What is the average RMSE value achieved by the DNN model compared to the SVM model?",
-    "answer": "The average RMSE value achieved by the DNN model is 0.867, compared to the SVM model's average RMSE of 1.032.",
+    "question": "What is the title of figure 1?",
+    "answer": " The block diagram of the main data processing scheme.",
     "pdf_id": "336.pdf",
-    "tag": "1-1"
+    "tag": "1-3"
   },
   {
     "questionId": 665,
@@ -4790,7 +4790,7 @@
   {
     "questionId": 685,
     "question": "What is the title of the document?",
-    "answer": "Sensors and Actuators B: Chemical",
+    "answer": "Absorption-type optical pH sensitive film based on immobilized purple cabbage pigment",
     "pdf_id": "347.pdf",
     "tag": "1-3"
   },
@@ -4818,7 +4818,7 @@
   {
     "questionId": 689,
     "question": "Which properties are discussed in association with both irradiance and solar cycle variability?",
-    "answer": "Cloud phase properties.",
+    "answer": "Absorption-type optical pH sensitive film based on immobilized purple cabbage pigment.",
     "pdf_id": "349.pdf",
     "tag": "2-1"
   },
@@ -4832,7 +4832,7 @@
   {
     "questionId": 691,
     "question": "Who is the author of \"Diet in Sinus Infections and Colds\"?",
-    "answer": "Egan W. Ullmann, M.D.",
+    "answer": " Egon V. Ullmann, M.D.",
     "pdf_id": "350.pdf",
     "tag": "1-1"
   },
@@ -4944,7 +4944,7 @@
   {
     "questionId": 707,
     "question": "What is drawn at the bottom of the first page?",
-    "answer": " A microscope, beakers, gears, and an atom model.",
+    "answer": " Page 1 of 28.",
     "pdf_id": "358.pdf",
     "tag": "1-4"
   },
@@ -5084,7 +5084,7 @@
   {
     "questionId": 727,
     "question": "What type of pythons were used in the study?",
-    "answer": "Burmese pythons",
+    "answer": " None—no pythons were used; the study used Sprague-Dawley rats.",
     "pdf_id": "368.pdf",
     "tag": "1-1"
   },
@@ -5098,7 +5098,7 @@
   {
     "questionId": 729,
     "question": "What does the x-axis of Figure 8 represent?",
-    "answer": "six companies",
+    "answer": " Property management companies (the individual property stocks).",
     "pdf_id": "369.pdf",
     "tag": "1-2"
   },
@@ -5154,7 +5154,7 @@
   {
     "questionId": 737,
     "question": "What is the name at the top of the document?",
-    "answer": "BONNET WAVE AND HALF STAR (Sionaland.blogspot.com)",
+    "answer": "Nela",
     "pdf_id": "373.pdf",
     "tag": "1-4"
   },
@@ -5237,8 +5237,8 @@
   },
   {
     "questionId": 749,
-    "question": "What is the date mentioned on the top left of the document?",
-    "answer": "April 2, 2023",
+    "question": "What is written on the top of page 1?",
+    "answer": "安信国际",
     "pdf_id": "379.pdf",
     "tag": "1-4"
   },
@@ -5273,7 +5273,7 @@
   {
     "questionId": 754,
     "question": "What is the highest closing price listed in the Shanghai-Shenzhen Index table?",
-    "answer": "2833.62",
+    "answer": " 8759.76",
     "pdf_id": "381.pdf",
     "tag": "1-2"
   },
@@ -5378,7 +5378,7 @@
   {
     "questionId": 769,
     "question": "Referencing the diagram and the text, which section of the pattern uses the leaf motif and how many rows does it span in the chart?",
-    "answer": " The leaf motif is in the 'Leaves' section and spans 5 rows in the chart.",
+    "answer": " Leaves section; 36 rows.",
     "pdf_id": "389.pdf",
     "tag": "2-2"
   },
@@ -5399,7 +5399,7 @@
   {
     "questionId": 772,
     "question": "What is the subtitle of the fourth section of the document?",
-    "answer": "Earnings Forecast and Investment Recommendations",
+    "answer": "相关研究",
     "pdf_id": "390.pdf",
     "tag": "1-3"
   },
@@ -5413,7 +5413,7 @@
   {
     "questionId": 774,
     "question": "What is the heading at the top of page 3?",
-    "answer": "1.RMB Credit: Total Volume Grows Less Year-on-Year, Structure Still Awaiting Improvement",
+    "answer": "开源证券宏观经济点评.",
     "pdf_id": "391.pdf",
     "tag": "1-4"
   },
@@ -5448,7 +5448,7 @@
   {
     "questionId": 779,
     "question": "How many student growth components are in Criterion 3?",
-    "answer": "Three",
+    "answer": "2",
     "pdf_id": "394.pdf",
     "tag": "1-2"
   },
@@ -5566,10 +5566,10 @@
   },
   {
     "questionId": 796,
-    "question": "Based on Figure 4 and the results in Table 3, which polymer exhibited the highest third-order nonlinear optical susceptibility?",
-    "answer": "PPPD (1) exhibited the highest third-order nonlinear optical susceptibility",
+    "question": "How many subtitles does '2. Experimental part' have?",
+    "answer": "5",
     "pdf_id": "402.pdf",
-    "tag": "2-2"
+    "tag": "2-3"
   },
   {
     "questionId": 797,
@@ -5615,8 +5615,8 @@
   },
   {
     "questionId": 803,
-    "question": "What was the total retail sales volume for the first quarter of 2023?",
-    "answer": "17,500 - 24,000",
+    "question": "What is the name of the analyst?",
+    "answer": "陈梦洁",
     "pdf_id": "406.pdf",
     "tag": "1-1"
   },
@@ -5665,7 +5665,7 @@
   {
     "questionId": 810,
     "question": "According to the document, what is the significance of adding gadolinium (Gd) in the ceramic matrix as described in the microcalorimetry results?",
-    "answer": "Gadolinium helps block the movement of grain boundaries, reducing the activation energy for coarsening and preventing grain growth beyond 50 nm, consistent with predictions.",
+    "answer": "It segregates to grain boundaries, blocking their motion and raising the activation energy—microcalorimetry shows reduced heat release, decreasing the driving force for coarsening and halting grain growth (~50 nm).",
     "pdf_id": "409.pdf",
     "tag": "2-2"
   },
@@ -5686,7 +5686,7 @@
   {
     "questionId": 813,
     "question": "What is the total number of diagrams on page 5?",
-    "answer": "2 diagrams",
+    "answer": "0",
     "pdf_id": "411.pdf",
     "tag": "2-4"
   },
@@ -5749,7 +5749,7 @@
   {
     "questionId": 822,
     "question": "What is the reverse voltage mentioned in the absolute maximum ratings section?",
-    "answer": "50 V",
+    "answer": "30 kV",
     "pdf_id": "415.pdf",
     "tag": "1-1"
   },
@@ -5790,10 +5790,10 @@
   },
   {
     "questionId": 828,
-    "question": "Based on the document, what is the difference between the sound levels noted on weekdays compared to weekends, as shown in the graphs?",
-    "answer": "Weekday sound levels are generally slightly higher than weekend levels, except at the Royal Berkshire Hospital where weekend levels are lower.",
+    "question": "How many patients treated in ICUs become confused or develop delirium?",
+    "answer": "Over 30% of patients.",
     "pdf_id": "418.pdf",
-    "tag": "2-2"
+    "tag": "1-1"
   },
   {
     "questionId": 829,
@@ -5861,7 +5861,7 @@
   {
     "questionId": 838,
     "question": "What is the duration of the performance comparison section in the document?",
-    "answer": "December 2001 to May 2018",
+    "answer": "Six months (the next six months).",
     "pdf_id": "423.pdf",
     "tag": "1-1"
   },
@@ -5902,15 +5902,15 @@
   },
   {
     "questionId": 844,
-    "question": "What percentage increase is projected from 2011 through 2035 for total final energy consumption in Africa?",
-    "answer": "89%",
+    "question": "What is the title on page 2?",
+    "answer": "The Act Before Last",
     "pdf_id": "426.pdf",
     "tag": "1-1"
   },
   {
     "questionId": 845,
     "question": "What university is Charles Franklin Thwing affiliated with, and what educational work does he discuss in the document?",
-    "answer": "Charles Franklin Thwing is affiliated with Western Reserve University and Adelbert College. He discusses his book \"Education in the Far East.\"",
+    "answer": "- University: Western Reserve University (president emeritus; also Adelbert College) - Work discussed: His book “The College President”",
     "pdf_id": "427.pdf",
     "tag": "2-1"
   },
@@ -5965,10 +5965,10 @@
   },
   {
     "questionId": 853,
-    "question": "What is the title of the section before \"GENERAL DISCUSSION\"?",
-    "answer": "​​PROCOAGULANT RESPONSES OF PLATELETS ATTACHED TO BIOMATERIALS",
+    "question": "What is the number on the top-left corner of page 3?",
+    "answer": "​228",
     "pdf_id": "431.pdf",
-    "tag": "1-3"
+    "tag": "2-4"
   },
   {
     "questionId": 854,
@@ -5993,10 +5993,10 @@
   },
   {
     "questionId": 857,
-    "question": "According to the bar chart and text, which journal has the highest impact factor and what is the major research focus mentioned?",
-    "answer": "Journal not specified; major focus on Internet governance challenges.",
+    "question": "What is the date on the first page?",
+    "answer": "APRIL 2015",
     "pdf_id": "433.pdf",
-    "tag": "2-2"
+    "tag": "1-4"
   },
   {
     "questionId": 858,
@@ -6021,10 +6021,10 @@
   },
   {
     "questionId": 861,
-    "question": "What is the page number shown at the bottom of the music sheet?",
-    "answer": "162",
+    "question": "What is the answer of the sixth question?",
+    "answer": "Yes, (Matthew 11:28-30, Luke 22:41-42, and I Corinthians 15:3).",
     "pdf_id": "435.pdf",
-    "tag": "1-4"
+    "tag": "1-1"
   },
   {
     "questionId": 862,
@@ -6050,28 +6050,28 @@
   {
     "questionId": 865,
     "question": "What is the title on the second slide from the top in the first column on page 3?",
-    "answer": "Obesity & Inflammation",
+    "answer": "Obesity as a carcinogen",
     "pdf_id": "437.pdf",
     "tag": "1-4"
   },
   {
     "questionId": 866,
     "question": "What is shown in the slide at the top of page 5?",
-    "answer": "Multivitamin slide: Provides core nutrition of vitamins and minerals, fills missing gaps, best consumed with food.",
+    "answer": "A “Cancer Prevention Foods” slide listing items like green tea, broccoli, cabbage, citrus fruits, nuts, avocados, and tomatoes.",
     "pdf_id": "437.pdf",
     "tag": "1-4"
   },
   {
     "questionId": 867,
     "question": "What is the title of the section after the introduction?",
-    "answer": "The Conventional 6T SRAM Cell",
+    "answer": "II. THE CONVENTIONAL SRAM CELL",
     "pdf_id": "438.pdf",
     "tag": "1-3"
   },
   {
     "questionId": 868,
     "question": "What does the y-axis of Fig. 9 represent?",
-    "answer": "The y-axis represents the SNM (Static Noise Margin).",
+    "answer": "Voltage (V)",
     "pdf_id": "438.pdf",
     "tag": "1-2"
   },
@@ -6127,7 +6127,7 @@
   {
     "questionId": 876,
     "question": "What is the settlement amount for reverse repo operations on March 29, and how does it compare to the expiring amount on the same day?",
-    "answer": "The settlement amount for reverse repo operations on March 29 is 200 billion yuan, and it is equal to the expiring amount on the same day.",
+    "answer": "2000亿元；同日到期670亿元，净投放1330亿元（投放多于到期）。",
     "pdf_id": "442.pdf",
     "tag": "2-1"
   },
@@ -6147,10 +6147,10 @@
   },
   {
     "questionId": 879,
-    "question": "What is the name of the top graph in Figure 4?",
-    "answer": "Satge of Experiment",
+    "question": "When is this paper accepted?",
+    "answer": "23 January 2002",
     "pdf_id": "444.pdf",
-    "tag": "1-2"
+    "tag": "1-1"
   },
   {
     "questionId": 880,
@@ -6168,10 +6168,10 @@
   },
   {
     "questionId": 882,
-    "question": "What change occurs in the response rate when pigeons are treated with a combination of morphine and levorphanol as opposed to morphine alone?",
-    "answer": "The response rate increased when pigeons were given higher doses of morphine combined with a large amount of levorphanol.",
+    "question": "What is the number in the top-right corner?",
+    "answer": "557",
     "pdf_id": "445.pdf",
-    "tag": "2-1"
+    "tag": "1-4"
   },
   {
     "questionId": 883,
@@ -6217,10 +6217,10 @@
   },
   {
     "questionId": 889,
-    "question": "What is the color of the highlighted text in the table on page 11?",
-    "answer": "Green",
+    "question": "What is the date on page 1?",
+    "answer": "September 17, 2008",
     "pdf_id": "449.pdf",
-    "tag": "2-4"
+    "tag": "1-4"
   },
   {
     "questionId": 890,
@@ -6294,8 +6294,8 @@
   },
   {
     "questionId": 900,
-    "question": "What is the first section of the fifth page?",
-    "answer": "Introduction to the Agricultural Group",
+    "question": "What is the date on page 1?",
+    "answer": "2023 年 04 月 28 日",
     "pdf_id": "454.pdf",
     "tag": "1-4"
   },
@@ -6343,10 +6343,10 @@
   },
   {
     "questionId": 907,
-    "question": "Which field has seen significant progress with the advent of smart grid technologies?",
-    "answer": "Optical communication.",
+    "question": "What is the number on the top-right corner of page 1?",
+    "answer": "1921",
     "pdf_id": "458.pdf",
-    "tag": "1-1"
+    "tag": "1-4"
   },
   {
     "questionId": 908,
@@ -6357,10 +6357,10 @@
   },
   {
     "questionId": 909,
-    "question": "What is the expected market return for the 'buy' rating over the next 12 months, and what is SAM's main breakthrough?",
-    "answer": "The expected market return for the 'buy' rating is 20% or more over the next 12 months, and SAM's main breakthrough is that it is a visual model that significantly changes the CV landscape.",
+    "question": "What is the date of this paper?",
+    "answer": "2023 年 04 月 10 日",
     "pdf_id": "459.pdf",
-    "tag": "2-1"
+    "tag": "1-4"
   },
   {
     "questionId": 910,
@@ -6413,17 +6413,17 @@
   },
   {
     "questionId": 917,
-    "question": "What motifs are depicted in the image at the beginning of the document?",
-    "answer": "Crocheted granny squares with central light green squares and turquoise hexagonal motifs.",
+    "question": "What is the website of 'My Ravelry Store'?",
+    "answer": "http://www.ravelry.com/stores/smoothfox-crochet-designs",
     "pdf_id": "463.pdf",
-    "tag": "1-2"
+    "tag": "1-1"
   },
   {
     "questionId": 918,
-    "question": "What does the image at the beginning of the document show?",
-    "answer": "Three crocheted squares.",
+    "question": "What is the website of 'My blog'?",
+    "answer": "http://smoothfoxlover.blogspot.com/",
     "pdf_id": "463.pdf",
-    "tag": "1-2"
+    "tag": "1-1"
   },
   {
     "questionId": 919,
@@ -6470,7 +6470,7 @@
   {
     "questionId": 925,
     "question": "What information is displayed at the bottom of the left side?",
-    "answer": "Date of birth, date of first issue, and validity period.",
+    "answer": "Validity period: 2024-07-24 to long-term.",
     "pdf_id": "467.pdf",
     "tag": "1-4"
   },
@@ -6504,10 +6504,10 @@
   },
   {
     "questionId": 930,
-    "question": "What is the period covered by Figure 22?",
-    "answer": "January 2022 to December 2023.",
+    "question": "What is the the date on the top-right corner of page 1?",
+    "answer": "2024年01月07日",
     "pdf_id": "470.pdf",
-    "tag": "1-2"
+    "tag": "1-4"
   },
   {
     "questionId": 931,
@@ -6567,10 +6567,10 @@
   },
   {
     "questionId": 939,
-    "question": "What is the finished bust circumference for size 42¾?",
-    "answer": "42¼ inches",
+    "question": "What is written at the bottom-left corner of the first page?",
+    "answer": "3/20/12",
     "pdf_id": "474.pdf",
-    "tag": "1-1"
+    "tag": "1-4"
   },
   {
     "questionId": 940,
@@ -6582,7 +6582,7 @@
   {
     "questionId": 941,
     "question": "What is the title of the document?",
-    "answer": "Efficient L-band femtosecond optical parametric amplification in BiB3O6 pumped at 800 nm",
+    "answer": "Efficient 1 kHz femtosecond optical parametric amplification in BiB3O6 pumped at 800 nm",
     "pdf_id": "475.pdf",
     "tag": "1-1"
   },
@@ -6623,10 +6623,10 @@
   },
   {
     "questionId": 947,
-    "question": "What is the capacity of the pump mentioned for freezing in cold weather?",
-    "answer": "The capacity of the pump is unlimited. With proper proportions of air to the water, it can deliver up to 16,660 gallons per minute, equal to 1,000,000 gallons per hour.",
+    "question": "What number is written on the top-right corner of page 1?",
+    "answer": "16381",
     "pdf_id": "478.pdf",
-    "tag": "1-1"
+    "tag": "1-4"
   },
   {
     "questionId": 948,
@@ -6666,14 +6666,14 @@
   {
     "questionId": 953,
     "question": "How many types of proprietary phones are shown in the image?",
-    "answer": "Two types: digital and IP proprietary terminals.",
+    "answer": "8",
     "pdf_id": "481.pdf",
     "tag": "1-2"
   },
   {
     "questionId": 954,
     "question": "Compare the color patterns of sock pattern version 1 and version 2; which one uses a wider range of colors?",
-    "answer": "Sock pattern version 1.",
+    "answer": "Neither—both versions use the same range of colors.",
     "pdf_id": "482.pdf",
     "tag": "2-2"
   },
@@ -6722,14 +6722,14 @@
   {
     "questionId": 961,
     "question": "What is the total amount claimed for Labour (AV Tech)?",
-    "answer": "$344.50",
+    "answer": "345.1",
     "pdf_id": "485.pdf",
     "tag": "2-1"
   },
   {
     "questionId": 962,
     "question": "What is written on the right top conner?",
-    "answer": "Page 15",
+    "answer": "Home LifeStyle",
     "pdf_id": "486.pdf",
     "tag": "1-4"
   },
@@ -6826,10 +6826,10 @@
   },
   {
     "questionId": 976,
-    "question": "What date was the \"Tile Fish\" report communicated to the U.S. National Museum?",
-    "answer": "March 23rd",
+    "question": "What number is written on the top-right corner of page 1?",
+    "answer": "263",
     "pdf_id": "493.pdf",
-    "tag": "1-1"
+    "tag": "1-4"
   },
   {
     "questionId": 977,
@@ -6848,14 +6848,14 @@
   {
     "questionId": 979,
     "question": "How can stock import be done via Excel files?",
-    "answer": "To import stock via Excel files, import them into the ERP system by selecting \"Excel Import\" and then choose the file to upload.",
+    "answer": "Not described in the provided pages.",
     "pdf_id": "494.pdf",
     "tag": "1-1"
   },
   {
     "questionId": 980,
     "question": "What is the research status listed in the document?",
-    "answer": "The research status is listed as \"药物共同研究\" (drug joint research) and \"多角度临床研究\" (multi-angle clinical research).",
+    "answer": "多项研究结果已在2021年ASH年会上发布。",
     "pdf_id": "495.pdf",
     "tag": "1-1"
   },
@@ -6897,7 +6897,7 @@
   {
     "questionId": 986,
     "question": "What are the main sections of the document?",
-    "answer": "Abstract, Introduction, Materials and methods, Results, Discussion, Conclusion, References",
+    "answer": "Abstract; Introduction; Material and methods; Results; Discussion; References.",
     "pdf_id": "498.pdf",
     "tag": "2-3"
   },
@@ -7064,8 +7064,8 @@
   },
   {
     "questionId": 1010,
-    "question": "What is the title on page 2?",
-    "answer": "DALHOUSIE FRENCH STUDIES.",
+    "question": "What is the number written on the bottom-left corner of every page?",
+    "answer": "07/12/2012",
     "pdf_id": "510.pdf",
     "tag": "1-4"
   },
@@ -7344,10 +7344,10 @@
   },
   {
     "questionId": 1050,
-    "question": "Based on the data in the tables and graphs, how did the total operating revenue change from Q2 2022 to Q2 2023, and what was the primary contributor to this change?",
-    "answer": "The total operating revenue increased from Q2 2022 to Q2 2023, with the primary contributor being the growth in the cloud computing segment.",
+    "question": "What is the number on the top-left corner of page 1?",
+    "answer": "2023年08月27日",
     "pdf_id": "530.pdf",
-    "tag": "2-2"
+    "tag": "1-4"
   },
   {
     "questionId": 1051,
@@ -7386,10 +7386,10 @@
   },
   {
     "questionId": 1056,
-    "question": "How many reaction types with a product yield of over 90% are there in the experimental section?",
-    "answer": "3",
+    "question": "What is the date written on the top-right corner of page 1?",
+    "answer": "2023 年 10 月 22 日",
     "pdf_id": "533.pdf",
-    "tag": "2-1"
+    "tag": "1-4"
   },
   {
     "questionId": 1057,
@@ -7443,15 +7443,15 @@
   {
     "questionId": 1064,
     "question": "Which papers discuss issues related to rock stability and their practical applications?",
-    "answer": "Rock Fracture and Failure Mechanisms, Support Measures in Tunnel Excavation, Rock Stresses in Engineering Projects, Shear Fracture Mechanism, Geological Approach for Predicting Instability, Tunnel Instability and Strain Softening",
+    "answer": "- Geological approach for predicting unstable roof and floor conditions in advance of mining (Ealy, Mazurak, Langrand, 1979) - Rock stresses in Canada: Their relevance to engineering projects (Franklin & Hungr, 1978) - Support measures used in excavating the Arlberg Tunnel—adaptation to rock mass conditions by means of geotechnical measurements (Judtmann, 1978) - Shear fracture mechanism of rock mass in the vicinity of deep tunnels: test results and analytical concepts (Feder, 1978) - Considerations about rock pressure and its significance to excavations in rock by blasting (Heltzen, 1978) - Measurement of static and dynamic excess stresses in the pillars of shallow underground quarries (Bonvallet, Dejean, Schwartzmann, 1978) - Fundamental study on instability of tunnel considering post-peak strain softening behavior of rock (Akal & Hori, 1978) - Mining and tunnelling—interaction and crossfertilisation (Feder & Olsacher, 1978)",
     "pdf_id": "537.pdf",
     "tag": "2-1"
   },
   {
     "questionId": 1065,
-    "question": "What is being measured in the reports from Canada mentioned by Franklin and Bags?",
-    "answer": "Ground stress measurements in Canada.",
+    "question": "What is written on the top of the document?",
+    "answer": "115A",
     "pdf_id": "537.pdf",
-    "tag": "1-2"
+    "tag": "1-4"
   }
 ]
