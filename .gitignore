@@ -70,3 +70,5 @@ MoDora-backend/configs/local.json
 *.swp
 *.bak
 MoDora-backend/data/
+
+data/
