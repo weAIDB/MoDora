@@ -12,7 +12,7 @@
   - [Automated Installation](#1-automated-installation)
   - [Configuration](#2-configuration)
   - [Execution](#3-execution)
-  - [Manual Setup](#-manual-setup)
+- [Manual Setup](#-manual-setup)
 - [CLI Usage](#-cli-usage-experiments)
 
 
