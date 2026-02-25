@@ -24,6 +24,7 @@ from modora.core.prompts import (
     image_reasoning_prompt,
     rerank_prompt,
     evaluation_prompt,
+    TREE_RECOMPOSE_PROMPT
 )
 
 
@@ -198,9 +199,31 @@ class BaseAsyncLLMClient(ABC):
     async def reason_whole(
         self, query: str, data: str, image: str | None = None
     ) -> str:
-        """Perform reasoning based on global context."""
+        """Perform whole document reasoning based on the query and data."""
         prompt = whole_reasoning_prompt.format(query=query, data=data)
         return await self._call_llm(prompt, base64_image=image)
+
+    async def recompose_tree(self, schema: dict[str, Any], query: str) -> dict[str, Any]:
+        """Generate a new tree structure based on the current schema and user query."""
+        import json
+        prompt = TREE_RECOMPOSE_PROMPT.format(
+            schema=json.dumps(schema, ensure_ascii=False, indent=2),
+            query=query
+        )
+        response = await self._call_llm(prompt)
+        
+        # Try to parse JSON, cleaning Markdown tags if they are included
+        cleaned_response = response.strip()
+        if cleaned_response.startswith("```json"):
+            cleaned_response = cleaned_response[7:]
+        if cleaned_response.endswith("```"):
+            cleaned_response = cleaned_response[:-3]
+        
+        try:
+            return json.loads(cleaned_response)
+        except json.JSONDecodeError as e:
+            # Log or handle errors
+            raise ValueError(f"AI returned invalid JSON: {e}\nResponse: {response}")
 
     async def generate_annotation_async(
         self, base64_image: str, cp_type: str, settings: Settings | None = None

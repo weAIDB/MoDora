@@ -48,6 +48,33 @@ class TreeNode:
             "children": {child.title: child.to_dict() for child in self.children},
         }
 
+    def to_flat_list(self) -> list[dict[str, Any]]:
+        """Flatten the tree structure into a list of nodes for easier AI processing."""
+        nodes = []
+        nodes.append({
+            "title": self.title,
+            "type": self.type,
+            "metadata": self.metadata,
+            "content_summary": (self.data[:100] + "...") if isinstance(self.data, str) and len(self.data) > 100 else self.data
+        })
+        for child in self.children:
+            nodes.extend(child.to_flat_list())
+        return nodes
+
+    def get_schema(self) -> dict[str, Any]:
+        """Extract the tree structure's schema (a simplified version, removing redundant information)."""
+        return {
+            "title": self.title,
+            "type": self.type,
+            "children": [child.get_schema() for child in self.children]
+        }
+
+    def recompose_by_schema(self, ai_schema: dict[str, Any]) -> "TreeNode":
+        """
+        Reconstruct the tree structure based on the AI-generated schema and inherit node information from the current tree.
+        """
+        return recompose_tree_with_ai(self, ai_schema)
+
 
 def dict_to_tree(
     dict_node: dict[str, Any], root_title: str = "ROOT", path: list[str] | None = None
@@ -182,11 +209,11 @@ def reconstruct_tree_from_elements(
     Returns:
         dict[str, Any]: The reconstructed CCTree dictionary.
     """
-    # 1. 创建节点映射，方便通过 ID 查找
+    # 1. Create node mapping for easy lookup by ID
     nodes_map = {}
     edges = []
 
-    # 建立原始数据的映射，以便找回 location 等信息
+    # Map original data to retrieve location and other details
     original_nodes_data = {}
 
     def map_original(name, data):
@@ -202,7 +229,7 @@ def reconstruct_tree_from_elements(
         else:
             nodes_map[el["id"]] = el
 
-    # 2. 建立父子关系映射
+    # 2. Establish parent-child relationship mapping
     parent_to_children = {}
     for edge in edges:
         source = edge["source"]
@@ -211,7 +238,7 @@ def reconstruct_tree_from_elements(
             parent_to_children[source] = []
         parent_to_children[source].append(target)
 
-    # 3. 递归构建树结构
+    # 3. Recursively build the tree structure
     def build_node(node_id):
         node_el = nodes_map.get(node_id)
         if not node_el:
@@ -220,7 +247,7 @@ def reconstruct_tree_from_elements(
         node_name = node_el.get("label", node_el.get("data", {}).get("label", ""))
         node_data_attr = node_el.get("data", {})
 
-        # 尝试从原始树中获取丢失的详细信息 (如 location)
+        # Try to retrieve missing details (e.g., location) from the original tree
         orig_data = original_nodes_data.get(node_name, {})
 
         reconstructed = {
@@ -233,7 +260,7 @@ def reconstruct_tree_from_elements(
             "children": {},
         }
 
-        # 递归处理子节点
+        # Recursively process child nodes
         child_ids = parent_to_children.get(node_id, [])
         for child_id in reversed(child_ids):
             child_node_el = nodes_map.get(child_id)
@@ -247,10 +274,10 @@ def reconstruct_tree_from_elements(
 
         return reconstructed
 
-    # 找到根节点的 ID (通常是 "root" 或者没有被作为 target 的节点)
+    # Find the root node ID (usually "root" or a node that is not a target)
     root_id = "root"
     if root_id not in nodes_map:
-        # 如果没有固定 ID 为 root 的节点，找入度为 0 的节点
+        # If no fixed "root" node ID, find the node with in-degree 0
         all_targets = {e["target"] for e in edges}
         potential_roots = [nid for nid in nodes_map if nid not in all_targets]
         if potential_roots:
@@ -258,3 +285,134 @@ def reconstruct_tree_from_elements(
 
     result_tree = build_node(root_id)
     return result_tree if result_tree else original_tree
+
+
+def recompose_tree_with_ai(
+    original_root: TreeNode, ai_schema: dict[str, Any]
+) -> TreeNode:
+    """
+    Reconstruct the tree structure based on the AI-generated schema and inherit information from the original nodes.
+    Example of ai_schema format:
+    {
+        "title": "New Root",
+        "type": "chapter",
+        "children": [
+            { "title": "Old Node A", "type": "section", "children": [] },
+            { "title": "New Category", "type": "chapter", "children": [...] }
+        ]
+    }
+    """
+    # 1. Establish mapping for original node data (based on titles)
+    original_nodes_map = {}
+
+    def map_nodes(node: TreeNode):
+        # If there are duplicate titles, they will be overwritten here.
+        # In actual application, more complex logic (like combining with path) might be needed.
+        original_nodes_map[node.title] = node
+        for child in node.children:
+            map_nodes(child)
+
+    map_nodes(original_root)
+
+    # 2. Recursively build the new tree
+    def build_from_ai(schema_node: dict[str, Any]) -> TreeNode:
+        title = schema_node.get("title", "Untitled")
+        typ = schema_node.get("type", "text")
+        
+        # Try to find the original node to inherit information
+        orig_node = original_nodes_map.get(title)
+        
+        if orig_node:
+            # Inherit original information
+            new_node = TreeNode(
+                title=title,
+                typ=typ or orig_node.type, # Prioritize type specified by AI
+                metadata=orig_node.metadata,
+                data=orig_node.data,
+                location=orig_node.location,
+                impact=orig_node.impact,
+            )
+        else:
+            # New node created by AI (e.g., category directory)
+            new_node = TreeNode(
+                title=title,
+                typ=typ,
+                metadata="",
+                data="",
+                location=[],
+                impact=0
+            )
+            
+        # Process child nodes
+        for child_schema in schema_node.get("children", []):
+            new_node.insert_child(build_from_ai(child_schema))
+            
+        return new_node
+
+    return build_from_ai(ai_schema)
+
+
+def recompose_tree_dict(
+    tree_dict: dict[str, Any], root_title: str, rule: str
+) -> dict[str, Any]:
+    root = dict_to_tree(tree_dict, root_title=root_title)
+
+    def sort_children(node: TreeNode, key_fn) -> None:
+        node.children.sort(key=key_fn)
+        for child in node.children:
+            sort_children(child, key_fn)
+
+    def collect_nodes(node: TreeNode, out: list[TreeNode]) -> None:
+        for child in node.children:
+            out.append(child)
+            collect_nodes(child, out)
+
+    def clone_node(node: TreeNode) -> TreeNode:
+        return TreeNode(
+            title=node.title,
+            typ=node.type,
+            metadata=node.metadata,
+            data=node.data,
+            location=node.location,
+            impact=node.impact,
+        )
+
+    if rule == "type_first":
+        sort_children(root, lambda n: ((n.type or ""), n.title))
+        return root.to_dict()
+
+    if rule == "shuffle":
+        import random
+
+        rng = random.Random()
+
+        def shuffle_children(node: TreeNode) -> None:
+            rng.shuffle(node.children)
+            for child in node.children:
+                shuffle_children(child)
+
+        shuffle_children(root)
+        return root.to_dict()
+
+    if rule == "balanced":
+        nodes: list[TreeNode] = []
+        collect_nodes(root, nodes)
+        nodes.sort(key=lambda n: ((n.type or ""), n.title))
+        new_root = clone_node(root)
+        queue = [new_root]
+        parent_index = 0
+        index = 0
+        k = 3
+        while index < len(nodes):
+            parent = queue[parent_index]
+            parent_index += 1
+            for _ in range(k):
+                if index >= len(nodes):
+                    break
+                child = clone_node(nodes[index])
+                index += 1
+                parent.insert_child(child)
+                queue.append(child)
+        return new_root.to_dict()
+
+    return root.to_dict()
