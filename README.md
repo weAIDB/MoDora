@@ -611,7 +611,7 @@
 
 Content extraction methods:
 
-- [QUEST](https://arxiv.org/pdf/2309.14389)
+- [QUEST](https://arxiv.org/pdf/2507.06515)
 
 Structure extraction methods:
 
@@ -635,7 +635,7 @@ Retrieval-Augmented Generation methods:
 
 - [SV-RAG](https://github.com/puar-playground/Self-Visual-RAG/tree/main)
 
-- [TextRAG](https://arxiv.org/pdf/2507.06515)
+- [TextRAG](https://arxiv.org/pdf/2309.14389)
 
 ## 🚀 Quick Start 
 
