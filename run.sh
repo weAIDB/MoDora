@@ -8,10 +8,26 @@
 # Function to find an unused port
 find_unused_port() {
     local port=$1
-    while lsof -Pi :$port -sTCP:LISTEN -t >/dev/null ; do
+    while true; do
+        # Try to bind using python as it is the most reliable cross-user check
+        if command -v python3 >/dev/null 2>&1; then
+            if python3 -c "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.bind(('0.0.0.0', $port)); s.close()" >/dev/null 2>&1; then
+                echo $port
+                return
+            fi
+        # Fallback to lsof if python is not available
+        elif command -v lsof >/dev/null 2>&1; then
+            if ! lsof -Pi :$port -sTCP:LISTEN -t >/dev/null; then
+                echo $port
+                return
+            fi
+        else
+            # If no tools available, just return the port and hope for the best
+            echo $port
+            return
+        fi
         port=$((port + 1))
     done
-    echo $port
 }
 
 # Find an available port for Backend (starting from 8005)
