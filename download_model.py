@@ -1,17 +1,28 @@
 from huggingface_hub import snapshot_download
 import os
 import sys
+import argparse
 
 
 def download_model():
-    # Model configuration
-    repo_id = os.environ.get("MODEL_REPO_ID", "Qwen/Qwen3-VL-8B-Instruct")
-    model_dir_env = os.environ.get("MODEL_DIR", "")
-    model_dir = (
-        os.path.abspath(model_dir_env)
-        if model_dir_env
-        else os.path.abspath("./models/Qwen3-VL-8B-Instruct")
+    parser = argparse.ArgumentParser(description="Download a model from Hugging Face Hub")
+    parser.add_argument(
+        "--repo_id", 
+        type=str, 
+        default="Qwen/Qwen3-VL-8B-Instruct",
+        help="The Hugging Face repository ID (e.g., Qwen/Qwen3-VL-8B-Instruct)"
     )
+    parser.add_argument(
+        "--local_dir", 
+        type=str, 
+        default="./MoDora-backend/models/Qwen3-VL-8B-Instruct",
+        help="The local directory to save the model"
+    )
+
+    args = parser.parse_status = parser.parse_args()
+    
+    repo_id = args.repo_id
+    model_dir = os.path.abspath(args.local_dir)
 
     print(f"🚀 Starting download for {repo_id}...")
     print(f"📁 Target directory: {model_dir}")
@@ -32,7 +43,8 @@ def download_model():
             ],  # Ignore torch/legacy weights, keep safetensors
         )
 
-        print(f"✅ Model successfully downloaded to: {model_dir}")
+        print(f"\n✅ Model successfully downloaded to: {model_dir}")
+        print(f"💡 You can now configure this path in your local.json under 'model_instances'.")
     except Exception as e:
         print(f"❌ Error downloading model: {e}")
         sys.exit(1)

@@ -31,8 +31,9 @@ class QAService:
         self.retriever_settings = retriever_settings or self.settings
 
         # Use AsyncLLMFactory.create to properly handle local/remote switching based on instance_id
+        self.qa_instance = qa_instance or self.settings.default_qa_model_instance
         self.remote_llm = AsyncLLMFactory.create(
-            self.settings, instance_id=qa_instance
+            self.settings, instance_id=self.qa_instance
         )
         self.cropper = PDFCropper()
         self.semantic_retriever = SemanticRetriever(

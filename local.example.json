@@ -20,17 +20,18 @@
   "rerank_model_name": "qwen3-rerank",
 
   "model_instances": {
-    "local-default": {
-      "type": "local",
-      "model": "./models/your-local-model",
-      "port": 9001,
-      "device": "0"
-    },
-    "remote-default": {
+    "GPT-5": {
       "type": "remote",
-      "model": "your-remote-model",
-      "base_url": "https://your-api-base-url/v1",
+      "model": "gpt-5",
+      "base_url": "https://www.openai.com/v1",
       "api_key": "your-api-key"
+    },
+    "Qwen3-VL-8B-Instruct": {
+      "type": "local",
+      "model": "Qwen3-VL-8B-Instruct",
+      "local_dir": "/home/yukai/project/MoDora/MoDora-backend/models/Qwen3-VL-8B-Instruct",
+      "port": null,
+      "device": null
     }
   },
 
@@ -42,16 +43,16 @@
   "ocr_text_recognition_batch_size": 8,
   "ocr_use_table_recognition": true,
   "ocr_use_doc_unwarping": false,
-  "enable_vector_search": true,
+  "enable_vector_search": false,
 
   "ui_settings": {
     "schemaVersion": 3,
     "pipelines": {
-      "enrichment": { "modelInstance": "local-default" },
-      "levelGenerator": { "modelInstance": "local-default" },
-      "metadataGenerator": { "modelInstance": "local-default" },
-      "retriever": { "modelInstance": "local-default" },
-      "qaService": { "modelInstance": "local-default" }
+      "enrichment": { "modelInstance": "Qwen3-VL-8B-Instruct" },
+      "levelGenerator": { "modelInstance": "Qwen3-VL-8B-Instruct" },
+      "metadataGenerator": { "modelInstance": "Qwen3-VL-8B-Instruct" },
+      "retriever": { "modelInstance": "Qwen3-VL-8B-Instruct" },
+      "qaService": { "modelInstance": "Qwen3-VL-8B-Instruct" }
     }
   }
 }

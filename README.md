@@ -9,10 +9,9 @@
 - [MMDA Bench](#-mmda-bench)
 - [Performance](#-performance)
 - [Quick Start](#-quick-start)
-  - [Automated Installation](#1-automated-installation)
-  - [Configuration](#2-configuration)
-  - [Execution](#3-execution)
-- [Manual Setup](#-manual-setup)
+  - [1. Configuration](#1-configuration)
+  - [2. Installation](#2-installation)
+  - [3. Execution](#3-execution)
 - [CLI Usage](#-cli-usage-experiments)
 
 
@@ -640,30 +639,66 @@ Retrieval-Augmented Generation methods:
 
 ## 🚀 Quick Start 
 
-### 1. Automated Installation
+### 1. Configuration
 
-  We provide a one-click setup script that automatically creates a virtual environment and installs all dependencies (including PyTorch, LMDeploy, FlashAttention, and PaddleOCR):
+  First, grant execution permissions and initialize your configuration:
 
 ```bash
   # Grant execution permissions
   chmod +x setup.sh run.sh start_backend.sh start_frontend.sh
-  
+
+  # Initialize config from template
+  cp local.example.json local.json
+```
+
+  Then, open `local.json` and fill in the required fields.
+
+  **Critical configurations in local.json:**
+
+  - **API Keys (Required)**: Ensure that the `api_key` for at least one model instance in `model_instances` (e.g., `GPT-5`) is correctly filled so that the system can run.
+  - **Vector Search (Optional)**: If you enable `enable_vector_search`, you MUST fill in `embedding_api_key` (and `rerank_api_key` if a rerank model is used). These are not required if vector search is disabled.
+
+### 2. Installation
+
+  We provide a one-click setup script that automatically creates a virtual environment and installs all dependencies (including PyTorch, LMDeploy, FlashAttention, and PaddleOCR):
+
+```bash
   # Run the setup script (this may take a while)
   ./setup.sh
 ```
 
-### 2. Configuration
+  Local models are NOT automatically downloaded. By default, MoDora uses remote models (GPT-5). 
 
-  Model configuration is handled interactively by `./setup.sh`. It creates `local.json` (based on `local.example.json`) in the project root and writes the model selections you input.
+  > **Recommendation**: If you have a GPU with **24GB+ VRAM**, we highly recommend using **Qwen-3-VL-8B-Instruct** as a local model for better performance and privacy.
 
-  **What setup.sh configures:**
+  To use a local model, download it and update your `local.json`:
 
-  - `model_instances`: All available model instances (local/remote). Each item includes `type`, `model`, and optional `base_url`, `port`, `device`.
-  - `ui_settings.pipelines`: Which model instance each module uses (`enrichment`, `retriever`, `qaService`, etc.).
-  - `ui_settings.ocr.provider`: OCR model selection (`ppstructure` or `paddle_ocr_vl`).
-  - Local model download: you input a model name (HuggingFace repo id). The model is downloaded into `MoDora-backend/models/<model_name>` if it does not exist.
+```bash
+  # Activate venv after setup.sh
+  source MoDora-backend/venv/bin/activate
 
-  If you need to tweak values later, edit `local.json` in the project root and restart the backend.
+  # Download recommendation: Qwen-3-VL-8B-Instruct
+  python download_model.py --repo_id Qwen/Qwen3-VL-8B-Instruct --local_dir ./MoDora-backend/models/Qwen3-VL-8B-Instruct
+```
+
+  **Update `local.json` Example:**
+
+```json
+  "model_instances": {
+    "Qwen3-VL-8B-Instruct": {
+      "type": "local",
+      "model": "MoDora-backend/models/Qwen3-VL-8B-Instruct",
+      "port": 9001,
+      "device": "0"
+    }
+  },
+  "ui_settings": {
+    "pipelines": {
+      "enrichment": { "modelInstance": "Qwen3-VL-8B-Instruct" },
+      "retriever": { "modelInstance": "Qwen3-VL-8B-Instruct" }
+    }
+  }
+```
 
 ### 3. Execution
 
@@ -672,69 +707,6 @@ Retrieval-Augmented Generation methods:
 ```bash
   ./run.sh
 ```
-
----
-
-## 🛠 Manual Setup
-
-  If you prefer to set up manually:
-
-### 1. Backend Setup (MoDora-backend)
-
-  **Environment.**
-  Requires Python 3.10+.
-
-```bash
-  cd MoDora-backend
-  # Install the package in editable mode
-  pip install -e .
-  
-  # Install additional dependencies for OCR and LLM
-  # e.g., for PaddleOCR: pip install paddleocr paddlepaddle-gpu
-```
-
-  **Configuration.**
-  MoDora-backend supports environment variables or a JSON config file (path set via `MODORA_CONFIG`). If you are not using `setup.sh`, create your own `local.json`:
-
-```bash
-  cp local.example.json local.json
-  export MODORA_CONFIG="local.json"
-```
-
-  Edit `local.json` to set `model_instances` and `ui_settings` for module-level model selection. Remote models require `api_key`/`base_url`, and local models require `model` (local path) and optional `port`/`device`.
-
-  **Running the API.**
-
-```bash
-  # Start FastAPI server
-  uvicorn modora.api.app:app --host 0.0.0.0 --port 8005 --reload
-```
-
-### 2. Frontend Setup (MoDora-frontend)
-
-  **Environment.**
-  Requires Node.js (v20.19.0+ or v22.12.0+).
-
-```bash
-  cd MoDora-frontend
-  npm install
-```
-
-  **Running the Dev Server.**
-
-```bash
-  npm run dev
-```
-
-### 3. Benchmark & Model
-
-  **Benchmark.**
-  Our MMDA Bench is in [MMDA](./datasets/MMDA/test.json).
-  For DUDE and its samples subset, refer to [DUDE](https://huggingface.co/datasets/jordyvl/DUDE_loader/tree/main/data).
-
-  **Model.**
-  We support both remote APIs (e.g., GPT-5) and local models (e.g., Qwen3-VL-8B-Instruct).
-  Configure model paths and settings in your environment or `config.json`.
 
 ---
 
