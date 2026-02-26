@@ -539,12 +539,10 @@
 
 ## 📊 Performance
 
-  The following table demonstrates the AIC-Acc and ACNLS score of different methods over MMDA Bench. The AIC-Acc and ACNLS are the modified versions of Acc and ANLS metrics respectively.
+  The following chart demonstrates the AIC-Acc and ACNLS score of different methods over MMDA Bench. The AIC-Acc and ACNLS are the modified versions of Acc and ANLS metrics respectively.
 
-| **Metric**      | UDOP | LayoutLMv3 |DocOwl2 | M3DocRAG | SV-RAG | TextRAG | ZenDB | QUEST | GPT-5 | DocAgent | MoDora |
-| :----: | :------: | :--: | :-----: | :------: | :----: | :-----: | :---: | :---: | :---: | :----: | :----: |
-| **ACNLS(%)**    | 15.44 | 13.96 | 29.38 | 41.12 | 33.06 | 29.57 | 36.68 | 18.84 | 41.55 | 37.10 | 55.23 |
-| **AIC-Acc(%)**  | 15.77 | 17.37 | 29.58 | 47.42 | 37.75 | 36.24 | 47.14 | 24.32 | 46.48 | 57.09 | 73.33 |
+<img width="1566" height="463" alt="image" src="https://github.com/user-attachments/assets/003513ea-9d20-4994-b227-bfd6b327530b" />
+
 
   **Baselines**
 
