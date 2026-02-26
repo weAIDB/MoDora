@@ -47,7 +47,6 @@ MoDora-backend/temp_*.json
 # Models & Data
 models/
 *.pdf
-datasets/
 MoDora-backend/src/modora/lab/output/
 
 # Frontend

@@ -220,14 +220,14 @@ const {
   dimensions, viewport,
 } = useVueFlow();
 
-const elements = ref([]); // 保持数据源
+const elements = ref([]); // Keep the data source
 
-// 内部追踪状态
+// Internal tracking state
 let animationFrameId = null;
 const isLoading = ref(false);
 const error = ref(null);
-const isEditMode = ref(false); // 控制编辑模式
-const isHeatmapMode = ref(false); // 控制热力图模式
+const isEditMode = ref(false); // Toggle edit mode
+const isHeatmapMode = ref(false); // Toggle heatmap mode
 const showEditModal = ref(false);
 const editingNodeData = ref({});
 const isRecomposing = ref(false)
@@ -236,28 +236,28 @@ const isRecomposing = ref(false)
 const aiQuery = ref('');
 const aiInputRef = ref(null);
 
-// 3D 旋转相关的配置
+// 3D rotation configuration
 const rotationSpeed = 0.03
 let activeParticleCount = 0
 let rotationY = 0
 
 /**
- * 使用 dagre 进行自动布局
+ * Auto layout using dagre
  */
 const layout = (els) => {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
   
-  // 设定方向: TB (Top to Bottom), LR (Left to Right)
-  // nodesep: 同层节点之间的间距; ranksep: 不同层级之间的间距
+  // Direction: TB (Top to Bottom), LR (Left to Right)
+  // nodesep: spacing between nodes on same rank; ranksep: spacing between ranks
   dagreGraph.setGraph({ rankdir: 'TB', nodesep: 50, ranksep: 60 });
 
   els.forEach((el) => {
     if (el.position) {
-      // 节点
+      // Node
       dagreGraph.setNode(el.id, { width: 200, height: 100 });
     } else {
-      // 连线
+      // Edge
       dagreGraph.setEdge(el.source, el.target);
     }
   });
@@ -270,8 +270,8 @@ const layout = (els) => {
       return {
         ...el,
         position: {
-          x: nodeWithPosition.x - 100, // 减去宽度的一半使中心对齐
-          y: nodeWithPosition.y - 50,  // 减去高度的一半
+          x: nodeWithPosition.x - 100, // Subtract half width to center align
+          y: nodeWithPosition.y - 50,  // Subtract half height
         },
       };
     }
@@ -279,7 +279,7 @@ const layout = (els) => {
   });
 };
 
-// --- 热力图样式 ---
+// --- Heatmap styles ---
 const maxImpact = computed(() => {
   const impacts = elements.value
     .filter(el => el.data && el.data.impact)
@@ -297,15 +297,15 @@ const getHeatmapDynamicStyle = (impact) => {
     };
   }
 
-  // 归一化 impact (0 到 1 之间)
+  // Normalize impact (0 to 1)
   const normalized = Math.min(impact / maxImpact.value, 1);
   
-  // 颜色插值逻辑: 浅黄 -> 橙色 -> 深红
-  // HSL: 60 (黄) -> 30 (橙) -> 0 (红)
+  // Color interpolation: light yellow -> orange -> deep red
+  // HSL: 60 (yellow) -> 30 (orange) -> 0 (red)
   const hue = 60 - (normalized * 60); 
-  // Lightness: 95% (浅) -> 50% (深)
+  // Lightness: 95% (light) -> 50% (dark)
   const lightness = 95 - (normalized * 45);
-  // Saturation: 80% (亮) -> 100% (鲜艳)
+  // Saturation: 80% (bright) -> 100% (vivid)
   const saturation = 80 + (normalized * 20);
 
   return {
@@ -318,7 +318,7 @@ const getHeatmapDynamicStyle = (impact) => {
   };
 };
 
-// --- 编辑状态 ---
+// --- Edit state ---
 const openEditModal = (nodeData) => {
     if (!isEditMode.value) return; // Only allow editing in edit mode
     editingNodeData.value = { ...nodeData };
@@ -440,21 +440,21 @@ const focusRoot = async () => {
     }
 };
 
-// 计算球体上节点的位置
+// Calculate node positions on the sphere
 const getSpherePosition = (index, total, radius, centerX, centerY) => {
   const phi = Math.acos(-1 + (2 * index) / total)
   const theta = Math.sqrt(total * Math.PI) * phi
   
-  // 应用当前的旋转
+  // Apply current rotation
   const x3d = radius * Math.sin(phi) * Math.cos(theta + rotationY)
   const y3d = radius * Math.sin(phi) * Math.sin(theta + rotationY)
   const z3d = radius * Math.cos(phi)
   
-  // 将 3D 坐标投影到 2D 平面
+  // Project 3D coordinates to 2D plane
   const rotatedX = x3d * Math.cos(rotationY) - z3d * Math.sin(rotationY)
   const rotatedZ = x3d * Math.sin(rotationY) + z3d * Math.cos(rotationY)
   
-  // 计算缩放 (模拟远近)
+  // Calculate scale (simulate depth)
   const scale = (rotatedZ + radius * 2) / (radius * 2)
   const opacity = 0.3 + (scale - 0.5) * 0.7
   
@@ -467,7 +467,7 @@ const getSpherePosition = (index, total, radius, centerX, centerY) => {
   }
 }
 
-// 动画帧循环
+// Animation frame loop
  const updateSphereFrame = (radius, centerX, centerY) => {
    if (!isRecomposing.value) return
    
@@ -480,7 +480,7 @@ const getSpherePosition = (index, total, radius, centerX, centerY) => {
        
        return {
          ...el,
-         position: { x: pos.x - 96, y: pos.y - 40 }, // 减去卡片半宽(96)和半高(40)，使卡片中心对准球体坐标
+        position: { x: pos.x - 96, y: pos.y - 40 }, // Subtract half card size to center on sphere position
          data: { 
            ...el.data, 
            opacity: pos.opacity,
@@ -498,20 +498,20 @@ const getSpherePosition = (index, total, radius, centerX, centerY) => {
  const explodeAndReassemble = async (userQuery) => {
    if (isRecomposing.value) return
    
-   // 1. 获取当前视口中心 (使用 Vue Flow 提供的 dimensions 和 viewport)
+  // 1. Get current viewport center (use Vue Flow dimensions and viewport)
    const { x, y, zoom } = viewport.value
    const { width, height } = dimensions.value
    
-   // 计算画布坐标系下的屏幕中心点，并应用偏移（向左和向上移动）
-   // 减去 150 和 100 是为了让中心看起来更靠左上，避开右侧或下方的 UI 干扰
+  // Compute screen center in canvas coordinates and apply offset (left/up)
+  // Subtract 150 and 100 to shift away from right/bottom UI
    const centerX = (width / 2 - x) / zoom 
    const centerY = (height / 2 - y) / zoom 
    
-   // 2. 备份当前元素并提取真实节点数据
+  // 2. Backup current elements and extract real node data
    const originalElements = [...elements.value]
    const existingNodes = elements.value.filter(el => el.position && el.type !== 'particle')
    
-   // 如果当前没有节点，则使用默认的一组语义化标签
+  // If no nodes exist, use a default semantic set
    const displayNodes = existingNodes.length > 0 ? existingNodes : [
      { label: 'Document Root', data: { type: 'root' } },
      { label: 'Core Concepts', data: { type: 'chapter' } },
@@ -519,17 +519,17 @@ const getSpherePosition = (index, total, radius, centerX, centerY) => {
      { label: 'Data Schema', data: { type: 'section' } }
    ]
 
-   // 限制旋转的卡片数量，避免性能问题
+  // Limit rotating cards to avoid performance issues
   const maxParticles = 20
   const nodesToAnimate = displayNodes.slice(0, maxParticles)
    activeParticleCount = nodesToAnimate.length
    
-   // 3. 创建旋转卡片节点
+  // 3. Create rotating card nodes
    const particles = nodesToAnimate.map((node, i) => ({
      id: `particle-${i}`,
      type: 'particle',
      label: node.label,
-     position: { x: centerX - 96, y: centerY - 40 }, // 初始位置设为计算出的中心(减去偏移使卡片居中)
+    position: { x: centerX - 96, y: centerY - 40 }, // Start at computed center with offset
      data: { 
        opacity: 0,
        type: node.data?.type || 'node',
@@ -537,16 +537,16 @@ const getSpherePosition = (index, total, radius, centerX, centerY) => {
      }
    }))
    
-   // 4. 切换到动画状态
+  // 4. Switch to animation state
   isRecomposing.value = true
-  rotationY = 0 // 重置旋转角度
+  rotationY = 0 // Reset rotation angle
   elements.value = particles
    
-   // 5. 启动 3D 旋转动画
+  // 5. Start 3D rotation animation
    const radius = 320 
    updateSphereFrame(radius, centerX, centerY)
    
-   // 自动平滑聚焦到旋转中心，确保用户视角正对动画
+  // Smoothly focus on rotation center so the camera faces the animation
    setCenter(centerX, centerY, { zoom: zoom > 0.6 ? zoom : 0.8, duration: 1000 })
    
    try {
@@ -564,12 +564,12 @@ const getSpherePosition = (index, total, radius, centerX, centerY) => {
      if (!response.ok) throw new Error('Failed to recompose tree')
      const data = await response.json()
      
-     // 6. 停止 3D 动画
+    // 6. Stop 3D animation
      isRecomposing.value = false
      if (animationFrameId) cancelAnimationFrame(animationFrameId)
      
-     // 7. 更新数据并重置布局
-     // 先把粒子替换成新节点，但初始位置设为当前粒子的平均位置或中心
+    // 7. Update data and reset layout
+    // Replace particles with new nodes, starting from average/center position
      const newElements = data.elements.map(el => {
        if (el.type === 'custom') {
          return {
@@ -583,7 +583,7 @@ const getSpherePosition = (index, total, radius, centerX, centerY) => {
      
      elements.value = newElements
      
-     // 触发自动布局
+    // Trigger auto layout
      setTimeout(() => {
        elements.value = layout(elements.value)
      }, 50)
@@ -616,7 +616,7 @@ const fetchTreeData = async () => {
 
     if (data.elements) {
       elements.value = layout(data.elements);
-      // 自动聚焦到根节点
+      // Auto-focus on root node
       setTimeout(() => {
           focusRoot();
       }, 200);

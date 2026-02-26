@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col h-full bg-transparent">
-    <!-- 1. 顶部工具栏 -->
+    <!-- 1. Top toolbar -->
     <div class="h-16 flex items-center justify-between px-4 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm z-10 shrink-0">
       <div class="flex items-center space-x-2 min-w-0">
         <span class="font-bold text-slate-700 dark:text-slate-200 text-sm truncate max-w-[150px]" :title="fileName">
@@ -12,7 +12,7 @@
       </div>
 
       <div class="flex items-center space-x-2 shrink-0">
-        <!-- 缩放控制 -->
+        <!-- Zoom controls -->
         <div class="flex items-center bg-slate-100 dark:bg-slate-700 rounded-lg p-1 mr-2">
           <button @click="changeScale(-0.1)" class="w-6 h-6 flex items-center justify-center hover:bg-white dark:hover:bg-slate-600 rounded text-slate-600 dark:text-slate-300 transition">
             <i class="fa-solid fa-minus text-[10px]"></i>
@@ -29,13 +29,13 @@
       </div>
     </div>
 
-    <!-- 2. PDF 内容区域 (可滚动) -->
+    <!-- 2. PDF content area (scrollable) -->
     <div class="flex-1 overflow-auto p-4 md:p-8 flex justify-center custom-scrollbar bg-transparent relative" ref="containerRef">
 
-      <!-- 渲染区域 -->
-      <!-- 只有当 pdfWidth > 0 时才渲染，避免动画期间的闪烁 -->
+      <!-- Render area -->
+      <!-- Only render when pdfWidth > 0 to avoid flicker during transitions -->
       <div v-if="source && pdfWidth > 0" class="relative shadow-lg transition-all duration-75 ease-out bg-white h-max" :style="{ width: pdfWidth + 'px' }">
-        <!-- 模式 A: 普通 PDF 阅读模式 -->
+        <!-- Mode A: standard PDF reading -->
         <VuePdfEmbed
           v-show="!useImageMode"
           ref="pdfRef"
@@ -50,7 +50,7 @@
           annotation-layer
         />
 
-        <!-- 模式 B: 原文溯源图片模式 (高精度) -->
+        <!-- Mode B: source image mode (high precision) -->
         <img 
           v-if="useImageMode"
           :src="imageUrl"
@@ -59,14 +59,14 @@
           @load="handleImageLoad"
         />
         
-        <!-- 高亮覆盖层 -->
+        <!-- Highlight overlay -->
         <div v-for="(hl, idx) in highlights" :key="idx"
              class="absolute bg-purple-500/30 animate-pulse pointer-events-none z-10 mix-blend-multiply dark:mix-blend-normal rounded-md transform scale-[1.05]"
              :style="hl"
         ></div>
       </div>
 
-      <!-- 加载中或初始化状态 -->
+      <!-- Loading or initial state -->
       <div v-else class="absolute inset-0 flex items-center justify-center">
         <div class="flex flex-col items-center text-slate-400 dark:text-slate-500">
           <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2"></i>
@@ -102,10 +102,10 @@ import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import VuePdfEmbed from 'vue-pdf-embed';
 import * as pdfjs from 'pdfjs-dist';
 
-// 设置 PDF.js Worker
+// Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-// 导入必要样式，确保 text-layer 和 annotation-layer 正常显示
+// Import required styles to render text and annotation layers
 import 'vue-pdf-embed/dist/styles/textLayer.css';
 import 'vue-pdf-embed/dist/styles/annotationLayer.css';
 
@@ -116,11 +116,11 @@ const props = defineProps({
   highlightBboxes: { type: Array, default: () => [] }
 });
 
-const scale = ref(1.0); // 默认缩放倍率 (相对于容器宽度)
+const scale = ref(1.0); // Default zoom (relative to container width)
 const currentPage = ref(props.initialPage);
 const pageCount = ref(0);
 const containerRef = ref(null);
-const containerWidth = ref(0); // 响应式容器宽度
+const containerWidth = ref(0); // Reactive container width
 let resizeObserver = null;
 
 const pdfDocRef = ref(null);
@@ -129,15 +129,15 @@ const imageAspectRatio = ref(null);
 const imageNaturalWidth = ref(0);
 const imageNaturalHeight = ref(0);
 
-// --- 模式切换逻辑 ---
+// --- Mode switching logic ---
 const useImageMode = computed(() => {
-    // 只有当有高亮框时才使用图片模式（用于原文溯源）
+    // Use image mode only when highlights exist (for source tracing)
     return props.highlightBboxes && props.highlightBboxes.length > 0;
 });
 
 const imageUrl = computed(() => {
     if (!props.fileName || !currentPage.value) return '';
-    // 使用相对路径，以便通过 Vite 代理
+    // Use relative path to go through the Vite proxy
     return `/api/pdf/${props.fileName}/${currentPage.value}/image`;
 });
 
@@ -150,19 +150,19 @@ const handleImageLoad = (e) => {
     }
 };
 
-// 核心计算：PDF 实际渲染宽度 = 容器宽度 * 缩放倍率
+// Core calculation: PDF render width = container width * zoom
 const pdfWidth = computed(() => {
-  // 减去 64px 是为了留出左右 padding (p-8 = 2rem = 32px, 左右共 64px)
-  // 确保 PDF 不会贴边，视觉更舒适
+  // Subtract 64px to leave horizontal padding (p-8 = 2rem = 32px on each side)
+  // Keep the PDF from touching edges for better readability
   const availableWidth = containerWidth.value - 64;
   if (availableWidth <= 0) return 0;
   return Math.floor(availableWidth * scale.value);
 });
 
-// 计算高亮框样式
+// Compute highlight styles
 const highlights = computed(() => {
     if (!props.highlightBboxes || props.highlightBboxes.length === 0) return [];
-    // 在图片模式下，只要有 renderWidth 即可，不一定非要 originalPageViewport
+    // In image mode, renderWidth is enough; originalPageViewport is optional
     if (pdfWidth.value <= 0) return [];
     if (!useImageMode.value && !originalPageViewport.value) return [];
     
@@ -187,8 +187,8 @@ const highlights = computed(() => {
         
         let sx1, sy1, sx2, sy2;
 
-        // 判断是否为归一化坐标 (0.0 ~ 1.0)
-        // 阈值设为 2.0 是为了容错
+        // Check if coordinates are normalized (0.0 ~ 1.0)
+        // Threshold set to 2.0 for tolerance
         const isNormalized = x2 <= 2.0 && y2 <= 2.0;
 
         if (isNormalized) {
@@ -197,23 +197,23 @@ const highlights = computed(() => {
             sx2 = x2 * renderWidth;
             sy2 = y2 * renderHeight;
         } else {
-            // 绝对坐标 (PDF Point 或 Image Pixel)
+            // Absolute coordinates (PDF points or image pixels)
             let scaleX, scaleY;
 
-            // 坐标修正：直接使用后端返回的坐标，不再进行倍率变换
+            // Coordinate correction: use backend coordinates directly
             const coordScale = 1.0;
 
-            // 优先使用 PDF 原始尺寸 (1x) 来计算缩放比
+            // Prefer original PDF size (1x) for scale calculation
             if (originalPageViewport.value) {
                 scaleX = renderWidth / originalPageViewport.value.width;
                 scaleY = renderHeight / originalPageViewport.value.height;
             } else if (useImageMode.value && imageNaturalWidth.value > 0) {
-                // 兜底：如果没有 PDF 尺寸 (极少情况)，尝试用图片尺寸反推
-                // 假设后端图片是 2x 缩放，所以要乘以 2.0
+                // Fallback: if PDF size missing (rare), infer from image size
+                // Assume backend image is 2x scale, so multiply by 2.0
                 scaleX = (renderWidth / imageNaturalWidth.value) * 2.0;
                 scaleY = (renderHeight / imageNaturalHeight.value) * 2.0;
             } else {
-                // 最后的兜底
+                // Final fallback
                 scaleX = 1;
                 scaleY = 1;
             }
@@ -243,12 +243,12 @@ const highlights = computed(() => {
     }).filter(Boolean);
 });
 
-// 监听页码变化
+// Watch page number changes
 watch(() => props.initialPage, (newPage) => {
   currentPage.value = newPage;
 });
 
-// 监听当前页变化，获取原始尺寸
+// Watch current page changes to get original size
 watch(currentPage, async (newPage) => {
     if (pdfDocRef.value) {
         try {
@@ -261,12 +261,12 @@ watch(currentPage, async (newPage) => {
     }
 });
 
-// 核心修复：使用 ResizeObserver 监听容器大小变化
+// Core fix: use ResizeObserver to track container size changes
 onMounted(() => {
   if (containerRef.value) {
     resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        // 获取容器的内容区域宽度
+        // Get container content width
         if (entry.contentRect.width > 0) {
           containerWidth.value = entry.contentRect.width;
         }
@@ -285,7 +285,7 @@ const handleLoaded = async (pdfDoc) => {
   pageCount.value = pdfDoc.numPages;
   pdfDocRef.value = pdfDoc;
   
-  // 加载完成后立即获取当前页信息
+  // Fetch current page info immediately after load
   try {
       const page = await pdfDoc.getPage(currentPage.value);
       const viewport = page.getViewport({ scale: 1.0 });
@@ -299,14 +299,14 @@ const changePage = (delta) => {
   const newPage = currentPage.value + delta;
   if (newPage >= 1 && newPage <= pageCount.value) {
     currentPage.value = newPage;
-    // 翻页时自动滚回到顶部
+    // Auto-scroll to top when changing pages
     if (containerRef.value) containerRef.value.scrollTop = 0;
   }
 };
 
 const changeScale = (delta) => {
   const newScale = scale.value + delta;
-  // 限制缩放范围 0.5 ~ 3.0
+  // Limit zoom range to 0.5 ~ 3.0
   if (newScale >= 0.5 && newScale <= 3.0) {
     scale.value = Number(newScale.toFixed(1));
   }
