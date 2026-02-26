@@ -2,6 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Node ^20.19.0 || >=22.12.0](https://img.shields.io/badge/node-%5E20.19.0%20%7C%7C%20%3E%3D22.12.0-blue.svg)](https://nodejs.org/download/release/)
 
 ## 📑 Table of Contents
 
@@ -642,6 +643,18 @@ Retrieval-Augmented Generation methods:
 ```bash
   ./run.sh
 ```
+
+  Alternatively, you can start the backend and frontend separately in two terminal tabs:
+
+```bash
+  # Terminal 1: Backend
+  ./start_backend.sh
+
+  # Terminal 2: Frontend
+  ./start_frontend.sh
+```
+
+  > **Note on Ports**: Both scripts automatically detect the API port from `local.json` (defaulting to `8005`). This ensures the frontend proxy correctly points to the backend even when started manually. You can customize the port by modifying the `"api_port"` field in your `local.json`.
 
 ---
 

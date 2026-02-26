@@ -30,9 +30,25 @@ find_unused_port() {
     done
 }
 
-# Find an available port for Backend (starting from 8005)
-export MODORA_API_PORT=$(find_unused_port 8005)
-echo "✅ Backend will use available port: $MODORA_API_PORT"
+# Determine backend port for proxy
+if [ -z "$MODORA_API_PORT" ]; then
+    # Try to find what port the backend might be using (default logic)
+    # 1. Try to read from root local.json
+    if [ -f "local.json" ] && command -v python3 &>/dev/null; then
+        CONFIG_PORT=$(python3 -c "import json; print(json.load(open('local.json')).get('api_port', ''))" 2>/dev/null)
+        if [ -n "$CONFIG_PORT" ]; then
+            export MODORA_API_PORT=$CONFIG_PORT
+            echo "📝 Found MODORA_API_PORT in local.json: $MODORA_API_PORT"
+        fi
+    fi
+fi
+
+if [ -z "$MODORA_API_PORT" ]; then
+    # 2. Fallback to find an unused port
+    export MODORA_API_PORT=$(find_unused_port 8005)
+fi
+
+echo "✅ Backend will use port: $MODORA_API_PORT"
 
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
     echo "🌐 Detected tmux! Starting backend and frontend in a split session..."

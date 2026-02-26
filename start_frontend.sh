@@ -41,10 +41,23 @@ find_unused_port() {
 # Determine backend port for proxy
 if [ -z "$MODORA_API_PORT" ]; then
     # Try to find what port the backend might be using (default logic)
-    # Note: If start_backend.sh is run separately without env var, it will also use this logic
-    export MODORA_API_PORT=$(find_unused_port 8005)
-    echo "⚠️ MODORA_API_PORT not set, auto-detected available port: $MODORA_API_PORT"
+    # 1. Try to read from root local.json
+    if [ -f "../local.json" ] && command -v python3 &>/dev/null; then
+        CONFIG_PORT=$(python3 -c "import json; print(json.load(open('../local.json')).get('api_port', ''))" 2>/dev/null)
+        if [ -n "$CONFIG_PORT" ]; then
+            export MODORA_API_PORT=$CONFIG_PORT
+            echo "📝 Found MODORA_API_PORT in local.json: $MODORA_API_PORT"
+        fi
+    fi
 fi
+
+if [ -z "$MODORA_API_PORT" ]; then
+    # 2. Default to 8005 (don't use find_unused_port as it finds a port NOT in use)
+    export MODORA_API_PORT=8005
+    echo "💡 Using default MODORA_API_PORT: $MODORA_API_PORT"
+fi
+
+echo "🚀 Frontend will proxy to API on port: $MODORA_API_PORT"
 
 # Run Vite
 npm run dev

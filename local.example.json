@@ -1,6 +1,7 @@
 {
   "env": "dev",
   "service_name": "modora-backend",
+  "api_port": 8005,
   "log_level": "INFO",
   "log_format": "text",
   "log_to_file": false,
@@ -25,13 +26,6 @@
       "model": "gpt-5",
       "base_url": "https://www.openai.com/v1",
       "api_key": "your-api-key"
-    },
-    "Qwen3-VL-8B-Instruct": {
-      "type": "local",
-      "model": "Qwen3-VL-8B-Instruct",
-      "local_dir": "/home/yukai/project/MoDora/MoDora-backend/models/Qwen3-VL-8B-Instruct",
-      "port": null,
-      "device": null
     }
   },
 
@@ -48,11 +42,11 @@
   "ui_settings": {
     "schemaVersion": 3,
     "pipelines": {
-      "enrichment": { "modelInstance": "Qwen3-VL-8B-Instruct" },
-      "levelGenerator": { "modelInstance": "Qwen3-VL-8B-Instruct" },
-      "metadataGenerator": { "modelInstance": "Qwen3-VL-8B-Instruct" },
-      "retriever": { "modelInstance": "Qwen3-VL-8B-Instruct" },
-      "qaService": { "modelInstance": "Qwen3-VL-8B-Instruct" }
+      "enrichment": { "modelInstance": "GPT-5" },
+      "levelGenerator": { "modelInstance": "GPT-5" },
+      "metadataGenerator": { "modelInstance": "GPT-5" },
+      "retriever": { "modelInstance": "GPT-5" },
+      "qaService": { "modelInstance": "GPT-5" }
     }
   }
 }
