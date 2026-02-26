@@ -1,10 +1,8 @@
-# MoDora
+<img width="5404" height="3040" alt="image" src="https://github.com/user-attachments/assets/31eb8239-e16a-4a32-b248-a96ce47dea39" />
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Node ^20.19.0 || >=22.12.0](https://img.shields.io/badge/node-%5E20.19.0%20%7C%7C%20%3E%3D22.12.0-blue.svg)](https://nodejs.org/download/release/)
-
-<img width="761" height="429" alt="5b4be666c0824062c0ef1170d7c97e1a" src="https://github.com/user-attachments/assets/1aa0d1f2-beba-4582-801c-48079602bd05" />
 
 
 ## 📑 Table of Contents
