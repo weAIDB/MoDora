@@ -539,7 +539,7 @@
 
 ## 📊 Performance
 
-  The following chart demonstrates the AIC-Acc and ACNLS score of different methods over MMDA Bench. The AIC-Acc and ACNLS are the modified versions of Acc and ANLS metrics respectively.
+  The following chart demonstrates the AIC-Acc and ACNLS score of different methods. The AIC-Acc and ACNLS are the modified versions of Acc and ANLS metrics respectively.
 
 <img width="1566" height="463" alt="image" src="https://github.com/user-attachments/assets/003513ea-9d20-4994-b227-bfd6b327530b" />
 
