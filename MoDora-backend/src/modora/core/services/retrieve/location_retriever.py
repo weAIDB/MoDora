@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import fitz
+from pathlib import Path
 from typing import List, Tuple
 
 from modora.core.domain import CCTree, CCTreeNode, RetrievalResult
@@ -30,6 +31,7 @@ class LocationRetriever:
         result = RetrievalResult()
 
         doc = fitz.open(pdf_path)
+        file_name = Path(pdf_path).name
         try:
             target_pages = self._resolve_page_list(page_list, doc.page_count)
 
@@ -58,6 +60,15 @@ class LocationRetriever:
         finally:
             doc.close()
 
+        if file_name:
+            for loc in result.locations:
+                if not loc.file_name:
+                    loc.file_name = file_name
+            for locs in result.locations_by_path.values():
+                for loc in locs:
+                    if not loc.file_name:
+                        loc.file_name = file_name
+        result.normalize_locations()
         return result
 
     def _resolve_page_list(self, page_list: List[int], total_pages: int) -> List[int]:

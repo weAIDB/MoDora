@@ -41,9 +41,10 @@ class SemanticRetriever:
         Returns:
             RetrievalResult: Retrieval results.
         """
-        # Start from the root node
         nodes = {"root": tree.root}
-        return await self._retrieve_recursive(nodes, query, source_path)
+        result = await self._retrieve_recursive(nodes, query, source_path)
+        result.normalize_locations()
+        return result
 
     async def _retrieve_recursive(
         self,

@@ -3,10 +3,14 @@ from __future__ import annotations
 import json
 import os
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from modora.core.settings import ModelInstance, Settings
-from modora.core.utils.config import MODULE_KEYS, normalize_ui_settings
+from modora.core.utils.config import (
+    MODULE_KEYS,
+    normalize_ui_settings,
+    save_ui_settings_to_config,
+)
 
 router = APIRouter(tags=["models"])
 
@@ -98,3 +102,15 @@ def get_ui_settings():
     settings = Settings.load()
     ui_settings = _load_ui_settings(settings)
     return {"settings": ui_settings}
+
+
+@router.post("/settings/ui")
+def update_ui_settings(payload: dict[str, object]):
+    raw_settings = payload.get("settings") if isinstance(payload, dict) else None
+    try:
+        saved = save_ui_settings_to_config(raw_settings)
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+    return {"settings": saved}

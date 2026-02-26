@@ -377,6 +377,9 @@ class RetrievalResult:
     text_map: Dict[str, str] = field(default_factory=dict)
     locations: List[Location] = field(default_factory=list)
     locations_by_path: Dict[str, List[Location]] = field(default_factory=dict)
+    locations_by_file_page: Dict[tuple[str | None, int], List[Location]] = field(
+        default_factory=dict
+    )
 
     def update(self, other: "RetrievalResult") -> None:
         """Merges another retrieval result.
@@ -394,3 +397,41 @@ class RetrievalResult:
                     self.locations_by_path[path].extend(locs)
                 else:
                     self.locations_by_path[path] = list(locs)
+        self.normalize_locations()
+
+    def normalize_locations(self) -> None:
+        def normalize_file_name(name: str | None) -> str | None:
+            if not name:
+                return None
+            return Path(name).name
+
+        normalized_locations: List[Location] = []
+        seen_locations: set[tuple[str | None, int, tuple[float, float, float, float]]] = set()
+        for loc in self.locations:
+            loc.file_name = normalize_file_name(loc.file_name)
+            key = (loc.file_name, loc.page, tuple(loc.bbox))
+            if key in seen_locations:
+                continue
+            seen_locations.add(key)
+            normalized_locations.append(loc)
+        self.locations = normalized_locations
+
+        normalized_by_path: Dict[str, List[Location]] = {}
+        for path, locs in self.locations_by_path.items():
+            seen_path: set[
+                tuple[str | None, int, tuple[float, float, float, float]]
+            ] = set()
+            for loc in locs:
+                loc.file_name = normalize_file_name(loc.file_name)
+                key = (loc.file_name, loc.page, tuple(loc.bbox))
+                if key in seen_path:
+                    continue
+                seen_path.add(key)
+                normalized_by_path.setdefault(path, []).append(loc)
+        self.locations_by_path = normalized_by_path
+
+        grouped: Dict[tuple[str | None, int], List[Location]] = {}
+        for loc in self.locations:
+            key = (loc.file_name, loc.page)
+            grouped.setdefault(key, []).append(loc)
+        self.locations_by_file_page = grouped

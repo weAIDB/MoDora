@@ -316,10 +316,25 @@ export function useModoraStore() {
     };
 
     // 动作：更新设置
-    const updateSettings = (newSettings) => {
+    const updateSettings = async (newSettings) => {
         state.settings = normalizeSettings({ ...state.settings, ...newSettings });
         localStorage.setItem('modora_settings', JSON.stringify(state.settings));
-        console.log("Settings updated:", state.settings);
+        try {
+            const res = await fetch('/api/settings/ui', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ settings: state.settings })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.settings) {
+                    state.settings = normalizeSettings(data.settings);
+                    localStorage.setItem('modora_settings', JSON.stringify(state.settings));
+                }
+            }
+        } catch (e) {
+            console.error("Failed to save settings:", e);
+        }
     };
 
     const loadSettings = async () => {

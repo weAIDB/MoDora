@@ -199,7 +199,6 @@
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue';
 import { VueFlow, useVueFlow, Handle, Position } from '@vue-flow/core';
-import gsap from 'gsap';
 import { Background } from '@vue-flow/background';
 import { Controls } from '@vue-flow/controls';
 import dagre from '@dagrejs/dagre';
@@ -219,33 +218,12 @@ const {
   setCenter,
   getSelectedElements,
   dimensions, viewport,
-  getNodesBounds,
-  nodes: flowNodes,
-  edges: flowEdges
 } = useVueFlow();
 
 const elements = ref([]); // 保持数据源
 
-// 渲染限制：最多渲染 20 个节点及其相关的连线
-const renderedNodes = computed(() => {
-  const nodes = elements.value.filter(el => el.position);
-  if (nodes.length <= 20) return nodes;
-  
-  // 简单策略：按索引取前 20 个，后续可以优化为按层级或权重取
-  return nodes.slice(0, 20);
-});
-
-const renderedEdges = computed(() => {
-  const edges = elements.value.filter(el => !el.position);
-  const nodeIds = new Set(renderedNodes.value.map(n => n.id));
-  
-  // 只渲染连接已存在节点的边
-  return edges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
-});
-
 // 内部追踪状态
 let animationFrameId = null;
-let currentInitialNodes = [];
 const isLoading = ref(false);
 const error = ref(null);
 const isEditMode = ref(false); // 控制编辑模式
@@ -460,21 +438,6 @@ const focusRoot = async () => {
         await nextTick();
         setCenter(rootNode.position.x + 96, rootNode.position.y + 50, { zoom: 1.0, duration: 800 });
     }
-};
-
-const applyTransitionToElements = (els, duration) => {
-  return els.map((el) => {
-    if (!el.position) return el;
-    return {
-      ...el,
-      style: {
-        ...el.style,
-        transition: `transform ${duration}ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
-        transform: el.style?.transform || '',
-        opacity: el.style?.opacity || 1
-      }
-    };
-  });
 };
 
 // 计算球体上节点的位置

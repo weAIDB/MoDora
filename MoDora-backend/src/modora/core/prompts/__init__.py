@@ -54,6 +54,7 @@ from .retrieval import (
     whole_reasoning_prompt,
 )
 from .evaluation import check_answer_prompt, evaluation_prompt
+from .recompose import TREE_RECOMPOSE_PROMPT
 
 __all__ = [
     "image_enrichment_prompt",
@@ -73,4 +74,5 @@ __all__ = [
     "whole_reasoning_prompt",
     "location_extraction_prompt",
     "evaluation_prompt",
+    "TREE_RECOMPOSE_PROMPT"
 ]

@@ -161,6 +161,7 @@ class VectorRetriever:
                 result.locations.extend(node.location)
                 result.locations_by_path.setdefault(path, []).extend(node.location)
 
+        result.normalize_locations()
         return result
 
     def _get_node_source(self, path: str, source_path: str | dict[str, str]) -> str:

@@ -150,3 +150,34 @@ def load_ui_settings_from_config(
     except Exception:
         return None
     return None
+
+
+def save_ui_settings_to_config(
+    payload: dict[str, Any] | None, config_path: str | None = None
+) -> dict[str, Any]:
+    cfg_path = (config_path or os.getenv("MODORA_CONFIG") or "").strip()
+    if not cfg_path:
+        backend_root = Path(__file__).resolve().parents[4]
+        default_cfg = backend_root / "configs" / "local.json"
+        if default_cfg.exists():
+            cfg_path = str(default_cfg)
+    if not cfg_path:
+        raise FileNotFoundError("No config path available")
+    cfg_file = Path(cfg_path)
+    if not cfg_file.exists():
+        raise FileNotFoundError(f"Config not found: {cfg_path}")
+
+    normalized = normalize_ui_settings(payload)
+    try:
+        data: dict[str, Any] = {}
+        with cfg_file.open("r", encoding="utf-8") as f:
+            existing = json.load(f)
+            if isinstance(existing, dict):
+                data = existing
+        data["ui_settings"] = normalized
+        with cfg_file.open("w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        raise ValueError(f"Failed to save ui_settings: {e}") from e
+
+    return normalized
