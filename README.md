@@ -30,6 +30,7 @@
 
 - 👫 **Flexibility & Options**: Provide a configuration solution for flexibly adjusting backend models (local/API). And different modules can also be processed using different models.
 
+We provide frontend deployment as follows (click to jump to demo video):
   [![Watch on Vimeo](https://github.com/user-attachments/assets/2dcd4e49-2ec8-4ced-8789-0363503548b4)](https://vimeo.com/manage/videos/1168527529)
 
 
