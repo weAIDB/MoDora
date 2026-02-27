@@ -534,7 +534,7 @@ We provide frontend deployment as follows (click to jump to demo video):
   MMDA is a benchmark with 537 documents and 1065 questions curated from over one million real-world documents. We perform layout-emphasize clustering to obtain these representative documents and most of them are semi-structured.
   Then automatic LLM generation and manual verification are combined for QA pairs annotaion. The questions can be concered about different aspects of document (e.g. hierarchy, text, table, chart, imgae, location, formatted), to comprehensively evaluate the semi-structured document analysis performance.
 
-  You can visit it here [MMDA](./datasets/MMDA/test.json), and some documents involving sensitive data are hidden.
+  You can visit it here [MMDA](./datasets/MMDA/test.json), and some documents involving sensitive data are hidden. If you believe any content in this open source dataset infringes upon your copyright, please contact us, and we will remove it.
 
 ## 📊 Performance
 
