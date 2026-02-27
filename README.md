@@ -723,3 +723,16 @@ Retrieval-Augmented Generation methods:
      - Update `result.json` with calculated metrics (Accuracy, ANLS, etc.).
      - Save the detailed evaluation to `evaluation.jsonl` in the same directory as `result.json`.
      - Generate accuracy/ACNLS bar charts and summary CSVs in the same directory.
+
+## 📒 Citation
+
+If you like this project, please cite our paper:
+
+```
+@article{xu2026modora,
+  author       = {Bangrui Xu and Qihang Yao and Zirui Tang and Xuanhe Zhou and Yeye He and Shihan Yu and Qianqian Xu and Bin Wang and Guoliang Li and Conghui He and Fan Wu},
+  title        = {MoDora: Tree-Based Semi-Structured Document Analysis System},
+  journal      = {ACM SIGMOD},
+  year         = {2026}
+}
+```
