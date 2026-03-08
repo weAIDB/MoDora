@@ -1,5 +1,6 @@
-<img width="5404" height="3040" alt="image" src="https://github.com/user-attachments/assets/31eb8239-e16a-4a32-b248-a96ce47dea39" />
-
+<a href="https://wu-uk.github.io/MoDora" target="_blank">
+  <img src="https://github.com/user-attachments/assets/a5e839e5-5757-4960-99ce-55b8980605f1" alt="image" width="1855" height="955" />
+</a>
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Node ^20.19.0 || >=22.12.0](https://img.shields.io/badge/node-%5E20.19.0%20%7C%7C%20%3E%3D22.12.0-blue.svg)](https://nodejs.org/download/release/)
