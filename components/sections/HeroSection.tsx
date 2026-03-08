@@ -51,7 +51,7 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="text-base px-8 h-12" asChild>
-              <Link href="https://github.com/yukai/MoDora" target="_blank" rel="noopener noreferrer">
+              <Link href="https://github.com/weAIDB/MoDora" target="_blank" rel="noopener noreferrer">
                 <Github className="mr-2 h-4 w-4" /> GitHub
               </Link>
             </Button>

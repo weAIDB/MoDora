@@ -34,7 +34,7 @@ export function Footer() {
             <h4 className="text-sm font-semibold">Community</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="https://github.com/yukai/MoDora" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-foreground">
+                <Link href="https://github.com/weAIDB/MoDora" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-foreground">
                   <Github className="h-4 w-4" /> GitHub
                 </Link>
               </li>

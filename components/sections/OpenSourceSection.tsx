@@ -15,7 +15,7 @@ export function OpenSourceSection() {
             MoDora is built by the community, for the community. Join us in advancing the state of multimodal document analysis.
           </p>
           <Button size="lg" variant="secondary" className="h-12 px-8" asChild>
-            <Link href="https://github.com/yukai/MoDora" target="_blank" rel="noopener noreferrer">
+            <Link href="https://github.com/weAIDB/MoDora" target="_blank" rel="noopener noreferrer">
               <Github className="mr-2 h-5 w-5" />
               Star on GitHub
             </Link>

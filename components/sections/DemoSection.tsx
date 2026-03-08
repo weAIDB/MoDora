@@ -1,8 +1,6 @@
 "use client";
 
 import { Container } from "@/components/layout/Container";
-import { Badge } from "lucide-react"; // Import Badge icon just in case, but usually Badge is a component. Wait, I don't have Badge component. I'll just use span.
-import Image from "next/image";
 
 export function DemoSection() {
   return (
@@ -19,12 +17,13 @@ export function DemoSection() {
           </div>
 
           <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl border bg-background">
-             <Image 
-                src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=A%20modern%20software%20interface%20screenshot%20showing%20a%20document%20analysis%20dashboard%20with%20a%20PDF%20on%20the%20left%20and%20a%20structured%20tree%20visualization%20on%20the%20right%2C%20clean%20UI%2C%20white%20background%2C%20blue%20accents%2C%20high%20resolution&image_size=landscape_16_9"
-                alt="MoDora Dashboard Interface"
-                fill
-                className="object-cover"
-             />
+            <iframe
+              src="https://player.vimeo.com/video/1168527529?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+              frameBorder="0"
+              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+              className="absolute inset-0 w-full h-full"
+              title="MoDora_Demo"
+            ></iframe>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full max-w-4xl pt-8">

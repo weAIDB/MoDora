@@ -29,7 +29,7 @@ export function Header() {
 
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild>
-              <Link href="https://github.com/yukai/MoDora" target="_blank" rel="noopener noreferrer">
+              <Link href="https://github.com/weAIDB/MoDora" target="_blank" rel="noopener noreferrer">
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </Link>
