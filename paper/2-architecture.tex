@@ -20,31 +20,35 @@ To bridge natural language queries with structured document trees, \modora provi
 \runin{Tree Visualizer} Facilitates human-in-the-loop intervention by allowing users to manually refine the CCTree structure. It incorporates a \textit{Node Heatmap} (based on retrieval impact) to visually identify critical information hubs within the document hierarchy.
 
 \subsection{\modora Service Engine}
-Acting as the middleware bridging the user interaction layer and the core algorithmic pipeline, the Service Engine is optimized for multimodal RAG workloads. It orchestrates the asynchronous execution of computationally intensive VLM preprocessing tasks (Stage 1) and manages global document indexing to support cross-document question-answering across various sessions.
+Acting as the middleware bridging the user interaction layer and the core algorithmic pipeline, the Service Engine is optimized for multimodal RAG workloads. It orchestrates asynchronous preprocessing and retrieval tasks, tracks document processing status, and maintains a persistent knowledge base that stores per-document tags, semantic tags, and structural statistics for cross-session reuse.
 
 \subsection{Stage 1: Multimodal Preprocessing}
 Before indexing, documents undergo a rigorous enrichment process to capture multimodal nuances:
 
-\runin{Local-Alignment Aggregation} The system first performs optical character recognition (OCR) using \textit{PPStructureV3}~\cite{PPStructureV3} to identify raw elements such as titles, text blocks, tables, and images. Subsequently, a local-alignment strategy is applied using heuristic rules (e.g., text aggregation rule $A_1$, non-text aggregation rule $A_2$) to group fragmented elements into self-contained Aggregated Components. This ensures the components \xbr{are semantically (e.g., a table with its corresponding title) and visually (pixel-level coordinate) complete}.
+\runin{OCR with Robust Fallback} The backend first attempts structured OCR extraction through a configured OCR model, and automatically falls back to direct PDF block extraction when OCR loading or prediction fails. This design guarantees end-to-end document ingestion even under model failures.
 
-\runin{VLM-based Information Enrichment} For non-textual components, \modora utilizes VLMs to extract integrated information, forming a semantic triplet consisting of Title, Metadata, and Data. For charts, the focus is on axes, labels, and trends; for tables, the schema and representative cell values are prioritized.
+\runin{Local-Alignment Aggregation} The system then applies rule-based structural analysis over OCR blocks: title blocks trigger new text components, figure blocks are paired with nearby captions, and header/footer/page-number/aside blocks are isolated into supplementary channels. The output is a ComponentPack with aligned content and pixel-level coordinates.
+
+\runin{VLM-based Information Enrichment} For non-textual components (image/chart/table), \modora crops evidence regions and asynchronously invokes a multimodal LLM to generate a semantic triplet (Title, Metadata, Data). A bounded-concurrency design keeps throughput stable on large documents.
 
 \subsection{Stage 2: Recursive Tree Construction}
 The system organizes the enriched components into a logical hierarchy through a two-stage process:
 
-\runin{Hierarchical Relationship Modeling} 1) \textit{Main Branch Construction}: Establishes ``text-to-text'' hierarchical relations based on title level prediction and ``text-to-other'' associations by attaching adjacent non-text components as children of relevant text nodes. 2) \textit{Supplementary Branch Isolation}: Page headers, footers, and sidebars are isolated into an independent branch under a virtual root to prevent semantic interference \xbr{with the main body} during retrieval.
+\runin{Hierarchical Relationship Modeling} 1) \textit{Level Generation}: text titles are passed to an LLM that predicts Markdown-style heading depth, with retry and parser validation. 2) \textit{Main Branch Construction}: a stack-based constructor creates text hierarchy by title level and attaches adjacent non-text components to the current context. Duplicate sibling titles are disambiguated by automatic suffixing.
+
+\runin{Supplementary Branch Isolation} Headers, footers, original page numbers, and aside texts are materialized as an independent \textit{Supplement} subtree under the root, preventing layout noise from contaminating main-body semantic retrieval.
 
 \begin{sloppypar}
-\runin{Bottom-up Metadata Summarization} To address information loss in long-document retrieval, summaries are recursively generated from leaf nodes upward. To balance information density, the number of summary keywords $n_i$ for each node $v_i$ is determined by an information attenuation formula, i.e., $n_i = \left\lceil \frac{D_i + d_i - 1}{D_i} \cdot \log_2(n_{i-1}^k) + 1 \right\rceil$, where $D_i$ denotes the maximum depth of the subtree rooted at $v_i$, $d_i$ represents the depth of node $v_i$, and $n_{i-1}$ indicates the total number of summaries generated by the children of $v_i$. The term $\frac{D_i + d_i - 1}{D_i}$ serves as the information attenuation coefficient, while $k$ is a hyperparameter controlling the rate of information growth. This ensures the root node captures a global overview while preserving critical details from the leaves.
+\runin{Bottom-up Metadata Summarization} To address information loss in long-document retrieval, metadata is generated with a bottom-up DFS pass. Leaf text nodes first receive keyword summaries, then internal nodes integrate child metadata into higher-level semantic descriptors. The target keyword count follows an attenuation-controlled growth model, preserving global coverage while avoiding summary explosion.
 \end{sloppypar}
 
-\subsection{Stage 3: Two-Pathway Retrieval}
+\subsection{Stage 3: Query-Adaptive Retrieval}
 \modora uses a question-type-aware ``Parse-Retrieve-Verify'' workflow to balance recall and precision.
 
-\runin{Query Parsing} The system first identifies whether a query contains spatial cues, then routes it to location-aware or semantic retrieval.
+\runin{Query Parsing} The QA service first extracts page and position vectors from the query. If extraction fails, the query is treated as content-centric and routed to semantic/vector retrieval; otherwise it is routed to location-aware retrieval.
 
-\runin{Location-Aware Path} For position-sensitive queries, \textit{LocationRetriever} traverses the CCTree with normalized bounding boxes and returns nodes overlapping the target regions, enabling direct grounding to layout coordinates.
+\runin{Location-Aware Path} For position-sensitive queries, \textit{LocationRetriever} traverses the CCTree with normalized bounding boxes and a 3$\times$3 page grid overlap test, returning nodes that intersect target regions and directly grounding answers to page coordinates.
 
-\runin{Semantic Path} For content-centric queries, \textit{SemanticRetriever} recursively prunes irrelevant branches with LLM guidance, applies embedding fallback on pruned branches, and verifies candidate nodes using both text and cropped visual regions.
+\runin{Semantic + Vector Path} For content-centric queries, \textit{SemanticRetriever} recursively explores the tree by LLM-guided child selection and multimodal node relevance checks (text + cropped image). In parallel, \textit{VectorRetriever} performs embedding retrieval over CCTree nodes with persistent Chroma indexing and reranking. Their evidence is merged into a unified retrieval result.
 
-\runin{Verification-then-Fallback} Retrieved evidence is used for final reasoning. If consistency checks fail, the system falls back to whole-page reasoning. The retrieved nodes' impact scores are then updated for future tree optimization.
+\runin{Verification-then-Fallback} Retrieved evidence is used for final reasoning. If answer verification fails, the system falls back to whole-page reasoning (single-document mode). The engine then records retrieval provenance and updates node impact scores for subsequent interactive analysis.

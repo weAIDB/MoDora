@@ -18,7 +18,7 @@ Despite recent advancements, three key challenges remain in multimodal document 
 \textit{Second, semantic gaps in structured systems.} While systems like ZenDB~\cite{ZenDB} specialize in structured data, they often rely on pure text relations or SQL logic, ignoring non-textual visual cues. This can result in the retrieval of redundant or irrelevant evidence when queries involve charts or tables. 
 \textit{Third, visual hallucinations in native VLMs.} End-to-end Vision Language Models (VLMs) lack explicit structural guidance. Without a logical hierarchy to navigate, they frequently misinterpret \xbr{document structure and connections between text and visual elements.}%data trends or lose the connection between legends and visual elements, especially in dense layouts.
 
-\runin{Extension over Prior MoDora} The original MoDora work~\cite{xu2026modora} introduced CCTree-based semi-structured document understanding and released the MMDA benchmark. Building on that foundation, this paper emphasizes demo-oriented advances: (1) interactive evidence grounding from answer spans to PDF regions, (2) human-in-the-loop tree refinement with impact-aware visualization, and (3) a robust verification-then-fallback retrieval loop for practical multimodal QA.
+\runin{Extension over Prior MoDora} The original MoDora work~\cite{xu2026modora} introduced CCTree-based semi-structured document understanding and released the MMDA benchmark. Building on that foundation, this paper emphasizes demo-oriented advances in the deployed backend: (1) an asynchronous OCR-to-CCTree pipeline with robust fallback for real-world documents, (2) tri-path evidence retrieval (location, semantic, vector) with unified grounding output, and (3) a verification-then-fallback QA loop with impact updates for interactive analysis.
 
 \runin{Our Proposal} To address these limitations, we present \modora, a novel tree-structured multimodal RAG system designed for complex document understanding. As illustrated in Figure~\ref{fig:intro}, \modora constructs a hierarchical Component-\-Correlation Tree (CCTree) from unstructured PDFs. 
 The system is built on three core designs: 
@@ -30,5 +30,5 @@ This human-in-the-loop design ensures that the retrieval process is not only acc
 \runin{Results and Contributions} We have implemented \modora and evaluated it on the MMDA benchmark proposed in MoDora~\cite{xu2026modora}. Experimental results demonstrate that \modora achieves an AIC-Acc of 71.1\%, outperforming the strongest baseline (DocAgent~\cite{DocAgent}) by a margin of 14.1\%. 
 In summary, our contributions are: 
 (i) we propose a CCTree-based indexing structure that preserves document hierarchy and visual context for multimodal RAG; 
-(ii) we design a dual-pathway retrieval strategy combining spatial mapping with semantic verification to reduce hallucinations; 
-and (iii) \xbr{we demonstrate an interactive system for manual tree structure refinement and evidence verification.}
+(ii) we design a query-adaptive retrieval strategy that coordinates location, semantic, and vector retrievers under a unified verification framework; 
+and (iii) we demonstrate an interactive system for evidence grounding, node-impact analysis, and cross-session knowledge-base reuse.

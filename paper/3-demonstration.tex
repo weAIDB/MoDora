@@ -8,9 +8,9 @@
 
 This section demonstrates how \modora turns semi-structured documents into verifiable knowledge assets (Figure~\ref{fig:gui}).
 
-\runin{Hierarchical Parsing and Inspection} After ingestion, \modora groups fragmented OCR outputs into aggregated components and organizes them into a CCTree. Users inspect and refine this structure through the \textit{Tree Visualizer} (Figure~\ref{fig:gui}-\circled{2}).
+\runin{Hierarchical Parsing and Inspection} After ingestion, \modora executes an asynchronous pipeline (\textit{OCR/fallback} $\rightarrow$ \textit{component aggregation} $\rightarrow$ \textit{tree construction} $\rightarrow$ \textit{metadata generation}) and stores intermediate artifacts (e.g., OCR blocks, component pack, tree JSON). Users inspect and refine this structure through the \textit{Tree Visualizer} (Figure~\ref{fig:gui}-\circled{2}).
 
-\runin{Verified Multimodal QA} Users issue natural-language queries across documents, and \modora performs dual-path retrieval (spatial + semantic). With \textit{Interactive Grounding} (Figure~\ref{fig:gui}-\circled{5}), citation clicks highlight source regions in the original PDF layout (Figure~\ref{fig:gui}-\circled{6}).
+\runin{Verified Multimodal QA} Users issue natural-language queries across documents, and \modora performs query-adaptive retrieval (location or semantic+vector). With \textit{Interactive Grounding} (Figure~\ref{fig:gui}-\circled{5}), citation clicks highlight source regions in the original PDF layout (Figure~\ref{fig:gui}-\circled{6}). Each evidence item keeps retriever provenance (location/semantic/vector), page index, and bounding boxes for transparent validation.
 
-\runin{Human-in-the-Loop Optimization} The \textit{Node Heatmap} (Figure~\ref{fig:gui}-\circled{3}) visualizes retrieval impact, while manual node editing and tree restructuring improve future retrieval. Indexed CCTrees are archived in the \textit{Knowledge Base View} (Figure~\ref{fig:gui}-\circled{4}) for cross-session reuse.
+\runin{Human-in-the-Loop Optimization} The \textit{Node Heatmap} (Figure~\ref{fig:gui}-\circled{3}) visualizes retrieval impact, while manual node editing and tree restructuring improve future retrieval. Indexed CCTrees are archived in the \textit{Knowledge Base View} (Figure~\ref{fig:gui}-\circled{4}) for cross-session reuse, together with auto-generated document tags (e.g., length/layout complexity) and structural statistics.
 
