@@ -1,0 +1,17 @@
+# Fdb version 4
+["xdvipdfmx"] 0 "4-experiments.xdv" "4-experiments.pdf" "4-experiments" 0 -1
+  "4-experiments.xdv" 0 -1 0 "xelatex"
+  (generated)
+  "4-experiments.pdf"
+  (rewritten before read)
+["xelatex"] 1773024730.09757 "4-experiments.tex" "4-experiments.xdv" "4-experiments" 1773024732.44189 2
+  "4-experiments.aux" 1773024730 32 3985256e7290058c681f74d7a3565a19 "xelatex"
+  "4-experiments.tex" 1773024725 4547 d98beba0cf92fb4fe2ae201d8ccf96a1 ""
+  "c:/texlive/2025/texmf-dist/web2c/texmf.cnf" 1761053609 42148 61becc7c670cd061bb319c643c27fdd4 ""
+  "c:/texlive/2025/texmf-var/web2c/xetex/xelatex.fmt" 1761057319 5639800 1b93ec161d6df82b86ee69be0d769fc1 ""
+  "c:/texlive/2025/texmf.cnf" 1761057124 713 614551405fc44b98efbf516466e3c909 ""
+  (generated)
+  "4-experiments.aux"
+  "4-experiments.log"
+  "4-experiments.xdv"
+  (rewritten before read)

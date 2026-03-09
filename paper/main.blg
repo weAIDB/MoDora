@@ -1,0 +1,85 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: ACM-Reference-Format.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Database file #1: reference.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=200001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Warning--no number and no volume in Qwen3-VL
+Warning--page numbers missing in both pages and numpages fields in Qwen3-VL
+Warning--empty publisher in SV-RAG
+Warning--empty address in SV-RAG
+Warning--page numbers missing in both pages and numpages fields in SV-RAG
+Warning--no number and no volume in M3DocRAG
+Warning--page numbers missing in both pages and numpages fields in M3DocRAG
+Warning--empty publisher in DocOwl2
+Warning--empty address in DocOwl2
+Warning--page numbers missing in both pages and numpages fields in DocOwl2
+Warning--empty publisher in TextRAG
+Warning--empty address in TextRAG
+Warning--page numbers missing in both pages and numpages fields in TextRAG
+Warning--empty publisher in ZenDB
+Warning--empty address in ZenDB
+Warning--page numbers missing in both pages and numpages fields in ZenDB
+Warning--empty publisher in QUEST
+Warning--empty address in QUEST
+Warning--page numbers missing in both pages and numpages fields in QUEST
+Warning--no number and no volume in GPT-5
+Warning--page numbers missing in both pages and numpages fields in GPT-5
+Warning--empty publisher in DocAgent
+Warning--empty address in DocAgent
+Warning--page numbers missing in both pages and numpages fields in DocAgent
+Warning--empty publisher in UDOP
+Warning--empty address in UDOP
+Warning--page numbers missing in both pages and numpages fields in UDOP
+Warning--no number and no volume in xu2026modora
+Warning--page numbers missing in both pages and numpages fields in xu2026modora
+You've used 12 entries,
+            6273 wiz_defined-function locations,
+            1579 strings with 20680 characters,
+and the built_in function-call counts, 14459 in all, are:
+= -- 1533
+> -- 820
+< -- 0
++ -- 288
+- -- 276
+* -- 1261
+:= -- 1590
+add.period$ -- 53
+call.type$ -- 12
+change.case$ -- 135
+chr.to.int$ -- 12
+cite$ -- 41
+duplicate$ -- 1132
+empty$ -- 808
+format.name$ -- 324
+if$ -- 3359
+int.to.chr$ -- 2
+int.to.str$ -- 1
+missing$ -- 51
+newline$ -- 129
+num.names$ -- 84
+pop$ -- 627
+preamble$ -- 1
+purify$ -- 231
+quote$ -- 0
+skip$ -- 379
+stack$ -- 0
+substring$ -- 639
+swap$ -- 55
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 304
+warning$ -- 29
+while$ -- 36
+width$ -- 0
+write$ -- 247
+(There were 29 warnings)

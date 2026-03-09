@@ -1,0 +1,54 @@
+\section{Experiments} \label{sec:experiments}
+
+We conduct a series of evaluations on the MMDA benchmark to demonstrate the effectiveness of \modora in processing semi-structured documents.
+
+\subsection{Experimental Configuration}
+\runin{Dataset and Metric} Our evaluation uses the MMDA dataset introduced in MoDora~\cite{xu2026modora}, which contains 1,065 QA pairs in 537 documents with different layouts. We employ AIC-Acc (\%) as the primary evaluation metric, using an LLM-based judge to verify correctness of the responses while allowing for extraneous content.
+
+\runin{Implementation Details} We implement a hybrid architecture. 
+We deploy Qwen3-VL-8B-Instruct~\cite{Qwen3-VL} as the LLM for intermediate steps, including enrichment, hierarchy detection, question parsing and retrieval. We use the GPT-5 API~\cite{GPT-5} for the final high-level reasoning and answer generation.
+
+\runin{Baselines} We compare \modora against nine state-of-the-art baselines: UDOP~\cite{UDOP}, DocOWL2~\cite{DocOwl2}, M3DocRAG~\cite{M3DocRAG}, SV-RAG~\cite{SV-RAG}, TextRAG~\cite{TextRAG}, QUEST~\cite{QUEST}, ZenDB~\cite{ZenDB}, DocAgent~\cite{DocAgent}, and GPT-5~\cite{GPT-5}.
+
+\subsection{Performance Analysis} 
+As illustrated in Figure~\ref{fig:exp1}, \modora achieves an AIC-Acc of 71.1\% on the MMDA benchmark.
+
+\begin{figure}[h] 
+\centering 
+\includegraphics[width=0.95\linewidth]{Fig/exp_new.pdf} 
+\caption{Experimental results on the MMDA dataset.} 
+\label{fig:exp1} 
+\end{figure}
+
+\runin{Comparative Advantages} \modora outperforms the strongest baseline, DocAgent~\cite{DocAgent} (57.0\%), by a margin of 14.1\%. This improvement stems from the system's ability to transform fragmented OCR elements into layout-aware components, which are then organized into a hierarchical tree.
+
+\runin{Structural and Hybrid Reasoning} While text-centric methods like TextRAG~\cite{TextRAG} (36.2\%) and ZenDB~\cite{ZenDB} (47.1\%) struggle with non-textual elements, \modora's tree-based retrieval accurately aligns semantic cues with visual data. Furthermore, our approach significantly exceeds the performance of end-to-end models such as DocOWL2~\cite{DocOwl2} (29.6\%) and UDOP~\cite{UDOP} (15.8\%), which often fail to capture fine-grained layout distinctions.
+
+\runin{Noise Reduction} Compared to the vanilla GPT-5~\cite{GPT-5} (46.5\%), which processes full document pages, \modora's question-type-aware retrieval mechanism filters irrelevant content more effectively, resulting in higher reasoning precision.
+
+\subsection{Case Study: Multi-Scenario Analysis}\label{subsec:case_study}
+We present three representative cases from the MMDA benchmark to highlight how \modora handles complex queries that typically baffle traditional RAG systems.
+
+\begin{table}[h]
+\centering
+\caption{Performance Analysis in Complex Scenarios}
+\label{tab:case_study}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lllc@{}}
+\toprule
+\textbf{Scenario} & \textbf{Challenge} & \textbf{Baseline Limitation} & \textbf{\modora} \\ \midrule
+Hierarchy & Multi-level nesting & Context loss in flat chunking & \checkmark \\
+\textit{(Sectional)} & Section dependencies & Misidentified parent-child links & \checkmark \\ \midrule
+Hybrid & Text-Chart alignment & Hallucination in visual reasoning & \checkmark \\
+\textit{(Cross-modal)} & Table-to-text links & Missing cross-element context & \checkmark \\ \midrule
+Location & Spatial cues & Lack of coordinate metadata & \checkmark \\
+\textit{(Visual-rich)} & Precise UI elements & Overlapping region filtering & \checkmark \\ \bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\runin{Scenario 1: Structural Depth (C1)} In queries regarding nested subsections (e.g., Section III's second subsection), traditional flat-retrieval methods often fail because they lose the parent-child context. \modora utilizes the CCTree to accurately traverse the document hierarchy and retrieve complete logical branches.
+
+\runin{Scenario 2: Multi-Modal Fusion (C2)} Hybrid questions requiring integrated reasoning over tables and text (e.g., matching a ``winter'' experiment ID to a specific table row) often lead to hallucinations in vanilla GPT-5 or text-only RAG. \modora's VLM-based enrichment generates semantic triplets that align visual cell data with textual descriptors.
+
+\runin{Scenario 3: Spatial Precision (C3)} For queries like ``What is in the top-right logo?'', most baselines are unable to process locational metadata. \modora's Location-Based Path maps coordinates to grid-partitioned nodes, ensuring the retrieval of the exact visual element.

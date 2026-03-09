@@ -1,0 +1,6 @@
+PWD d:/IDM_download/SIGMOD_template_modora_demo_2
+INPUT c:/texlive/2025/texmf.cnf
+INPUT c:/texlive/2025/texmf-dist/web2c/texmf.cnf
+INPUT c:/texlive/2025/texmf-var/web2c/xetex/xelatex.fmt
+INPUT 3-demonstration.tex
+OUTPUT 3-demonstration.log

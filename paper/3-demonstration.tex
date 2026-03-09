@@ -1,0 +1,16 @@
+﻿\section{Demonstration Scenarios}
+\label{sec:demonstration}
+\begin{figure*}[t] % 浣跨敤 figure* 鍙互璺ㄥ弻鏍忔樉绀猴紙濡傛灉鏄崟鏍忔ā鏉垮幓鎺?锛?  \centering
+  \includegraphics[width=0.9\textwidth]{Fig/ui_v2.pdf} 
+  \caption{A running example of \modora}
+  \label{fig:gui}
+\end{figure*}
+
+This section demonstrates how \modora turns semi-structured documents into verifiable knowledge assets (Figure~\ref{fig:gui}).
+
+\runin{Hierarchical Parsing and Inspection} After ingestion, \modora groups fragmented OCR outputs into aggregated components and organizes them into a CCTree. Users inspect and refine this structure through the \textit{Tree Visualizer} (Figure~\ref{fig:gui}-\circled{2}).
+
+\runin{Verified Multimodal QA} Users issue natural-language queries across documents, and \modora performs dual-path retrieval (spatial + semantic). With \textit{Interactive Grounding} (Figure~\ref{fig:gui}-\circled{5}), citation clicks highlight source regions in the original PDF layout (Figure~\ref{fig:gui}-\circled{6}).
+
+\runin{Human-in-the-Loop Optimization} The \textit{Node Heatmap} (Figure~\ref{fig:gui}-\circled{3}) visualizes retrieval impact, while manual node editing and tree restructuring improve future retrieval. Indexed CCTrees are archived in the \textit{Knowledge Base View} (Figure~\ref{fig:gui}-\circled{4}) for cross-session reuse.
+

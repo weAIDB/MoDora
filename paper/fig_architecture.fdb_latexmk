@@ -1,0 +1,17 @@
+# Fdb version 4
+["xdvipdfmx"] 0 "fig_architecture.xdv" "fig_architecture.pdf" "fig_architecture" 0 -1
+  "fig_architecture.xdv" 0 -1 0 "xelatex"
+  (generated)
+  "fig_architecture.pdf"
+  (rewritten before read)
+["xelatex"] 1773024732.44655 "fig_architecture.tex" "fig_architecture.xdv" "fig_architecture" 1773024732.93283 2
+  "c:/texlive/2025/texmf-dist/web2c/texmf.cnf" 1761053609 42148 61becc7c670cd061bb319c643c27fdd4 ""
+  "c:/texlive/2025/texmf-var/web2c/xetex/xelatex.fmt" 1761057319 5639800 1b93ec161d6df82b86ee69be0d769fc1 ""
+  "c:/texlive/2025/texmf.cnf" 1761057124 713 614551405fc44b98efbf516466e3c909 ""
+  "fig_architecture.aux" 1773024732 32 3985256e7290058c681f74d7a3565a19 "xelatex"
+  "fig_architecture.tex" 1772992250 0 d41d8cd98f00b204e9800998ecf8427e ""
+  (generated)
+  "fig_architecture.aux"
+  "fig_architecture.log"
+  "fig_architecture.xdv"
+  (rewritten before read)

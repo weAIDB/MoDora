@@ -1,0 +1,183 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{12}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{} and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showURL}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showURL #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[Bai et~al\mbox{.}(2025)]%
+        {Qwen3-VL}
+\bibfield{author}{\bibinfo{person}{Shuai Bai}, \bibinfo{person}{Yuxuan Cai},
+  \bibinfo{person}{Keming Zhu}, {et~al\mbox{.}}}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Qwen3-VL Technical Report}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2511.21631}}
+  (\bibinfo{year}{2025}).
+\newblock
+
+
+\bibitem[Chen et~al\mbox{.}(2025)]%
+        {SV-RAG}
+\bibfield{author}{\bibinfo{person}{Jian Chen}, \bibinfo{person}{Ruiyi Zhang},
+  \bibinfo{person}{Yufan Zhou}, \bibinfo{person}{Tong Yu},
+  \bibinfo{person}{Franck Dernoncourt}, \bibinfo{person}{Jiuxiang Gu},
+  \bibinfo{person}{Ryan~A. Rossi}, \bibinfo{person}{Changyou Chen}, {and}
+  \bibinfo{person}{Tong Sun}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{SV-RAG: LoRA-Contextualizing Adaptation of MLLMs
+  for Long Document Understanding}. In \bibinfo{booktitle}{\emph{ICLR}}.
+\newblock
+
+
+\bibitem[Cho et~al\mbox{.}(2024)]%
+        {M3DocRAG}
+\bibfield{author}{\bibinfo{person}{Jaemin Cho}, \bibinfo{person}{Debanjan
+  Mahata}, \bibinfo{person}{Ozan Irsoy}, \bibinfo{person}{Yujie He}, {and}
+  \bibinfo{person}{Mohit Bansal}.} \bibinfo{year}{2024}\natexlab{}.
+\newblock \showarticletitle{M3DocRAG: Multi-modal Retrieval is What You Need
+  for Multi-page Multi-document Understanding}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2411.04952}}
+  (\bibinfo{year}{2024}).
+\newblock
+
+
+\bibitem[Cui et~al\mbox{.}(2025)]%
+        {PPStructureV3}
+\bibfield{author}{\bibinfo{person}{Cheng Cui}, \bibinfo{person}{Ting Sun},
+  \bibinfo{person}{Manhui Lin}, \bibinfo{person}{Tingquan Gao},
+  \bibinfo{person}{Yubo Zhang}, \bibinfo{person}{Jiaxuan Liu},
+  \bibinfo{person}{Xueqing Wang}, \bibinfo{person}{Zelun Zhang},
+  \bibinfo{person}{Changda Zhou}, \bibinfo{person}{Hongen Liu},
+  {et~al\mbox{.}}} \bibinfo{year}{2025}\natexlab{}.
+\newblock \bibinfo{title}{PaddleOCR 3.0 Technical Report}.
+\newblock
+\newblock
+\shownote{arXiv:2507.05595}.
+
+
+\bibitem[Hu et~al\mbox{.}(2025)]%
+        {DocOwl2}
+\bibfield{author}{\bibinfo{person}{Anwen Hu}, \bibinfo{person}{Haiyang Xu},
+  \bibinfo{person}{Liang Zhang}, \bibinfo{person}{Jiabo Ye},
+  \bibinfo{person}{Ming Yan}, \bibinfo{person}{Ji Zhang}, \bibinfo{person}{Qin
+  Jin}, \bibinfo{person}{Fei Huang}, {and} \bibinfo{person}{Jingren Zhou}.}
+  \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{mPLUG-DocOwl2: High-resolution Compressing for
+  OCR-free Multi-page Document Understanding}. In
+  \bibinfo{booktitle}{\emph{ACL}}.
+\newblock
+
+
+\bibitem[Lewis et~al\mbox{.}(2020)]%
+        {TextRAG}
+\bibfield{author}{\bibinfo{person}{Patrick Lewis}, \bibinfo{person}{Ethan
+  Perez}, \bibinfo{person}{Aleksandra Piktus}, \bibinfo{person}{Fabio Petroni},
+  \bibinfo{person}{Vladimir Karpukhin}, \bibinfo{person}{Naman Goyal},
+  \bibinfo{person}{Heinrich K{\"u}ttler}, \bibinfo{person}{Mike Lewis},
+  \bibinfo{person}{Wen-tau Yih}, \bibinfo{person}{Tim Rockt{\"a}schel},
+  {et~al\mbox{.}}} \bibinfo{year}{2020}\natexlab{}.
+\newblock \showarticletitle{Retrieval-Augmented Generation for
+  Knowledge-Intensive NLP Tasks}. In \bibinfo{booktitle}{\emph{NeurIPS}}.
+\newblock
+
+
+\bibitem[Lin et~al\mbox{.}(2025)]%
+        {ZenDB}
+\bibfield{author}{\bibinfo{person}{Yiming Lin}, \bibinfo{person}{Madelon
+  Hulsebos}, \bibinfo{person}{Ruiying Ma}, \bibinfo{person}{Shreya Shankar},
+  \bibinfo{person}{Sepanta Zeigham}, \bibinfo{person}{Aditya~G. Parameswaran},
+  {and} \bibinfo{person}{Eugene Wu}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{Querying Templatized Document Collections with
+  Large Language Models}. In \bibinfo{booktitle}{\emph{ICDE}}.
+\newblock
+
+
+\bibitem[Malaviya et~al\mbox{.}(2023)]%
+        {QUEST}
+\bibfield{author}{\bibinfo{person}{Chaitanya Malaviya}, \bibinfo{person}{Peter
+  Shaw}, \bibinfo{person}{Ming-Wei Chang}, \bibinfo{person}{Kenton Lee}, {and}
+  \bibinfo{person}{Kristina Toutanova}.} \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{QUEST: A Retrieval Dataset of Entity-Seeking
+  Queries with Implicit Set Operations}. In \bibinfo{booktitle}{\emph{ACL}}.
+\newblock
+
+
+\bibitem[Singh et~al\mbox{.}(2026)]%
+        {GPT-5}
+\bibfield{author}{\bibinfo{person}{Aaditya Singh}, \bibinfo{person}{Adam Fry},
+  \bibinfo{person}{Adam Perelman}, {et~al\mbox{.}}}
+  \bibinfo{year}{2026}\natexlab{}.
+\newblock \showarticletitle{OpenAI GPT-5 System Card}.
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:2601.03267}}
+  (\bibinfo{year}{2026}).
+\newblock
+
+
+\bibitem[Sun et~al\mbox{.}(2025)]%
+        {DocAgent}
+\bibfield{author}{\bibinfo{person}{Li Sun}, \bibinfo{person}{Liu He},
+  \bibinfo{person}{Shuyue Jia}, \bibinfo{person}{Yangfan He}, {and}
+  \bibinfo{person}{Chenyu You}.} \bibinfo{year}{2025}\natexlab{}.
+\newblock \showarticletitle{DocAgent: An Agentic Framework for Multi-Modal
+  Long-Context Document Understanding}. In \bibinfo{booktitle}{\emph{EMNLP}}.
+\newblock
+
+
+\bibitem[Tang et~al\mbox{.}(2023)]%
+        {UDOP}
+\bibfield{author}{\bibinfo{person}{Zineng Tang}, \bibinfo{person}{Ziyi Peng},
+  \bibinfo{person}{Shijie Geng}, \bibinfo{person}{Yujia Zhu},
+  \bibinfo{person}{Zi Yan}, \bibinfo{person}{Ziting Hu},
+  \bibinfo{person}{Jianshu Wang}, \bibinfo{person}{Yanjia Yan},
+  \bibinfo{person}{Guoyin Wang}, \bibinfo{person}{Mingwei Hu}, {et~al\mbox{.}}}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \showarticletitle{Unifying Vision, Text, and Layout for Universal
+  Document Processing}. In \bibinfo{booktitle}{\emph{CVPR}}.
+\newblock
+
+
+\bibitem[Xu et~al\mbox{.}(2026)]%
+        {xu2026modora}
+\bibfield{author}{\bibinfo{person}{Bangrui Xu}, \bibinfo{person}{Qihang Yao},
+  \bibinfo{person}{Zirui Tang}, \bibinfo{person}{Xuanhe Zhou},
+  \bibinfo{person}{Yeye He}, \bibinfo{person}{Shihan Yu},
+  \bibinfo{person}{Qianqian Xu}, \bibinfo{person}{Bin Wang},
+  \bibinfo{person}{Guoliang Li}, \bibinfo{person}{Conghui He}, {and}
+  \bibinfo{person}{Fan Wu}.} \bibinfo{year}{2026}\natexlab{}.
+\newblock \showarticletitle{MoDora: Tree-Based Semi-Structured Document
+  Analysis System}.
+\newblock \bibinfo{journal}{\emph{ACM SIGMOD}} (\bibinfo{year}{2026}).
+\newblock
+
+
+\end{thebibliography}

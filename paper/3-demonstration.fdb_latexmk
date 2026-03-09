@@ -1,0 +1,17 @@
+# Fdb version 4
+["xdvipdfmx"] 0 "3-demonstration.xdv" "3-demonstration.pdf" "3-demonstration" 0 -1
+  "3-demonstration.xdv" 0 -1 0 "xelatex"
+  (generated)
+  "3-demonstration.pdf"
+  (rewritten before read)
+["xelatex"] 1773024728.14776 "3-demonstration.tex" "3-demonstration.xdv" "3-demonstration" 1773024730.09298 2
+  "3-demonstration.aux" 1773024728 32 3985256e7290058c681f74d7a3565a19 "xelatex"
+  "3-demonstration.tex" 1773022626 1383 a42fb3d4febb8fd3ae64bcfaf36c19ff ""
+  "c:/texlive/2025/texmf-dist/web2c/texmf.cnf" 1761053609 42148 61becc7c670cd061bb319c643c27fdd4 ""
+  "c:/texlive/2025/texmf-var/web2c/xetex/xelatex.fmt" 1761057319 5639800 1b93ec161d6df82b86ee69be0d769fc1 ""
+  "c:/texlive/2025/texmf.cnf" 1761057124 713 614551405fc44b98efbf516466e3c909 ""
+  (generated)
+  "3-demonstration.aux"
+  "3-demonstration.log"
+  "3-demonstration.xdv"
+  (rewritten before read)

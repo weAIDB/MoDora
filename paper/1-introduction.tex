@@ -1,0 +1,34 @@
+\section{Introduction}
+\label{sec:intro}
+
+% --- Introduction Figure ---
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.95\linewidth]{Fig/intro.pdf}
+    \caption{Overview of \modora. Unlike traditional flat RAG systems, \modora constructs a hierarchical CCTree to preserve document structure and supports interactive verification.}
+    \label{fig:intro}
+\end{figure}
+% -----------------------------
+
+Retrieval-Augmented Generation (RAG) has become a cornerstone for enhancing Large Language Models (LLMs) with external knowledge. By grounding responses in retrieved documents, RAG mitigates hallucinations and enables up-to-date reasoning. However, existing RAG pipelines typically rely on a ``chunking + vector retrieval'' flat strategy. This approach segments documents into independent text blocks, inevitably leading to the loss of hierarchical structure and visual context. While effective for plain text, this paradigm struggles with complex multimodal documents (e.g., financial reports, scientific papers) where layout and visual elements carry critical semantic information.
+
+\runin{Challenges}
+Despite recent advancements, three key challenges remain in multimodal document understanding. 
+\textit{First, structural fragmentation.} Traditional RAG treats documents as a sequence of isolated chunks, failing to capture parent-child relationships between sections. This often leads to interpretations that are effectively ``taken out of context''. 
+\textit{Second, semantic gaps in structured systems.} While systems like ZenDB~\cite{ZenDB} specialize in structured data, they often rely on pure text relations or SQL logic, ignoring non-textual visual cues. This can result in the retrieval of redundant or irrelevant evidence when queries involve charts or tables. 
+\textit{Third, visual hallucinations in native VLMs.} End-to-end Vision Language Models (VLMs) lack explicit structural guidance. Without a logical hierarchy to navigate, they frequently misinterpret \xbr{document structure and connections between text and visual elements.}%data trends or lose the connection between legends and visual elements, especially in dense layouts.
+
+\runin{Extension over Prior MoDora} The original MoDora work~\cite{xu2026modora} introduced CCTree-based semi-structured document understanding and released the MMDA benchmark. Building on that foundation, this paper emphasizes demo-oriented advances: (1) interactive evidence grounding from answer spans to PDF regions, (2) human-in-the-loop tree refinement with impact-aware visualization, and (3) a robust verification-then-fallback retrieval loop for practical multimodal QA.
+
+\runin{Our Proposal} To address these limitations, we present \modora, a novel tree-structured multimodal RAG system designed for complex document understanding. As illustrated in Figure~\ref{fig:intro}, \modora constructs a hierarchical Component-\-Correlation Tree (CCTree) from unstructured PDFs. 
+The system is built on three core designs: 
+(1) \textit{Tree-Structured Modeling}, which preserves logical hierarchies and parent-child relationships instead of flat chunking; 
+(2) \textit{VLM-Enhanced Retrieval}, which incorporates Vision Language Models to enrich non-textual elements into semantic triplets (Title, Metadata, Data), ensuring accurate alignment between visual evidence and textual queries; 
+and (3) \textit{Interactive Verification}, which provides a frontend featuring \textit{Interactive Grounding} to trace answers back to original PDF regions, a \textit{Tree Visualizer} for manual structural refinement, and a \textit{Node Heatmap} to identify critical information hubs. 
+This human-in-the-loop design ensures that the retrieval process is not only accurate but also transparent and verifiable.
+
+\runin{Results and Contributions} We have implemented \modora and evaluated it on the MMDA benchmark proposed in MoDora~\cite{xu2026modora}. Experimental results demonstrate that \modora achieves an AIC-Acc of 71.1\%, outperforming the strongest baseline (DocAgent~\cite{DocAgent}) by a margin of 14.1\%. 
+In summary, our contributions are: 
+(i) we propose a CCTree-based indexing structure that preserves document hierarchy and visual context for multimodal RAG; 
+(ii) we design a dual-pathway retrieval strategy combining spatial mapping with semantic verification to reduce hallucinations; 
+and (iii) \xbr{we demonstrate an interactive system for manual tree structure refinement and evidence verification.}
