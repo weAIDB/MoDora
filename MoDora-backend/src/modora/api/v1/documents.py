@@ -85,9 +85,16 @@ async def upload_file(
     file_location = paths.docs_dir / file.filename
     try:
         with file_location.open("wb") as buffer:
-            buffer.write(await file.read())
+            while True:
+                chunk = await file.read(1024 * 1024)
+                if not chunk:
+                    break
+                buffer.write(chunk)
+        logger.info(f"Saved uploaded file: {file_location}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"File save failed: {e}")
+    finally:
+        await file.close()
 
     TASK_STATUS.set(file.filename, "pending")
     background_tasks.add_task(

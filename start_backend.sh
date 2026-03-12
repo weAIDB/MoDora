@@ -71,5 +71,14 @@ fi
 export MODORA_API_PORT=$API_PORT
 echo "🚀 API will listen on port: $API_PORT"
 
-# Run FastAPI
-uvicorn modora.api.app:app --host 0.0.0.0 --port "$API_PORT" --reload
+# Run FastAPI.
+# Limit reload watching to source code so large uploads/cache writes do not
+# trigger repeated restarts while a document is being received or processed.
+uvicorn modora.api.app:app \
+  --host 0.0.0.0 \
+  --port "$API_PORT" \
+  --reload \
+  --reload-dir src/modora \
+  --reload-exclude '../datasets/*' \
+  --reload-exclude '../cache/*' \
+  --reload-exclude '../log/*'

@@ -58,6 +58,20 @@ if [ -z "$MODORA_API_PORT" ]; then
 fi
 
 echo "🚀 Frontend will proxy to API on port: $MODORA_API_PORT"
+export VITE_MODORA_API_PORT="$MODORA_API_PORT"
+export VITE_MODORA_FRONTEND_PORT="$MODORA_FRONTEND_PORT"
+
+# Expose frontend dev server on all interfaces by default so it can be reached
+# from other machines when the host firewall/security group allows it.
+if [ -z "$MODORA_FRONTEND_HOST" ]; then
+    export MODORA_FRONTEND_HOST=0.0.0.0
+fi
+
+if [ -z "$MODORA_FRONTEND_PORT" ]; then
+    export MODORA_FRONTEND_PORT=$(find_unused_port 5173)
+fi
+
+echo "🌍 Frontend will listen on ${MODORA_FRONTEND_HOST}:$MODORA_FRONTEND_PORT"
 
 # Run Vite
-npm run dev
+npm run dev -- --host "$MODORA_FRONTEND_HOST" --port "$MODORA_FRONTEND_PORT"

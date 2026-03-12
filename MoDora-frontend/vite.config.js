@@ -20,6 +20,9 @@ export default defineConfig(() => {
     },
     // --- 核心配置 ---
     server: {
+      // Allow temporary tunnel domains such as pinggy/localhost.run during
+      // experimental remote access without requiring per-domain edits.
+      allowedHosts: true,
       proxy: {
         '/api': {
           target: `http://localhost:${backendPort}`,

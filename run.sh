@@ -48,19 +48,29 @@ if [ -z "$MODORA_API_PORT" ]; then
     export MODORA_API_PORT=$(find_unused_port 8005)
 fi
 
+if [ -z "$MODORA_FRONTEND_PORT" ]; then
+    export MODORA_FRONTEND_PORT=$(find_unused_port 5173)
+fi
+
+if [ -z "$MODORA_FRONTEND_HOST" ]; then
+    export MODORA_FRONTEND_HOST=0.0.0.0
+fi
+
 echo "✅ Backend will use port: $MODORA_API_PORT"
+echo "✅ Frontend will use host/port: $MODORA_FRONTEND_HOST:$MODORA_FRONTEND_PORT"
+echo "ℹ️  Public access also requires opening port $MODORA_FRONTEND_PORT in your firewall or cloud security group."
 
 if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
     echo "🌐 Detected tmux! Starting backend and frontend in a split session..."
-    tmux new-session -d -s modora "export MODORA_API_PORT=$MODORA_API_PORT; ./start_backend.sh"
-    tmux split-window -h "export MODORA_API_PORT=$MODORA_API_PORT; ./start_frontend.sh"
+    tmux new-session -d -s modora "export MODORA_API_PORT=$MODORA_API_PORT; export MODORA_FRONTEND_PORT=$MODORA_FRONTEND_PORT; export MODORA_FRONTEND_HOST=$MODORA_FRONTEND_HOST; ./start_backend.sh"
+    tmux split-window -h "export MODORA_API_PORT=$MODORA_API_PORT; export MODORA_FRONTEND_PORT=$MODORA_FRONTEND_PORT; export MODORA_FRONTEND_HOST=$MODORA_FRONTEND_HOST; ./start_frontend.sh"
     tmux attach-session -t modora
 else
     echo "🚀 To run MoDora in separate terminals, please open two terminal tabs and run:"
     echo ""
     echo "  Terminal 1 (Backend): export MODORA_API_PORT=$MODORA_API_PORT && ./start_backend.sh"
-    echo "  Terminal 2 (Frontend): export MODORA_API_PORT=$MODORA_API_PORT && ./start_frontend.sh"
+    echo "  Terminal 2 (Frontend): export MODORA_API_PORT=$MODORA_API_PORT MODORA_FRONTEND_HOST=$MODORA_FRONTEND_HOST MODORA_FRONTEND_PORT=$MODORA_FRONTEND_PORT && ./start_frontend.sh"
     echo ""
     echo "Alternatively, you can run them both in this terminal (not recommended for log viewing):"
-    echo "MODORA_API_PORT=$MODORA_API_PORT ./start_backend.sh & MODORA_API_PORT=$MODORA_API_PORT ./start_frontend.sh"
+    echo "MODORA_API_PORT=$MODORA_API_PORT MODORA_FRONTEND_PORT=$MODORA_FRONTEND_PORT MODORA_FRONTEND_HOST=$MODORA_FRONTEND_HOST ./start_backend.sh & MODORA_API_PORT=$MODORA_API_PORT MODORA_FRONTEND_PORT=$MODORA_FRONTEND_PORT MODORA_FRONTEND_HOST=$MODORA_FRONTEND_HOST ./start_frontend.sh"
 fi
