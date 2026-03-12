@@ -50,6 +50,14 @@ models/
 MoDora-backend/src/modora/lab/output/
 
 # Frontend
+node_modules/
+.next/
+out/
+nohup.out
+.backup/
+.dist/
+.runtime/
+.tools/
 MoDora-frontend/node_modules/
 MoDora-frontend/dist/
 MoDora-frontend/.env.local
