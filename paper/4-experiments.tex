@@ -25,29 +25,11 @@ As illustrated in Figure~\ref{fig:exp1}, \modora achieves an AIC-Acc of 71.1\% o
 
 \runin{Noise Reduction} Compared to the vanilla GPT-5~\cite{GPT-5} (46.5\%), which processes full document pages, \modora's query-adaptive retrieval mechanism filters irrelevant content more effectively, resulting in higher reasoning precision.
 
-\subsection{Case Study: End-to-End System Capabilities}\label{subsec:case_study}
-We present three representative cases to demonstrate how users interact with \modora in realistic document analysis workflows. Rather than focusing only on final QA accuracy, these cases illustrate how the system supports structural correction, cross-modal verification, spatial inspection, and evidence-grounded interaction throughout the end-to-end pipeline.
+\subsection{Case Study: System Capabilities}\label{subsec:case_study}
+We present three representative cases to show how users interact with \modora beyond final-answer generation.
 
-\begin{table}[h]
-\centering
-\caption{Representative User-Facing Capabilities Demonstrated by \modora}
-\label{tab:case_study}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{@{}lllc@{}}
-\toprule
-\textbf{Scenario} & \textbf{User Task} & \textbf{Activated System Capabilities} & \textbf{Observed Benefit} \\ \midrule
-Structural & Navigate and correct & OCR aggregation, CCTree construction, & Editable structure for \\
-\textit{(Navigation)} & noisy section hierarchy & tree visualizer, branch retrieval & reliable section-level QA \\ \midrule
-Cross-modal & Verify table-text & VLM enrichment, semantic/vector retrieval, & Grounded evidence across \\
-\textit{(Verification)} & consistency & interactive grounding & multiple modalities \\ \midrule
-Spatial & Inspect visually localized & location retrieval, answer verification, & Precise visual lookup with \\
-\textit{(Inspection)} & page elements & fallback mechanism & trustworthy responses \\ \bottomrule
-\end{tabular}%
-}
-\end{table}
+\runin{Scenario 1: Structural Correction for Section-Level Navigation (C1)} A user asks: ``Move `3.2 Results' under Section III.'' \modora revises the tree structure according to the natural-language instruction, after which subsequent question answering is performed by retrieving evidence from the updated branch and grounding the answer in the corresponding PDF regions.
 
-\runin{Scenario 1: Structural Correction for Section-Level Navigation (C1)} A user uploads a scanned paper and asks: ``What is discussed in the second subsection of Section III?'' Because OCR may fragment headings and body text, a flat chunking pipeline can mix unrelated paragraphs and captions, making section-level navigation unreliable. In \modora, the document is first aggregated into layout-aware components and organized into a CCTree. The user can then inspect the recovered hierarchy in the tree visualizer, identify a misplaced heading node, and manually correct its parent-child relation. After this refinement, \modora retrieves the complete logical branch of Section III and grounds the returned answer in the corresponding PDF regions. This case shows that \modora supports editable structural analysis rather than only final-answer generation.
+\runin{Scenario 2: Cross-Modal Verification and Reasoning (C2)} A user asks: ``Does the figure support the trend described in the text, and what evidence supports it?'' \modora jointly retrieves the relevant textual and visual evidence and supports verification by exposing the cross-modal evidence used for reasoning.
 
-\runin{Scenario 2: Cross-Modal Verification for Table-Text Reasoning (C2)} A user inspects an experimental report and asks: ``Which parameter setting corresponds to the `winter' experiment in the table, and how is it described in the text?'' The evidence is split across table cells and narrative paragraphs, so the user needs not only an answer but also a way to verify where it comes from. \modora first applies VLM-based enrichment to convert the table into semantic triplets that preserve row-column relations, and then coordinates semantic and vector retrieval to locate both the relevant table entry and the explanatory text span. In the grounding view, the system highlights the exact table cells together with the supporting sentence in the PDF. The user can therefore verify whether the numeric configuration and the textual interpretation are consistent. This case demonstrates \modora's role as a cross-modal evidence alignment and verification system, not merely a QA model.
-
-\runin{Scenario 3: Spatial Inspection for Visual Element Identification (C3)} A user examines a visually dense page and asks: ``What is the logo in the top-right corner?'' Such questions depend primarily on spatial cues rather than pure textual similarity. In this case, \modora activates its location retrieval path to map the query onto a normalized page grid and select overlapping visual components. If the initially retrieved node does not provide sufficient evidence, the verification module suppresses unsupported answers and triggers fallback reasoning over a broader region. The final response is returned together with grounded highlights on the PDF, allowing the user to directly inspect the referenced visual element. This illustrates how \modora supports reliable spatial inspection in real document analysis workflows.
+\runin{Scenario 3: Spatial Inspection for Visual Element Identification (C3)} A user asks: ``What is the logo in the top-right corner?'' \modora activates location retrieval to map the query onto a normalized page grid and select overlapping visual components. It can precisely localize the relevant evidence in the PDF and highlight the corresponding regions for direct inspection; when evidence is weak, verification suppresses unsupported answers and triggers fallback reasoning.

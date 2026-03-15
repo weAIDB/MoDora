@@ -4,8 +4,8 @@
 % --- Introduction Figure ---
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.95\linewidth]{Fig/intro.pdf}
-    \caption{Overview of \modora. Unlike traditional flat RAG systems, \modora constructs a hierarchical CCTree to preserve document structure and supports interactive verification.}
+    \includegraphics[width=0.95\linewidth]{Fig/intro_v2.pdf}
+    \caption{Overview of \modora with CCTree-based retrieval and interactive verification.}
     \label{fig:intro}
 \end{figure}
 % -----------------------------
@@ -24,7 +24,7 @@ Despite recent advancements, three key challenges remain in multimodal document 
 The system is built on three core designs: 
 (1) \textit{Tree-Structured Modeling}, which preserves logical hierarchies and parent-child relationships instead of flat chunking; 
 (2) \textit{VLM-Enhanced Retrieval}, which incorporates Vision Language Models to enrich non-textual elements into semantic triplets (Title, Metadata, Data), ensuring accurate alignment between visual evidence and textual queries; 
-and (3) \textit{Interactive Verification}, which provides a frontend featuring \textit{Interactive Grounding} to trace answers back to original PDF regions, a \textit{Tree Visualizer} for manual structural refinement, and a \textit{Node Heatmap} to identify critical information hubs. 
+and (3) \textit{Interactive Verification}, which provides a frontend featuring \textit{Interactive Grounding} to trace answers back to original PDF regions, a \textit{Tree Visualizer} for manual or natural-language structural refinement, and a \textit{Node Heatmap} to identify critical information hubs. 
 This human-in-the-loop design ensures that the retrieval process is not only accurate but also transparent and verifiable.
 
 \runin{Results and Contributions} We have implemented \modora and evaluated it on the MMDA benchmark proposed in MoDora~\cite{xu2026modora}. Experimental results demonstrate that \modora achieves an AIC-Acc of 71.1\%, outperforming the strongest baseline (DocAgent~\cite{DocAgent}) by a margin of 14.1\%. 

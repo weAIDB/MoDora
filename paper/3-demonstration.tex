@@ -1,7 +1,7 @@
 ﻿\section{Demonstration Scenarios}
 \label{sec:demonstration}
 \begin{figure*}[t] % 浣跨敤 figure* 鍙互璺ㄥ弻鏍忔樉绀猴紙濡傛灉鏄崟鏍忔ā鏉垮幓鎺?锛?  \centering
-  \includegraphics[width=0.9\textwidth]{Fig/ui_v2.pdf} 
+  \includegraphics[width=0.9\textwidth]{Fig/ui_v3.pdf} 
   \caption{A running example of \modora}
   \label{fig:gui}
 \end{figure*}
@@ -12,5 +12,4 @@ This section demonstrates how \modora turns semi-structured documents into verif
 
 \runin{Verified Multimodal QA} Users issue natural-language queries across documents, and \modora performs query-adaptive retrieval (location or semantic+vector). With \textit{Interactive Grounding} (Figure~\ref{fig:gui}-\circled{5}), citation clicks highlight source regions in the original PDF layout (Figure~\ref{fig:gui}-\circled{6}). Each evidence item keeps retriever provenance (location/semantic/vector), page index, and bounding boxes for transparent validation.
 
-\runin{Human-in-the-Loop Optimization} The \textit{Node Heatmap} (Figure~\ref{fig:gui}-\circled{3}) visualizes retrieval impact, while manual node editing and tree restructuring improve future retrieval. Indexed CCTrees are archived in the \textit{Knowledge Base View} (Figure~\ref{fig:gui}-\circled{4}) for cross-session reuse, together with auto-generated document tags (e.g., length/layout complexity) and structural statistics.
-
+\runin{Human-in-the-Loop Optimization} The \textit{Node Heatmap} (Figure~\ref{fig:gui}-\circled{3}) visualizes retrieval impact, while users can refine the tree through direct node editing or natural-language restructuring instructions. Indexed CCTrees are archived in the \textit{Knowledge Base View} (Figure~\ref{fig:gui}-\circled{4}) for cross-session reuse, together with auto-generated document tags and structural statistics.
