@@ -527,14 +527,14 @@ We provide frontend deployment as follows (click to jump to demo video):
     </div></details>
 
 
-  The full results of MoDora and baselines are shown in [Results](./Results/resmodora.jsonl).
+  A small sample result kept for `dev` is shown in [Results](./Results/resmodora.jsonl). The complete benchmark results are intended to live on `main` and `test`.
 
 ## 💻 MMDA Bench
 
   MMDA is a benchmark with 537 documents and 1065 questions curated from over one million real-world documents. We perform layout-emphasize clustering to obtain these representative documents and most of them are semi-structured.
   Then automatic LLM generation and manual verification are combined for QA pairs annotaion. The questions can be concered about different aspects of document (e.g. hierarchy, text, table, chart, imgae, location, formatted), to comprehensively evaluate the semi-structured document analysis performance.
 
-  You can visit it here [MMDA](./datasets/MMDA/test.json), and some documents involving sensitive data are hidden. If you believe any content in this open source dataset infringes upon your copyright, please contact us, and we will remove it.
+  The `dev` branch keeps only a tiny runnable sample at [datasets/MMDA/test.json](./datasets/MMDA/test.json). The complete dataset is intended to live on `main` and `test`. If you believe any content in the open source dataset infringes upon your copyright, please contact us, and we will remove it.
 
 ## 📊 Performance
 
@@ -660,7 +660,7 @@ Retrieval-Augmented Generation methods:
 
 ## 🧪 CLI Usage (Experiments)
 
-  > **Note**: The CLI is primarily designed for experimental purposes, such as offline dataset preprocessing and batch evaluation. Before using the CLI, please ensure you have downloaded the MMDA dataset to the `datasets/MMDA` directory.
+  > **Note**: The `dev` branch only keeps a tiny MMDA sample. For full offline preprocessing and batch evaluation, use the complete dataset from `main` or `test`, or place it under `datasets/MMDA`.
 
   MoDora provides a comprehensive CLI for offline experiments, dataset preprocessing, and batch evaluation.
 
