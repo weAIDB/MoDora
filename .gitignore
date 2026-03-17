@@ -24,6 +24,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.pip_tmp/
 MoDora-backend/.pip_tmp/
 
 # MoDora Specific
@@ -46,10 +47,17 @@ MoDora-backend/temp_*.json
 # Models & Data
 models/
 *.pdf
-datasets/
 MoDora-backend/src/modora/lab/output/
 
 # Frontend
+node_modules/
+.next/
+out/
+nohup.out
+.backup/
+.dist/
+.runtime/
+.tools/
 MoDora-frontend/node_modules/
 MoDora-frontend/dist/
 MoDora-frontend/.env.local
@@ -58,8 +66,8 @@ MoDora-frontend/.env.test.local
 MoDora-frontend/.env.production.local
 
 # Configuration
-MoDora-backend/configs/local.json
-!MoDora-backend/configs/local.example.json
+local.json
+!local.example.json
 
 # IDEs & OS
 .vscode/
@@ -69,3 +77,6 @@ MoDora-backend/configs/local.json
 *.log
 *.swp
 *.bak
+MoDora-backend/data/
+
+data/

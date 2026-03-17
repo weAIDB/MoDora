@@ -14,9 +14,15 @@ logger = logging.getLogger(__name__)
 class SemanticRetriever:
     """CCTree retriever based on semantic understanding."""
 
-    def __init__(self, settings: Settings | None = None, mode: str | None = None):
-        self.settings = settings or Settings()
-        self.llm = AsyncLLMFactory.create(self.settings, mode=mode or "local")
+    def __init__(
+        self,
+        settings: Settings | None = None,
+        instance_id: str | None = None,
+    ):
+        self.settings = settings or Settings.load()
+        self.llm = AsyncLLMFactory.create(
+            self.settings, instance_id=instance_id
+        )
         self.cropper = PDFCropper()
 
     async def retrieve(
@@ -35,9 +41,10 @@ class SemanticRetriever:
         Returns:
             RetrievalResult: Retrieval results.
         """
-        # Start from the root node
         nodes = {"root": tree.root}
-        return await self._retrieve_recursive(nodes, query, source_path)
+        result = await self._retrieve_recursive(nodes, query, source_path)
+        result.normalize_locations()
+        return result
 
     async def _retrieve_recursive(
         self,
@@ -151,8 +158,9 @@ class SemanticRetriever:
             ):
                 if node.data:
                     result.text_map[path] = node.data
-                # Semantic matching means the entire node is relevant
-                result.locations.extend(node.location)
+                if node.location:
+                    result.locations.extend(node.location)
+                    result.locations_by_path.setdefault(path, []).extend(node.location)
 
             # If child nodes exist, perform selection
             if node.children:

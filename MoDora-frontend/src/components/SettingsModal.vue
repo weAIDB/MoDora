@@ -124,8 +124,8 @@ const close = () => {
   emit('close');
 };
 
-const save = () => {
-  store.updateSettings(form.value);
+const save = async () => {
+  await store.updateSettings(form.value);
   close();
 };
 </script>

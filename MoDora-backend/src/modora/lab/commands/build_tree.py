@@ -27,12 +27,12 @@ def register(sub: argparse._SubParsersAction) -> None:
     p = sub.add_parser("build-tree", help="Build title.json and tree.json for dataset")
     p.add_argument(
         "--dataset",
-        default="/home/yukai/project/MoDora/datasets/MMDA",
+        default=None,
         help="Path to a directory containing <num>.pdf files",
     )
     p.add_argument(
         "--cache-dir",
-        default="/home/yukai/project/MoDora/MoDora-backend/cache_v5",
+        default=None,
         help="Cache directory containing <num>/co.json",
     )
     p.add_argument(
@@ -226,8 +226,14 @@ def _handle_build_tree(args: argparse.Namespace, logger: logging.Logger) -> int:
     ensure_llm_local_loaded(settings, logger)
 
     try:
-        dataset_dir = Path(str(getattr(args, "dataset", "") or "").strip()).resolve()
-        cache_dir = Path(str(getattr(args, "cache_dir", "") or "").strip()).resolve()
+        dataset_value = str(getattr(args, "dataset", "") or "").strip()
+        cache_value = str(getattr(args, "cache_dir", "") or "").strip()
+        dataset_dir = Path(
+            dataset_value or (settings.docs_dir or "")
+        ).resolve()
+        cache_dir = Path(
+            cache_value or (settings.cache_dir or "")
+        ).resolve()
 
         pdf_paths = list(iter_pdf_paths(dataset_dir))
 

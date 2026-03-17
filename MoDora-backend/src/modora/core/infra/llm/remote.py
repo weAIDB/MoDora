@@ -12,23 +12,34 @@ class AsyncRemoteLLMClient(BaseAsyncLLMClient):
     Specifically used for calling remote OpenAI compatible interfaces (e.g., Gemini, GPT, etc.).
     """
 
-    def __init__(self, settings: Settings | None = None):
+    def __init__(self, settings: Settings | None = None, instance_id: str | None = None):
         """Initialize remote client.
 
         Args:
             settings: Configuration object. If None, default configuration is loaded.
+            instance_id: Optional specific model instance ID to use.
         """
-        super().__init__(settings)
+        super().__init__(settings, instance_id=instance_id)
         self._init_client()
 
     def _init_client(self):
-        """Initialize OpenAI async client instance based on configuration.
-
-        Reads api_key, api_base, and api_model from settings.
-        """
-        self.api_key = getattr(self.settings, "api_key", None)
-        self.base_url = getattr(self.settings, "api_base", None)
-        self.model = getattr(self.settings, "api_model", "gemini-2.5-flash")
+        """Initialize OpenAI async client instance based on configuration."""
+        # Use explicit instance if provided
+        if self.instance_id:
+            instance = self.settings.resolve_model_instance(self.instance_id)
+            if instance and instance.type == "remote":
+                self.api_key = instance.api_key
+                self.base_url = instance.base_url
+                self.model = instance.model or "gemini-2.5-flash"
+            else:
+                self.api_key = None
+                self.base_url = None
+                self.model = "gemini-2.5-flash"
+        else:
+            # Fallback (though global fields are mostly gone)
+            self.api_key = getattr(self.settings, "api_key", None)
+            self.base_url = getattr(self.settings, "api_base", None)
+            self.model = getattr(self.settings, "api_model", "gemini-2.5-flash")
 
         if self.api_key and self.base_url:
             self.client = AsyncOpenAI(

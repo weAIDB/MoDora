@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from datetime import datetime
@@ -15,6 +16,32 @@ from modora.core.infra.ocr.manager import get_ocr_model
 from modora.core.infra.pdf.fallback import extract_pdf_blocks
 from modora.core.domain.ocr import OcrExtractResponse, OCRBlock
 from modora.core.settings import Settings
+
+
+def _extract_ocr_response_sync(
+    source_p: Path,
+    settings: Settings,
+    logger: logging.Logger,
+) -> OcrExtractResponse:
+    """Run OCR/PDF fallback off the event loop because it is CPU/GPU bound."""
+    model = None
+    try:
+        model = get_ocr_model(settings=settings, logger=logger, create_if_missing=True)
+    except Exception as e:
+        logger.warning(f"OCR model load failed, using PDF text fallback: {e}")
+
+    if model is None:
+        logger.warning("OCR model not available, using PDF text fallback")
+        return extract_pdf_blocks(str(source_p))
+
+    try:
+        pdf_blocks: list[OCRBlock] = []
+        for page_blocks in model.predict_iter(str(source_p)):
+            pdf_blocks.extend(page_blocks)
+        return OcrExtractResponse(source=f"file:{source_p}", blocks=pdf_blocks)
+    except Exception as e:
+        logger.warning(f"OCR predict failed, using PDF text fallback: {e}")
+        return extract_pdf_blocks(str(source_p))
 
 
 def _generate_auto_tags(
@@ -62,33 +89,19 @@ async def process_document_task(
 
     try:
         source_p = Path(source_path)
-        # 1. Prioritize using the OCR model; fallback to PDF text extraction when unavailable to ensure the process continues.
-        model = None
-        try:
-            model = get_ocr_model(
-                settings=settings, logger=logger, create_if_missing=True
-            )
-        except Exception as e:
-            logger.warning(f"OCR model load failed, using PDF text fallback: {e}")
-        if model is None:
-            logger.warning("OCR model not available, using PDF text fallback")
-            ocr_res = extract_pdf_blocks(str(source_p))
-        else:
-            try:
-                pdf_blocks: list[OCRBlock] = []
-                for page_blocks in model.predict_iter(str(source_p)):
-                    pdf_blocks.extend(page_blocks)
-                ocr_res = OcrExtractResponse(
-                    source=f"file:{source_p}", blocks=pdf_blocks
-                )
-            except Exception as e:
-                logger.warning(f"OCR predict failed, using PDF text fallback: {e}")
-                ocr_res = extract_pdf_blocks(str(source_p))
+        # 1. OCR/PDF extraction is blocking work; keep it off the API event loop.
+        ocr_res = await asyncio.to_thread(
+            _extract_ocr_response_sync,
+            source_p,
+            settings,
+            logger,
+        )
 
         # 2. Cache OCR results
         cache_dir = paths.doc_cache_dir(filename)
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        (cache_dir / "ocr.json").write_text(
+        await asyncio.to_thread(cache_dir.mkdir, parents=True, exist_ok=True)
+        await asyncio.to_thread(
+            (cache_dir / "ocr.json").write_text,
             json.dumps(ocr_res.model_dump(), ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
@@ -117,7 +130,8 @@ async def process_document_task(
 
         # 5. Persist Tree
         tree_path = cache_dir / "tree.json"
-        tree_path.write_text(
+        await asyncio.to_thread(
+            tree_path.write_text,
             json.dumps(tree.to_dict(), ensure_ascii=False, indent=2),
             encoding="utf-8",
         )

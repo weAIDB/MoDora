@@ -256,6 +256,28 @@ class CCTree:
         obj = json.loads(p.read_text(encoding="utf-8"))
         return CCTree.from_dict(obj)
 
+    @staticmethod
+    def normalize_tree_dict(tree: dict[str, Any]) -> dict[str, Any]:
+        def visit(node: dict[str, Any], depth: int) -> int:
+            if not isinstance(node, dict):
+                return 0
+            node.setdefault("keyword_cnt", 0)
+            node["depth"] = depth
+            children = node.get("children")
+            if not isinstance(children, dict):
+                children = {}
+                node["children"] = children
+            max_child_height = 0
+            for child in children.values():
+                child_height = visit(child, depth + 1)
+                if child_height > max_child_height:
+                    max_child_height = child_height
+            node["height"] = max_child_height + 1
+            return node["height"]
+
+        visit(tree, 1)
+        return tree
+
     def get_structure(self) -> dict[str, Any]:
         """Gets the skeletal structure of the entire tree.
 
@@ -354,6 +376,10 @@ class RetrievalResult:
 
     text_map: Dict[str, str] = field(default_factory=dict)
     locations: List[Location] = field(default_factory=list)
+    locations_by_path: Dict[str, List[Location]] = field(default_factory=dict)
+    locations_by_file_page: Dict[tuple[str | None, int], List[Location]] = field(
+        default_factory=dict
+    )
 
     def update(self, other: "RetrievalResult") -> None:
         """Merges another retrieval result.
@@ -363,3 +389,49 @@ class RetrievalResult:
         """
         self.text_map.update(other.text_map)
         self.locations.extend(other.locations)
+        if other.locations_by_path:
+            for path, locs in other.locations_by_path.items():
+                if not locs:
+                    continue
+                if path in self.locations_by_path:
+                    self.locations_by_path[path].extend(locs)
+                else:
+                    self.locations_by_path[path] = list(locs)
+        self.normalize_locations()
+
+    def normalize_locations(self) -> None:
+        def normalize_file_name(name: str | None) -> str | None:
+            if not name:
+                return None
+            return Path(name).name
+
+        normalized_locations: List[Location] = []
+        seen_locations: set[tuple[str | None, int, tuple[float, float, float, float]]] = set()
+        for loc in self.locations:
+            loc.file_name = normalize_file_name(loc.file_name)
+            key = (loc.file_name, loc.page, tuple(loc.bbox))
+            if key in seen_locations:
+                continue
+            seen_locations.add(key)
+            normalized_locations.append(loc)
+        self.locations = normalized_locations
+
+        normalized_by_path: Dict[str, List[Location]] = {}
+        for path, locs in self.locations_by_path.items():
+            seen_path: set[
+                tuple[str | None, int, tuple[float, float, float, float]]
+            ] = set()
+            for loc in locs:
+                loc.file_name = normalize_file_name(loc.file_name)
+                key = (loc.file_name, loc.page, tuple(loc.bbox))
+                if key in seen_path:
+                    continue
+                seen_path.add(key)
+                normalized_by_path.setdefault(path, []).append(loc)
+        self.locations_by_path = normalized_by_path
+
+        grouped: Dict[tuple[str | None, int], List[Location]] = {}
+        for loc in self.locations:
+            key = (loc.file_name, loc.page)
+            grouped.setdefault(key, []).append(loc)
+        self.locations_by_file_page = grouped

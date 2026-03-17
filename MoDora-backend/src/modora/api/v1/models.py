@@ -39,6 +39,13 @@ class TreeUpdateRequest(BaseModel):
     elements: list
 
 
+class TreeRecomposeRequest(BaseModel):
+    file_name: str
+    rule: str = "balanced"
+    user_query: str | None = None
+    settings: dict[str, Any] | None = None
+
+
 class NodeUpdateRequest(BaseModel):
     file_name: str
     action: str

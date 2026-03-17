@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import logging
 import threading
 from typing import Any
 from openai import AsyncOpenAI
 
 from modora.core.infra.llm.base import BaseAsyncLLMClient
+from modora.core.infra.llm.process import _resolve_model_path
 from modora.core.settings import Settings
 
 
@@ -17,31 +19,42 @@ class AsyncLocalLLMClient(BaseAsyncLLMClient):
 
     _rr_lock = threading.Lock()
     _rr_idx = 0
+    _logger = logging.getLogger(__name__)
 
-    def __init__(self, settings: Settings | None = None):
-        super().__init__(settings)
+    def __init__(self, settings: Settings | None = None, instance_id: str | None = None):
+        """Initialize local client.
+
+        Args:
+            settings: Configuration object. If None, default configuration is loaded.
+            instance_id: Optional specific model instance ID to use.
+        """
+        super().__init__(settings, instance_id=instance_id)
 
     def _list_base_urls(self) -> list[str]:
         """Get a list of all available Base URLs."""
-        # 1. Prioritize using explicitly configured llm_local_base_url
-        if self.settings.llm_local_base_url:
-            return [self.settings.llm_local_base_url.rstrip("/")]
+        # 1. If an explicit instance is provided, use its base_url or port
+        if self.instance_id:
+            instance = self.settings.resolve_model_instance(self.instance_id)
+            if instance and instance.type == "local":
+                if instance.base_url:
+                    return [instance.base_url.rstrip("/")]
+                if instance.port:
+                    return [f"http://127.0.0.1:{instance.port}/v1"]
 
-        # 2. Then use local multi-instance configuration
-        instances = list(getattr(self.settings, "llm_local_instances", ()) or ())
-        if instances:
-            urls: list[str] = []
-            for it in instances:
-                host = (getattr(it, "host", None) or "127.0.0.1").strip() or "127.0.0.1"
-                port = int(
-                    getattr(it, "port", self.settings.llm_local_port)
-                    or self.settings.llm_local_port
-                )
-                urls.append(f"http://{host}:{port}/v1")
+        # 2. Fallback to all local model_instances if no explicit instance_id or if it fails
+        urls: list[str] = []
+        for inst in self.settings.model_instances.values():
+            if inst.type == "local":
+                if inst.base_url:
+                    urls.append(inst.base_url.rstrip("/"))
+                elif inst.port:
+                    urls.append(f"http://127.0.0.1:{inst.port}/v1")
+        
+        if urls:
             return urls
 
-        # 3. Fallback to default local port
-        return [f"http://127.0.0.1:{self.settings.llm_local_port}/v1"]
+        # 3. Last resort fallback
+        return ["http://127.0.0.1:9001/v1"]
 
     def _get_next_start_index(self, n: int) -> int:
         """Get the next starting index for round-robin."""
@@ -91,16 +104,40 @@ class AsyncLocalLLMClient(BaseAsyncLLMClient):
 
         Supports multi-instance round-robin and external API compatibility.
         """
-        model = self.settings.llm_local_model
+        model = None
+        if self.instance_id:
+            instance = self.settings.resolve_model_instance(self.instance_id)
+            if instance:
+                model = instance.model
+        
         if not model:
-            raise RuntimeError("llm_local_model is not configured")
+            # Fallback to the first local model found
+            for inst in self.settings.model_instances.values():
+                if inst.type == "local" and inst.model:
+                    model = inst.model
+                    break
+        
+        if not model:
+            raise RuntimeError("No local model instance found in configuration")
 
+        model = _resolve_model_path(model)
+        self._logger.info(
+            "local llm request model resolved",
+            extra={
+                "instance_id": self.instance_id,
+                "model": model,
+                "base_urls": self._list_base_urls(),
+            },
+        )
         base_urls = self._list_base_urls()
         start = self._get_next_start_index(len(base_urls))
         messages = self._create_messages(prompt, base64_image)
 
-        # Prioritize using locally configured API Key
-        api_key = self.settings.llm_local_api_key or "sk-no-key"
+        api_key = "sk-no-key"
+        if self.instance_id:
+            instance = self.settings.resolve_model_instance(self.instance_id)
+            if instance and instance.api_key:
+                api_key = instance.api_key
 
         last_exc: Exception | None = None
         for i in range(len(base_urls)):

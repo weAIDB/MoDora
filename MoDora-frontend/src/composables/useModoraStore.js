@@ -53,6 +53,65 @@ const state = reactive({
     modelInstances: []
 });
 
+const getDirectApiUrl = (path) => {
+    const apiPort = import.meta.env.VITE_MODORA_API_PORT;
+    const relayApiPort = import.meta.env.VITE_MODORA_PUBLIC_API_PORT;
+    const frontendPort = import.meta.env.VITE_MODORA_FRONTEND_PORT;
+    if ((!apiPort && !relayApiPort) || typeof window === 'undefined') {
+        return path;
+    }
+
+    const protocol = window.location.protocol || 'http:';
+    const hostname = window.location.hostname || '127.0.0.1';
+    const currentPort = window.location.port || '';
+    const targetPort =
+        relayApiPort && frontendPort && currentPort !== String(frontendPort)
+            ? relayApiPort
+            : apiPort;
+
+    if (!targetPort) {
+        return path;
+    }
+
+    return `${protocol}//${hostname}:${targetPort}${path}`;
+};
+
+const uploadViaDirectApi = (formData, onProgress) => new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', getDirectApiUrl('/api/upload'));
+    xhr.responseType = 'json';
+
+    xhr.upload.onprogress = (event) => {
+        if (!event.lengthComputable || typeof onProgress !== 'function') return;
+        onProgress(event.loaded / event.total);
+    };
+
+    xhr.onerror = () => {
+        reject(new Error('Upload request failed'));
+    };
+
+    xhr.ontimeout = () => {
+        reject(new Error('Upload timed out'));
+    };
+
+    xhr.onload = () => {
+        const response = xhr.response ?? {};
+        if (xhr.status >= 200 && xhr.status < 300) {
+            resolve(response);
+            return;
+        }
+
+        const detail =
+            response?.detail ||
+            (typeof xhr.responseText === 'string' && xhr.responseText) ||
+            `Upload failed with status ${xhr.status}`;
+        reject(new Error(detail));
+    };
+
+    xhr.timeout = 30 * 60 * 1000;
+    xhr.send(formData);
+});
+
 export function useModoraStore() {
 
     // 获取当前会话对象
@@ -191,15 +250,17 @@ export function useModoraStore() {
 
         try {
             // 发起真实 API 请求
+            const payload = { 
+                file_names: fileNames,
+                file_name: fileNames[0],
+                query: currentQuery,
+                settings: state.settings
+            };
+            console.log("Chat request payload:", payload);
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    file_names: fileNames, // 发送多文件列表
-                    file_name: fileNames[0], // 兼容旧接口
-                    query: currentQuery,
-                    settings: state.settings // 传递全局设置
-                })
+                body: JSON.stringify(payload)
             });
 
             if (!response.ok) {
@@ -314,10 +375,25 @@ export function useModoraStore() {
     };
 
     // 动作：更新设置
-    const updateSettings = (newSettings) => {
+    const updateSettings = async (newSettings) => {
         state.settings = normalizeSettings({ ...state.settings, ...newSettings });
         localStorage.setItem('modora_settings', JSON.stringify(state.settings));
-        console.log("Settings updated:", state.settings);
+        try {
+            const res = await fetch('/api/settings/ui', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ settings: state.settings })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.settings) {
+                    state.settings = normalizeSettings(data.settings);
+                    localStorage.setItem('modora_settings', JSON.stringify(state.settings));
+                }
+            }
+        } catch (e) {
+            console.error("Failed to save settings:", e);
+        }
     };
 
     const loadSettings = async () => {
@@ -372,20 +448,14 @@ export function useModoraStore() {
             formData.append("file", file);
             formData.append("settings", JSON.stringify(state.settings));
 
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData
+            const data = await uploadViaDirectApi(formData, (ratio) => {
+                const scaled = Math.min(40, Math.max(1, ratio * 40));
+                state.uploadProgress = Math.max(state.uploadProgress, scaled);
             });
 
             clearInterval(progressTimer); 
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.detail || `Upload failed with status ${response.status}`);
-            }
-
             state.uploadProgress = 40;
-            const data = await response.json();
             const filename = data.filename;
 
             // 阶段 2: 轮询后台状态 (40% -> 99%)

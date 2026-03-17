@@ -15,7 +15,7 @@
       </div>
       
       <div class="flex items-center">
-        <!-- 设置按钮 -->
+        <!-- Settings button -->
         <button 
           @click="$emit('open-settings')"
           class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors mr-2"
@@ -24,7 +24,7 @@
           <i class="fa-solid fa-gear"></i>
         </button>
 
-        <!-- 主题切换按钮 -->
+        <!-- Theme toggle button -->
         <button 
           @click="toggleTheme" 
           class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
@@ -391,7 +391,7 @@
       </div>
     </Teleport>
 
-    <!-- 标签编辑弹窗 -->
+    <!-- Tag editor modal -->
     <Teleport to="body">
       <div v-if="editingTagsDocId" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-all duration-300">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-300">
@@ -408,7 +408,7 @@
           </div>
           
           <div class="p-8 space-y-6">
-            <!-- 文档信息展示 -->
+            <!-- Document info section -->
             <div class="flex items-center p-4 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800/50">
               <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center mr-4 shadow-sm text-indigo-500 text-xl">
                 <i class="fa-solid fa-file-pdf"></i>
@@ -420,9 +420,9 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <!-- 左侧：添加与活跃标签 -->
+              <!-- Left: create and active tags -->
               <div class="space-y-6">
-                <!-- 添加标签 -->
+                <!-- Create tag -->
                 <div>
                   <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-3 block">Create New Tag</label>
                   <div class="relative group">
@@ -438,7 +438,7 @@
                   </div>
                 </div>
 
-                <!-- 当前标签列表 -->
+                <!-- Active tag list -->
                 <div>
                   <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-3 block">Active Tags</label>
                   <div class="flex flex-wrap gap-2 min-h-[120px] p-4 bg-slate-50/30 dark:bg-slate-900/10 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800/50 overflow-y-auto max-h-[200px] custom-scrollbar">
@@ -461,7 +461,7 @@
                 </div>
               </div>
 
-              <!-- 右侧：全局库建议 -->
+              <!-- Right: global library suggestions -->
               <div class="flex flex-col h-full">
                 <label class="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-3 block flex items-center">
                   <i class="fa-solid fa-lightbulb text-amber-400 mr-2"></i>
@@ -519,7 +519,7 @@ import { ref, nextTick, computed, onMounted } from 'vue';
 
 const store = useModoraStore();
 
-// 初始化拉取知识库数据
+// Initialize knowledge base data fetch
 onMounted(() => {
   store.fetchKbDocs();
   store.fetchGlobalTags();
@@ -532,17 +532,17 @@ const editInputRef = ref(null);
 const editingSessionId = ref(null);
 const editingName = ref('');
 
-// 统计相关状态
+// Stats-related state
 const showingSessionStats = ref(false);
 const showingDocStatsId = ref(null);
 
-// 标签编辑相关状态
+// Tag editor state
 const editingTagsDocId = ref(null);
 const editingTagsDocName = ref('');
 const currentTags = ref([]);
 const newTagInput = ref('');
 
-// 知识库选择相关状态
+// Knowledge base selection state
 const showingKbSelector = ref(false);
 const kbSearchQuery = ref('');
 const selectedKbDocs = ref([]);
@@ -658,7 +658,7 @@ const confirmDeleteKbDoc = (name) => {
 const startTagEditing = (doc) => {
   editingTagsDocId.value = doc.id;
   editingTagsDocName.value = doc.name;
-  // 从 store 中获取当前标签 (合并规则标签和语义标签)
+  // Read current tags from store (merge rule tags and semantic tags)
   const kbInfo = store.state.kbDocs[doc.name];
   if (kbInfo) {
     const tags = kbInfo.tags || [];
@@ -692,7 +692,7 @@ const removeTag = (tag) => {
 const saveTags = async () => {
   await store.updateDocTags(editingTagsDocName.value, currentTags.value);
   editingTagsDocId.value = null;
-  // 重新获取知识库数据以同步
+  // Refresh knowledge base data to keep in sync
   store.fetchKbDocs();
   store.fetchGlobalTags();
 };
@@ -718,7 +718,7 @@ const startEditing = (sess) => {
   editingName.value = sess.name;
   
   nextTick(() => {
-    // 如果有多个输入框（虽然v-if保证同时只有一个），确保聚焦
+    // If multiple inputs exist (v-if should keep one), ensure focus
     if (editInputRef.value && editInputRef.value[0]) {
        editInputRef.value[0].focus();
     } else if (editInputRef.value) {
@@ -738,13 +738,13 @@ const saveEditing = (sessId) => {
   }
 };
 
-// 触发文件选择
+// Trigger file selection
 const triggerUpload = () => {
   if (store.state.isUploading) return;
   fileInputRef.value?.click();
 };
 
-// 简单的文件图标映射
+// Simple file icon mapping
 const getFileIcon = (type) => {
   if (!type) return 'fa-regular fa-file';
   if (type.includes('pdf')) return 'fa-regular fa-file-pdf';
@@ -761,11 +761,11 @@ const onFileChange = async (e) => {
     await store.uploadFile(files[i]);
   }
   
-  // 重置 input，允许重复上传同一个文件
+  // Reset input to allow re-uploading the same file
   e.target.value = '';
 };
 
-// 获取标签样式
+// Get tag style
 const getTagStyle = (tag, isSemantic = false) => {
   const style = FIXED_TAG_STYLE_MAP[tag];
   if (style) return `${style} border`;

@@ -204,6 +204,9 @@ class ComponentPack:
             encoding="utf-8",
         )
 
+    def save_json(self, path: str | Path) -> None:
+        self.dump_json(path)
+
     @staticmethod
     def load_json(path: str) -> "ComponentPack":
         """Load a ComponentPack object from a JSON file."""

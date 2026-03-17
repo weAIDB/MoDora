@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import re
+from typing import Any
 from abc import ABC, abstractmethod
 from typing import Tuple
+
+import httpx
 
 from modora.core.settings import Settings
 from modora.core.prompts import (
@@ -19,7 +22,9 @@ from modora.core.prompts import (
     check_answer_prompt,
     whole_reasoning_prompt,
     image_reasoning_prompt,
+    rerank_prompt,
     evaluation_prompt,
+    TREE_RECOMPOSE_PROMPT
 )
 
 
@@ -29,6 +34,23 @@ def _bool_string(s: str) -> bool:
     if "t" in s or "yes" in s or "true" in s:
         return True
     return False
+
+
+def _parse_score(s: str) -> float:
+    if not s:
+        return 0.0
+    nums = re.findall(r"-?\d+(?:\.\d+)?", s)
+    if not nums:
+        return 0.0
+    try:
+        score = float(nums[0])
+    except Exception:
+        return 0.0
+    if score < 0.0:
+        return 0.0
+    if score > 1.0:
+        return 1.0
+    return score
 
 
 def _prompt_for_type(cp_type: str) -> str:
@@ -41,15 +63,52 @@ def _prompt_for_type(cp_type: str) -> str:
     return image_enrichment_prompt
 
 
+def _normalize_endpoint(base_url: str, endpoint: str) -> str:
+    base = base_url.rstrip("/")
+    ep = endpoint.strip("/")
+    if not ep:
+        return base
+    if base.endswith(f"/{ep}"):
+        return base
+    return f"{base}/{ep}"
+
+
+def _build_headers(api_key: str | None) -> dict[str, str]:
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["Authorization"] = api_key
+    return headers
+
+
+async def _post_json(
+    url: str,
+    payload: dict[str, Any],
+    headers: dict[str, str],
+    timeout: float,
+) -> dict[str, Any]:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            url, json=payload, headers=headers, timeout=timeout
+        )
+        response.raise_for_status()
+        return response.json()
+
+
 class BaseAsyncLLMClient(ABC):
     """Abstract base class for asynchronous LLM clients.
 
     Implements common business logic and defines LLM interaction interfaces.
     """
 
-    def __init__(self, settings: Settings | None = None):
-        """Initialize the client and load the configuration."""
+    def __init__(self, settings: Settings | None = None, instance_id: str | None = None):
+        """Initialize the client and load the configuration.
+
+        Args:
+            settings: Configuration object.
+            instance_id: Optional specific model instance ID to use.
+        """
         self.settings = settings or Settings.load()
+        self.instance_id = instance_id
 
     @abstractmethod
     async def _call_llm(
@@ -111,6 +170,11 @@ class BaseAsyncLLMClient(ABC):
         res = await self._call_llm(prompt, base64_image)
         return _bool_string(res)
 
+    async def rerank_score(self, query: str, passage: str) -> float:
+        prompt = rerank_prompt.format(query=query, passage=passage)
+        res = await self._call_llm(prompt)
+        return _parse_score(res or "")
+
     async def evaluate(self, query: str, reference: str, prediction: str) -> bool:
         """Evaluate whether the generated answer is semantically consistent with the reference answer."""
         prompt = evaluation_prompt.format(query=query, a=reference, b=prediction)
@@ -135,9 +199,31 @@ class BaseAsyncLLMClient(ABC):
     async def reason_whole(
         self, query: str, data: str, image: str | None = None
     ) -> str:
-        """Perform reasoning based on global context."""
+        """Perform whole document reasoning based on the query and data."""
         prompt = whole_reasoning_prompt.format(query=query, data=data)
         return await self._call_llm(prompt, base64_image=image)
+
+    async def recompose_tree(self, schema: dict[str, Any], query: str) -> dict[str, Any]:
+        """Generate a new tree structure based on the current schema and user query."""
+        import json
+        prompt = TREE_RECOMPOSE_PROMPT.format(
+            schema=json.dumps(schema, ensure_ascii=False, indent=2),
+            query=query
+        )
+        response = await self._call_llm(prompt)
+        
+        # Try to parse JSON, cleaning Markdown tags if they are included
+        cleaned_response = response.strip()
+        if cleaned_response.startswith("```json"):
+            cleaned_response = cleaned_response[7:]
+        if cleaned_response.endswith("```"):
+            cleaned_response = cleaned_response[:-3]
+        
+        try:
+            return json.loads(cleaned_response)
+        except json.JSONDecodeError as e:
+            # Log or handle errors
+            raise ValueError(f"AI returned invalid JSON: {e}\nResponse: {response}")
 
     async def generate_annotation_async(
         self, base64_image: str, cp_type: str, settings: Settings | None = None

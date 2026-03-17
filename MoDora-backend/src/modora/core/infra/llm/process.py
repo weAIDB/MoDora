@@ -10,7 +10,12 @@ from pathlib import Path
 from urllib.parse import urlparse
 from typing import Any
 
-from modora.core.settings import Settings
+from modora.core.settings import Settings, ModelInstance
+from modora.core.utils.config import (
+    MODULE_KEYS,
+    load_ui_settings_from_config,
+    normalize_ui_settings,
+)
 
 _llm_local_procs: dict[tuple[str, int], subprocess.Popen] = {}
 
@@ -68,75 +73,101 @@ def _resolve_model_path(model: str) -> str:
     return model
 
 
-def ensure_llm_local_loaded(settings: Settings, logger: Any) -> None:
+def _selected_model_instance_ids(
+    settings: Settings, config_path: str | None = None
+) -> list[str]:
+    ui_settings = load_ui_settings_from_config(config_path)
+    normalized = normalize_ui_settings(ui_settings)
+    instances = settings.model_instances or {}
+    default_instance_id = next(iter(instances.keys()), None)
+    selected: list[str] = []
+    pipelines = normalized.get("pipelines")
+    if isinstance(pipelines, dict):
+        for key in MODULE_KEYS:
+            item = pipelines.get(key)
+            if isinstance(item, dict):
+                model_instance = item.get("modelInstance")
+                if isinstance(model_instance, str) and model_instance.strip():
+                    selected.append(model_instance.strip())
+                    continue
+            if default_instance_id:
+                selected.append(default_instance_id)
+    elif default_instance_id:
+        selected = [default_instance_id]
+
+    seen: set[str] = set()
+    deduped: list[str] = []
+    for item in selected:
+        if item in seen:
+            continue
+        seen.add(item)
+        deduped.append(item)
+    return deduped
+
+
+def _resolve_local_entries(
+    settings: Settings, *, config_path: str | None = None, force: bool = False
+) -> list[tuple[str, int, str | None, str | None]]:
+    local_entries: list[tuple[str, int, str | None, str | None]] = []
+    instances: list[ModelInstance] = []
+    if settings.model_instances:
+        if force:
+            for inst in settings.model_instances.values():
+                if inst.type == "local" and inst.model:
+                    instances.append(inst)
+        else:
+            for inst_id in _selected_model_instance_ids(settings, config_path):
+                inst = settings.resolve_model_instance(inst_id)
+                if inst and inst.type == "local" and inst.model:
+                    instances.append(inst)
+
+        for inst in instances:
+            host = "127.0.0.1"
+            port = inst.port or 9001
+            if inst.base_url and not inst.port:
+                parsed_host, parsed_port = _parse_base_url(inst.base_url)
+                if parsed_host:
+                    host = parsed_host
+                if parsed_port:
+                    port = parsed_port
+            local_entries.append(
+                (host, int(port), _resolve_model_path(inst.model), inst.device)
+            )
+
+    return local_entries
+
+
+def ensure_llm_local_loaded(
+    settings: Settings,
+    logger: Any,
+    *,
+    config_path: str | None = None,
+    force: bool = False,
+) -> None:
     """Ensure local LLM service (lmdeploy) is started.
 
     Logic:
-    1. Check configuration. If llm_local_model is not enabled, return immediately.
-    2. Parse llm_local_instances configuration to determine the list of instances to start.
-    3. For each instance:
+    1. Parse model_instances configuration to determine the list of local instances to start.
+    2. For each instance:
        - Check if a process is already running and healthy (via /v1/models interface).
        - If the port is not occupied and there's no response, start a new lmdeploy child process.
-    4. Poll and wait for all instances to be ready (until timeout).
+    3. Poll and wait for all instances to be ready (until timeout).
     """
     global _llm_local_procs
 
-    local_entries: list[tuple[str, int, str | None, str | None]] = []
-    for inst in settings.model_instances.values():
-        if inst.type != "local":
-            continue
-        if not inst.model:
-            continue
-        host = "127.0.0.1"
-        port = inst.port
-        if inst.base_url and not port:
-            parsed_host, parsed_port = _parse_base_url(inst.base_url)
-            if parsed_host:
-                host = parsed_host
-            if parsed_port:
-                port = parsed_port
-        if not port:
-            port = settings.llm_local_port
-        local_entries.append(
-            (host, int(port), _resolve_model_path(inst.model), inst.device)
-        )
+    local_entries = _resolve_local_entries(
+        settings, config_path=config_path, force=force
+    )
 
-    if not local_entries and not settings.llm_local_model:
-        logger.info("local llm disabled", extra={"llm_local_model": None})
+    if not local_entries:
+        logger.info("local llm disabled")
         return
 
     bases: list[tuple[str, int, str, str | None, str]] = []
-    if local_entries:
-        for host, port, model, device in local_entries:
-            url_host = "localhost" if host in {"0.0.0.0"} else host
-            base = f"http://{url_host}:{port}/v1"
-            bases.append((host, port, base, device, model))
-    else:
-        instances = list(getattr(settings, "llm_local_instances", ()) or ())
-        if not instances:
-            instances = [
-                type(
-                    "_TmpInst",
-                    (),
-                    {
-                        "host": "127.0.0.1",
-                        "port": int(settings.llm_local_port),
-                        "cuda_visible_devices": settings.llm_local_cuda_visible_devices,
-                    },
-                )()
-            ]
-
-        for inst in instances:
-            host = (getattr(inst, "host", None) or "127.0.0.1").strip() or "127.0.0.1"
-            port = int(
-                getattr(inst, "port", settings.llm_local_port)
-                or settings.llm_local_port
-            )
-            url_host = "localhost" if host in {"0.0.0.0"} else host
-            base = f"http://{url_host}:{port}/v1"
-            cuda_visible_devices = getattr(inst, "cuda_visible_devices", None)
-            model_path = _resolve_model_path(settings.llm_local_model)
-            bases.append((host, port, base, cuda_visible_devices, model_path))
+    for host, port, model, device in local_entries:
+        url_host = "localhost" if host in {"0.0.0.0"} else host
+        base = f"http://{url_host}:{port}/v1"
+        bases.append((host, port, base, device, model))
 
     for host, port, base, cuda_visible_devices, model in bases:
         key = (host, port)

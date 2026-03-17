@@ -14,6 +14,10 @@ from modora.core.domain.jobs import QAJob
 from modora.core.services.qa_service import QAService
 from modora.core.settings import Settings
 from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
+from modora.core.utils.config import (
+    load_ui_settings_from_config,
+    settings_from_ui_payload,
+)
 
 
 def register(sub: argparse._SubParsersAction) -> None:
@@ -21,17 +25,17 @@ def register(sub: argparse._SubParsersAction) -> None:
     parser = sub.add_parser("batch-qa", help="Run batch QA experiments")
     parser.add_argument(
         "--dataset",
-        default="/home/yukai/project/MoDora/datasets/MMDA/test.json",
+        default=None,
         help="Path to the dataset JSON file (e.g., test.json)",
     )
     parser.add_argument(
         "--cache",
-        default="/home/yukai/project/MoDora/MoDora-backend/cache_v5",
+        default=None,
         help="Path to the cache directory containing trees",
     )
     parser.add_argument(
         "--output",
-        default="/home/yukai/project/MoDora/MoDora-backend/tmp",
+        default=None,
         help="Directory to save intermediate and final results",
     )
     parser.add_argument(
@@ -197,11 +201,13 @@ async def run_single_qa(
 
 
 async def run_batch_qa(
-    jobs: List[QAJob], concurrency: int, logger: logging.Logger, debug: bool = False
+    jobs: List[QAJob],
+    qa_service: QAService,
+    concurrency: int,
+    logger: logging.Logger,
+    debug: bool = False,
 ) -> List[dict[str, Any]]:
     """Run QA tasks in batch."""
-    settings = Settings.load()
-    qa_service = QAService(settings)
     sem = asyncio.Semaphore(concurrency)
 
     tasks = [run_single_qa(job, qa_service, sem, logger, debug) for job in jobs]
@@ -217,13 +223,34 @@ async def run_batch_qa(
 
 def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
     """Processor for the batch-qa command."""
-    settings = Settings.load()
-    ensure_llm_local_loaded(settings, logger)
+    config_path = getattr(args, "config", None)
+    settings = Settings.load(config_path)
+    ensure_llm_local_loaded(settings, logger, config_path=config_path)
 
     try:
-        dataset_path = Path(args.dataset).resolve()
-        cache_dir = Path(args.cache).resolve()
-        output_dir = Path(args.output).resolve()
+        ui_settings = load_ui_settings_from_config(config_path)
+        qa_settings, _, qa_instance_id, cfg = settings_from_ui_payload(
+            settings, ui_settings, module_key="qaService"
+        )
+        retriever_settings, _, retriever_instance_id, _ = settings_from_ui_payload(
+            settings, cfg, module_key="retriever"
+        )
+        qa_service = QAService(
+            qa_settings,
+            qa_instance=qa_instance_id,
+            retriever_settings=retriever_settings,
+            retriever_instance=retriever_instance_id,
+        )
+
+        dataset_value = (getattr(args, "dataset", None) or "").strip()
+        cache_value = (getattr(args, "cache", None) or "").strip()
+        output_value = (getattr(args, "output", None) or "").strip()
+
+        dataset_path = Path(
+            dataset_value or (Path(settings.docs_dir or "") / "test.json")
+        ).resolve()
+        cache_dir = Path(cache_value or (settings.cache_dir or "")).resolve()
+        output_dir = Path(output_value or (settings.cache_dir or "")).resolve()
         output_dir.mkdir(parents=True, exist_ok=True)
 
         with open(dataset_path, "r", encoding="utf-8") as f:
@@ -284,7 +311,7 @@ def _handle_batch_qa(args: argparse.Namespace, logger: logging.Logger) -> int:
         new_results = []
         if jobs:
             new_results = asyncio.run(
-                run_batch_qa(jobs, args.concurrency, logger, args.debug)
+                run_batch_qa(jobs, qa_service, args.concurrency, logger, args.debug)
             )
 
         # Merge and save final summary

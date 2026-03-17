@@ -1,6 +1,6 @@
 <template>
   <main class="flex-1 flex flex-col h-full bg-transparent relative">
-    <!-- 顶部 -->
+    <!-- Header -->
     <header class="h-16 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 flex items-center justify-between shrink-0 z-10 rounded-t-3xl">
       <div class="flex items-center space-x-3">
         <div class="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)]"></div>

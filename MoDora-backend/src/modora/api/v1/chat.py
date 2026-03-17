@@ -21,13 +21,18 @@ def _settings_from_payload(
     payload: dict[str, Any] | None,
 ) -> tuple[Settings, str | None, Settings, str | None]:
     settings = Settings.load()
-    qa_settings, qa_mode, cfg = settings_from_ui_payload(
+    qa_settings, _, qa_instance, cfg = settings_from_ui_payload(
         settings, payload, module_key="qaService"
     )
-    retriever_settings, retriever_mode, _ = settings_from_ui_payload(
+    retriever_settings, _, retriever_instance, _ = settings_from_ui_payload(
         settings, cfg, module_key="retriever"
     )
-    return qa_settings, qa_mode, retriever_settings, retriever_mode
+    return (
+        qa_settings,
+        qa_instance,
+        retriever_settings,
+        retriever_instance,
+    )
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -36,12 +41,16 @@ async def chat_endpoint(request: ChatRequest):
     file_names = request.file_names or (
         [] if not request.file_name else [request.file_name]
     )
+   
     if not file_names:
         raise HTTPException(status_code=400, detail="File name(s) required")
 
-    app_settings, qa_mode, retriever_settings, retriever_mode = _settings_from_payload(
-        settings_payload
-    )
+    (
+        app_settings,
+        qa_instance,
+        retriever_settings,
+        retriever_instance,
+    ) = _settings_from_payload(settings_payload)
     paths = resolve_paths(app_settings)
 
     # Load tree structures for all documents
@@ -82,10 +91,11 @@ async def chat_endpoint(request: ChatRequest):
     # Use the core QAService with the overrides from payload
     qa_service = QAService(
         app_settings,
-        qa_mode=qa_mode,
-        retriever_mode=retriever_mode,
+        qa_instance=qa_instance,
+        retriever_instance=retriever_instance,
         retriever_settings=retriever_settings,
     )
+    
 
     try:
         # Use the correct method name 'qa' from core QAService

@@ -24,10 +24,10 @@ const props = defineProps({
   }
 });
 
-// 配置 marked
+// Configure marked
 marked.setOptions({
-  gfm: true, // 启用 GitHub 风格的 Markdown
-  breaks: true, // 启用换行符
+  gfm: true, // Enable GitHub-flavored Markdown
+  breaks: true, // Enable line breaks
 });
 
 const renderedContent = computed(() => {
@@ -38,7 +38,7 @@ const renderedContent = computed(() => {
 </script>
 
 <style>
-/* 针对 prose 的一些自定义微调 */
+/* Minor custom tweaks for prose */
 .prose p {
   margin-bottom: 0.5em;
   margin-top: 0.5em;
