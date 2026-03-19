@@ -1,4 +1,4 @@
-<a href="https://wu-uk.github.io/MoDora" target="_blank">
+<img width="128" height="128" alt="image" src="https://github.com/user-attachments/assets/55dbfa34-240f-4a8b-98dc-4ca1a6ab6c3b" /><a href="https://wu-uk.github.io/MoDora" target="_blank">
   <img src="https://github.com/user-attachments/assets/a5e839e5-5757-4960-99ce-55b8980605f1" alt="image" width="1855" height="955" />
 </a>
 
@@ -16,8 +16,8 @@
   - [1. Configuration](#1-configuration)
   - [2. Installation](#2-installation)
   - [3. Execution](#3-execution)
-- [CLI Usage](#-cli-usage-experiments)
-
+- [CLI Usage](#cli-usage-experiments)
+- [OpenClaw Skill](#openclaw-skill)
 
 ## ✨ Introduction
 
@@ -725,6 +725,10 @@ Retrieval-Augmented Generation methods:
      - Update `result.json` with calculated metrics (Accuracy, ANLS, etc.).
      - Save the detailed evaluation to `evaluation.jsonl` in the same directory as `result.json`.
      - Generate accuracy/ACNLS bar charts and summary CSVs in the same directory.
+
+##  OpenClaw Skill
+
+Visit [Modora(ClawHub)](https://clawhub.ai/wu-uk/modora-http) for details.
 
 ## 📒 Citation
 
