@@ -118,6 +118,7 @@ async def process_document_task(
             cp,
             logger,
             source_path=str(source_p),
+            interim_tree_path=str(cache_dir / "tree.json"),
             settings=settings,
             config=config,
         )

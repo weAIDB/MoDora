@@ -1,7 +1,8 @@
 {
-  "env": "dev",
+  "env": "prod",
   "service_name": "modora-backend",
   "api_port": 8005,
+  "cors_allowed_origins": ["https://modora.pro", "https://www.modora.pro"],
   "log_level": "INFO",
   "log_format": "text",
   "log_to_file": false,
@@ -29,14 +30,19 @@
     }
   },
 
-  "// OCR 配置": "Structural recognition based on PaddleOCR (ppstructure or paddle_ocr_vl)",
-  "ocr_model": "ppstructure",
+  "// OCR 配置": "Use paddle_api for Paddle cloud OCR, disabled for PDF text fallback, or ppstructure/paddle_ocr_vl for local OCR",
+  "ocr_model": "disabled",
+  "enable_ocr_preload": false,
   "ocr_device": "gpu:0",
   "ocr_lang": "en",
   "ocr_layout_unclip_ratio": 1.2,
   "ocr_text_recognition_batch_size": 8,
   "ocr_use_table_recognition": true,
   "ocr_use_doc_unwarping": false,
+  "ocr_api_url": "https://paddleocr.aistudio-app.com/api/v2/ocr/jobs",
+  "ocr_api_token": "your-paddle-token",
+  "ocr_api_model": "PP-StructureV3",
+  "ocr_api_poll_interval_s": 5,
   "enable_vector_search": false,
 
   "ui_settings": {

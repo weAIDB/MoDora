@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 import logging
 from openai import AsyncOpenAI
 from modora.core.settings import Settings
@@ -45,6 +46,7 @@ class AsyncRemoteLLMClient(BaseAsyncLLMClient):
             self.client = AsyncOpenAI(
                 api_key=self.api_key,
                 base_url=self.base_url,
+                timeout=float(getattr(self.settings, "llm_request_timeout_s", 60.0)),
             )
         else:
             self.client = None
@@ -67,7 +69,7 @@ class AsyncRemoteLLMClient(BaseAsyncLLMClient):
             logging.getLogger(__name__).error(
                 "Remote LLM client not initialized (missing api_key or api_base)"
             )
-            return ""
+            raise RuntimeError("remote llm client not initialized")
 
         messages = [
             {
@@ -97,14 +99,44 @@ class AsyncRemoteLLMClient(BaseAsyncLLMClient):
                         }
                     )
 
+        logger = logging.getLogger(__name__)
+        started_at = time.monotonic()
+        logger.info(
+            "Remote LLM request start",
+            extra={
+                "model": self.model,
+                "base_url": self.base_url,
+                "message_parts": len(messages[0]["content"]),
+                "has_image": len(messages[0]["content"]) > 1,
+                "prompt_chars": len(prompt),
+                "timeout_s": float(getattr(self.settings, "llm_request_timeout_s", 60.0)),
+            },
+        )
+
         try:
-            # Call Chat Completion of OpenAI compatible interface
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
                 max_completion_tokens=16384,  # Increase token limit to support long text generation
             )
-            return response.choices[0].message.content or ""
+            content = response.choices[0].message.content or ""
+            logger.info(
+                "Remote LLM request success",
+                extra={
+                    "model": self.model,
+                    "duration_s": round(time.monotonic() - started_at, 3),
+                    "response_chars": len(content),
+                },
+            )
+            return content
         except Exception as e:
-            logging.getLogger(__name__).error(f"Remote LLM call failed: {e}")
-            return ""
+            logger.error(
+                "Remote LLM call failed",
+                extra={
+                    "model": self.model,
+                    "base_url": self.base_url,
+                    "duration_s": round(time.monotonic() - started_at, 3),
+                    "error": str(e),
+                },
+            )
+            raise

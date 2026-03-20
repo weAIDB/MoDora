@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
+from pathlib import Path
 
 from modora.core.domain import ComponentPack, OcrExtractResponse
 from modora.core.infra.llm import AsyncLLMFactory
@@ -63,6 +65,7 @@ async def build_tree_async(
     cp: ComponentPack,
     logger: logging.Logger,
     source_path: str = "",
+    interim_tree_path: str | None = None,
     settings: Settings | None = None,
     config: dict | None = None,
 ):
@@ -103,14 +106,35 @@ async def build_tree_async(
     constructor = TreeConstructor(base_settings, logger)
 
     # 1. Heading level enhancement
+    logger.info("build_tree: starting level generation", extra={"source_path": source_path})
     cp = await AsyncLevelGenerator(llm_level, cropper).generate_level(
         source_path=source_path, cp=cp, config=level_settings, logger=logger
     )
+    logger.info("build_tree: level generation finished", extra={"source_path": source_path})
 
     # 2. Construct tree structure
+    logger.info("build_tree: constructing tree", extra={"source_path": source_path})
     cctree = constructor.construct_tree(cp)
+    logger.info(
+        "build_tree: tree construction finished",
+        extra={"source_path": source_path, "root_children": len(cctree.root.children)},
+    )
+
+    if interim_tree_path:
+        tree_path = Path(interim_tree_path)
+        await asyncio.to_thread(
+            tree_path.write_text,
+            json.dumps(cctree.to_dict(), ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        logger.info(
+            "build_tree: wrote interim tree",
+            extra={"source_path": source_path, "tree_path": str(tree_path)},
+        )
 
     # 3. Semantic metadata generation
+    logger.info("build_tree: starting metadata generation", extra={"source_path": source_path})
     await generator.get_metadata(cctree)
+    logger.info("build_tree: metadata generation finished", extra={"source_path": source_path})
 
     return cctree

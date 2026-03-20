@@ -8,7 +8,7 @@ echo "🔧 Starting Backend API..."
 cd MoDora-backend
 
 # Check for virtual environment
-if [ ! -d "venv" ]; then
+if [ ! -f "venv/bin/activate" ]; then
     echo "❌ Virtual environment not found. Please run ./setup.sh first."
     exit 1
 fi

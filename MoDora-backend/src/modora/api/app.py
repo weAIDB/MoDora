@@ -32,7 +32,10 @@ logger = logging.getLogger("modora.api")
 async def lifespan(_app: FastAPI):
     ensure_llm_local_loaded(settings, logger)
     try:
-        ensure_ocr_model_loaded(settings, logger)
+        if settings.enable_ocr_preload:
+            ensure_ocr_model_loaded(settings, logger)
+        else:
+            logger.info("ocr preload disabled")
     except Exception as e:
         logger.warning(f"ocr model init failed: {e}")
     try:
@@ -50,7 +53,7 @@ if paths.docs_dir.exists():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

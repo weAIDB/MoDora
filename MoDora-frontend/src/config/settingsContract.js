@@ -17,6 +17,7 @@ export const MODULE_LABELS = {
 };
 
 export const OCR_MODEL_OPTIONS = [
+  { value: 'paddle_api', label: 'Paddle OCR API' },
   { value: 'ppstructure', label: 'PPStructureV3' },
   { value: 'paddle_ocr_vl', label: 'PaddleOCRVL' },
 ];

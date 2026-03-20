@@ -10,6 +10,7 @@ dependencies = [
   "fastapi",
   "uvicorn",
   "pydantic",
+  "requests",
   "python-Levenshtein",
   "tqdm",
   "numpy",
@@ -18,16 +19,22 @@ dependencies = [
   "pymupdf",
   "Pillow",
   "nvidia-ml-py",
-  "huggingface_hub",
-  "transformers>=4.45.0",
   "pandas",
   "seaborn",
   "matplotlib",
   "python-multipart",
+  "chromadb",
+]
+
+[project.optional-dependencies]
+local-llm = [
+  "huggingface_hub",
+  "transformers>=4.45.0",
   "lmdeploy==0.12.0",
+]
+local-ocr = [
   "paddleocr",
   "paddlex>=3.4.2",
-  "chromadb",
 ]
 
 [project.scripts]

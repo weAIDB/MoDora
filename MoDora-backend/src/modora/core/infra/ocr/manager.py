@@ -68,6 +68,12 @@ def get_ocr_model(
                 return None
             return _ocr_clients.get(_default_ocr_key)
 
+        model_name = (settings.ocr_model or "").strip().lower()
+        if model_name in {"", "none", "disabled", "pdf_fallback"}:
+            if logger is not None:
+                logger.info("OCR model disabled; using PDF text fallback only")
+            return None
+
         key = _ocr_settings_key(settings)
         existing = _ocr_clients.get(key)
         if existing is not None:

@@ -173,6 +173,7 @@ class Settings:
     api_base: str | None = None
     api_key: str | None = None
     api_port: int = 8005
+    cors_allowed_origins: list[str] = field(default_factory=lambda: ["*"])
 
     embedding_api_base: str | None = None
     embedding_api_key: str | None = None
@@ -185,14 +186,20 @@ class Settings:
     model_instances: dict[str, ModelInstance] = field(default_factory=dict)
 
     llm_local_startup_timeout_s: float = 600.0
+    llm_request_timeout_s: float = 60.0
 
     ocr_model: str = "ppstructure"
+    enable_ocr_preload: bool = True
     ocr_device: str = "gpu:7"
     ocr_lang: str = "en"
     ocr_layout_unclip_ratio: float | tuple[float, float] = 1.2
     ocr_text_recognition_batch_size: int = 8
     ocr_use_table_recognition: bool = True
     ocr_use_doc_unwarping: bool = False
+    ocr_api_url: str | None = None
+    ocr_api_token: str | None = None
+    ocr_api_model: str = "PP-StructureV3"
+    ocr_api_poll_interval_s: float = 5.0
 
     enable_vector_search: bool = True
 
@@ -259,6 +266,19 @@ class Settings:
         api_base = _clean_str(pick("api_base", None))
         api_key = _clean_str(pick("api_key", None))
         api_port = int(pick("api_port", 8005))
+        cors_allowed_origins_raw = _coerce_json(pick("cors_allowed_origins", ["*"]))
+        cors_allowed_origins: list[str]
+        if isinstance(cors_allowed_origins_raw, list):
+            cors_allowed_origins = [
+                origin
+                for item in cors_allowed_origins_raw
+                if (origin := _clean_str(item)) is not None
+            ]
+        else:
+            origin = _clean_str(cors_allowed_origins_raw)
+            cors_allowed_origins = [origin] if origin else ["*"]
+        if not cors_allowed_origins:
+            cors_allowed_origins = ["*"]
 
         embedding_api_base = _clean_str(pick("embedding_api_base", None))
         embedding_api_key = _clean_str(pick("embedding_api_key", None))
@@ -306,8 +326,12 @@ class Settings:
                 )
 
         llm_local_startup_timeout_s = float(pick("llm_local_startup_timeout_s", 600.0))
+        llm_request_timeout_s = float(pick("llm_request_timeout_s", 60.0))
 
         ocr_model = _clean_str(pick("ocr_model", "ppstructure"))
+        enable_ocr_preload = _coerce_bool(
+            pick("enable_ocr_preload", True), default=True
+        )
         ocr_device = _clean_str(pick("ocr_device", "gpu:7")) or "gpu:7"
         ocr_lang = _clean_str(pick("ocr_lang", "en"))
         ocr_layout_unclip_ratio = _coerce_float_or_pair(
@@ -322,6 +346,12 @@ class Settings:
         ocr_use_doc_unwarping = _coerce_bool(
             pick("ocr_use_doc_unwarping", False), default=False
         )
+        ocr_api_url = _clean_str(
+            pick("ocr_api_url", "https://paddleocr.aistudio-app.com/api/v2/ocr/jobs")
+        )
+        ocr_api_token = _clean_str(pick("ocr_api_token", None))
+        ocr_api_model = _clean_str(pick("ocr_api_model", "PP-StructureV3")) or "PP-StructureV3"
+        ocr_api_poll_interval_s = float(pick("ocr_api_poll_interval_s", 5.0))
         enable_vector_search = _coerce_bool(
             pick("enable_vector_search", True), default=True
         )
@@ -355,6 +385,7 @@ class Settings:
             api_base=api_base,
             api_key=api_key,
             api_port=api_port,
+            cors_allowed_origins=cors_allowed_origins,
             embedding_api_base=embedding_api_base,
             embedding_api_key=embedding_api_key,
             embedding_model_name=embedding_model_name,
@@ -363,12 +394,18 @@ class Settings:
             rerank_model_name=rerank_model_name,
             model_instances=model_instances,
             llm_local_startup_timeout_s=llm_local_startup_timeout_s,
+            llm_request_timeout_s=llm_request_timeout_s,
             ocr_model=ocr_model,
+            enable_ocr_preload=enable_ocr_preload,
             ocr_device=ocr_device,
             ocr_lang=ocr_lang,
             ocr_layout_unclip_ratio=ocr_layout_unclip_ratio,
             ocr_text_recognition_batch_size=ocr_text_recognition_batch_size,
             ocr_use_table_recognition=ocr_use_table_recognition,
             ocr_use_doc_unwarping=ocr_use_doc_unwarping,
+            ocr_api_url=ocr_api_url,
+            ocr_api_token=ocr_api_token,
+            ocr_api_model=ocr_api_model,
+            ocr_api_poll_interval_s=ocr_api_poll_interval_s,
             enable_vector_search=enable_vector_search,
         )

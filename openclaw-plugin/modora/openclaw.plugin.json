@@ -1,0 +1,31 @@
+{
+  "id": "modora",
+  "name": "MoDora",
+  "description": "Expose MoDora document-analysis APIs as OpenClaw agent tools.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "baseUrl": {
+        "type": "string",
+        "description": "Base URL for the running MoDora backend."
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 1000,
+        "maximum": 300000,
+        "description": "HTTP timeout in milliseconds for backend requests."
+      }
+    }
+  },
+  "uiHints": {
+    "baseUrl": {
+      "label": "MoDora Base URL",
+      "placeholder": "https://modora.pro"
+    },
+    "timeoutMs": {
+      "label": "Request Timeout (ms)",
+      "placeholder": "120000"
+    }
+  }
+}

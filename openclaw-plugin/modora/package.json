@@ -1,0 +1,42 @@
+{
+  "name": "@weaidb/modora",
+  "version": "0.1.1",
+  "license": "MIT",
+  "author": "weAIDB",
+  "type": "module",
+  "description": "OpenClaw plugin that exposes MoDora document-analysis tools.",
+  "keywords": [
+    "openclaw",
+    "plugin",
+    "modora",
+    "document-analysis",
+    "rag",
+    "pdf"
+  ],
+  "homepage": "https://github.com/weAIDB/MoDora/tree/main/openclaw-plugin/modora",
+  "bugs": {
+    "url": "https://github.com/weAIDB/MoDora/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weAIDB/MoDora.git",
+    "directory": "openclaw-plugin/modora"
+  },
+  "files": [
+    "index.js",
+    "openclaw.plugin.json",
+    "README.md",
+    "skills"
+  ],
+  "openclaw": {
+    "extensions": [
+      "./index.js"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

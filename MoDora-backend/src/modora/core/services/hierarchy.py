@@ -6,7 +6,7 @@ import logging
 
 from modora.core.domain.component import ComponentPack
 from modora.core.settings import Settings
-from modora.core.infra.llm.local import AsyncLocalLLMClient
+from modora.core.infra.llm.base import BaseAsyncLLMClient
 from modora.core.interfaces.media import ImageProvider
 
 
@@ -16,7 +16,7 @@ class AsyncLevelGenerator:
     Responsible for using LLM to correct or generate title hierarchies (Markdown style).
     """
 
-    def __init__(self, llm_client: AsyncLocalLLMClient, image_provider: ImageProvider):
+    def __init__(self, llm_client: BaseAsyncLLMClient, image_provider: ImageProvider):
         self.llm = llm_client
         self.media = image_provider
 
@@ -59,26 +59,45 @@ class AsyncLevelGenerator:
 
         # Crop the title area image to assist the LLM in visual hierarchy judgment
         image = self.media.crop_image(source_path, title_bbox_list)
+        timeout_s = float(getattr(config, "llm_request_timeout_s", 60.0))
+        logger.info(
+            "generate_levels request prepared",
+            extra={
+                "source_path": source_path,
+                "title_count": len(title_list),
+                "image_chars": len(image) if isinstance(image, str) else 0,
+                "timeout_s": timeout_s,
+            },
+        )
 
         leveled_title: list[str] = []
         max_attempts = 3
+        last_error: Exception | None = None
         # LLM call with retry mechanism
         for attempt in range(1, max_attempts + 1):
             try:
-                # Invoke local multimodal LLM to generate titles with Markdown hierarchy
-                raw = await self.llm.generate_levels(title_list, image)
+                raw = await asyncio.wait_for(
+                    self.llm.generate_levels(title_list, image),
+                    timeout=timeout_s,
+                )
                 parsed = ast.literal_eval(raw)
                 if isinstance(parsed, list):
                     leveled_title = [str(x) for x in parsed]
                     break
                 raise TypeError("generate_levels result is not a list")
             except Exception as e:
+                last_error = e
                 logger.warning(
                     f"generate_levels failed (attempt {attempt}/{max_attempts}) for {source_path}: {e}"
                 )
                 leveled_title = []
                 if attempt < max_attempts:
                     await asyncio.sleep(0.2 * attempt)
+
+        if not leveled_title:
+            raise RuntimeError(
+                f"generate_levels failed after {max_attempts} attempts for {source_path}: {last_error}"
+            )
 
         # Fill the generated hierarchy information back into the components
         for co, title in zip(located, leveled_title):

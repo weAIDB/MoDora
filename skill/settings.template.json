@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 3,
+  "ocr": {
+    "provider": "ppstructure"
+  },
+  "pipelines": {
+    "enrichment": {
+      "modelInstance": "user_multimodal"
+    },
+    "levelGenerator": {
+      "modelInstance": "user_multimodal"
+    },
+    "metadataGenerator": {
+      "modelInstance": "user_multimodal"
+    },
+    "retriever": {
+      "modelInstance": "user_multimodal"
+    },
+    "qaService": {
+      "modelInstance": "user_multimodal"
+    }
+  },
+  "model_instances": {
+    "user_multimodal": {
+      "type": "remote",
+      "model": "replace-with-your-own-multimodal-model",
+      "base_url": "https://replace-with-your-own-endpoint/v1",
+      "api_key": "replace-with-your-own-api-key"
+    }
+  }
+}

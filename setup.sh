@@ -116,6 +116,47 @@ if [ "$EXISTING_PIPELINE_COUNT" -eq 0 ]; then
     exit 1
 fi
 
+OCR_MODEL_VALUE=""
+OCR_PRELOAD_VALUE="true"
+if [ -f "$CONFIG_PATH" ] && command -v python3 &> /dev/null; then
+    IFS=$'\t' read -r OCR_MODEL_VALUE OCR_PRELOAD_VALUE < <(python3 - "$CONFIG_PATH" <<'PY'
+import json
+import os
+import sys
+
+path = sys.argv[1]
+if not os.path.exists(path):
+    print("\t")
+    raise SystemExit(0)
+
+with open(path, "r", encoding="utf-8") as f:
+    data = json.load(f)
+
+ocr_model = str(data.get("ocr_model", "") or "")
+enable_preload = data.get("enable_ocr_preload", True)
+print(ocr_model, str(enable_preload).lower(), sep="\t")
+PY
+)
+fi
+
+ENABLE_LOCAL_OCR=1
+case "${OCR_MODEL_VALUE,,}" in
+    ""|"none"|"disabled"|"pdf_fallback"|"paddle_api")
+        ENABLE_LOCAL_OCR=0
+        ;;
+esac
+if [ "${OCR_PRELOAD_VALUE,,}" = "false" ]; then
+    ENABLE_LOCAL_OCR=0
+fi
+
+ENABLE_LOCAL_LLM=0
+for INSTANCE_TYPE in "${MODEL_INSTANCE_TYPES[@]}"; do
+    if [ "$INSTANCE_TYPE" = "local" ]; then
+        ENABLE_LOCAL_LLM=1
+        break
+    fi
+done
+
 DEFAULT_EMBEDDING_API_BASE="https://www.dmxapi.cn/v1/embeddings"
 DEFAULT_EMBEDDING_MODEL_NAME="Qwen/Qwen3-Embedding-8B"
 DEFAULT_RERANK_API_BASE="https://www.dmxapi.cn/v1/rerank"
@@ -191,38 +232,44 @@ fi
 # 3. Setup Backend
 echo "📦 Setting up Backend (MoDora-backend)..."
 cd MoDora-backend
-if [ ! -d "venv" ]; then
+if [ ! -f "venv/bin/activate" ]; then
+    rm -rf venv
     python3 -m venv venv
     echo "✅ Virtual environment created."
 fi
 source venv/bin/activate
 pip install --upgrade pip wheel setuptools packaging
 
-# Install PyTorch with CUDA support first
-# We pin to 2.5.1 to stay within lmdeploy's supported range (<= 2.8.0)
-echo "🔥 Installing Stable PyTorch (2.5.1), Transformers (4.57.3) and LMDeploy (0.12.0)..."
-pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 transformers==4.57.3 
-
-# Install PaddlePaddle for OCR support
-echo "📦 Installing PaddlePaddle GPU (v3.3.0) for OCR support..."
-pip install paddlepaddle-gpu==3.3.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu130/
-
 echo "📦 Installing MoDora-backend and remaining requirements..."
 pip install -e .
-# Fix: PPStructureV3 requires additional ocr dependencies in paddlex
-pip install "paddlex[ocr]"
-pip install chromadb
 
-# Install FlashAttention last as it's the most likely to have environmental issues
-echo "⚡ Attempting to install FlashAttention (this may take a while)..."
-mkdir -p ./.pip_tmp
-export TMPDIR=$PWD/.pip_tmp
-if pip install flash-attn --no-build-isolation --no-cache-dir; then
-    echo "✅ FlashAttention installed successfully."
+if [ "$ENABLE_LOCAL_LLM" -eq 1 ]; then
+    echo "🔥 Installing local LLM dependencies..."
+    pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 ".[local-llm]"
+
+    # Install FlashAttention last as it's the most likely to have environmental issues
+    echo "⚡ Attempting to install FlashAttention (this may take a while)..."
+    mkdir -p ./.pip_tmp
+    export TMPDIR=$PWD/.pip_tmp
+    if pip install flash-attn --no-build-isolation --no-cache-dir; then
+        echo "✅ FlashAttention installed successfully."
+    else
+        echo "⚠️ FlashAttention installation failed (inference might be slower)."
+    fi
+    rm -rf ./.pip_tmp
 else
-    echo "⚠️ FlashAttention installation failed (inference might be slower)."
+    echo "ℹ️ Skipping local LLM dependencies (no local model instances configured)."
 fi
-rm -rf ./.pip_tmp
+
+if [ "$ENABLE_LOCAL_OCR" -eq 1 ]; then
+    echo "📦 Installing local OCR dependencies..."
+    pip install paddlepaddle-gpu==3.3.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu130/
+    pip install ".[local-ocr]"
+    # Fix: PPStructureV3 requires additional ocr dependencies in paddlex
+    pip install "paddlex[ocr]"
+else
+    echo "ℹ️ Skipping local OCR dependencies (OCR disabled, remote OCR selected, or preload disabled)."
+fi
 
 export MODORA_CONFIG_PATH="$CONFIG_PATH"
 export MODORA_MODEL_INSTANCES_FILE="$MODEL_INSTANCES_FILE"

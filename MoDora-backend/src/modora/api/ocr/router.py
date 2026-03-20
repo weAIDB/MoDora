@@ -3,8 +3,6 @@ from __future__ import annotations
 import base64
 from pathlib import Path
 
-import cv2
-import numpy as np
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -78,6 +76,15 @@ def _decode_image_bytes_to_rgb(raw: bytes):
     Returns:
         np.ndarray: Image in RGB format.
     """
+    try:
+        import cv2
+        import numpy as np
+    except Exception as e:
+        raise HTTPException(
+            status_code=503,
+            detail=f"opencv dependencies are unavailable: {e}",
+        )
+
     buf = np.frombuffer(raw, dtype=np.uint8)
     img_bgr = cv2.imdecode(buf, cv2.IMREAD_COLOR)
     if img_bgr is None:
