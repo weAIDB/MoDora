@@ -1,8 +1,8 @@
 {
-  "name": "@weaidb/modora",
+  "name": "@wu-uk/modora",
   "version": "0.1.1",
   "license": "MIT",
-  "author": "weAIDB",
+  "author": "wu-uk",
   "type": "module",
   "description": "OpenClaw plugin that exposes MoDora document-analysis tools.",
   "keywords": [

@@ -32,7 +32,7 @@ openclaw plugins enable modora
 For npm distribution, use:
 
 ```bash
-openclaw plugins install @weaidb/modora
+openclaw plugins install @wu-uk/modora
 openclaw plugins enable modora
 ```
 
