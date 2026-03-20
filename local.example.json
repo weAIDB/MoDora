@@ -2,7 +2,7 @@
   "env": "prod",
   "service_name": "modora-backend",
   "api_port": 8005,
-  "cors_allowed_origins": ["https://modora.pro", "https://www.modora.pro"],
+  "cors_allowed_origins": ["https://modora.pro", "https://www.modora.pro", "https://api.modora.pro"],
   "log_level": "INFO",
   "log_format": "text",
   "log_to_file": false,

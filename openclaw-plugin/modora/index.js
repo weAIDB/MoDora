@@ -3,7 +3,7 @@ import { access } from "node:fs/promises";
 import { openAsBlob } from "node:fs";
 
 const PLUGIN_ID = "modora";
-const DEFAULT_BASE_URL = "https://modora.pro";
+const DEFAULT_BASE_URL = "https://api.modora.pro";
 const DEFAULT_TIMEOUT_MS = 120000;
 
 function getPluginConfig(api) {

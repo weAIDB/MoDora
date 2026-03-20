@@ -21,7 +21,7 @@
   "uiHints": {
     "baseUrl": {
       "label": "MoDora Base URL",
-      "placeholder": "https://modora.pro"
+      "placeholder": "https://api.modora.pro"
     },
     "timeoutMs": {
       "label": "Request Timeout (ms)",

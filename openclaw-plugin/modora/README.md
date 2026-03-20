@@ -49,7 +49,7 @@ Configure `plugins.entries.modora.config`:
       "modora": {
         "enabled": true,
         "config": {
-          "baseUrl": "https://modora.pro",
+          "baseUrl": "https://api.modora.pro",
           "timeoutMs": 120000
         }
       }
@@ -106,7 +106,7 @@ cp local.example.json local.json
 ./start_backend.sh
 ```
 
-The default plugin target is `https://modora.pro`. Override `baseUrl` when you need to point OpenClaw at a local or staging backend.
+The default plugin target is `https://api.modora.pro`. Override `baseUrl` when you need to point OpenClaw at a local or staging backend.
 
 ## Troubleshooting
 

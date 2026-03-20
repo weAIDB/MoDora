@@ -14,7 +14,7 @@ import uuid
 from pathlib import Path
 
 
-DEFAULT_BASE_URL = "https://modora.pro"
+DEFAULT_BASE_URL = "https://api.modora.pro"
 SKILL_HEADERS = {"X-Modora-Client": "skill"}
 
 

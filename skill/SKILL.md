@@ -33,10 +33,10 @@ This skill is appropriate when the user wants to:
 This skill assumes the MoDora backend is exposed as an HTTP base URL. Set `MODORA_BASE_URL` before running scripts. Example:
 
 ```bash
-export MODORA_BASE_URL="https://modora.pro"
+export MODORA_BASE_URL="https://api.modora.pro"
 ```
 
-If `MODORA_BASE_URL` is unset, scripts default to `https://modora.pro`.
+If `MODORA_BASE_URL` is unset, scripts default to `https://api.modora.pro`.
 
 The scripts are implemented in Python so they work across Linux, macOS, Windows, and WSL as long as `python3` is available.
 
