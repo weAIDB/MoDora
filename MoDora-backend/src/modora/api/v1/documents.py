@@ -21,6 +21,7 @@ from modora.core.persistence.documents import (
     update_document_status,
     update_document_storage_key,
 )
+from modora.core.persistence.user_preferences import effective_settings_for_user
 from modora.core.settings import Settings
 from modora.core.utils.paths import resolve_paths
 from modora.core.utils.config import settings_from_ui_payload
@@ -31,8 +32,12 @@ router = APIRouter(tags=["documents"])
 logger = logging.getLogger("modora.api")
 
 
-def _settings_from_payload(payload: dict[str, Any] | None) -> Settings:
-    settings = Settings.load()
+def _settings_from_payload(
+    payload: dict[str, Any] | None,
+    *,
+    user: AuthUser | None,
+) -> Settings:
+    settings = effective_settings_for_user(Settings.load(), user_id=user.id if user else None)
     settings, _, _, _ = settings_from_ui_payload(
         settings, payload, module_key="levelGenerator"
     )
@@ -210,7 +215,7 @@ async def upload_file(
         except json.JSONDecodeError:
             cfg = {}
 
-    app_settings = _settings_from_payload(cfg)
+    app_settings = _settings_from_payload(cfg, user=user)
     paths = resolve_paths(app_settings)
     original_name = Path(file.filename or "").name
     if not original_name:

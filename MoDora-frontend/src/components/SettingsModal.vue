@@ -14,6 +14,105 @@
       </div>
 
       <div class="p-6 overflow-y-auto custom-scrollbar space-y-5">
+        <div
+          v-if="feedbackMessage"
+          class="rounded-xl border px-4 py-3 text-sm"
+          :class="feedbackType === 'error'
+            ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/20 dark:text-rose-300'
+            : 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/20 dark:text-emerald-300'"
+        >
+          {{ feedbackMessage }}
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">Model Instances</label>
+            <button
+              @click="toggleCreateModel"
+              class="px-3 py-1.5 text-sm font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors"
+            >
+              <i class="fa-solid fa-plus mr-2"></i>
+              Add Model
+            </button>
+          </div>
+
+          <div
+            v-if="modelOptions.length > 0"
+            class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/20 divide-y divide-slate-100 dark:divide-slate-800"
+          >
+            <div
+              v-for="item in modelItems"
+              :key="item.id"
+              class="flex items-center justify-between gap-4 p-4"
+            >
+              <div class="min-w-0">
+                <div class="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{{ item.model || item.id }}</div>
+                <div class="text-xs text-slate-500 truncate">{{ item.base_url || 'No base URL' }}</div>
+              </div>
+              <button
+                @click="handleDeleteModel(item.id)"
+                class="px-3 py-1.5 text-sm font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors"
+              >
+                <i class="fa-solid fa-trash-can mr-2"></i>
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <div
+            v-if="showCreateModel"
+            class="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/20 p-4 space-y-3"
+          >
+            <div class="grid gap-3 md:grid-cols-2">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Model Name</label>
+                <input
+                  v-model="newModel.modelName"
+                  type="text"
+                  placeholder="e.g. gpt-4.1"
+                  class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all dark:text-slate-200"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Base URL</label>
+                <input
+                  v-model="newModel.baseUrl"
+                  type="text"
+                  placeholder="https://api.example.com/v1"
+                  class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all dark:text-slate-200"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">API Key</label>
+              <input
+                v-model="newModel.apiKey"
+                type="password"
+                placeholder="sk-..."
+                class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 transition-all dark:text-slate-200"
+              />
+            </div>
+            <p v-if="createError" class="text-sm text-rose-600">{{ createError }}</p>
+            <div class="flex justify-end gap-2">
+              <button
+                @click="cancelCreateModel"
+                class="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                @click="submitCreateModel"
+                :disabled="isCreatingModel"
+                class="px-3 py-2 text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition-colors disabled:opacity-60"
+              >
+                {{ isCreatingModel ? 'Adding...' : 'Create Instance' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="h-px bg-slate-100 dark:bg-slate-700"></div>
+
         <div class="space-y-3">
           <label class="text-xs font-bold text-slate-500 uppercase tracking-wider block">OCR Model</label>
           <div>
@@ -95,6 +194,15 @@ const emit = defineEmits(['close']);
 const store = useModoraStore();
 
 const form = ref(normalizeSettings(DEFAULT_SETTINGS));
+const showCreateModel = ref(false);
+const isCreatingModel = ref(false);
+const feedbackMessage = ref('');
+const feedbackType = ref('error');
+const newModel = ref({
+  modelName: '',
+  baseUrl: '',
+  apiKey: '',
+});
 
 const moduleConfigs = computed(() =>
   MODULE_KEYS.map((key) => ({
@@ -104,9 +212,12 @@ const moduleConfigs = computed(() =>
   }))
 );
 
+const modelItems = computed(() =>
+  Array.isArray(store.state.modelInstances) ? store.state.modelInstances : []
+);
+
 const modelOptions = computed(() => {
-  const items = Array.isArray(store.state.modelInstances) ? store.state.modelInstances : [];
-  return items.map((item) => {
+  return modelItems.value.map((item) => {
     const label = item.model || item.id;
     return { value: item.id, label };
   });
@@ -117,6 +228,7 @@ watch(() => props.isOpen, async (newVal) => {
     await store.loadSettings();
     await store.loadModelInstances();
     form.value = normalizeSettings(store.state.settings);
+    cancelCreateModel();
   }
 });
 
@@ -124,7 +236,71 @@ const close = () => {
   emit('close');
 };
 
+const resetNewModel = () => {
+  newModel.value = {
+    modelName: '',
+    baseUrl: '',
+    apiKey: '',
+  };
+};
+
+const toggleCreateModel = () => {
+  showCreateModel.value = !showCreateModel.value;
+  if (!showCreateModel.value) {
+    resetNewModel();
+  }
+};
+
+const cancelCreateModel = () => {
+  showCreateModel.value = false;
+  isCreatingModel.value = false;
+  resetNewModel();
+};
+
+const submitCreateModel = async () => {
+  feedbackMessage.value = '';
+  isCreatingModel.value = true;
+  try {
+    const instance = await store.createModelInstance(newModel.value);
+    const instanceId = instance?.id || newModel.value.modelName.trim();
+    for (const key of MODULE_KEYS) {
+      const current = form.value.pipelines[key]?.modelInstance;
+      if (!current || !modelOptions.value.some((item) => item.value === current)) {
+        form.value.pipelines[key].modelInstance = instanceId;
+      }
+    }
+    feedbackType.value = 'success';
+    feedbackMessage.value = `Model instance "${instanceId}" created.`;
+    cancelCreateModel();
+  } catch (error) {
+    feedbackType.value = 'error';
+    feedbackMessage.value = error instanceof Error ? error.message : 'Failed to create model instance';
+  } finally {
+    isCreatingModel.value = false;
+  }
+};
+
+const handleDeleteModel = async (instanceId) => {
+  feedbackMessage.value = '';
+  try {
+    await store.deleteModelInstance(instanceId);
+  } catch (error) {
+    feedbackType.value = 'error';
+    feedbackMessage.value = error instanceof Error ? error.message : 'Failed to delete model instance';
+    return;
+  }
+
+  for (const key of MODULE_KEYS) {
+    if (form.value.pipelines[key]?.modelInstance === instanceId) {
+      form.value.pipelines[key].modelInstance = modelOptions.value[0]?.value || '';
+    }
+  }
+  feedbackType.value = 'success';
+  feedbackMessage.value = `Model instance "${instanceId}" deleted.`;
+};
+
 const save = async () => {
+  feedbackMessage.value = '';
   await store.updateSettings(form.value);
   close();
 };

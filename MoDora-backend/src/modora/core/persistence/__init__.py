@@ -15,6 +15,15 @@ from .documents import (
     update_document_storage_key,
     update_job_status,
 )
+from .user_preferences import (
+    add_user_model_instance,
+    delete_user_model_instance,
+    effective_settings_for_user,
+    get_user_model_instances,
+    get_user_ui_settings,
+    save_user_model_instances,
+    save_user_ui_settings,
+)
 
 __all__ = [
     "connect_db",
@@ -32,4 +41,11 @@ __all__ = [
     "update_document_status",
     "update_document_storage_key",
     "update_job_status",
+    "add_user_model_instance",
+    "delete_user_model_instance",
+    "effective_settings_for_user",
+    "get_user_model_instances",
+    "get_user_ui_settings",
+    "save_user_model_instances",
+    "save_user_ui_settings",
 ]

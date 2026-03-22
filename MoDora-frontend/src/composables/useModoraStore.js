@@ -524,6 +524,9 @@ export function useModoraStore() {
     const updateSettings = async (newSettings) => {
         state.settings = normalizeSettings({ ...state.settings, ...newSettings });
         localStorage.setItem('modora_settings', JSON.stringify(state.settings));
+        if (!state.currentUser) {
+            return;
+        }
         try {
             const res = await apiFetch('/api/settings/ui', {
                 method: 'POST',
@@ -543,6 +546,10 @@ export function useModoraStore() {
     };
 
     const loadSettings = async () => {
+        if (!state.currentUser) {
+            state.settings = normalizeSettings(JSON.parse(localStorage.getItem('modora_settings')) || DEFAULT_SETTINGS);
+            return;
+        }
         try {
             const res = await apiFetch('/api/settings/ui');
             if (res.ok) {
@@ -558,6 +565,10 @@ export function useModoraStore() {
     };
 
     const loadModelInstances = async () => {
+        if (!state.currentUser) {
+            state.modelInstances = [];
+            return;
+        }
         try {
             const res = await apiFetch('/api/models/instances');
             if (res.ok) {
@@ -572,6 +583,35 @@ export function useModoraStore() {
             state.modelInstances = [];
             console.error("Failed to load model instances:", e);
         }
+    };
+
+    const createModelInstance = async ({ modelName, baseUrl, apiKey }) => {
+        const res = await apiFetch('/api/models/instances', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model_name: modelName,
+                base_url: baseUrl,
+                api_key: apiKey || ''
+            })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            throw new Error(data.detail || `HTTP ${res.status}`);
+        }
+        await loadModelInstances();
+        return data.instance || null;
+    };
+
+    const deleteModelInstance = async (instanceId) => {
+        const res = await apiFetch(`/api/models/instances/${encodeURIComponent(instanceId)}`, {
+            method: 'DELETE'
+        });
+        if (res.status !== 204) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.detail || `HTTP ${res.status}`);
+        }
+        await loadModelInstances();
     };
 
     const uploadFile = async (file) => {
@@ -957,6 +997,7 @@ export function useModoraStore() {
             throw new Error(data.detail || `HTTP ${res.status}`);
         }
         state.currentUser = data.user;
+        await Promise.all([loadSettings(), loadModelInstances()]);
         await loadUserDocuments();
         await loadConversations();
         await Promise.all([fetchKbDocs(), fetchGlobalTags()]);
@@ -979,9 +1020,9 @@ export function useModoraStore() {
 
     const initializeApp = async () => {
         state.isAuthLoading = true;
-        await Promise.all([loadSettings(), loadModelInstances()]);
         await fetchCurrentUser();
         if (state.currentUser) {
+            await Promise.all([loadSettings(), loadModelInstances()]);
             await loadUserDocuments();
             await loadConversations();
             await Promise.all([fetchKbDocs(), fetchGlobalTags()]);
@@ -989,6 +1030,8 @@ export function useModoraStore() {
             state.documentLibrary = [];
             state.kbDocs = {};
             state.globalTags = [];
+            state.modelInstances = [];
+            state.settings = normalizeSettings(JSON.parse(localStorage.getItem('modora_settings')) || DEFAULT_SETTINGS);
         }
         state.isAuthLoading = false;
     };
@@ -1011,6 +1054,8 @@ export function useModoraStore() {
         updateSettings,
         loadSettings,
         loadModelInstances,
+        createModelInstance,
+        deleteModelInstance,
         initializeApp,
         authenticate,
         logout,

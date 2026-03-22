@@ -9,6 +9,7 @@ from modora.api.auth import get_optional_current_user
 from modora.api.v1.document_access import resolve_document_paths
 from modora.core.domain.cctree import CCTree
 from modora.core.auth.service import AuthUser
+from modora.core.persistence.user_preferences import effective_settings_for_user
 from modora.core.settings import Settings
 from modora.core.utils.config import settings_from_ui_payload
 from modora.core.infra.llm.factory import AsyncLLMFactory
@@ -37,7 +38,7 @@ async def get_document_tree(
     request: TreeRequest,
     user: AuthUser | None = Depends(get_optional_current_user),
 ):
-    settings = Settings.load()
+    settings = effective_settings_for_user(Settings.load(), user_id=user.id if user else None)
     return await _get_document_tree(request, user, settings)
 
 
@@ -68,7 +69,11 @@ async def get_document_tree_by_document(
 ):
     if user is None:
         raise HTTPException(status_code=401, detail="authentication required")
-    return await _get_document_tree(request, user, Settings.load())
+    return await _get_document_tree(
+        request,
+        user,
+        effective_settings_for_user(Settings.load(), user_id=user.id),
+    )
 
 
 @router.post("/tree/update")
@@ -111,7 +116,7 @@ async def recompose_tree_endpoint(
     request: TreeRecomposeRequest,
     user: AuthUser | None = Depends(get_optional_current_user),
 ):
-    settings = Settings.load()
+    settings = effective_settings_for_user(Settings.load(), user_id=user.id if user else None)
     return await _recompose_tree_endpoint(request, user, settings)
 
 
@@ -176,7 +181,11 @@ async def recompose_tree_by_document_endpoint(
 ):
     if user is None:
         raise HTTPException(status_code=401, detail="authentication required")
-    return await _recompose_tree_endpoint(request, user, Settings.load())
+    return await _recompose_tree_endpoint(
+        request,
+        user,
+        effective_settings_for_user(Settings.load(), user_id=user.id),
+    )
 
 
 @router.post("/tree/node/update")

@@ -23,7 +23,7 @@ export const OCR_MODEL_OPTIONS = [
 ];
 
 const DEFAULT_PIPELINE_CONFIG = {
-  modelInstance: 'local-default',
+  modelInstance: '',
 };
 
 export const DEFAULT_SETTINGS = {

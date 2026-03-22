@@ -35,7 +35,7 @@ def normalize_ui_settings(payload: dict[str, Any] | None) -> dict[str, Any]:
         # If payload is empty or invalid, return a default pipeline structure
         return {
             "pipelines": {
-                k: {"modelInstance": "local-default"} for k in MODULE_KEYS
+                k: {} for k in MODULE_KEYS
             }
         }
 
@@ -62,9 +62,6 @@ def normalize_ui_settings(payload: dict[str, Any] | None) -> dict[str, Any]:
                 continue
             item: dict[str, str] = {}
             model_instance = value.get("modelInstance")
-            if model_instance is None:
-                raise ValueError(f"Missing 'modelInstance' for module '{module}'")
-            
             if isinstance(model_instance, str) and model_instance.strip():
                 item["modelInstance"] = model_instance.strip()
             clean_pipelines[module] = item

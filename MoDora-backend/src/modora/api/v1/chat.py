@@ -10,6 +10,7 @@ from modora.api.auth import get_optional_current_user
 from modora.api.v1.document_access import resolve_document_paths
 from modora.core.domain.cctree import CCTree
 from modora.core.auth.service import AuthUser
+from modora.core.persistence.user_preferences import effective_settings_for_user
 from modora.core.settings import Settings
 from modora.core.utils.config import settings_from_ui_payload
 from modora.core.services.qa_service import QAService
@@ -21,8 +22,10 @@ logger = logging.getLogger("modora.api")
 
 def _settings_from_payload(
     payload: dict[str, Any] | None,
+    *,
+    user: AuthUser | None,
 ) -> tuple[Settings, str | None, Settings, str | None]:
-    settings = Settings.load()
+    settings = effective_settings_for_user(Settings.load(), user_id=user.id if user else None)
     qa_settings, _, qa_instance, cfg = settings_from_ui_payload(
         settings, payload, module_key="qaService"
     )
@@ -61,7 +64,7 @@ async def chat_endpoint(
         qa_instance,
         retriever_settings,
         retriever_instance,
-    ) = _settings_from_payload(settings_payload)
+    ) = _settings_from_payload(settings_payload, user=user)
 
     # Load tree structures for all documents
     trees: dict[str, CCTree] = {}
