@@ -15,6 +15,7 @@ from modora.core.services.task_store import TASK_STATUS
 from modora.core.infra.ocr.manager import get_ocr_model
 from modora.core.infra.pdf.fallback import extract_pdf_blocks
 from modora.core.domain.ocr import OcrExtractResponse, OCRBlock
+from modora.core.persistence.documents import update_document_status, update_job_status
 from modora.core.settings import Settings
 
 
@@ -82,9 +83,22 @@ async def process_document_task(
     config: dict[str, Any] | None,
     logger: logging.Logger,
     mode: str | None = None,
+    *,
+    status_key: str | None = None,
+    status_user_id: str | None = None,
+    document_id: str | None = None,
+    job_id: str | None = None,
 ) -> None:
     filename = Path(source_path).name
-    TASK_STATUS.set(filename, "processing")
+    task_key = status_key or filename
+    if status_user_id:
+        TASK_STATUS.set_for_user(status_user_id, task_key, "processing")
+    else:
+        TASK_STATUS.set(task_key, "processing")
+    if document_id:
+        update_document_status(settings, document_id, status="processing")
+    if job_id:
+        update_job_status(settings, job_id, status="processing")
     logger.info(f"Start processing document: {filename}")
 
     try:
@@ -138,7 +152,7 @@ async def process_document_task(
         )
 
         # 6. Update KB and statistical information
-        kb_path = paths.cache_dir / "knowledge_base.json"
+        kb_path = getattr(paths, "kb_path", paths.cache_dir / "knowledge_base.json")
         kb = KnowledgeBaseManager(kb_path)
 
         counts, variance, pages = get_component_stats(cache_dir / "ocr.json")
@@ -162,8 +176,22 @@ async def process_document_task(
             },
         )
 
-        TASK_STATUS.set(filename, "completed")
+        if status_user_id:
+            TASK_STATUS.set_for_user(status_user_id, task_key, "completed")
+        else:
+            TASK_STATUS.set(task_key, "completed")
+        if document_id:
+            update_document_status(settings, document_id, status="completed")
+        if job_id:
+            update_job_status(settings, job_id, status="completed")
         logger.info(f"Finished processing document: {filename}")
     except Exception as e:
         logger.error(f"Failed to process document {filename}: {e}", exc_info=True)
-        TASK_STATUS.set(filename, "failed")
+        if status_user_id:
+            TASK_STATUS.set_for_user(status_user_id, task_key, "failed")
+        else:
+            TASK_STATUS.set(task_key, "failed")
+        if document_id:
+            update_document_status(settings, document_id, status="failed")
+        if job_id:
+            update_job_status(settings, job_id, status="failed", error=str(e))
