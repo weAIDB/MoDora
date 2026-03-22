@@ -157,10 +157,13 @@ class PaddleOCRAPIClient(OCRClient):
     def predict_iter(self, images_or_path: Any) -> Iterator[list[OCRBlock]]:
         file_path = str(images_or_path)
         page_results = self._run_job(file_path)
-        for page_id, page_result in enumerate(page_results, start=1):
+        fallback_page_id = 1
+        for parsed_page_id, page_result in page_results:
+            page_id = parsed_page_id if parsed_page_id is not None else fallback_page_id
             yield self._parse_page(page_result, page_id=page_id)
+            fallback_page_id = max(fallback_page_id, page_id + 1)
 
-    def _run_job(self, file_path: str) -> list[dict[str, Any]]:
+    def _run_job(self, file_path: str) -> list[tuple[int | None, dict[str, Any]]]:
         headers = {
             "Authorization": f"bearer {self.token}",
         }
@@ -234,8 +237,8 @@ class PaddleOCRAPIClient(OCRClient):
             )
             time.sleep(self.poll_interval_s)
 
-    def _parse_jsonl_payload(self, body: str) -> list[dict[str, Any]]:
-        pages: list[dict[str, Any]] = []
+    def _parse_jsonl_payload(self, body: str) -> list[tuple[int | None, dict[str, Any]]]:
+        pages: list[tuple[int | None, dict[str, Any]]] = []
         for line in body.splitlines():
             line = line.strip()
             if not line:
@@ -243,13 +246,108 @@ class PaddleOCRAPIClient(OCRClient):
             item = json.loads(line)
             result = item.get("result")
             if isinstance(result, dict):
-                pages.append(result)
+                pages.extend(self._collect_page_results(item, result))
+            elif isinstance(result, list):
+                for entry in result:
+                    if isinstance(entry, dict):
+                        pages.extend(self._collect_page_results(item, entry))
         if not pages:
             raise ValueError("Paddle OCR API returned empty JSONL payload")
         return pages
 
+    def _collect_page_results(
+        self, container: dict[str, Any], result: dict[str, Any]
+    ) -> list[tuple[int | None, dict[str, Any]]]:
+        layout_pages = result.get("layoutParsingResults")
+        if isinstance(layout_pages, list) and layout_pages:
+            collected: list[tuple[int | None, dict[str, Any]]] = []
+            for page_index, entry in enumerate(layout_pages, start=1):
+                if isinstance(entry, dict):
+                    collected.append((page_index, entry))
+            if collected:
+                return collected
+
+        nested_pages = result.get("pages")
+        if isinstance(nested_pages, list) and nested_pages:
+            collected: list[tuple[int | None, dict[str, Any]]] = []
+            for entry in nested_pages:
+                if not isinstance(entry, dict):
+                    continue
+                page_id = self._extract_page_id(entry)
+                collected.append((page_id, entry))
+            if collected:
+                return collected
+
+        page_id = self._extract_page_id(result)
+        if page_id is None:
+            page_id = self._extract_page_id(container)
+        return [(page_id, result)]
+
+    def _extract_page_id(self, node: Any) -> int | None:
+        if isinstance(node, dict):
+            direct_keys = (
+                "page_id",
+                "pageId",
+                "page_no",
+                "pageNo",
+                "page_num",
+                "pageNum",
+                "page_number",
+                "pageNumber",
+                "page",
+            )
+            zero_based_keys = ("page_index", "pageIndex", "page_idx", "pageIdx")
+
+            for key in direct_keys:
+                value = node.get(key)
+                page_id = self._coerce_page_id(value, zero_based=False)
+                if page_id is not None:
+                    return page_id
+
+            for key in zero_based_keys:
+                value = node.get(key)
+                page_id = self._coerce_page_id(value, zero_based=True)
+                if page_id is not None:
+                    return page_id
+
+            for value in node.values():
+                page_id = self._extract_page_id(value)
+                if page_id is not None:
+                    return page_id
+
+        elif isinstance(node, list):
+            for item in node:
+                page_id = self._extract_page_id(item)
+                if page_id is not None:
+                    return page_id
+
+        return None
+
+    @staticmethod
+    def _coerce_page_id(value: Any, *, zero_based: bool) -> int | None:
+        if isinstance(value, bool) or value is None:
+            return None
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return None
+            if not value.isdigit():
+                return None
+            numeric = int(value)
+        elif isinstance(value, (int, float)):
+            numeric = int(value)
+        else:
+            return None
+
+        if zero_based:
+            numeric += 1
+        return numeric if numeric >= 1 else None
+
     def _parse_page(self, page_result: dict[str, Any], page_id: int) -> list[OCRBlock]:
         layout_results = page_result.get("layoutParsingResults")
+        if not isinstance(layout_results, list):
+            if any(key in page_result for key in ("prunedResult", "markdown", "inputImage")):
+                layout_results = [page_result]
         if isinstance(layout_results, list) and layout_results:
             blocks = self._blocks_from_pruned_results(layout_results, page_id=page_id)
             if blocks:

@@ -33,9 +33,12 @@ logger = logging.getLogger("modora.api")
 
 
 @router.post("/tree", response_model=TreeResponse)
-async def get_document_tree(request: TreeRequest):
+async def get_document_tree(
+    request: TreeRequest,
+    user: AuthUser | None = Depends(get_optional_current_user),
+):
     settings = Settings.load()
-    return await _get_document_tree(request, None, settings)
+    return await _get_document_tree(request, user, settings)
 
 
 async def _get_document_tree(
@@ -104,9 +107,12 @@ def update_tree_endpoint(
 
 
 @router.post("/tree/recompose", response_model=TreeResponse)
-async def recompose_tree_endpoint(request: TreeRecomposeRequest):
+async def recompose_tree_endpoint(
+    request: TreeRecomposeRequest,
+    user: AuthUser | None = Depends(get_optional_current_user),
+):
     settings = Settings.load()
-    return await _recompose_tree_endpoint(request, None, settings)
+    return await _recompose_tree_endpoint(request, user, settings)
 
 
 async def _recompose_tree_endpoint(

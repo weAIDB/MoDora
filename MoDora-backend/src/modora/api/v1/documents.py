@@ -7,7 +7,7 @@ from typing import Any
 
 import fitz
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 from modora.api.auth import get_optional_current_user
 from modora.api.v1.models import DocumentItem, DocumentListResponse, TaskStatusResponse, UploadResponse
@@ -125,6 +125,7 @@ def list_documents(user: AuthUser = Depends(get_optional_current_user)):
             DocumentItem(
                 id=doc.id,
                 original_name=doc.original_name,
+                storage_key=doc.storage_key,
                 status=doc.status,
                 created_at=doc.created_at,
             )
@@ -169,6 +170,30 @@ def get_pdf_image_by_document_id(
     except Exception as e:
         logger.error(f"Error generating PDF image: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/documents/{document_id}/file")
+def get_document_file(
+    document_id: str,
+    user: AuthUser = Depends(get_optional_current_user),
+):
+    if user is None:
+        raise HTTPException(status_code=401, detail="authentication required")
+
+    settings = Settings.load()
+    document = get_document_by_id(settings, user_id=user.id, document_id=document_id)
+    if document is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    source_path = resolve_paths(settings).user_paths(user.id).docs_dir / document.storage_key
+    if not source_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+
+    return FileResponse(
+        path=str(source_path),
+        media_type="application/pdf",
+        filename=document.original_name,
+    )
 
 
 @router.post("/upload")

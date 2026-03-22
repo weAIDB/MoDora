@@ -64,7 +64,7 @@
              <div
                 v-for="(citation, cIdx) in msg.citations"
                 :key="cIdx"
-                @click="store.openPdf(citation.fileId, citation.page, citation.bboxes || [])"
+                @click="store.openPdf(citation.documentId || citation.fileId || citation.fileName, citation.page, citation.bboxes || [])"
                 class="bg-white/60 dark:bg-slate-700/60 border border-white/60 dark:border-slate-600 rounded-xl p-3 hover:border-primary-300 dark:hover:border-primary-500 hover:bg-white dark:hover:bg-slate-700 hover:shadow-lg hover:shadow-primary-500/10 transition-all cursor-pointer group/card flex items-start backdrop-blur-sm"
              >
                 <!-- PDF Icon -->

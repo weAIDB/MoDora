@@ -39,7 +39,7 @@
         <VuePdfEmbed
           v-show="!useImageMode"
           ref="pdfRef"
-          :source="source"
+          :source="pdfSource"
           :page="currentPage"
           :width="pdfWidth"
           @loaded="handleLoaded"
@@ -135,6 +135,17 @@ const imageNaturalHeight = ref(0);
 const useImageMode = computed(() => {
     // Use image mode only when highlights exist (for source tracing)
     return props.highlightBboxes && props.highlightBboxes.length > 0;
+});
+
+const pdfSource = computed(() => {
+    if (!props.source) return null;
+    if (props.documentId) {
+        return {
+            url: props.source,
+            withCredentials: true
+        };
+    }
+    return props.source;
 });
 
 const imageUrl = computed(() => {
