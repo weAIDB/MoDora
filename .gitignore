@@ -80,4 +80,7 @@ local.json
 MoDora-backend/data/
 
 data/
+storage/
+loadtest/
+.npm-cache/
 openclaw-plugin/modora/*.tgz
