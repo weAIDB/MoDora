@@ -1,5 +1,6 @@
 import hashlib
 import logging
+from pathlib import Path
 
 import chromadb
 from chromadb.config import Settings as ChromaSettings
@@ -9,6 +10,40 @@ from modora.core.infra.llm import AsyncLLMFactory
 from modora.core.settings import Settings
 
 logger = logging.getLogger(__name__)
+
+
+def delete_source_index(
+    settings: Settings | None,
+    *,
+    source_path: str,
+    collection_name: str = "modora_kb",
+) -> None:
+    current_settings = settings or Settings.load()
+    if current_settings.chroma_persist_path:
+        chroma_client = chromadb.PersistentClient(
+            path=current_settings.chroma_persist_path,
+            settings=ChromaSettings(anonymized_telemetry=False),
+        )
+    else:
+        chroma_client = chromadb.Client(
+            ChromaSettings(anonymized_telemetry=False)
+        )
+
+    try:
+        collection = chroma_client.get_collection(name=collection_name)
+    except Exception:
+        logger.info(
+            "Skipping vector index deletion because collection is missing",
+            extra={"collection_name": collection_name, "source_path": source_path},
+        )
+        return
+
+    normalized_source = str(Path(source_path).resolve())
+    collection.delete(where={"source": normalized_source})
+    logger.info(
+        "Deleted vector index entries for source",
+        extra={"collection_name": collection_name, "source_path": normalized_source},
+    )
 
 
 class VectorRetriever:

@@ -10,6 +10,7 @@ from modora.api.v1.document_access import resolve_document_paths
 from modora.core.settings import Settings
 from modora.core.utils.paths import resolve_paths
 from modora.core.services.kb import KnowledgeBaseManager
+from modora.core.services.retrieve import delete_source_index
 from modora.core.auth.service import AuthUser
 from modora.core.persistence.documents import delete_document
 from modora.api.v1.models import UpdateTagsRequest
@@ -74,6 +75,7 @@ def delete_kb_doc(
     settings = Settings.load()
     resolved = resolve_document_paths(settings, user=user, file_name=file_name)
     kb = KnowledgeBaseManager(resolved.kb_path)
+    delete_source_index(settings, source_path=str(resolved.source_path))
 
     source_path = resolved.source_path
     if source_path.exists():
@@ -99,6 +101,7 @@ def delete_kb_doc_by_document_id(
     settings = Settings.load()
     resolved = resolve_document_paths(settings, user=user, document_id=document_id)
     kb = KnowledgeBaseManager(resolved.kb_path)
+    delete_source_index(settings, source_path=str(resolved.source_path))
 
     if resolved.source_path.exists():
         resolved.source_path.unlink()

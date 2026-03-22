@@ -6,14 +6,18 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi import BackgroundTasks, Response
 
 from modora.api.auth import AuthRequest, register
 from modora.api.v1.documents import upload_file
+from modora.api.v1.documents import get_document_file
 from modora.api.v1.kb import delete_kb_doc_by_document_id, get_kb_docs, update_kb_doc_tags
 from modora.api.v1.models import UpdateTagsRequest
 from modora.api.v1.stats import get_doc_stats_by_document_id
+from modora.api.v1.models import TreeRequest
+from modora.api.v1.tree import get_document_tree
 from modora.core.persistence import init_db
 from modora.core.persistence.documents import get_document_by_id
 from modora.core.services.kb import KnowledgeBaseManager
@@ -162,8 +166,14 @@ class DocumentAccessEndpointsTest(unittest.TestCase):
         self.assertTrue(source_path.exists())
         self.assertTrue(cache_dir.exists())
 
-        result = delete_kb_doc_by_document_id(self.document_id, user=self.user)
+        with patch("modora.api.v1.kb.delete_source_index") as delete_index:
+            result = delete_kb_doc_by_document_id(self.document_id, user=self.user)
+
         self.assertEqual(result["status"], "success")
+        delete_index.assert_called_once_with(
+            self.settings,
+            source_path=str(source_path),
+        )
         self.assertFalse(source_path.exists())
         self.assertFalse(cache_dir.exists())
         self.assertIsNone(
@@ -173,6 +183,22 @@ class DocumentAccessEndpointsTest(unittest.TestCase):
                 document_id=self.document_id,
             )
         )
+
+    def test_tree_and_pdf_file_access_use_authenticated_document_scope(self) -> None:
+        tree = asyncio.run(
+            get_document_tree(
+                TreeRequest(
+                    file_name=self.document.original_name,
+                    document_id=self.document_id,
+                ),
+                user=self.user,
+            )
+        )
+        self.assertTrue(len(tree.elements) > 0)
+
+        response = get_document_file(self.document_id, user=self.user)
+        self.assertEqual(response.media_type, "application/pdf")
+        self.assertIn(self.document.storage_key, str(response.path))
 
 
 if __name__ == "__main__":
