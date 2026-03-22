@@ -79,6 +79,7 @@
             :source="store.state.viewingPdf.url"
             :initial-page="store.state.viewingPdf.page"
             :file-name="store.state.viewingPdf.name"
+            :document-id="store.state.viewingPdf.documentId"
             :highlight-bboxes="store.state.viewingPdf.bboxes"
           />
 

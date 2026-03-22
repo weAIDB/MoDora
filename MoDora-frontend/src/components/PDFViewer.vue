@@ -101,6 +101,7 @@
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import VuePdfEmbed from 'vue-pdf-embed';
 import * as pdfjs from 'pdfjs-dist';
+import { getApiUrl } from '../config/api';
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -113,6 +114,7 @@ const props = defineProps({
   source: { type: String, required: true },
   initialPage: { type: Number, default: 1 },
   fileName: { type: String, default: 'Document.pdf' },
+  documentId: { type: String, default: null },
   highlightBboxes: { type: Array, default: () => [] }
 });
 
@@ -136,9 +138,12 @@ const useImageMode = computed(() => {
 });
 
 const imageUrl = computed(() => {
-    if (!props.fileName || !currentPage.value) return '';
-    // Use relative path to go through the Vite proxy
-    return `/api/pdf/${props.fileName}/${currentPage.value}/image`;
+    if (!currentPage.value) return '';
+    if (props.documentId) {
+        return getApiUrl(`/api/documents/${props.documentId}/pdf/${currentPage.value}/image`);
+    }
+    if (!props.fileName) return '';
+    return getApiUrl(`/api/pdf/${props.fileName}/${currentPage.value}/image`);
 });
 
 const handleImageLoad = (e) => {

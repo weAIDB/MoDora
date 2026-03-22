@@ -4,11 +4,13 @@ import json
 import logging
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from modora.api.auth import get_optional_current_user
+from modora.api.v1.document_access import resolve_document_paths
 from modora.core.domain.cctree import CCTree
+from modora.core.auth.service import AuthUser
 from modora.core.settings import Settings
-from modora.core.utils.paths import resolve_paths
 from modora.core.utils.config import settings_from_ui_payload
 from modora.core.services.qa_service import QAService
 from modora.api.v1.models import ChatRequest, ChatResponse, RetrievalItem
@@ -36,14 +38,23 @@ def _settings_from_payload(
 
 
 @router.post("/chat", response_model=ChatResponse)
-async def chat_endpoint(request: ChatRequest):
+async def chat_endpoint(
+    request: ChatRequest,
+    user: AuthUser | None = Depends(get_optional_current_user),
+):
     settings_payload = request.settings or {}
-    file_names = request.file_names or (
-        [] if not request.file_name else [request.file_name]
-    )
-   
-    if not file_names:
-        raise HTTPException(status_code=400, detail="File name(s) required")
+    identifiers: list[tuple[str, str]] = []
+    if request.document_ids:
+        identifiers.extend(("document_id", item) for item in request.document_ids)
+    elif request.document_id:
+        identifiers.append(("document_id", request.document_id))
+    elif request.file_names:
+        identifiers.extend(("file_name", item) for item in request.file_names)
+    elif request.file_name:
+        identifiers.append(("file_name", request.file_name))
+
+    if not identifiers:
+        raise HTTPException(status_code=400, detail="File name(s) or document id(s) required")
 
     (
         app_settings,
@@ -51,27 +62,37 @@ async def chat_endpoint(request: ChatRequest):
         retriever_settings,
         retriever_instance,
     ) = _settings_from_payload(settings_payload)
-    paths = resolve_paths(app_settings)
 
     # Load tree structures for all documents
     trees: dict[str, CCTree] = {}
     source_paths: dict[str, str] = {}
+    display_names: dict[str, str] = {}
+    document_ids_by_storage_name: dict[str, str] = {}
 
-    for fn in file_names:
-        s_path = paths.docs_dir / fn
+    for identifier_type, value in identifiers:
+        resolved = resolve_document_paths(
+            app_settings,
+            user=user,
+            document_id=value if identifier_type == "document_id" else None,
+            file_name=value if identifier_type == "file_name" else None,
+        )
+        s_path = resolved.source_path
         if not s_path.exists():
             continue
 
-        t_path = paths.doc_cache_dir(fn) / "tree.json"
+        t_path = resolved.cache_dir / "tree.json"
         if not t_path.exists():
             continue
 
         try:
             t_dict = json.loads(t_path.read_text(encoding="utf-8"))
-            trees[fn] = CCTree.from_dict(t_dict)
-            source_paths[fn] = str(s_path)
+            trees[resolved.storage_name] = CCTree.from_dict(t_dict)
+            source_paths[resolved.storage_name] = str(s_path)
+            display_names[resolved.storage_name] = resolved.display_name
+            if resolved.document_id:
+                document_ids_by_storage_name[resolved.storage_name] = resolved.document_id
         except Exception as e:
-            logger.warning(f"Failed to load tree for {fn}: {e}")
+            logger.warning(f"Failed to load tree for {resolved.storage_name}: {e}")
 
     if not trees:
         raise HTTPException(status_code=404, detail="No valid document trees found.")
@@ -103,7 +124,13 @@ async def chat_endpoint(request: ChatRequest):
 
         # Save updated impact values to each document's tree.json
         for fn, tree in trees.items():
-            t_path = paths.doc_cache_dir(fn) / "tree.json"
+            resolved = resolve_document_paths(
+                app_settings,
+                user=user,
+                document_id=document_ids_by_storage_name.get(fn),
+                file_name=fn,
+            )
+            t_path = resolved.cache_dir / "tree.json"
             try:
                 tree.save_json(str(t_path))
             except Exception as e:
@@ -115,13 +142,14 @@ async def chat_endpoint(request: ChatRequest):
 
     documents = []
     for doc in qa_result.get("retrieved_documents", []):
-        doc_file_name = doc.get("file_name") or primary
+        doc_storage_name = doc.get("file_name") or primary
         documents.append(
             RetrievalItem(
                 page=doc.get("page", 0),
                 content=doc.get("content", ""),
                 bboxes=doc.get("bboxes", []),
-                file_name=doc_file_name,
+                file_name=display_names.get(doc_storage_name, doc_storage_name),
+                document_id=document_ids_by_storage_name.get(doc_storage_name),
                 score=doc.get("score", 0.0),
             )
         )

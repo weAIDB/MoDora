@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import logging
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from modora.api.auth import get_optional_current_user
+from modora.api.v1.document_access import resolve_document_paths
+from modora.core.auth.service import AuthUser
 from modora.core.settings import Settings
-from modora.core.utils.paths import resolve_paths
 from modora.core.services.kb import KnowledgeBaseManager
 from modora.core.services.stats import get_component_stats, get_tree_stats
 from modora.api.v1.models import (
@@ -18,21 +20,48 @@ logger = logging.getLogger("modora.api")
 
 
 @router.get("/docs/stats/{file_name}", response_model=DocStatsResponse)
-async def get_doc_stats(file_name: str):
+async def get_doc_stats(
+    file_name: str,
+    user: AuthUser | None = Depends(get_optional_current_user),
+):
+    return await _get_doc_stats(file_name=file_name, document_id=None, user=user)
+
+
+@router.get("/documents/{document_id}/stats", response_model=DocStatsResponse)
+async def get_doc_stats_by_document_id(
+    document_id: str,
+    user: AuthUser = Depends(get_optional_current_user),
+):
+    if user is None:
+        raise HTTPException(status_code=401, detail="authentication required")
+    return await _get_doc_stats(file_name=None, document_id=document_id, user=user)
+
+
+async def _get_doc_stats(
+    *,
+    file_name: str | None,
+    document_id: str | None,
+    user: AuthUser | None,
+):
     settings = Settings.load()
-    paths = resolve_paths(settings)
-    cache_dir = paths.doc_cache_dir(file_name)
+    resolved = resolve_document_paths(
+        settings,
+        user=user,
+        document_id=document_id,
+        file_name=file_name,
+    )
+    cache_dir = resolved.cache_dir
 
     ocr_path = cache_dir / "ocr.json"
     tree_path = cache_dir / "tree.json"
     if not ocr_path.exists() or not tree_path.exists():
-        raise HTTPException(status_code=404, detail=f"Stats not found for {file_name}")
+        raise HTTPException(status_code=404, detail=f"Stats not found for {resolved.display_name}")
 
     counts, variance, page_count = get_component_stats(ocr_path)
     nodes, leaves, depth = get_tree_stats(tree_path)
 
-    kb = KnowledgeBaseManager(paths.cache_dir / "knowledge_base.json")
-    doc_info = kb.get_doc_info(file_name) or {}
+    kb = KnowledgeBaseManager(resolved.kb_path)
+    doc_info = kb.get_doc_info(resolved.storage_name) or {}
     tags = doc_info.get("tags", [])
     semantic_tags = doc_info.get("semantic_tags", [])
 
@@ -49,9 +78,17 @@ async def get_doc_stats(file_name: str):
 
 
 @router.post("/session/stats", response_model=SessionStatsResponse)
-async def get_session_stats(request: SessionStatsRequest):
-    file_names = request.file_names
-    if not file_names:
+async def get_session_stats(
+    request: SessionStatsRequest,
+    user: AuthUser | None = Depends(get_optional_current_user),
+):
+    identifiers = []
+    if request.document_ids:
+        identifiers.extend(("document_id", item) for item in request.document_ids)
+    if request.file_names:
+        identifiers.extend(("file_name", item) for item in request.file_names)
+
+    if not identifiers:
         return SessionStatsResponse(
             total_files=0,
             avg_pages=0.0,
@@ -67,9 +104,6 @@ async def get_session_stats(request: SessionStatsRequest):
             avg_variance=0.0,
         )
 
-    settings = Settings.load()
-    paths = resolve_paths(settings)
-
     total_pages = 0
     total_nodes = 0
     total_depth = 0
@@ -77,8 +111,16 @@ async def get_session_stats(request: SessionStatsRequest):
     total_variance = 0.0
     valid_count = 0
 
-    for file_name in file_names:
-        cache_dir = paths.doc_cache_dir(file_name)
+    settings = Settings.load()
+
+    for identifier_type, value in identifiers:
+        resolved = resolve_document_paths(
+            settings,
+            user=user,
+            document_id=value if identifier_type == "document_id" else None,
+            file_name=value if identifier_type == "file_name" else None,
+        )
+        cache_dir = resolved.cache_dir
         ocr_path = cache_dir / "ocr.json"
         tree_path = cache_dir / "tree.json"
         if not ocr_path.exists() or not tree_path.exists():

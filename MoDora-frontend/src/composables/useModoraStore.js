@@ -1,4 +1,5 @@
 import { reactive } from 'vue';
+import { apiFetch, createApiXhr, getApiUrl } from '../config/api';
 import { DEFAULT_SETTINGS, normalizeSettings } from '../config/settingsContract';
 
 // 辅助：生成 ID
@@ -53,32 +54,9 @@ const state = reactive({
     modelInstances: []
 });
 
-const getDirectApiUrl = (path) => {
-    const apiPort = import.meta.env.VITE_MODORA_API_PORT;
-    const relayApiPort = import.meta.env.VITE_MODORA_PUBLIC_API_PORT;
-    const frontendPort = import.meta.env.VITE_MODORA_FRONTEND_PORT;
-    if ((!apiPort && !relayApiPort) || typeof window === 'undefined') {
-        return path;
-    }
-
-    const protocol = window.location.protocol || 'http:';
-    const hostname = window.location.hostname || '127.0.0.1';
-    const currentPort = window.location.port || '';
-    const targetPort =
-        relayApiPort && frontendPort && currentPort !== String(frontendPort)
-            ? relayApiPort
-            : apiPort;
-
-    if (!targetPort) {
-        return path;
-    }
-
-    return `${protocol}//${hostname}:${targetPort}${path}`;
-};
-
 const uploadViaDirectApi = (formData, onProgress) => new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', getDirectApiUrl('/api/upload'));
+    const xhr = createApiXhr();
+    xhr.open('POST', getApiUrl('/api/upload'));
     xhr.responseType = 'json';
 
     xhr.upload.onprogress = (event) => {
@@ -113,6 +91,16 @@ const uploadViaDirectApi = (formData, onProgress) => new Promise((resolve, rejec
 });
 
 export function useModoraStore() {
+    const getDocByReference = (reference) => {
+        const session = getActiveSession();
+        if (!session) return null;
+        return (
+            session.docs.find(d => d.id === reference) ||
+            session.docs.find(d => d.documentId === reference) ||
+            session.docs.find(d => d.name === reference) ||
+            null
+        );
+    };
 
     // 获取当前会话对象
     const getActiveSession = () => {
@@ -172,30 +160,24 @@ export function useModoraStore() {
 
     // 打开 PDF 动作
     const openPdf = (fileId, page = 1, bboxes = []) => {
-        // fileId 其实没多大用了，主要靠 file_name
-        // 这里假设 fileId 就是 file_name 或者在 docs 里的 id
-        // 为了兼容旧逻辑，我们先在当前会话的 docs 里找
         const session = getActiveSession();
-        let doc = session.docs.find(d => d.id === fileId);
-        
-        // 如果找不到，可能是引用跳转过来的，尝试用 name 找
-        if (!doc) {
-             // 这里的 fileId 有时候传的是 name (在旧逻辑里混用了)
-             doc = session.docs.find(d => d.name === fileId);
-        }
+        let doc = getDocByReference(fileId);
 
         // 依然找不到？可能是跨会话引用（理论上不该发生），或者默认 fallback
         if (!doc && session.docs.length > 0) doc = session.docs[0];
         
         if (!doc) return; // 真的没有文档
 
-        const fileUrl = `/api/files/${encodeURIComponent(doc.name)}`;
+        const fileUrl = doc.documentId
+            ? getApiUrl(`/api/documents/${encodeURIComponent(doc.documentId)}/pdf/1/image`)
+            : getApiUrl(`/api/files/${encodeURIComponent(doc.name)}`);
 
         state.viewingPdf = {
             url: fileUrl,
             page: page,
             name: doc.name,
-            bboxes: bboxes || [] 
+            bboxes: bboxes || [],
+            documentId: doc.documentId || null
         };
 
         // 互斥：关闭结构树
@@ -230,6 +212,7 @@ export function useModoraStore() {
 
         // --- 获取当前会话的所有文档 ---
         const fileNames = session.docs.map(d => d.name);
+        const documentIds = session.docs.map(d => d.documentId).filter(Boolean);
         
         // 如果没有文档，提示用户上传
         if (fileNames.length === 0) {
@@ -253,11 +236,13 @@ export function useModoraStore() {
             const payload = { 
                 file_names: fileNames,
                 file_name: fileNames[0],
+                document_ids: documentIds.length > 0 ? documentIds : undefined,
+                document_id: documentIds[0] || undefined,
                 query: currentQuery,
                 settings: state.settings
             };
             console.log("Chat request payload:", payload);
-            const response = await fetch('/api/chat', {
+            const response = await apiFetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -285,6 +270,11 @@ export function useModoraStore() {
                 
                 // 尝试根据 file_name 找到对应的 fileId (用于 openPdf)
                 let docId = null;
+                let documentId = doc.document_id || null;
+                if (documentId) {
+                    const foundDoc = session.docs.find(d => d.documentId === documentId);
+                    if (foundDoc) docId = foundDoc.id;
+                }
                 if (doc.file_name) {
                     const foundDoc = session.docs.find(d => d.name === doc.file_name);
                     if (foundDoc) docId = foundDoc.id;
@@ -295,6 +285,7 @@ export function useModoraStore() {
                 return {
                     fileId: docId, 
                     fileName: doc.file_name || activeFile,
+                    documentId: documentId,
                     page: doc.page,
                     snippet: snippetText,
                     bboxes: doc.bboxes
@@ -335,13 +326,15 @@ export function useModoraStore() {
     };
     
     // 更新树节点
-    const updateTreeNode = async (fileName, nodePath, action, newData) => {
+    const updateTreeNode = async (fileRef, nodePath, action, newData) => {
+        const doc = getDocByReference(fileRef);
         try {
-            const response = await fetch('/api/tree/node/update', {
+            const response = await apiFetch('/api/tree/node/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    file_name: fileName,
+                    file_name: doc ? doc.name : fileRef,
+                    document_id: doc?.documentId,
                     action: action,
                     target_path: nodePath,
                     new_data: newData
@@ -356,13 +349,15 @@ export function useModoraStore() {
     };
     
     // 保存整个树结构
-    const saveTreeStructure = async (fileName, elements) => {
+    const saveTreeStructure = async (fileRef, elements) => {
+        const doc = getDocByReference(fileRef);
         try {
-             const response = await fetch('/api/tree/update', {
+             const response = await apiFetch('/api/tree/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    file_name: fileName,
+                    file_name: doc ? doc.name : fileRef,
+                    document_id: doc?.documentId,
                     elements: elements
                 })
             });
@@ -379,7 +374,7 @@ export function useModoraStore() {
         state.settings = normalizeSettings({ ...state.settings, ...newSettings });
         localStorage.setItem('modora_settings', JSON.stringify(state.settings));
         try {
-            const res = await fetch('/api/settings/ui', {
+            const res = await apiFetch('/api/settings/ui', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ settings: state.settings })
@@ -398,7 +393,7 @@ export function useModoraStore() {
 
     const loadSettings = async () => {
         try {
-            const res = await fetch('/api/settings/ui');
+            const res = await apiFetch('/api/settings/ui');
             if (res.ok) {
                 const data = await res.json();
                 if (data && data.settings) {
@@ -413,7 +408,7 @@ export function useModoraStore() {
 
     const loadModelInstances = async () => {
         try {
-            const res = await fetch('/api/models/instances');
+            const res = await apiFetch('/api/models/instances');
             if (res.ok) {
                 const data = await res.json();
                 if (Array.isArray(data.instances)) {
@@ -457,6 +452,9 @@ export function useModoraStore() {
 
             state.uploadProgress = 40;
             const filename = data.filename;
+            const documentId = data.document_id || null;
+            const jobId = data.job_id || null;
+            const taskStatusKey = jobId || filename;
 
             // 阶段 2: 轮询后台状态 (40% -> 99%)
             progressTimer = setInterval(() => {
@@ -470,7 +468,7 @@ export function useModoraStore() {
             await new Promise((resolve, reject) => {
                 pollTimer = setInterval(async () => {
                     try {
-                        const statusRes = await fetch(`/api/task/status/${encodeURIComponent(filename)}`);
+                        const statusRes = await apiFetch(`/api/task/status/${encodeURIComponent(taskStatusKey)}`);
                         if (!statusRes.ok) return; 
                         
                         const statusData = await statusRes.json();
@@ -497,9 +495,11 @@ export function useModoraStore() {
             // 上传成功后添加到当前会话
             const ext = filename.split('.').pop().toLowerCase();
             const newDoc = {
-                id: 'doc_' + Math.random().toString(36).substr(2, 9),
+                id: documentId || ('doc_' + Math.random().toString(36).substr(2, 9)),
                 name: filename,
-                type: ext
+                type: ext,
+                documentId: documentId,
+                jobId: jobId
             };
             
             const session = getActiveSession();
@@ -528,7 +528,7 @@ export function useModoraStore() {
     // 动作：获取知识库所有文档
     const fetchKbDocs = async () => {
         try {
-            const res = await fetch('/api/kb/docs');
+            const res = await apiFetch('/api/kb/docs');
             if (res.ok) {
                 state.kbDocs = await res.json();
             }
@@ -540,7 +540,7 @@ export function useModoraStore() {
     // 动作：获取全局标签库
     const fetchGlobalTags = async () => {
         try {
-            const res = await fetch('/api/kb/tags');
+            const res = await apiFetch('/api/kb/tags');
             if (res.ok) {
                 state.globalTags = await res.json();
             }
@@ -550,23 +550,29 @@ export function useModoraStore() {
     };
 
     // 动作：更新文档标签
-    const updateDocTags = async (fileName, tags) => {
+    const updateDocTags = async (fileRef, tags) => {
+        const doc = getDocByReference(fileRef);
+        const kbKey = doc?.documentId || doc?.name || fileRef;
         try {
-            const res = await fetch('/api/kb/doc/tags', {
+            const res = await apiFetch('/api/kb/doc/tags', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ file_name: fileName, tags })
+                body: JSON.stringify({
+                    file_name: doc?.name || fileRef,
+                    document_id: doc?.documentId,
+                    tags
+                })
             });
             if (res.ok) {
                 // 更新本地缓存
-                if (state.kbDocs[fileName]) {
-                    state.kbDocs[fileName].tags = tags;
+                if (state.kbDocs[kbKey]) {
+                    state.kbDocs[kbKey].tags = tags;
                 }
                 // 重新获取全局标签库，因为可能新增了标签
                 await fetchGlobalTags();
                 
                 // 如果当前正在看这个文档的统计，也更新一下
-                if (state.docStats && state.docStats.file_name === fileName) {
+                if (state.docStats && (state.docStats.document_id === doc?.documentId || state.docStats.file_name === doc?.name || state.docStats.file_name === fileRef)) {
                     state.docStats.tags = tags;
                 }
             }
@@ -622,7 +628,7 @@ export function useModoraStore() {
     // 动作：从全局库中删除标签
     const deleteGlobalTag = async (tag) => {
         try {
-            const res = await fetch(`/api/kb/tag/${encodeURIComponent(tag)}`, {
+            const res = await apiFetch(`/api/kb/tag/${encodeURIComponent(tag)}`, {
                 method: 'DELETE'
             });
             if (res.ok) {
@@ -640,31 +646,34 @@ export function useModoraStore() {
     };
 
     // 动作：从知识库彻底删除文档
-    const deleteKbDoc = async (fileName) => {
-        if (!confirm(`Are you sure you want to permanently delete "${fileName}"? This cannot be undone.`)) {
+    const deleteKbDoc = async (fileRef) => {
+        const doc = getDocByReference(fileRef);
+        const displayName = doc?.name || fileRef;
+        if (!confirm(`Are you sure you want to permanently delete "${displayName}"? This cannot be undone.`)) {
             return;
         }
         try {
-            const res = await fetch(`/api/kb/delete/${encodeURIComponent(fileName)}`, {
-                method: 'DELETE'
-            });
+            const endpoint = doc?.documentId
+                ? `/api/kb/doc/${encodeURIComponent(doc.documentId)}`
+                : `/api/kb/delete/${encodeURIComponent(displayName)}`;
+            const res = await apiFetch(endpoint, { method: 'DELETE' });
             // Treat 404 (Not Found) as success, assuming file is already deleted
             if (res.ok || res.status === 404) {
                 // 从本地缓存移除
-                if (state.kbDocs[fileName]) {
-                    delete state.kbDocs[fileName];
+                if (state.kbDocs[displayName]) {
+                    delete state.kbDocs[displayName];
                 }
                 // 从所有会话移除引用
                 state.sessions.forEach(sess => {
-                    const idx = sess.docs.findIndex(d => d.name === fileName);
+                    const idx = sess.docs.findIndex(d => d.name === displayName || d.documentId === doc?.documentId);
                     if (idx !== -1) {
                          sess.docs.splice(idx, 1);
                     }
                 });
                 
                 // 如果当前正在查看此文档，关闭它
-                if (state.viewingPdf && state.viewingPdf.name === fileName) closePdf();
-                if (state.viewingDocTree && state.viewingDocTree.name === fileName) closeSidePanel();
+                if (state.viewingPdf && state.viewingPdf.name === displayName) closePdf();
+                if (state.viewingDocTree && state.viewingDocTree.name === displayName) closeSidePanel();
             } else {
                 const err = await res.json().catch(() => ({}));
                 alert("Delete failed: " + (err.detail || `Status ${res.status}`));
@@ -676,11 +685,17 @@ export function useModoraStore() {
     };
 
     // 动作：获取单文档统计
-    const fetchDocStats = async (fileName) => {
+    const fetchDocStats = async (fileRef) => {
+        const doc = getDocByReference(fileRef);
         try {
-            const res = await fetch(`/api/docs/stats/${encodeURIComponent(fileName)}`);
+            const endpoint = doc?.documentId
+                ? `/api/documents/${encodeURIComponent(doc.documentId)}/stats`
+                : `/api/docs/stats/${encodeURIComponent(doc?.name || fileRef)}`;
+            const res = await apiFetch(endpoint);
             if (res.ok) {
                 state.docStats = await res.json();
+                state.docStats.file_name = doc?.name || fileRef;
+                state.docStats.document_id = doc?.documentId || null;
             }
         } catch (e) {
             console.error("Failed to fetch doc stats:", e);
@@ -691,16 +706,20 @@ export function useModoraStore() {
     const fetchSessionStats = async () => {
         const session = getActiveSession();
         const fileNames = session.docs.map(d => d.name);
+        const documentIds = session.docs.map(d => d.documentId).filter(Boolean);
         if (fileNames.length === 0) {
             state.sessionStats = null;
             return;
         }
 
         try {
-            const res = await fetch('/api/session/stats', {
+            const res = await apiFetch('/api/session/stats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ file_names: fileNames })
+                body: JSON.stringify({
+                    file_names: fileNames,
+                    document_ids: documentIds.length > 0 ? documentIds : undefined
+                })
             });
             if (res.ok) {
                 state.sessionStats = await res.json();

@@ -7,6 +7,8 @@ from pydantic import BaseModel
 class ChatRequest(BaseModel):
     file_name: str | None = None
     file_names: list[str] | None = None
+    document_id: str | None = None
+    document_ids: list[str] | None = None
     query: str
     settings: dict[str, Any] | None = None
 
@@ -17,6 +19,7 @@ class RetrievalItem(BaseModel):
     bboxes: list[Any]
     score: float | None = 0.0
     file_name: str | None = None
+    document_id: str | None = None
 
 
 class ChatResponse(BaseModel):
@@ -27,7 +30,8 @@ class ChatResponse(BaseModel):
 
 
 class TreeRequest(BaseModel):
-    file_name: str
+    file_name: str | None = None
+    document_id: str | None = None
 
 
 class TreeResponse(BaseModel):
@@ -35,19 +39,22 @@ class TreeResponse(BaseModel):
 
 
 class TreeUpdateRequest(BaseModel):
-    file_name: str
+    file_name: str | None = None
+    document_id: str | None = None
     elements: list
 
 
 class TreeRecomposeRequest(BaseModel):
-    file_name: str
+    file_name: str | None = None
+    document_id: str | None = None
     rule: str = "balanced"
     user_query: str | None = None
     settings: dict[str, Any] | None = None
 
 
 class NodeUpdateRequest(BaseModel):
-    file_name: str
+    file_name: str | None = None
+    document_id: str | None = None
     action: str
     target_path: list[str]
     new_data: dict[str, Any] | None = None
@@ -65,7 +72,8 @@ class DocStatsResponse(BaseModel):
 
 
 class SessionStatsRequest(BaseModel):
-    file_names: list[str]
+    file_names: list[str] | None = None
+    document_ids: list[str] | None = None
 
 
 class SessionStatsResponse(BaseModel):
@@ -78,5 +86,31 @@ class SessionStatsResponse(BaseModel):
 
 
 class UpdateTagsRequest(BaseModel):
-    file_name: str
+    file_name: str | None = None
+    document_id: str | None = None
     tags: list[str]
+
+
+class UploadResponse(BaseModel):
+    filename: str
+    status: str
+    message: str
+    document_id: str | None = None
+    job_id: str | None = None
+
+
+class TaskStatusResponse(BaseModel):
+    status: str
+    document_id: str | None = None
+    job_id: str | None = None
+
+
+class DocumentItem(BaseModel):
+    id: str
+    original_name: str
+    status: str
+    created_at: str
+
+
+class DocumentListResponse(BaseModel):
+    documents: list[DocumentItem]

@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 import logging
 import asyncio
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from modora.api.auth import get_optional_current_user
+from modora.api.v1.document_access import resolve_document_paths
 from modora.core.domain.cctree import CCTree
+from modora.core.auth.service import AuthUser
 from modora.core.settings import Settings
-from modora.core.utils.paths import resolve_paths
 from modora.core.utils.config import settings_from_ui_payload
 from modora.core.infra.llm.factory import AsyncLLMFactory
 from modora.core.utils.tree import (
@@ -33,22 +35,52 @@ logger = logging.getLogger("modora.api")
 @router.post("/tree", response_model=TreeResponse)
 async def get_document_tree(request: TreeRequest):
     settings = Settings.load()
-    paths = resolve_paths(settings)
-    tree_path = paths.doc_cache_dir(request.file_name) / "tree.json"
+    return await _get_document_tree(request, None, settings)
+
+
+async def _get_document_tree(
+    request: TreeRequest,
+    user: AuthUser | None,
+    settings: Settings,
+):
+    resolved = resolve_document_paths(
+        settings,
+        user=user,
+        document_id=request.document_id,
+        file_name=request.file_name,
+    )
+    tree_path = resolved.cache_dir / "tree.json"
     if not tree_path.exists():
         raise HTTPException(status_code=404, detail="Tree cache not found.")
 
     tree_dict = json.loads(tree_path.read_text(encoding="utf-8"))
-    elements = convert_tree_to_vueflow(tree_dict, root_label=request.file_name)
+    elements = convert_tree_to_vueflow(tree_dict, root_label=resolved.display_name)
     return TreeResponse(elements=elements)
 
 
-@router.post("/tree/update")
-def update_tree_endpoint(request: TreeUpdateRequest):
-    settings = Settings.load()
-    paths = resolve_paths(settings)
+@router.post("/tree/document", response_model=TreeResponse)
+async def get_document_tree_by_document(
+    request: TreeRequest,
+    user: AuthUser = Depends(get_optional_current_user),
+):
+    if user is None:
+        raise HTTPException(status_code=401, detail="authentication required")
+    return await _get_document_tree(request, user, Settings.load())
 
-    tree_path = paths.doc_cache_dir(request.file_name) / "tree.json"
+
+@router.post("/tree/update")
+def update_tree_endpoint(
+    request: TreeUpdateRequest,
+    user: AuthUser | None = Depends(get_optional_current_user),
+):
+    settings = Settings.load()
+    resolved = resolve_document_paths(
+        settings,
+        user=user,
+        document_id=request.document_id,
+        file_name=request.file_name,
+    )
+    tree_path = resolved.cache_dir / "tree.json"
     if not tree_path.exists():
         raise HTTPException(
             status_code=404, detail=f"Tree cache not found: {tree_path}"
@@ -57,7 +89,7 @@ def update_tree_endpoint(request: TreeUpdateRequest):
     original_tree_dict = json.loads(tree_path.read_text(encoding="utf-8"))
     try:
         new_tree_dict = reconstruct_tree_from_elements(
-            request.elements, original_tree_dict, request.file_name
+            request.elements, original_tree_dict, resolved.display_name
         )
         validate_tree_structure(new_tree_dict)
         CCTree.normalize_tree_dict(new_tree_dict)
@@ -74,8 +106,21 @@ def update_tree_endpoint(request: TreeUpdateRequest):
 @router.post("/tree/recompose", response_model=TreeResponse)
 async def recompose_tree_endpoint(request: TreeRecomposeRequest):
     settings = Settings.load()
-    paths = resolve_paths(settings)
-    tree_path = paths.doc_cache_dir(request.file_name) / "tree.json"
+    return await _recompose_tree_endpoint(request, None, settings)
+
+
+async def _recompose_tree_endpoint(
+    request: TreeRecomposeRequest,
+    user: AuthUser | None,
+    settings: Settings,
+):
+    resolved = resolve_document_paths(
+        settings,
+        user=user,
+        document_id=request.document_id,
+        file_name=request.file_name,
+    )
+    tree_path = resolved.cache_dir / "tree.json"
     if not tree_path.exists():
         raise HTTPException(status_code=404, detail="Tree cache not found.")
 
@@ -83,7 +128,7 @@ async def recompose_tree_endpoint(request: TreeRecomposeRequest):
         tree_dict = json.loads(tree_path.read_text(encoding="utf-8"))
         
         if request.rule == "ai" and request.user_query:
-            root_node = dict_to_tree(tree_dict, root_title=request.file_name)
+            root_node = dict_to_tree(tree_dict, root_title=resolved.display_name)
             schema = root_node.get_schema()
             
             # Resolve settings and instance_id from payload
@@ -109,26 +154,44 @@ async def recompose_tree_endpoint(request: TreeRecomposeRequest):
             recomposed_root = root_node.recompose_by_schema(ai_generated_schema)
             recomposed = recomposed_root.to_dict()
         else:
-            recomposed = recompose_tree_dict(tree_dict, request.file_name, request.rule)
+            recomposed = recompose_tree_dict(tree_dict, resolved.display_name, request.rule)
             
-        elements = convert_tree_to_vueflow(recomposed, root_label=request.file_name)
+        elements = convert_tree_to_vueflow(recomposed, root_label=resolved.display_name)
         return TreeResponse(elements=elements)
     except Exception as e:
         logger.error(f"Recompose error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/tree/recompose/document", response_model=TreeResponse)
+async def recompose_tree_by_document_endpoint(
+    request: TreeRecomposeRequest,
+    user: AuthUser = Depends(get_optional_current_user),
+):
+    if user is None:
+        raise HTTPException(status_code=401, detail="authentication required")
+    return await _recompose_tree_endpoint(request, user, Settings.load())
+
+
 @router.post("/tree/node/update")
-def update_node_endpoint(request: NodeUpdateRequest):
+def update_node_endpoint(
+    request: NodeUpdateRequest,
+    user: AuthUser | None = Depends(get_optional_current_user),
+):
     settings = Settings.load()
-    paths = resolve_paths(settings)
-    tree_path = paths.doc_cache_dir(request.file_name) / "tree.json"
+    resolved = resolve_document_paths(
+        settings,
+        user=user,
+        document_id=request.document_id,
+        file_name=request.file_name,
+    )
+    tree_path = resolved.cache_dir / "tree.json"
     if not tree_path.exists():
         raise HTTPException(status_code=404, detail="Tree not found")
 
     try:
         tree_dict = json.loads(tree_path.read_text(encoding="utf-8"))
-        root = dict_to_tree(tree_dict, root_title=request.file_name)
+        root = dict_to_tree(tree_dict, root_title=resolved.display_name)
 
         current_node = root
         parent_node = None

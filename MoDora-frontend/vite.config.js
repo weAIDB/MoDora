@@ -8,8 +8,10 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig(() => {
   // Determine backend port from environment variable, default to 8005
   const backendPort = process.env.MODORA_API_PORT || '8005'
+  const appBase = process.env.VITE_MODORA_BASE_PATH || '/'
   
   return {
+    base: appBase,
     plugins: [
       vue(),
     ],

@@ -202,6 +202,7 @@ import { VueFlow, useVueFlow, Handle, Position } from '@vue-flow/core';
 import { Background } from '@vue-flow/background';
 import { Controls } from '@vue-flow/controls';
 import dagre from '@dagrejs/dagre';
+import { apiFetch } from '../config/api';
 import { useModoraStore } from '../composables/useModoraStore';
 import { useDarkTheme } from '../composables/useDarkTheme';
 import NodeEditModal from './NodeEditModal.vue';
@@ -551,11 +552,12 @@ const getSpherePosition = (index, total, radius, centerX, centerY) => {
    
    try {
      const currentDoc = store.state.viewingDocTree
-     const response = await fetch('/api/tree/recompose', {
+     const response = await apiFetch('/api/tree/recompose', {
        method: 'POST',
        headers: { 'Content-Type': 'application/json' },
        body: JSON.stringify({
          file_name: currentDoc ? currentDoc.name : 'default',
+         document_id: currentDoc?.documentId,
          rule: 'ai',
          user_query: userQuery
        })
@@ -605,10 +607,13 @@ const fetchTreeData = async () => {
   elements.value = [];
 
   try {
-    const response = await fetch('/api/tree', {
+    const response = await apiFetch('/api/tree', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ file_name: currentDoc.name })
+      body: JSON.stringify({
+        file_name: currentDoc.name,
+        document_id: currentDoc.documentId
+      })
     });
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
