@@ -5,6 +5,21 @@
     2. Add padding (p-4), make main area float above background for better layering
   -->
   <div 
+    v-if="store.state.isAuthLoading"
+    class="flex h-screen w-screen items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.18),_transparent_35%),linear-gradient(135deg,_#f8fafc,_#e2e8f0)]"
+  >
+    <div class="rounded-[28px] border border-white/70 bg-white/80 px-8 py-6 shadow-2xl backdrop-blur-xl">
+      <div class="flex items-center gap-3 text-slate-700">
+        <i class="fa-solid fa-circle-notch animate-spin text-sky-500"></i>
+        <span class="text-sm font-semibold">Loading workspace...</span>
+      </div>
+    </div>
+  </div>
+
+  <AuthScreen v-else-if="!store.state.currentUser" />
+
+  <div 
+    v-else
     class="flex h-screen w-screen overflow-hidden p-4 md:p-6 gap-4 md:gap-6 relative"
     @dragover.prevent="onDragOver"
     @dragenter.prevent="onDragOver"
@@ -102,6 +117,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import AppSidebar from './components/AppSidebar.vue';
+import AuthScreen from './components/AuthScreen.vue';
 import ChatWindow from './components/ChatWindow.vue';
 import InteractiveTree from './components/InteractiveTree.vue';
 import PDFViewer from './components/PDFViewer.vue';
@@ -114,8 +130,7 @@ const isDraggingGlobal = ref(false);
 let dragCounter = 0;
 
 onMounted(() => {
-  store.loadSettings();
-  store.loadModelInstances();
+  store.initializeApp();
 });
 
 const onDragOver = (e) => {
@@ -139,7 +154,7 @@ const onDrop = async (e) => {
   dragCounter = 0;
   isDraggingGlobal.value = false;
   
-  if (store.state.isUploading) return;
+  if (store.state.isUploading || !store.state.currentUser) return;
   
   const files = e.dataTransfer.files;
   if (files && files.length > 0) {

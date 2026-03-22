@@ -36,6 +36,21 @@
       </div>
     </div>
 
+    <div class="border-b border-slate-200 bg-white/80 px-6 py-3 dark:border-slate-700 dark:bg-slate-800/80">
+      <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+          <div class="text-[10px] font-extrabold uppercase tracking-[0.22em] text-slate-400">Signed in</div>
+          <div class="truncate text-sm font-bold text-slate-700 dark:text-slate-200">{{ store.state.currentUser?.email }}</div>
+        </div>
+        <button
+          @click="store.logout()"
+          class="rounded-xl border border-slate-200 px-3 py-2 text-[11px] font-bold text-slate-500 transition hover:border-rose-200 hover:text-rose-500 dark:border-slate-700 dark:text-slate-300"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+
     <!-- List Area -->
     <div class="flex-1 overflow-y-auto p-4 custom-scrollbar flex flex-col space-y-6">
       
@@ -193,10 +208,10 @@
                   <span class="text-xs text-slate-600 dark:text-slate-300 truncate font-medium" :title="doc.name">{{ doc.name }}</span>
                   
                   <!-- Tag Display -->
-                  <div class="flex flex-wrap gap-1 mt-0.5" v-if="store.state.kbDocs[doc.name]">
+                  <div class="flex flex-wrap gap-1 mt-0.5" v-if="getDocKbInfo(doc)">
                     <!-- Show top 3 tags -->
                     <span 
-                      v-for="tag in orderedTags(store.state.kbDocs[doc.name].tags).slice(0, 3)" 
+                      v-for="tag in orderedTags(getDocKbInfo(doc).tags).slice(0, 3)" 
                       :key="tag"
                       :class="getTagStyle(tag)"
                       class="px-1 py-0.5 text-[8px] rounded leading-none"
@@ -205,7 +220,7 @@
                     </span>
                     <!-- Semantic tags (different color) -->
                     <span 
-                      v-for="tag in orderedTags(store.state.kbDocs[doc.name].semantic_tags).slice(0, 1)" 
+                      v-for="tag in orderedTags(getDocKbInfo(doc).semantic_tags).slice(0, 1)" 
                       :key="tag"
                       :class="getTagStyle(tag, true)"
                       class="px-1 py-0.5 text-[8px] rounded leading-none italic font-medium"
@@ -214,10 +229,10 @@
                     </span>
                     <!-- More collapsed -->
                     <span 
-                      v-if="store.state.kbDocs[doc.name].tags.length > 3"
+                      v-if="getDocKbInfo(doc).tags.length > 3"
                       class="px-1 py-0.5 bg-slate-50 dark:bg-slate-800 text-[8px] text-slate-400 rounded leading-none"
                     >
-                      +{{ store.state.kbDocs[doc.name].tags.length - 3 }}
+                      +{{ getDocKbInfo(doc).tags.length - 3 }}
                     </span>
                   </div>
                 </div>
@@ -319,17 +334,17 @@
           <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div 
-                v-for="(info, name) in filteredKbDocs" 
-                :key="name"
-                @click="toggleKbDocSelection(name)"
+                v-for="entry in filteredKbDocs" 
+                :key="entry.key"
+                @click="toggleKbDocSelection(entry.key)"
                 class="p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group relative"
-                :class="selectedKbDocs.includes(name) 
+                :class="selectedKbDocs.includes(entry.key) 
                   ? 'bg-indigo-50/50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 ring-2 ring-indigo-500/20' 
                   : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md'"
               >
                 <!-- Delete Button -->
                 <button 
-                  @click.stop="confirmDeleteKbDoc(name)"
+                  @click.stop="confirmDeleteKbDoc(entry.key)"
                   class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white dark:bg-slate-700 hover:bg-red-500 hover:text-white text-slate-300 dark:text-slate-500 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 z-20 shadow-sm border border-slate-100 dark:border-slate-600"
                   title="Permanently Delete"
                 >
@@ -341,26 +356,26 @@
                     <i class="fa-solid fa-file-pdf text-lg"></i>
                   </div>
                   <div class="flex flex-col min-w-0">
-                    <span class="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{{ name }}</span>
+                    <span class="text-sm font-bold text-slate-700 dark:text-slate-200 truncate">{{ entry.name }}</span>
                     <div class="flex flex-wrap gap-1 mt-1.5">
-                      <span v-for="tag in orderedTags(info.tags)" :key="tag" :class="getTagStyle(tag)" class="text-[9px] px-1.5 py-0.5 rounded-md">
+                      <span v-for="tag in orderedTags(entry.info.tags)" :key="tag" :class="getTagStyle(tag)" class="text-[9px] px-1.5 py-0.5 rounded-md">
                         {{ tag }}
                       </span>
-                      <span v-for="tag in orderedTags(info.semantic_tags)" :key="tag" :class="getTagStyle(tag, true)" class="text-[9px] px-1.5 py-0.5 rounded-md italic">
+                      <span v-for="tag in orderedTags(entry.info.semantic_tags)" :key="tag" :class="getTagStyle(tag, true)" class="text-[9px] px-1.5 py-0.5 rounded-md italic">
                         {{ tag }}
                       </span>
                     </div>
                   </div>
                 </div>
                 <div class="shrink-0">
-                  <div v-if="selectedKbDocs.includes(name)" class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 scale-110 transition-transform">
+                  <div v-if="selectedKbDocs.includes(entry.key)" class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 scale-110 transition-transform">
                     <i class="fa-solid fa-check text-xs"></i>
                   </div>
                   <div v-else class="w-6 h-6 rounded-full border-2 border-slate-200 dark:border-slate-700 group-hover:border-indigo-300 transition-colors"></div>
                 </div>
               </div>
             </div>
-            <div v-if="Object.keys(filteredKbDocs).length === 0" class="py-20 text-center text-slate-400">
+            <div v-if="filteredKbDocs.length === 0" class="py-20 text-center text-slate-400">
               <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <i class="fa-solid fa-box-open text-4xl opacity-20"></i>
               </div>
@@ -515,14 +530,16 @@
 <script setup>
 import { useModoraStore } from '../composables/useModoraStore';
 import { useDarkTheme } from '../composables/useDarkTheme';
-import { ref, nextTick, computed, onMounted } from 'vue';
+import { ref, nextTick, computed, onMounted, watch } from 'vue';
 
 const store = useModoraStore();
 
 // Initialize knowledge base data fetch
 onMounted(() => {
-  store.fetchKbDocs();
-  store.fetchGlobalTags();
+  if (store.state.currentUser) {
+    store.fetchKbDocs();
+    store.fetchGlobalTags();
+  }
 });
 
 const { isDark, toggleTheme } = useDarkTheme();
@@ -613,20 +630,27 @@ const orderedTags = (tags) => {
 const orderedGlobalTags = computed(() => orderedTags(store.state.globalTags));
 const orderedCurrentTags = computed(() => orderedTags(currentTags.value));
 
+const kbEntries = computed(() => {
+  return Object.entries(store.state.kbDocs).map(([key, info]) => {
+    const linkedDoc = store.state.documentLibrary.find(doc => doc.storageKey === key || doc.name === key) || null;
+    return {
+      key,
+      name: linkedDoc?.name || key,
+      info
+    };
+  });
+});
+
 const filteredKbDocs = computed(() => {
   const query = kbSearchQuery.value.toLowerCase();
-  if (!query) return store.state.kbDocs;
+  if (!query) return kbEntries.value;
   
-  const result = {};
-  for (const [name, info] of Object.entries(store.state.kbDocs)) {
-    const nameMatch = name.toLowerCase().includes(query);
+  return kbEntries.value.filter(({ key, name, info }) => {
+    const nameMatch = name.toLowerCase().includes(query) || key.toLowerCase().includes(query);
     const tagMatch = (info.tags || []).some(t => t.toLowerCase().includes(query));
     const semanticTagMatch = (info.semantic_tags || []).some(t => t.toLowerCase().includes(query));
-    if (nameMatch || tagMatch || semanticTagMatch) {
-      result[name] = info;
-    }
-  }
-  return result;
+    return nameMatch || tagMatch || semanticTagMatch;
+  });
 });
 
 const openKbSelector = () => {
@@ -659,7 +683,7 @@ const startTagEditing = (doc) => {
   editingTagsDocId.value = doc.id;
   editingTagsDocName.value = doc.name;
   // Read current tags from store (merge rule tags and semantic tags)
-  const kbInfo = store.state.kbDocs[doc.name];
+  const kbInfo = getDocKbInfo(doc);
   if (kbInfo) {
     const tags = kbInfo.tags || [];
     const semanticTags = kbInfo.semantic_tags || [];
@@ -690,7 +714,7 @@ const removeTag = (tag) => {
 };
 
 const saveTags = async () => {
-  await store.updateDocTags(editingTagsDocName.value, currentTags.value);
+  await store.updateDocTags(editingTagsDocId.value || editingTagsDocName.value, currentTags.value);
   editingTagsDocId.value = null;
   // Refresh knowledge base data to keep in sync
   store.fetchKbDocs();
@@ -709,7 +733,7 @@ const openDocStats = (doc) => {
     showingDocStatsId.value = null;
   } else {
     showingDocStatsId.value = doc.id;
-    store.fetchDocStats(doc.name);
+    store.fetchDocStats(doc.documentId || doc.name);
   }
 };
 
@@ -774,4 +798,18 @@ const getTagStyle = (tag, isSemantic = false) => {
   const colorIndex = hash % HASH_COLOR_POOL.length;
   return HASH_COLOR_POOL[colorIndex] + (isSemantic ? ' border border-dashed' : ' border');
 };
+
+const getDocKbInfo = (doc) => store.getKbInfoForDoc(doc) || null;
+
+watch(
+  () => store.state.currentUser,
+  (currentUser) => {
+    if (!currentUser) {
+      showingKbSelector.value = false;
+      editingTagsDocId.value = null;
+      showingSessionStats.value = false;
+      showingDocStatsId.value = null;
+    }
+  }
+);
 </script>

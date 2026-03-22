@@ -30,6 +30,10 @@ const DEFAULT_SESSION = {
 const state = reactive({
     sessions: [DEFAULT_SESSION], // 会话列表
     activeSessionId: DEFAULT_SESSION.id, // 当前激活的会话 ID
+    currentUser: null,
+    isAuthLoading: true,
+    authError: '',
+    documentLibrary: [],
     
     // 界面状态
     isThinking: false,
@@ -91,20 +95,143 @@ const uploadViaDirectApi = (formData, onProgress) => new Promise((resolve, rejec
 });
 
 export function useModoraStore() {
+    const createSessionShell = (overrides = {}) => ({
+        id: generateId(),
+        name: "New Chat",
+        docs: createDefaultDocs(),
+        messages: createWelcomeMessage(),
+        createdAt: new Date(),
+        ...overrides
+    });
+
+    const resetSessionState = () => {
+        const fallbackSession = createSessionShell();
+        state.sessions = [fallbackSession];
+        state.activeSessionId = fallbackSession.id;
+        state.viewingDocTree = null;
+        state.viewingPdf = null;
+        state.docStats = null;
+        state.sessionStats = null;
+    };
+
+    const getKbKeyForDoc = (doc) => doc?.storageKey || doc?.kbKey || doc?.name || '';
+
+    const getKbInfoForDoc = (doc) => {
+        const key = getKbKeyForDoc(doc);
+        if (!key) return null;
+        return state.kbDocs[key] || state.kbDocs[doc?.name] || null;
+    };
+
+    const setDocumentLibrary = (documents) => {
+        state.documentLibrary = documents.map((doc) => ({
+            id: doc.id,
+            name: doc.original_name,
+            documentId: doc.id,
+            storageKey: doc.storage_key || doc.original_name,
+            kbKey: doc.storage_key || doc.original_name,
+            type: (doc.original_name.split('.').pop() || '').toLowerCase(),
+            status: doc.status,
+            createdAt: doc.created_at
+        }));
+    };
+
     const getDocByReference = (reference) => {
         const session = getActiveSession();
-        if (!session) return null;
-        return (
-            session.docs.find(d => d.id === reference) ||
-            session.docs.find(d => d.documentId === reference) ||
-            session.docs.find(d => d.name === reference) ||
-            null
-        );
+        const sessionDocs = session ? session.docs : [];
+        const allDocs = [...sessionDocs, ...state.documentLibrary];
+        return allDocs.find(d => d.id === reference)
+            || allDocs.find(d => d.documentId === reference)
+            || allDocs.find(d => d.storageKey === reference)
+            || allDocs.find(d => d.name === reference)
+            || null;
+    };
+
+    const serializeSessionMessage = (message) => ({
+        role: message.role,
+        content: message.content || '',
+        citations: Array.isArray(message.citations) ? message.citations : []
+    });
+
+    const serializeSession = (session) => ({
+        title: session.name || 'New Chat',
+        document_ids: session.docs.map(doc => doc.documentId).filter(Boolean),
+        messages: session.messages.map(serializeSessionMessage)
+    });
+
+    const buildSessionFromConversation = (conversation) => ({
+        id: conversation.id,
+        name: conversation.title,
+        docs: (conversation.documents || []).map((doc) => ({
+            id: doc.id,
+            name: doc.original_name,
+            documentId: doc.id,
+            storageKey: doc.storage_key || doc.original_name,
+            kbKey: doc.storage_key || doc.original_name,
+            type: (doc.original_name.split('.').pop() || '').toLowerCase(),
+            status: doc.status,
+            createdAt: doc.created_at
+        })),
+        messages: (conversation.messages || []).length > 0
+            ? conversation.messages.map((message) => ({
+                role: message.role,
+                content: message.content,
+                citations: message.citations || [],
+                isTyping: false
+            }))
+            : createWelcomeMessage(),
+        createdAt: conversation.created_at ? new Date(conversation.created_at) : new Date()
+    });
+
+    const loadConversations = async () => {
+        if (!state.currentUser) {
+            resetSessionState();
+            return;
+        }
+        try {
+            const res = await apiFetch('/api/conversations');
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+            const data = await res.json();
+            if (Array.isArray(data.conversations) && data.conversations.length > 0) {
+                state.sessions = data.conversations.map(buildSessionFromConversation);
+                state.activeSessionId = state.sessions[0].id;
+            } else {
+                state.sessions = [];
+                const created = await createNewSession();
+                state.activeSessionId = created.id;
+            }
+        } catch (e) {
+            console.error("Failed to load conversations:", e);
+            resetSessionState();
+        }
+    };
+
+    const persistSession = async (session) => {
+        if (!state.currentUser || !session?.id) return;
+        try {
+            await apiFetch(`/api/conversations/${encodeURIComponent(session.id)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(serializeSession(session))
+            });
+        } catch (e) {
+            console.error("Failed to persist conversation:", e);
+        }
     };
 
     // 获取当前会话对象
     const getActiveSession = () => {
         return state.sessions.find(s => s.id === state.activeSessionId) || state.sessions[0];
+    };
+
+    const syncCurrentSessionDocs = () => {
+        const session = getActiveSession();
+        if (!session) return;
+        session.docs = session.docs.map((doc) => {
+            const latest = getDocByReference(doc.documentId || doc.storageKey || doc.name);
+            return latest ? { ...latest, id: doc.id || latest.id } : doc;
+        });
     };
 
     // 动作：切换当前会话
@@ -118,25 +245,43 @@ export function useModoraStore() {
     };
 
     // 动作：新建会话
-    const createNewSession = () => {
-        const newSession = {
-            id: generateId(),
-            name: "New Chat",
-            docs: createDefaultDocs(),
-            messages: createWelcomeMessage(),
-            createdAt: new Date()
-        };
-        // 添加到列表开头
+    const createNewSession = async () => {
+        if (!state.currentUser) {
+            const localSession = createSessionShell();
+            state.sessions.unshift(localSession);
+            setActiveSession(localSession.id);
+            return localSession;
+        }
+        const response = await apiFetch('/api/conversations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: 'New Chat' })
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to create conversation: HTTP ${response.status}`);
+        }
+        const payload = await response.json();
+        const newSession = buildSessionFromConversation(payload);
         state.sessions.unshift(newSession);
-        // 自动激活
         setActiveSession(newSession.id);
+        return newSession;
     };
 
     // 动作：删除会话
-    const deleteSession = (sessionId) => {
+    const deleteSession = async (sessionId) => {
         const index = state.sessions.findIndex(s => s.id === sessionId);
         if (index === -1) return;
-        
+
+        if (state.currentUser) {
+            try {
+                await apiFetch(`/api/conversations/${encodeURIComponent(sessionId)}`, {
+                    method: 'DELETE'
+                });
+            } catch (e) {
+                console.error("Failed to delete conversation:", e);
+            }
+        }
+
         state.sessions.splice(index, 1);
         
         // 如果删除了当前会话，需要激活另一个
@@ -145,16 +290,17 @@ export function useModoraStore() {
                 state.activeSessionId = state.sessions[0].id;
             } else {
                 // 如果删空了，自动创建一个新的
-                createNewSession();
+                await createNewSession();
             }
         }
     };
 
     // 动作：重命名会话
-    const renameSession = (sessionId, newName) => {
+    const renameSession = async (sessionId, newName) => {
         const session = state.sessions.find(s => s.id === sessionId);
         if (session) {
             session.name = newName;
+            await persistSession(session);
         }
     };
 
@@ -169,7 +315,7 @@ export function useModoraStore() {
         if (!doc) return; // 真的没有文档
 
         const fileUrl = doc.documentId
-            ? getApiUrl(`/api/documents/${encodeURIComponent(doc.documentId)}/pdf/1/image`)
+            ? getApiUrl(`/api/documents/${encodeURIComponent(doc.documentId)}/file`)
             : getApiUrl(`/api/files/${encodeURIComponent(doc.name)}`);
 
         state.viewingPdf = {
@@ -222,6 +368,7 @@ export function useModoraStore() {
                 content: "Please upload at least one document so I can answer your questions.",
                 isTyping: false
             });
+            await persistSession(session);
             return;
         }
 
@@ -267,6 +414,7 @@ export function useModoraStore() {
             citations = retrievedDocs.map((doc) => {
                 let snippetText = doc.content || "Citation Details...";
                 if (snippetText.length > 60) snippetText = snippetText.substring(0, 60) + "...";
+                const citationPage = Number(doc.page) >= 1 ? Number(doc.page) : 1;
                 
                 // 尝试根据 file_name 找到对应的 fileId (用于 openPdf)
                 let docId = null;
@@ -283,12 +431,14 @@ export function useModoraStore() {
                 if (!docId && session.docs.length > 0) docId = session.docs[0].id;
 
                 return {
-                    fileId: docId, 
+                    fileId: documentId || docId || doc.file_name || activeFile,
                     fileName: doc.file_name || activeFile,
                     documentId: documentId,
-                    page: doc.page,
+                    page: citationPage,
                     snippet: snippetText,
-                    bboxes: doc.bboxes
+                    bboxes: Array.isArray(doc.bboxes)
+                        ? doc.bboxes.map((bbox) => Array.isArray(bbox) ? { page: citationPage, range: bbox } : bbox)
+                        : []
                 };
             });
 
@@ -320,6 +470,7 @@ export function useModoraStore() {
                 if (i >= answer.length) {
                     clearInterval(timer);
                     activeMsg.isTyping = false;
+                    persistSession(session);
                 }
             }, 30);
         }
@@ -499,11 +650,15 @@ export function useModoraStore() {
                 name: filename,
                 type: ext,
                 documentId: documentId,
-                jobId: jobId
+                jobId: jobId,
+                storageKey: documentId ? `${documentId}_${filename}` : filename,
+                kbKey: documentId ? `${documentId}_${filename}` : filename,
+                status: 'completed'
             };
             
             const session = getActiveSession();
             session.docs.push(newDoc);
+            await loadUserDocuments();
             
             // 刷新知识库数据
             await fetchKbDocs();
@@ -513,6 +668,7 @@ export function useModoraStore() {
             if (session.name === "New Chat") {
                 session.name = filename;
             }
+            await persistSession(session);
             
         } catch (e) {
             console.error("Upload Error:", e);
@@ -527,6 +683,10 @@ export function useModoraStore() {
 
     // 动作：获取知识库所有文档
     const fetchKbDocs = async () => {
+        if (!state.currentUser) {
+            state.kbDocs = {};
+            return;
+        }
         try {
             const res = await apiFetch('/api/kb/docs');
             if (res.ok) {
@@ -539,6 +699,10 @@ export function useModoraStore() {
 
     // 动作：获取全局标签库
     const fetchGlobalTags = async () => {
+        if (!state.currentUser) {
+            state.globalTags = [];
+            return;
+        }
         try {
             const res = await apiFetch('/api/kb/tags');
             if (res.ok) {
@@ -582,28 +746,30 @@ export function useModoraStore() {
     };
 
     // 动作：从知识库添加文档到当前会话
-    const addDocFromKb = (fileName) => {
+    const addDocFromKb = async (fileName) => {
+        const doc = getDocByReference(fileName);
         const session = getActiveSession();
-        // 检查是否已存在
-        if (session.docs.find(d => d.name === fileName)) {
+        const candidate = doc || state.documentLibrary.find(d => d.storageKey === fileName) || state.documentLibrary.find(d => d.name === fileName);
+        if (!candidate) {
             return;
         }
-        
-        const ext = fileName.split('.').pop().toLowerCase();
+        if (session.docs.find(d => d.documentId === candidate.documentId || d.storageKey === candidate.storageKey || d.name === candidate.name)) {
+            return;
+        }
         const newDoc = {
-            id: 'doc_' + Math.random().toString(36).substr(2, 9),
-            name: fileName,
-            type: ext
+            ...candidate,
+            id: candidate.id || ('doc_' + Math.random().toString(36).substr(2, 9))
         };
         session.docs.push(newDoc);
         
         if (session.name === "New Chat") {
-            session.name = fileName;
+            session.name = candidate.name;
         }
+        await persistSession(session);
     };
 
     // 动作：从当前会话移除文档
-    const removeDocFromSession = (docId) => {
+    const removeDocFromSession = async (docId) => {
         const session = getActiveSession();
         const docIndex = session.docs.findIndex(d => d.id === docId);
         if (docIndex === -1) return;
@@ -623,6 +789,7 @@ export function useModoraStore() {
         if (state.docStats && state.docStats.file_name === doc.name) {
              state.docStats = null;
         }
+        await persistSession(session);
     };
 
     // 动作：从全局库中删除标签
@@ -660,14 +827,17 @@ export function useModoraStore() {
             // Treat 404 (Not Found) as success, assuming file is already deleted
             if (res.ok || res.status === 404) {
                 // 从本地缓存移除
-                if (state.kbDocs[displayName]) {
-                    delete state.kbDocs[displayName];
+                const kbKey = doc?.storageKey || displayName;
+                if (state.kbDocs[kbKey]) {
+                    delete state.kbDocs[kbKey];
                 }
+                state.documentLibrary = state.documentLibrary.filter(item => item.documentId !== doc?.documentId && item.name !== displayName);
                 // 从所有会话移除引用
                 state.sessions.forEach(sess => {
                     const idx = sess.docs.findIndex(d => d.name === displayName || d.documentId === doc?.documentId);
                     if (idx !== -1) {
                          sess.docs.splice(idx, 1);
+                         persistSession(sess);
                     }
                 });
                 
@@ -729,6 +899,100 @@ export function useModoraStore() {
         }
     };
 
+    const loadUserDocuments = async () => {
+        if (!state.currentUser) {
+            state.documentLibrary = [];
+            return;
+        }
+        try {
+            const res = await apiFetch('/api/documents');
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+            const data = await res.json();
+            setDocumentLibrary(data.documents || []);
+            state.sessions = state.sessions.map((session) => ({
+                ...session,
+                docs: session.docs.map((doc) => {
+                    const latest = getDocByReference(doc.documentId || doc.storageKey || doc.name);
+                    return latest ? { ...latest, id: doc.id || latest.id } : doc;
+                })
+            }));
+            syncCurrentSessionDocs();
+        } catch (e) {
+            console.error("Failed to load user documents:", e);
+        }
+    };
+
+    const fetchCurrentUser = async () => {
+        try {
+            const res = await apiFetch('/api/auth/me');
+            if (!res.ok) {
+                if (res.status === 401) {
+                    state.currentUser = null;
+                    return null;
+                }
+                throw new Error(`HTTP ${res.status}`);
+            }
+            const data = await res.json();
+            state.currentUser = data.user;
+            return data.user;
+        } catch (e) {
+            console.error("Failed to fetch current user:", e);
+            state.currentUser = null;
+            return null;
+        }
+    };
+
+    const authenticate = async (mode, payload) => {
+        state.authError = '';
+        const endpoint = mode === 'register' ? '/api/auth/register' : '/api/auth/login';
+        const res = await apiFetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            throw new Error(data.detail || `HTTP ${res.status}`);
+        }
+        state.currentUser = data.user;
+        await loadUserDocuments();
+        await loadConversations();
+        await Promise.all([fetchKbDocs(), fetchGlobalTags()]);
+        return data.user;
+    };
+
+    const logout = async () => {
+        try {
+            await apiFetch('/api/auth/logout', { method: 'POST' });
+        } catch (e) {
+            console.error("Logout failed:", e);
+        } finally {
+            state.currentUser = null;
+            state.documentLibrary = [];
+            state.kbDocs = {};
+            state.globalTags = [];
+            resetSessionState();
+        }
+    };
+
+    const initializeApp = async () => {
+        state.isAuthLoading = true;
+        await Promise.all([loadSettings(), loadModelInstances()]);
+        await fetchCurrentUser();
+        if (state.currentUser) {
+            await loadUserDocuments();
+            await loadConversations();
+            await Promise.all([fetchKbDocs(), fetchGlobalTags()]);
+        } else {
+            state.documentLibrary = [];
+            state.kbDocs = {};
+            state.globalTags = [];
+        }
+        state.isAuthLoading = false;
+    };
+
     return {
         state,
         getActiveSession,
@@ -747,12 +1011,19 @@ export function useModoraStore() {
         updateSettings,
         loadSettings,
         loadModelInstances,
+        initializeApp,
+        authenticate,
+        logout,
+        fetchCurrentUser,
+        loadUserDocuments,
         fetchKbDocs,
         fetchGlobalTags,
         updateDocTags,
         fetchDocStats,
         fetchSessionStats,
         addDocFromKb,
+        getKbInfoForDoc,
+        getKbKeyForDoc,
         removeDocFromSession,
         deleteGlobalTag,
         deleteKbDoc

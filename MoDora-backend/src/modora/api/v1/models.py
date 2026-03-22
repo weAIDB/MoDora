@@ -108,9 +108,39 @@ class TaskStatusResponse(BaseModel):
 class DocumentItem(BaseModel):
     id: str
     original_name: str
+    storage_key: str | None = None
     status: str
     created_at: str
 
 
 class DocumentListResponse(BaseModel):
     documents: list[DocumentItem]
+
+
+class ConversationMessageItem(BaseModel):
+    role: str
+    content: str
+    citations: list[Any] = []
+    isTyping: bool | None = False
+
+
+class ConversationItem(BaseModel):
+    id: str
+    title: str
+    created_at: str
+    documents: list[DocumentItem] = []
+    messages: list[ConversationMessageItem] = []
+
+
+class ConversationListResponse(BaseModel):
+    conversations: list[ConversationItem]
+
+
+class ConversationCreateRequest(BaseModel):
+    title: str = "New Chat"
+
+
+class ConversationUpdateRequest(BaseModel):
+    title: str
+    document_ids: list[str] = []
+    messages: list[ConversationMessageItem] = []

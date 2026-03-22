@@ -1,4 +1,10 @@
 from .db import connect_db, db_path_from_settings, init_db
+from .conversations import (
+    create_conversation,
+    delete_conversation,
+    list_conversations_for_user,
+    update_conversation,
+)
 from .documents import (
     create_document,
     create_job,
@@ -14,6 +20,10 @@ __all__ = [
     "connect_db",
     "db_path_from_settings",
     "init_db",
+    "create_conversation",
+    "delete_conversation",
+    "list_conversations_for_user",
+    "update_conversation",
     "create_document",
     "create_job",
     "get_document_by_id",

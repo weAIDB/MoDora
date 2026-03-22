@@ -18,6 +18,7 @@ from modora.core.utils.paths import resolve_paths
 # Import new v1 routers
 from modora.api.auth import router as auth_router
 from modora.api.v1.chat import router as chat_router
+from modora.api.v1.conversations import router as conversations_router
 from modora.api.v1.documents import router as doc_router
 from modora.api.v1.kb import router as kb_router
 from modora.api.v1.tree import router as tree_router
@@ -64,6 +65,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth_router, prefix="/api")
+app.include_router(conversations_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
 app.include_router(doc_router, prefix="/api")
 app.include_router(kb_router, prefix="/api")
