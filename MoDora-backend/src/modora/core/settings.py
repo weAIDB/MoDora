@@ -169,11 +169,16 @@ class Settings:
     cache_dir: str | None = None
     exp_dir: str | None = None
     chroma_persist_path: str | None = None
+    storage_root: str | None = None
+    db_path: str | None = None
 
     api_base: str | None = None
     api_key: str | None = None
     api_port: int = 8005
     cors_allowed_origins: list[str] = field(default_factory=lambda: ["*"])
+    auth_session_cookie_name: str = "modora_session"
+    auth_session_ttl_seconds: int = 60 * 60 * 24 * 14
+    auth_cookie_domain: str | None = None
 
     embedding_api_base: str | None = None
     embedding_api_key: str | None = None
@@ -262,6 +267,8 @@ class Settings:
         log_to_file = _coerce_bool(pick("log_to_file", False))
         log_dir = _clean_str(pick("log_dir", None))
         chroma_persist_path = _clean_str(pick("chroma_persist_path", None))
+        storage_root = _clean_str(pick("storage_root", None))
+        db_path = _clean_str(pick("db_path", None))
 
         api_base = _clean_str(pick("api_base", None))
         api_key = _clean_str(pick("api_key", None))
@@ -327,6 +334,14 @@ class Settings:
 
         llm_local_startup_timeout_s = float(pick("llm_local_startup_timeout_s", 600.0))
         llm_request_timeout_s = float(pick("llm_request_timeout_s", 60.0))
+        auth_session_cookie_name = (
+            _clean_str(pick("auth_session_cookie_name", "modora_session"))
+            or "modora_session"
+        )
+        auth_session_ttl_seconds = int(
+            pick("auth_session_ttl_seconds", 60 * 60 * 24 * 14)
+        )
+        auth_cookie_domain = _clean_str(pick("auth_cookie_domain", None))
 
         ocr_model = _clean_str(pick("ocr_model", "ppstructure"))
         enable_ocr_preload = _coerce_bool(
@@ -359,6 +374,8 @@ class Settings:
         repo_root = Path(__file__).resolve().parents[4]
         default_docs = str(repo_root / "datasets" / "MMDA")
         default_cache = str(repo_root / "cache")
+        default_storage_root = str(repo_root / "storage")
+        default_db_path = str(repo_root / "storage" / "modora.db")
 
         def _resolve_path(val: str | None, default: str) -> str:
             raw = _clean_str(val) or default
@@ -370,6 +387,11 @@ class Settings:
         docs_dir = _resolve_path(pick("docs_dir", default_docs), default_docs)
         cache_dir = _resolve_path(pick("cache_dir", default_cache), default_cache)
         exp_dir = _resolve_path(pick("exp_dir", cache_dir), cache_dir)
+        storage_root = _resolve_path(
+            pick("storage_root", storage_root or default_storage_root),
+            default_storage_root,
+        )
+        db_path = _resolve_path(pick("db_path", db_path or default_db_path), default_db_path)
 
         return Settings(
             env=env,
@@ -382,10 +404,15 @@ class Settings:
             cache_dir=cache_dir,
             exp_dir=exp_dir,
             chroma_persist_path=chroma_persist_path,
+            storage_root=storage_root,
+            db_path=db_path,
             api_base=api_base,
             api_key=api_key,
             api_port=api_port,
             cors_allowed_origins=cors_allowed_origins,
+            auth_session_cookie_name=auth_session_cookie_name,
+            auth_session_ttl_seconds=auth_session_ttl_seconds,
+            auth_cookie_domain=auth_cookie_domain,
             embedding_api_base=embedding_api_base,
             embedding_api_key=embedding_api_key,
             embedding_model_name=embedding_model_name,

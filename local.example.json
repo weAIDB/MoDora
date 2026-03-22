@@ -11,7 +11,12 @@
   "// Data paths": "Data and cache directories",
   "docs_dir": "./datasets/MMDA",
   "cache_dir": "./cache",
+  "storage_root": "./storage",
+  "db_path": "./storage/modora.db",
   "chroma_persist_path": "./cache/chroma",
+  "auth_session_cookie_name": "modora_session",
+  "auth_session_ttl_seconds": 1209600,
+  "auth_cookie_domain": ".modora.pro",
 
   "// API 配置": "Used for external LLM API calls (OpenAI, Gemini, etc.)",
   "embedding_api_base": "https://www.dmxapi.cn/v1/embeddings",

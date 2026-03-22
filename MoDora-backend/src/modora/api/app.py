@@ -9,12 +9,14 @@ from fastapi.staticfiles import StaticFiles
 
 from modora.core.infra.logging.context import new_id, request_scope
 from modora.core.infra.logging.setup import configure_logging
+from modora.core.persistence import init_db
 from modora.core.settings import Settings
 from modora.core.infra.llm.process import ensure_llm_local_loaded, shutdown_llm_local
 from modora.core.infra.ocr.manager import ensure_ocr_model_loaded
 from modora.core.utils.paths import resolve_paths
 
 # Import new v1 routers
+from modora.api.auth import router as auth_router
 from modora.api.v1.chat import router as chat_router
 from modora.api.v1.documents import router as doc_router
 from modora.api.v1.kb import router as kb_router
@@ -30,6 +32,7 @@ logger = logging.getLogger("modora.api")
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    init_db(settings)
     ensure_llm_local_loaded(settings, logger)
     try:
         if settings.enable_ocr_preload:
@@ -60,6 +63,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
 app.include_router(doc_router, prefix="/api")
 app.include_router(kb_router, prefix="/api")
