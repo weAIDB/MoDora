@@ -29,6 +29,8 @@ def _ocr_settings_key(settings: Settings) -> tuple:
         int(settings.ocr_text_recognition_batch_size),
         bool(settings.ocr_use_table_recognition),
         bool(settings.ocr_use_doc_unwarping),
+        settings.ocr_api_base,
+        settings.ocr_api_model,
     )
 
 

@@ -1,6 +1,7 @@
 from modora.core.settings import Settings
 from modora.core.interfaces.ocr import OCRClient
 from modora.core.infra.ocr.paddle import PPStructureClient, PaddleOCRVLClient
+from modora.core.infra.ocr.remote import PaddleOCRRemoteClient
 
 
 class OCRFactory:
@@ -15,6 +16,7 @@ class OCRFactory:
                 Supported model types (settings.ocr_model):
                 - "ppstructure" -> PPStructureV3 (default)
                 - "paddle_ocr_vl" -> PaddleOCRVL (optional)
+                - "remote" -> PaddleOCR cloud service (requires ocr_api_base/ocr_api_key)
 
         Returns:
             OCRClient: An instance of the OCR client.
@@ -24,5 +26,7 @@ class OCRFactory:
             return PPStructureClient(settings)
         elif model == "paddle_ocr_vl":
             return PaddleOCRVLClient(settings)
+        elif model == "remote":
+            return PaddleOCRRemoteClient(settings)
         else:
             raise ValueError(f"Unknown OCR model type: {model}")
