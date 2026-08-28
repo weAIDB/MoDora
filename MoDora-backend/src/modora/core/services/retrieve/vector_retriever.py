@@ -1,9 +1,6 @@
 import hashlib
 import logging
 
-import chromadb
-from chromadb.config import Settings as ChromaSettings
-
 from modora.core.domain import CCTree, CCTreeNode, RetrievalResult
 from modora.core.infra.llm import AsyncLLMFactory
 from modora.core.settings import Settings
@@ -21,6 +18,11 @@ class VectorRetriever:
         min_score: float = 0.15,
         max_workers: int = 8,
     ):
+        # Imported lazily so that vector-search-disabled deployments do not
+        # require the chromadb dependency.
+        import chromadb
+        from chromadb.config import Settings as ChromaSettings
+
         self.settings = settings or Settings.load()
         self.embedding_client = AsyncLLMFactory.create_embedding(self.settings)
         self.rerank_client = AsyncLLMFactory.create_rerank(self.settings)

@@ -29,7 +29,7 @@
     }
   },
 
-  "// OCR 配置": "Structural recognition based on PaddleOCR (ppstructure or paddle_ocr_vl)",
+  "// OCR 配置": "Structural recognition: local PaddleOCR (ppstructure / paddle_ocr_vl) or remote service (remote)",
   "ocr_model": "ppstructure",
   "ocr_device": "gpu:0",
   "ocr_lang": "en",
@@ -37,6 +37,13 @@
   "ocr_text_recognition_batch_size": 8,
   "ocr_use_table_recognition": true,
   "ocr_use_doc_unwarping": false,
+
+  "// 远程 OCR 配置": "Used when ocr_model is 'remote' (PaddleOCR aistudio-app job API)",
+  "ocr_api_base": "https://paddleocr.aistudio-app.com/api/v2/ocr/jobs",
+  "ocr_api_key": "your-api-key",
+  "ocr_api_model": "PP-StructureV3",
+  "ocr_api_poll_interval_s": 5,
+  "ocr_api_timeout_s": 3600,
   "enable_vector_search": false,
 
   "ui_settings": {

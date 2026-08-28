@@ -194,6 +194,12 @@ class Settings:
     ocr_use_table_recognition: bool = True
     ocr_use_doc_unwarping: bool = False
 
+    ocr_api_base: str | None = None
+    ocr_api_key: str | None = None
+    ocr_api_model: str | None = "PP-StructureV3"
+    ocr_api_poll_interval_s: float = 5.0
+    ocr_api_timeout_s: float = 3600.0
+
     enable_vector_search: bool = True
 
     def resolve_model_instance(self, inst_id: str) -> ModelInstance | None:
@@ -322,6 +328,11 @@ class Settings:
         ocr_use_doc_unwarping = _coerce_bool(
             pick("ocr_use_doc_unwarping", False), default=False
         )
+        ocr_api_base = _clean_str(pick("ocr_api_base", None))
+        ocr_api_key = _clean_str(pick("ocr_api_key", None))
+        ocr_api_model = _clean_str(pick("ocr_api_model", "PP-StructureV3"))
+        ocr_api_poll_interval_s = float(pick("ocr_api_poll_interval_s", 5.0))
+        ocr_api_timeout_s = float(pick("ocr_api_timeout_s", 3600.0))
         enable_vector_search = _coerce_bool(
             pick("enable_vector_search", True), default=True
         )
@@ -370,5 +381,10 @@ class Settings:
             ocr_text_recognition_batch_size=ocr_text_recognition_batch_size,
             ocr_use_table_recognition=ocr_use_table_recognition,
             ocr_use_doc_unwarping=ocr_use_doc_unwarping,
+            ocr_api_base=ocr_api_base,
+            ocr_api_key=ocr_api_key,
+            ocr_api_model=ocr_api_model,
+            ocr_api_poll_interval_s=ocr_api_poll_interval_s,
+            ocr_api_timeout_s=ocr_api_timeout_s,
             enable_vector_search=enable_vector_search,
         )
