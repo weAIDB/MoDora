@@ -596,13 +596,44 @@ Retrieval-Augmented Generation methods:
   - **API Keys (Required)**: Ensure that the `api_key` for at least one model instance in `model_instances` (e.g., `GPT-5`) is correctly filled so that the system can run.
   - **Vector Search (Optional)**: If you enable `enable_vector_search`, you MUST fill in `embedding_api_key` (and `rerank_api_key` if a rerank model is used). These are not required if vector search is disabled.
 
+  **OCR configuration:**
+
+  `ocr_model` selects where document parsing runs:
+
+  - `"ppstructure"` (default) or `"paddle_ocr_vl"` — local PaddleOCR, requires an NVIDIA GPU (see `ocr_device`).
+  - `"remote"` — PaddleOCR cloud service (job-based API). No local GPU or PaddleOCR installation required; fill in `ocr_api_key` (and optionally `ocr_api_base` / `ocr_api_model`) under the `// 远程 OCR 配置` section.
+
+```json
+  "ocr_model": "remote",
+  "ocr_api_base": "https://paddleocr.aistudio-app.com/api/v2/ocr/jobs",
+  "ocr_api_key": "your-api-key",
+  "ocr_api_model": "PP-StructureV3"
+```
+
 ### 2. Installation
+
+  **Option A: One-click setup (Linux with NVIDIA GPU)**
 
   We provide a one-click setup script that automatically creates a virtual environment and installs all dependencies (including PyTorch, LMDeploy, FlashAttention, and PaddleOCR):
 
 ```bash
   # Run the setup script (this may take a while)
   ./setup.sh
+```
+
+  **Option B: Lightweight setup (macOS / CPU-only, remote OCR)**
+
+  If you use the remote OCR service (`"ocr_model": "remote"`) and remote LLM APIs, none of the GPU dependencies are needed. Install only the core dependencies with [uv](https://docs.astral.sh/uv/):
+
+```bash
+  # Create a venv (Python 3.10+) and install core dependencies
+  cd MoDora-backend
+  uv venv venv --python 3.12
+  uv pip install -p venv/bin/python -e .
+
+  # Optional extras:
+  #   uv pip install -p venv/bin/python -e ".[vector]"  # enable_vector_search=true
+  #   uv pip install -p venv/bin/python -e ".[gpu]"     # local OCR / local LLM (Linux + GPU)
 ```
 
   Local models are NOT automatically downloaded. By default, MoDora uses remote models (GPT-5). 
