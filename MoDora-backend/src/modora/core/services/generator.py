@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import math
 
@@ -19,11 +20,15 @@ class AsyncMetadataGenerator:
         growth_rate: float,
         llm_client: BaseAsyncLLMClient,
         logger: logging.Logger,
+        max_concurrency: int = 8,
     ):
         self.llm = llm_client
         self.logger = logger
         self.n0 = n0  # Number of keywords for leaf nodes
         self.growth_rate = growth_rate  # Growth rate of keywords for child nodes
+        # Limits concurrent LLM calls across sibling subtrees (per-node calls
+        # remain sequential because integrate depends on generate).
+        self._sem = asyncio.Semaphore(max_concurrency)
 
     def _calculate_keyword_cnt(self, node: CCTreeNode, growth_rate: float = 2.0) -> int:
         """Calculates the target number of keywords for a node.
@@ -44,7 +49,8 @@ class AsyncMetadataGenerator:
     async def _generate_metadata(self, node: CCTreeNode, cnt: int) -> None:
         """Generates basic metadata (keywords) for a text node."""
         try:
-            node.metadata = await self.llm.generate_metadata(node.data, cnt)
+            async with self._sem:
+                node.metadata = await self.llm.generate_metadata(node.data, cnt)
         except Exception as e:
             self.logger.warning(
                 "generate metadata failed for text node", extra={"error": str(e)}
@@ -59,7 +65,8 @@ class AsyncMetadataGenerator:
         child_metadata = [child.metadata or "" for child in children]
         all_metadata = [base_metadata, *child_metadata]
         try:
-            node.metadata = await self.llm.integrate_metadata(all_metadata, cnt)
+            async with self._sem:
+                node.metadata = await self.llm.integrate_metadata(all_metadata, cnt)
         except Exception as e:
             self.logger.warning(
                 "integrate metadata failed for text node", extra={"error": str(e)}
@@ -79,14 +86,20 @@ class AsyncMetadataGenerator:
             node.metadata = node.data
 
     async def _dfs(self, node: CCTreeNode, parent: CCTreeNode | None = None) -> None:
-        """Depth-first traversal, generating metadata from leaf nodes upwards."""
+        """Depth-first traversal, generating metadata from leaf nodes upwards.
+
+        Sibling subtrees are processed concurrently — they are independent of
+        each other — while a parent's integrate step still waits for all of
+        its children (data dependency).
+        """
         if parent is not None:
             node.depth = parent.depth + 1
 
-        # Recursively process child nodes
-        for child in list(node.children.values()):
-            await self._dfs(child, node)
-            node.height = max(node.height, child.height + 1)
+        # Process all child subtrees concurrently
+        children = list(node.children.values())
+        if children:
+            await asyncio.gather(*[self._dfs(child, node) for child in children])
+            node.height = max(node.height, max(c.height for c in children) + 1)
 
         # Calculate keyword count for the current node and generate metadata
         node.keyword_cnt = self._calculate_keyword_cnt(node, self.growth_rate)
